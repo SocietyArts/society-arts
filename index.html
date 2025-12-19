@@ -31,6 +31,10 @@
       0%, 100% { opacity: 0.4; }
       50% { opacity: 1; }
     }
+    @keyframes listening-pulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(199, 91, 63, 0.4); }
+      50% { transform: scale(1.05); box-shadow: 0 0 0 12px rgba(199, 91, 63, 0); }
+    }
     /* Custom scrollbar */
     ::-webkit-scrollbar {
       width: 6px;
@@ -51,7 +55,7 @@
   <div id="root"></div>
   
   <script type="text/babel">
-    const { useState, useRef, useEffect } = React;
+    const { useState, useRef, useEffect, useCallback } = React;
 
     const SYSTEM_PROMPT = `You are a warm, creative art director for Society Arts — a platform that transforms personal stories and memories into beautiful, custom AI-generated artwork.
 
@@ -128,7 +132,56 @@ Remember: You're here to help people create meaningful, beautiful art that they'
       const [selectedStyles, setSelectedStyles] = useState([]);
       const [aspectRatio, setAspectRatio] = useState('1:1');
       const [hasStarted, setHasStarted] = useState(false);
+      
+      // Voice mode states
+      const [voiceMode, setVoiceMode] = useState(false);
+      const [isListening, setIsListening] = useState(false);
+      const [isSpeaking, setIsSpeaking] = useState(false);
+      
       const messagesEndRef = useRef(null);
+      const recognitionRef = useRef(null);
+      const synthRef = useRef(window.speechSynthesis);
+
+      // Initialize speech recognition
+      useEffect(() => {
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+          const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+          recognitionRef.current = new SpeechRecognition();
+          recognitionRef.current.continuous = false;
+          recognitionRef.current.interimResults = false;
+          recognitionRef.current.lang = 'en-US';
+
+          recognitionRef.current.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            setInputValue(transcript);
+            setIsListening(false);
+            // Auto-send in voice mode
+            if (voiceMode) {
+              setTimeout(() => {
+                sendMessageWithText(transcript);
+              }, 300);
+            }
+          };
+
+          recognitionRef.current.onerror = (event) => {
+            console.error('Speech recognition error:', event.error);
+            setIsListening(false);
+          };
+
+          recognitionRef.current.onend = () => {
+            setIsListening(false);
+          };
+        }
+
+        return () => {
+          if (recognitionRef.current) {
+            recognitionRef.current.abort();
+          }
+          if (synthRef.current) {
+            synthRef.current.cancel();
+          }
+        };
+      }, [voiceMode]);
 
       const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -137,6 +190,88 @@ Remember: You're here to help people create meaningful, beautiful art that they'
       useEffect(() => {
         scrollToBottom();
       }, [messages]);
+
+      const speakText = useCallback((text) => {
+        if (!synthRef.current || !voiceMode) return;
+        
+        // Cancel any ongoing speech
+        synthRef.current.cancel();
+        
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 1.0;
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+        
+        // Try to find a pleasant voice
+        const voices = synthRef.current.getVoices();
+        const preferredVoice = voices.find(v => 
+          v.name.includes('Samantha') || 
+          v.name.includes('Google') || 
+          v.name.includes('Female') ||
+          v.lang.startsWith('en')
+        );
+        if (preferredVoice) {
+          utterance.voice = preferredVoice;
+        }
+
+        utterance.onstart = () => setIsSpeaking(true);
+        utterance.onend = () => {
+          setIsSpeaking(false);
+          // Auto-listen after speaking in voice mode
+          if (voiceMode && recognitionRef.current) {
+            setTimeout(() => {
+              startListening();
+            }, 500);
+          }
+        };
+        utterance.onerror = () => setIsSpeaking(false);
+
+        synthRef.current.speak(utterance);
+      }, [voiceMode]);
+
+      const startListening = () => {
+        if (recognitionRef.current && !isListening && !isSpeaking) {
+          try {
+            recognitionRef.current.start();
+            setIsListening(true);
+          } catch (e) {
+            console.error('Could not start speech recognition:', e);
+          }
+        }
+      };
+
+      const stopListening = () => {
+        if (recognitionRef.current && isListening) {
+          recognitionRef.current.stop();
+          setIsListening(false);
+        }
+      };
+
+      const toggleVoiceMode = () => {
+        if (voiceMode) {
+          // Turning off voice mode
+          setVoiceMode(false);
+          stopListening();
+          if (synthRef.current) {
+            synthRef.current.cancel();
+          }
+          setIsSpeaking(false);
+        } else {
+          // Turning on voice mode
+          setVoiceMode(true);
+          startListening();
+        }
+      };
+
+      const handleMicClick = () => {
+        if (!voiceMode) {
+          toggleVoiceMode();
+        } else if (isListening) {
+          stopListening();
+        } else if (!isSpeaking) {
+          startListening();
+        }
+      };
 
       const handleNewProject = () => {
         setMessages([]);
@@ -149,6 +284,12 @@ Remember: You're here to help people create meaningful, beautiful art that they'
         setSelectedStyles([]);
         setAspectRatio('1:1');
         setHasStarted(false);
+        setVoiceMode(false);
+        setIsListening(false);
+        setIsSpeaking(false);
+        if (synthRef.current) {
+          synthRef.current.cancel();
+        }
       };
 
       const callAPI = async (messagesPayload) => {
@@ -166,14 +307,14 @@ Remember: You're here to help people create meaningful, beautiful art that they'
         return response.json();
       };
 
-      const sendMessage = async () => {
-        if (!inputValue.trim() || isLoading) return;
+      const sendMessageWithText = async (text) => {
+        if (!text.trim() || isLoading) return;
 
         if (!hasStarted) {
           setHasStarted(true);
         }
 
-        const userMessage = { role: 'user', content: inputValue };
+        const userMessage = { role: 'user', content: text };
         const updatedMessages = [...messages, userMessage];
         setMessages(updatedMessages);
         setInputValue('');
@@ -212,28 +353,46 @@ Remember: You're here to help people create meaningful, beautiful art that they'
                 setStory(parsed.story);
               }
               
+              const assistantMessage = parsed.message || "I'd love to hear more about your vision!";
+              
               setMessages(prev => [...prev, {
                 role: 'assistant',
-                content: parsed.message || "I'd love to hear more about your vision!"
+                content: assistantMessage
               }]);
+
+              // Speak the response if in voice mode
+              if (voiceMode) {
+                speakText(assistantMessage);
+              }
             } catch (parseError) {
               setMessages(prev => [...prev, {
                 role: 'assistant',
                 content: responseText
               }]);
+              if (voiceMode) {
+                speakText(responseText);
+              }
             }
           } else {
             throw new Error('No response content');
           }
         } catch (error) {
           console.error('Error:', error);
+          const errorMessage = "I apologize, but I'm having trouble connecting right now. Please try again in a moment.";
           setMessages(prev => [...prev, {
             role: 'assistant',
-            content: "I apologize, but I'm having trouble connecting right now. Please try again in a moment."
+            content: errorMessage
           }]);
+          if (voiceMode) {
+            speakText(errorMessage);
+          }
         } finally {
           setIsLoading(false);
         }
+      };
+
+      const sendMessage = async () => {
+        await sendMessageWithText(inputValue);
       };
 
       const handleKeyDown = (e) => {
@@ -282,6 +441,55 @@ Remember: You're here to help people create meaningful, beautiful art that they'
           prev.includes(styleId) 
             ? prev.filter(id => id !== styleId)
             : [...prev, styleId]
+        );
+      };
+
+      // Dynamic mic button style based on state
+      const getMicButtonStyle = (isWelcome = false) => {
+        const baseStyle = isWelcome ? styles.welcomeMicButton : styles.micButton;
+        
+        if (isListening) {
+          return {
+            ...baseStyle,
+            animation: 'listening-pulse 1.5s ease-in-out infinite',
+            backgroundColor: '#C75B3F',
+          };
+        }
+        if (isSpeaking) {
+          return {
+            ...baseStyle,
+            backgroundColor: '#4A90A4',
+          };
+        }
+        if (voiceMode) {
+          return {
+            ...baseStyle,
+            backgroundColor: '#C75B3F',
+            border: '2px solid #fff',
+          };
+        }
+        return baseStyle;
+      };
+
+      // Mic icon based on state
+      const getMicIcon = () => {
+        if (isSpeaking) {
+          // Speaker/sound icon when speaking
+          return (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            </svg>
+          );
+        }
+        // Mic icon
+        return (
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+            <line x1="12" y1="19" x2="12" y2="23"></line>
+            <line x1="8" y1="23" x2="16" y2="23"></line>
+          </svg>
         );
       };
 
@@ -408,6 +616,18 @@ Remember: You're here to help people create meaningful, beautiful art that they'
                   </div>
                 )}
                 
+                {/* Voice mode indicator */}
+                {voiceMode && (
+                  <div style={styles.voiceModeIndicator}>
+                    <span style={styles.voiceModeText}>
+                      {isListening ? '🎤 Listening...' : isSpeaking ? '🔊 Speaking...' : '🎙️ Voice Mode Active'}
+                    </span>
+                    <button style={styles.exitVoiceButton} onClick={() => setVoiceMode(false)}>
+                      Exit Voice Mode
+                    </button>
+                  </div>
+                )}
+                
                 <div style={styles.messagesContainer}>
                   {!hasStarted ? (
                     <div style={styles.welcomeContainer}>
@@ -422,11 +642,11 @@ Remember: You're here to help people create meaningful, beautiful art that they'
                         <input
                           type="text"
                           style={styles.welcomeInput}
-                          placeholder="Start your story..."
+                          placeholder={isListening ? "Listening..." : "Start your story..."}
                           value={inputValue}
                           onChange={(e) => setInputValue(e.target.value)}
                           onKeyDown={handleKeyDown}
-                          disabled={isLoading}
+                          disabled={isLoading || isListening}
                         />
                         <button 
                           style={{...styles.welcomeSendButton, opacity: inputValue.trim() ? 1 : 0.4}}
@@ -438,15 +658,17 @@ Remember: You're here to help people create meaningful, beautiful art that they'
                             <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
                           </svg>
                         </button>
-                        <button style={styles.welcomeMicButton}>
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5">
-                            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                            <line x1="12" y1="19" x2="12" y2="23"></line>
-                            <line x1="8" y1="23" x2="16" y2="23"></line>
-                          </svg>
+                        <button 
+                          style={getMicButtonStyle(true)} 
+                          onClick={handleMicClick}
+                          title={voiceMode ? (isListening ? "Listening..." : "Click to speak") : "Enable voice mode"}
+                        >
+                          {getMicIcon()}
                         </button>
                       </div>
+                      {!voiceMode && (
+                        <p style={styles.voiceHint}>Click the microphone to enable voice mode</p>
+                      )}
                     </div>
                   ) : (
                     <>
@@ -485,11 +707,11 @@ Remember: You're here to help people create meaningful, beautiful art that they'
                       <input
                         type="text"
                         style={styles.textInput}
-                        placeholder="Start your story..."
+                        placeholder={isListening ? "Listening..." : "Start your story..."}
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
                         onKeyDown={handleKeyDown}
-                        disabled={isLoading}
+                        disabled={isLoading || isListening}
                       />
                       <button 
                         style={{...styles.sendButton, opacity: inputValue.trim() ? 1 : 0.4}}
@@ -501,13 +723,12 @@ Remember: You're here to help people create meaningful, beautiful art that they'
                           <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
                         </svg>
                       </button>
-                      <button style={styles.micButton}>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5">
-                          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-                          <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                          <line x1="12" y1="19" x2="12" y2="23"></line>
-                          <line x1="8" y1="23" x2="16" y2="23"></line>
-                        </svg>
+                      <button 
+                        style={getMicButtonStyle(false)} 
+                        onClick={handleMicClick}
+                        title={voiceMode ? (isListening ? "Listening..." : "Click to speak") : "Enable voice mode"}
+                      >
+                        {getMicIcon()}
                       </button>
                     </div>
                   </div>
@@ -837,6 +1058,30 @@ Remember: You're here to help people create meaningful, beautiful art that they'
         color: '#3D3530',
         flexShrink: 0,
       },
+      voiceModeIndicator: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '12px',
+        padding: '10px 20px',
+        backgroundColor: '#F5F0EB',
+        borderBottom: '1px solid #DED8D1',
+      },
+      voiceModeText: {
+        fontSize: '14px',
+        color: '#5C544D',
+        fontWeight: '500',
+      },
+      exitVoiceButton: {
+        background: 'none',
+        border: '1px solid #D4CCC4',
+        borderRadius: '15px',
+        padding: '4px 12px',
+        fontSize: '12px',
+        color: '#7A7067',
+        cursor: 'pointer',
+        fontFamily: "'Source Sans 3', sans-serif",
+      },
       messagesContainer: {
         flex: 1,
         overflowY: 'auto',
@@ -911,6 +1156,12 @@ Remember: You're here to help people create meaningful, beautiful art that they'
         alignItems: 'center',
         justifyContent: 'center',
         flexShrink: 0,
+        transition: 'all 0.2s ease',
+      },
+      voiceHint: {
+        fontSize: '12px',
+        color: '#A89F94',
+        marginTop: '12px',
       },
       userMessage: {
         display: 'flex',
@@ -992,6 +1243,7 @@ Remember: You're here to help people create meaningful, beautiful art that they'
         alignItems: 'center',
         justifyContent: 'center',
         flexShrink: 0,
+        transition: 'all 0.2s ease',
       },
       rightColumn: {
         display: 'flex',
