@@ -35,6 +35,12 @@
       0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(199, 91, 63, 0.4); }
       50% { transform: scale(1.05); box-shadow: 0 0 0 12px rgba(199, 91, 63, 0); }
     }
+    @keyframes speaking-wave {
+      0%, 100% { transform: scale(1); }
+      25% { transform: scale(1.1); }
+      50% { transform: scale(1); }
+      75% { transform: scale(1.08); }
+    }
     /* Custom scrollbar */
     ::-webkit-scrollbar {
       width: 6px;
@@ -57,7 +63,35 @@
   <script type="text/babel">
     const { useState, useRef, useEffect, useCallback } = React;
 
-    const SYSTEM_PROMPT = `You are a warm, creative art director for Society Arts — a platform that transforms personal stories and memories into beautiful, custom AI-generated artwork.
+    // Society Arts system prompt for Hume EVI
+    const SOCIETY_ARTS_PROMPT = `You are a warm, creative art director for Society Arts — a platform that transforms personal stories and memories into beautiful, custom AI-generated artwork.
+
+ABOUT SOCIETY ARTS:
+Society Arts helps people turn their most meaningful moments, memories, and ideas into stunning visual art. Whether it's a cherished family memory, a beloved pet, a dream landscape, or an emotion they want to capture — we help bring their vision to life through AI-powered art generation. Our mission is to make personalized art accessible to everyone.
+
+YOUR PERSONALITY:
+- Warm, encouraging, and genuinely interested in people's stories
+- Patient and supportive — treat every idea as valuable
+- Creative and inspiring — help people see the artistic potential in their ideas
+- Professional but friendly — like a trusted creative partner
+- Wholesome and family-friendly at all times
+
+CONTENT GUIDELINES:
+- Keep all conversations family-friendly and appropriate for all ages
+- Celebrate themes of love, family, nature, hope, joy, adventure, and meaningful life moments
+- Gently redirect if someone requests inappropriate content
+- Never generate descriptions involving violence, explicit content, or harmful themes
+
+CONVERSATION STYLE:
+- Ask about what moment, memory, or scene they want to capture
+- Explore the setting, mood, colors, and artistic style they prefer
+- After gathering enough details, create a vivid 2-3 sentence description of the artwork
+- Keep responses conversational and warm, not too long
+
+Remember: You're helping people create meaningful, beautiful art that they'll treasure.`;
+
+    // Claude API system prompt (for text mode)
+    const CLAUDE_SYSTEM_PROMPT = `You are a warm, creative art director for Society Arts — a platform that transforms personal stories and memories into beautiful, custom AI-generated artwork.
 
 ABOUT SOCIETY ARTS:
 Society Arts helps people turn their most meaningful moments, memories, and ideas into stunning visual art. Whether it's a cherished family memory, a beloved pet, a dream landscape, or an emotion they want to capture — we help bring their vision to life through AI-powered art generation. Our mission is to make personalized art accessible to everyone.
@@ -76,17 +110,6 @@ CONTENT GUIDELINES (IMPORTANT):
 - If asked about something outside art creation, kindly guide them back to creating their story
 - Never generate descriptions involving violence, explicit content, or harmful themes
 
-CONVERSATION FLOW:
-1. Welcome users warmly and ask what kind of image or moment they'd like to capture
-2. Ask thoughtful follow-up questions about:
-   - The subject or scene they're envisioning
-   - The setting or environment
-   - The mood, emotion, or feeling they want to convey
-   - Colors that resonate with them
-   - Any artistic style preferences (painterly, impressionist, realistic, etc.)
-3. Have a natural back-and-forth — don't overwhelm with too many questions at once
-4. After 3-4 exchanges, synthesize their vision into a cohesive "story" (image description)
-
 RESPONSE FORMAT:
 You must ALWAYS respond with valid JSON in this exact format:
 {
@@ -100,26 +123,268 @@ STORY GENERATION:
 - Generate the "story" field once you have enough details (usually after 3-4 exchanges)
 - Write 2-4 sentences of vivid, painterly description
 - Include subject, setting, mood, colors, and artistic style
-- Use present tense, descriptive prose
 - Make it emotionally resonant and visually rich
 
 TITLE GENERATION:
 - Create a "title" once a clear theme emerges
 - Make it evocative and poetic, 3-5 words
-- Examples: "Golden Hour Memories", "Grandmother's Garden", "Dreams of the Sea"
 
-HANDLING MODIFICATIONS:
-- If user says "change X to Y", "make it blue instead of red", etc.
-- Update the story field with the modification applied
-- Warmly acknowledge the change in your message
-- Keep everything else in the story the same
+Remember: You're here to help people create meaningful, beautiful art that they'll treasure.`;
 
-HANDLING QUESTIONS ABOUT SOCIETY ARTS:
-- If asked "what is Society Arts?" or similar, explain our mission warmly
-- If asked about pricing, say "Our team would be happy to discuss options with you! For now, let's focus on crafting your perfect story."
-- If asked technical questions, gently redirect to the creative process
+    // Hume EVI Hook
+    function useHumeEVI() {
+      const [isConnected, setIsConnected] = useState(false);
+      const [isListening, setIsListening] = useState(false);
+      const [isSpeaking, setIsSpeaking] = useState(false);
+      const [transcript, setTranscript] = useState('');
+      const [error, setError] = useState(null);
+      
+      const socketRef = useRef(null);
+      const audioContextRef = useRef(null);
+      const mediaRecorderRef = useRef(null);
+      const audioQueueRef = useRef([]);
+      const isPlayingRef = useRef(false);
+      const streamRef = useRef(null);
 
-Remember: You're here to help people create meaningful, beautiful art that they'll treasure. Be their creative partner and guide them with warmth and encouragement.`;
+      const getAccessToken = async () => {
+        try {
+          const response = await fetch('/.netlify/functions/hume-token', {
+            method: 'POST',
+          });
+          const data = await response.json();
+          if (data.error) {
+            throw new Error(data.error);
+          }
+          return data.accessToken;
+        } catch (err) {
+          console.error('Failed to get Hume access token:', err);
+          throw err;
+        }
+      };
+
+      const playAudioQueue = async () => {
+        if (isPlayingRef.current || audioQueueRef.current.length === 0) return;
+        
+        isPlayingRef.current = true;
+        setIsSpeaking(true);
+
+        while (audioQueueRef.current.length > 0) {
+          const audioData = audioQueueRef.current.shift();
+          try {
+            await playAudio(audioData);
+          } catch (err) {
+            console.error('Error playing audio:', err);
+          }
+        }
+
+        isPlayingRef.current = false;
+        setIsSpeaking(false);
+      };
+
+      const playAudio = (base64Audio) => {
+        return new Promise((resolve, reject) => {
+          try {
+            if (!audioContextRef.current) {
+              audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
+            }
+
+            const binaryString = atob(base64Audio);
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+              bytes[i] = binaryString.charCodeAt(i);
+            }
+
+            audioContextRef.current.decodeAudioData(bytes.buffer, (buffer) => {
+              const source = audioContextRef.current.createBufferSource();
+              source.buffer = buffer;
+              source.connect(audioContextRef.current.destination);
+              source.onended = resolve;
+              source.start(0);
+            }, reject);
+          } catch (err) {
+            reject(err);
+          }
+        });
+      };
+
+      const connect = async (configId = null) => {
+        try {
+          setError(null);
+          const accessToken = await getAccessToken();
+          
+          // Build WebSocket URL
+          let wsUrl = `wss://api.hume.ai/v0/evi/chat?access_token=${accessToken}`;
+          if (configId) {
+            wsUrl += `&config_id=${configId}`;
+          }
+
+          socketRef.current = new WebSocket(wsUrl);
+
+          socketRef.current.onopen = () => {
+            console.log('Hume EVI connected');
+            setIsConnected(true);
+            
+            // Send session settings with our custom prompt
+            socketRef.current.send(JSON.stringify({
+              type: 'session_settings',
+              system_prompt: SOCIETY_ARTS_PROMPT,
+            }));
+          };
+
+          socketRef.current.onmessage = (event) => {
+            const message = JSON.parse(event.data);
+            
+            switch (message.type) {
+              case 'user_message':
+                // User's transcribed speech
+                if (message.message?.content) {
+                  setTranscript(message.message.content);
+                }
+                break;
+                
+              case 'assistant_message':
+                // Assistant's text response
+                if (message.message?.content) {
+                  setTranscript(message.message.content);
+                }
+                break;
+                
+              case 'audio_output':
+                // Audio response from EVI
+                if (message.data) {
+                  audioQueueRef.current.push(message.data);
+                  playAudioQueue();
+                }
+                break;
+                
+              case 'user_interruption':
+                // User interrupted, clear audio queue
+                audioQueueRef.current = [];
+                break;
+                
+              case 'error':
+                console.error('Hume EVI error:', message);
+                setError(message.message || 'An error occurred');
+                break;
+            }
+          };
+
+          socketRef.current.onerror = (err) => {
+            console.error('WebSocket error:', err);
+            setError('Connection error');
+            setIsConnected(false);
+          };
+
+          socketRef.current.onclose = () => {
+            console.log('Hume EVI disconnected');
+            setIsConnected(false);
+            setIsListening(false);
+          };
+
+        } catch (err) {
+          console.error('Failed to connect to Hume EVI:', err);
+          setError(err.message);
+          throw err;
+        }
+      };
+
+      const startListening = async () => {
+        if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) {
+          console.error('WebSocket not connected');
+          return;
+        }
+
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ 
+            audio: {
+              echoCancellation: true,
+              noiseSuppression: true,
+              autoGainControl: true,
+            } 
+          });
+          streamRef.current = stream;
+
+          // Resume audio context if suspended
+          if (audioContextRef.current?.state === 'suspended') {
+            await audioContextRef.current.resume();
+          }
+
+          mediaRecorderRef.current = new MediaRecorder(stream, {
+            mimeType: 'audio/webm;codecs=opus',
+          });
+
+          mediaRecorderRef.current.ondataavailable = async (event) => {
+            if (event.data.size > 0 && socketRef.current?.readyState === WebSocket.OPEN) {
+              const reader = new FileReader();
+              reader.onloadend = () => {
+                const base64 = reader.result.split(',')[1];
+                socketRef.current.send(JSON.stringify({
+                  type: 'audio_input',
+                  data: base64,
+                }));
+              };
+              reader.readAsDataURL(event.data);
+            }
+          };
+
+          mediaRecorderRef.current.start(100); // Send chunks every 100ms
+          setIsListening(true);
+        } catch (err) {
+          console.error('Failed to start listening:', err);
+          setError('Microphone access denied');
+        }
+      };
+
+      const stopListening = () => {
+        if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+          mediaRecorderRef.current.stop();
+        }
+        if (streamRef.current) {
+          streamRef.current.getTracks().forEach(track => track.stop());
+          streamRef.current = null;
+        }
+        setIsListening(false);
+      };
+
+      const disconnect = () => {
+        stopListening();
+        if (socketRef.current) {
+          socketRef.current.close();
+          socketRef.current = null;
+        }
+        audioQueueRef.current = [];
+        setIsConnected(false);
+        setIsSpeaking(false);
+      };
+
+      const sendText = (text) => {
+        if (socketRef.current?.readyState === WebSocket.OPEN) {
+          socketRef.current.send(JSON.stringify({
+            type: 'user_input',
+            text: text,
+          }));
+        }
+      };
+
+      useEffect(() => {
+        return () => {
+          disconnect();
+        };
+      }, []);
+
+      return {
+        isConnected,
+        isListening,
+        isSpeaking,
+        transcript,
+        error,
+        connect,
+        disconnect,
+        startListening,
+        stopListening,
+        sendText,
+      };
+    }
 
     function SocietyArtsStoryBuilder() {
       const [messages, setMessages] = useState([]);
@@ -132,56 +397,12 @@ Remember: You're here to help people create meaningful, beautiful art that they'
       const [selectedStyles, setSelectedStyles] = useState([]);
       const [aspectRatio, setAspectRatio] = useState('1:1');
       const [hasStarted, setHasStarted] = useState(false);
-      
-      // Voice mode states
       const [voiceMode, setVoiceMode] = useState(false);
-      const [isListening, setIsListening] = useState(false);
-      const [isSpeaking, setIsSpeaking] = useState(false);
       
       const messagesEndRef = useRef(null);
-      const recognitionRef = useRef(null);
-      const synthRef = useRef(window.speechSynthesis);
-
-      // Initialize speech recognition
-      useEffect(() => {
-        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-          const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-          recognitionRef.current = new SpeechRecognition();
-          recognitionRef.current.continuous = false;
-          recognitionRef.current.interimResults = false;
-          recognitionRef.current.lang = 'en-US';
-
-          recognitionRef.current.onresult = (event) => {
-            const transcript = event.results[0][0].transcript;
-            setInputValue(transcript);
-            setIsListening(false);
-            // Auto-send in voice mode
-            if (voiceMode) {
-              setTimeout(() => {
-                sendMessageWithText(transcript);
-              }, 300);
-            }
-          };
-
-          recognitionRef.current.onerror = (event) => {
-            console.error('Speech recognition error:', event.error);
-            setIsListening(false);
-          };
-
-          recognitionRef.current.onend = () => {
-            setIsListening(false);
-          };
-        }
-
-        return () => {
-          if (recognitionRef.current) {
-            recognitionRef.current.abort();
-          }
-          if (synthRef.current) {
-            synthRef.current.cancel();
-          }
-        };
-      }, [voiceMode]);
+      
+      // Hume EVI
+      const hume = useHumeEVI();
 
       const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -191,87 +412,30 @@ Remember: You're here to help people create meaningful, beautiful art that they'
         scrollToBottom();
       }, [messages]);
 
-      const speakText = useCallback((text) => {
-        if (!synthRef.current || !voiceMode) return;
-        
-        // Cancel any ongoing speech
-        synthRef.current.cancel();
-        
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.rate = 1.0;
-        utterance.pitch = 1.0;
-        utterance.volume = 1.0;
-        
-        // Try to find a pleasant voice
-        const voices = synthRef.current.getVoices();
-        const preferredVoice = voices.find(v => 
-          v.name.includes('Samantha') || 
-          v.name.includes('Google') || 
-          v.name.includes('Female') ||
-          v.lang.startsWith('en')
-        );
-        if (preferredVoice) {
-          utterance.voice = preferredVoice;
-        }
-
-        utterance.onstart = () => setIsSpeaking(true);
-        utterance.onend = () => {
-          setIsSpeaking(false);
-          // Auto-listen after speaking in voice mode
-          if (voiceMode && recognitionRef.current) {
-            setTimeout(() => {
-              startListening();
-            }, 500);
-          }
-        };
-        utterance.onerror = () => setIsSpeaking(false);
-
-        synthRef.current.speak(utterance);
-      }, [voiceMode]);
-
-      const startListening = () => {
-        if (recognitionRef.current && !isListening && !isSpeaking) {
-          try {
-            recognitionRef.current.start();
-            setIsListening(true);
-          } catch (e) {
-            console.error('Could not start speech recognition:', e);
+      // Handle Hume transcript updates
+      useEffect(() => {
+        if (hume.transcript && voiceMode) {
+          // Add to messages when we get a complete transcript
+          const lastMessage = messages[messages.length - 1];
+          if (!lastMessage || lastMessage.content !== hume.transcript) {
+            // Determine if it's user or assistant based on who's speaking
+            if (hume.isSpeaking) {
+              // Assistant message
+              if (!lastMessage || lastMessage.role !== 'assistant' || lastMessage.content !== hume.transcript) {
+                setMessages(prev => {
+                  const updated = [...prev];
+                  if (updated.length > 0 && updated[updated.length - 1].role === 'assistant') {
+                    updated[updated.length - 1].content = hume.transcript;
+                  } else {
+                    updated.push({ role: 'assistant', content: hume.transcript });
+                  }
+                  return updated;
+                });
+              }
+            }
           }
         }
-      };
-
-      const stopListening = () => {
-        if (recognitionRef.current && isListening) {
-          recognitionRef.current.stop();
-          setIsListening(false);
-        }
-      };
-
-      const toggleVoiceMode = () => {
-        if (voiceMode) {
-          // Turning off voice mode
-          setVoiceMode(false);
-          stopListening();
-          if (synthRef.current) {
-            synthRef.current.cancel();
-          }
-          setIsSpeaking(false);
-        } else {
-          // Turning on voice mode
-          setVoiceMode(true);
-          startListening();
-        }
-      };
-
-      const handleMicClick = () => {
-        if (!voiceMode) {
-          toggleVoiceMode();
-        } else if (isListening) {
-          stopListening();
-        } else if (!isSpeaking) {
-          startListening();
-        }
-      };
+      }, [hume.transcript, hume.isSpeaking, voiceMode]);
 
       const handleNewProject = () => {
         setMessages([]);
@@ -285,14 +449,10 @@ Remember: You're here to help people create meaningful, beautiful art that they'
         setAspectRatio('1:1');
         setHasStarted(false);
         setVoiceMode(false);
-        setIsListening(false);
-        setIsSpeaking(false);
-        if (synthRef.current) {
-          synthRef.current.cancel();
-        }
+        hume.disconnect();
       };
 
-      const callAPI = async (messagesPayload) => {
+      const callClaudeAPI = async (messagesPayload) => {
         const response = await fetch('/.netlify/functions/chat', {
           method: 'POST',
           headers: {
@@ -307,19 +467,62 @@ Remember: You're here to help people create meaningful, beautiful art that they'
         return response.json();
       };
 
-      const sendMessageWithText = async (text) => {
-        if (!text.trim() || isLoading) return;
+      const toggleVoiceMode = async () => {
+        if (voiceMode) {
+          // Turn off voice mode
+          hume.disconnect();
+          setVoiceMode(false);
+        } else {
+          // Turn on voice mode
+          try {
+            await hume.connect();
+            setVoiceMode(true);
+            setHasStarted(true);
+            // Start listening immediately
+            setTimeout(() => {
+              hume.startListening();
+            }, 500);
+          } catch (err) {
+            console.error('Failed to enable voice mode:', err);
+            alert('Failed to connect to voice service. Please check your Hume.ai credentials.');
+          }
+        }
+      };
+
+      const handleMicClick = async () => {
+        if (!voiceMode) {
+          // Enable voice mode
+          await toggleVoiceMode();
+        } else if (hume.isListening) {
+          // Stop listening
+          hume.stopListening();
+        } else if (!hume.isSpeaking) {
+          // Start listening
+          hume.startListening();
+        }
+      };
+
+      const sendMessage = async () => {
+        if (!inputValue.trim() || isLoading) return;
 
         if (!hasStarted) {
           setHasStarted(true);
         }
 
-        const userMessage = { role: 'user', content: text };
+        const userMessage = { role: 'user', content: inputValue };
         const updatedMessages = [...messages, userMessage];
         setMessages(updatedMessages);
         setInputValue('');
         setIsLoading(true);
 
+        // If in voice mode, send to Hume
+        if (voiceMode && hume.isConnected) {
+          hume.sendText(inputValue);
+          setIsLoading(false);
+          return;
+        }
+
+        // Otherwise use Claude API
         try {
           let contextMessage = '';
           if (story) {
@@ -328,10 +531,10 @@ Remember: You're here to help people create meaningful, beautiful art that they'
 
           const userPrompt = updatedMessages.map(m => `${m.role}: ${m.content}`).join('\n');
 
-          const data = await callAPI([
+          const data = await callClaudeAPI([
             { 
               role: 'user', 
-              content: `${SYSTEM_PROMPT}${contextMessage}\n\n---\nConversation so far:\n${userPrompt}\n\nRespond as the assistant with valid JSON only.`
+              content: `${CLAUDE_SYSTEM_PROMPT}${contextMessage}\n\n---\nConversation so far:\n${userPrompt}\n\nRespond as the assistant with valid JSON only.`
             }
           ]);
           
@@ -353,46 +556,28 @@ Remember: You're here to help people create meaningful, beautiful art that they'
                 setStory(parsed.story);
               }
               
-              const assistantMessage = parsed.message || "I'd love to hear more about your vision!";
-              
               setMessages(prev => [...prev, {
                 role: 'assistant',
-                content: assistantMessage
+                content: parsed.message || "I'd love to hear more about your vision!"
               }]);
-
-              // Speak the response if in voice mode
-              if (voiceMode) {
-                speakText(assistantMessage);
-              }
             } catch (parseError) {
               setMessages(prev => [...prev, {
                 role: 'assistant',
                 content: responseText
               }]);
-              if (voiceMode) {
-                speakText(responseText);
-              }
             }
           } else {
             throw new Error('No response content');
           }
         } catch (error) {
           console.error('Error:', error);
-          const errorMessage = "I apologize, but I'm having trouble connecting right now. Please try again in a moment.";
           setMessages(prev => [...prev, {
             role: 'assistant',
-            content: errorMessage
+            content: "I apologize, but I'm having trouble connecting right now. Please try again in a moment."
           }]);
-          if (voiceMode) {
-            speakText(errorMessage);
-          }
         } finally {
           setIsLoading(false);
         }
-      };
-
-      const sendMessage = async () => {
-        await sendMessageWithText(inputValue);
       };
 
       const handleKeyDown = (e) => {
@@ -407,7 +592,7 @@ Remember: You're here to help people create meaningful, beautiful art that they'
         setIsLoading(true);
         
         try {
-          const data = await callAPI([{
+          const data = await callClaudeAPI([{
             role: 'user',
             content: `Take this image description and create an interesting variation. Keep the core subject and mood but change the perspective, add new details, or shift the emphasis. Keep it wholesome and family-friendly. Original: "${story}". Respond with ONLY the new description text, no explanation, no quotes, no JSON.`
           }]);
@@ -448,17 +633,18 @@ Remember: You're here to help people create meaningful, beautiful art that they'
       const getMicButtonStyle = (isWelcome = false) => {
         const baseStyle = isWelcome ? styles.welcomeMicButton : styles.micButton;
         
-        if (isListening) {
+        if (hume.isListening) {
           return {
             ...baseStyle,
             animation: 'listening-pulse 1.5s ease-in-out infinite',
             backgroundColor: '#C75B3F',
           };
         }
-        if (isSpeaking) {
+        if (hume.isSpeaking) {
           return {
             ...baseStyle,
             backgroundColor: '#4A90A4',
+            animation: 'speaking-wave 1s ease-in-out infinite',
           };
         }
         if (voiceMode) {
@@ -473,8 +659,7 @@ Remember: You're here to help people create meaningful, beautiful art that they'
 
       // Mic icon based on state
       const getMicIcon = () => {
-        if (isSpeaking) {
-          // Speaker/sound icon when speaking
+        if (hume.isSpeaking) {
           return (
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5">
               <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
@@ -482,7 +667,6 @@ Remember: You're here to help people create meaningful, beautiful art that they'
             </svg>
           );
         }
-        // Mic icon
         return (
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5">
             <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
@@ -620,9 +804,9 @@ Remember: You're here to help people create meaningful, beautiful art that they'
                 {voiceMode && (
                   <div style={styles.voiceModeIndicator}>
                     <span style={styles.voiceModeText}>
-                      {isListening ? '🎤 Listening...' : isSpeaking ? '🔊 Speaking...' : '🎙️ Voice Mode Active'}
+                      {hume.isListening ? '🎤 Listening...' : hume.isSpeaking ? '🔊 Speaking...' : hume.error ? '❌ ' + hume.error : '🎙️ Voice Mode (Hume EVI)'}
                     </span>
-                    <button style={styles.exitVoiceButton} onClick={() => setVoiceMode(false)}>
+                    <button style={styles.exitVoiceButton} onClick={() => toggleVoiceMode()}>
                       Exit Voice Mode
                     </button>
                   </div>
@@ -642,11 +826,11 @@ Remember: You're here to help people create meaningful, beautiful art that they'
                         <input
                           type="text"
                           style={styles.welcomeInput}
-                          placeholder={isListening ? "Listening..." : "Start your story..."}
+                          placeholder={hume.isListening ? "Listening..." : "Start your story..."}
                           value={inputValue}
                           onChange={(e) => setInputValue(e.target.value)}
                           onKeyDown={handleKeyDown}
-                          disabled={isLoading || isListening}
+                          disabled={isLoading || hume.isListening}
                         />
                         <button 
                           style={{...styles.welcomeSendButton, opacity: inputValue.trim() ? 1 : 0.4}}
@@ -661,13 +845,13 @@ Remember: You're here to help people create meaningful, beautiful art that they'
                         <button 
                           style={getMicButtonStyle(true)} 
                           onClick={handleMicClick}
-                          title={voiceMode ? (isListening ? "Listening..." : "Click to speak") : "Enable voice mode"}
+                          title={voiceMode ? (hume.isListening ? "Listening..." : "Click to speak") : "Enable Hume voice mode"}
                         >
                           {getMicIcon()}
                         </button>
                       </div>
                       {!voiceMode && (
-                        <p style={styles.voiceHint}>Click the microphone to enable voice mode</p>
+                        <p style={styles.voiceHint}>Click the microphone to enable voice mode powered by Hume AI</p>
                       )}
                     </div>
                   ) : (
@@ -684,7 +868,7 @@ Remember: You're here to help people create meaningful, beautiful art that they'
                           )}
                         </div>
                       ))}
-                      {isLoading && (
+                      {(isLoading || (voiceMode && hume.isListening)) && (
                         <div style={styles.assistantMessage}>
                           <div style={styles.typingIndicator}>
                             <div style={{...styles.dot, animationDelay: '0s'}}></div>
@@ -707,11 +891,11 @@ Remember: You're here to help people create meaningful, beautiful art that they'
                       <input
                         type="text"
                         style={styles.textInput}
-                        placeholder={isListening ? "Listening..." : "Start your story..."}
+                        placeholder={hume.isListening ? "Listening..." : "Start your story..."}
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
                         onKeyDown={handleKeyDown}
-                        disabled={isLoading || isListening}
+                        disabled={isLoading || hume.isListening}
                       />
                       <button 
                         style={{...styles.sendButton, opacity: inputValue.trim() ? 1 : 0.4}}
@@ -726,7 +910,7 @@ Remember: You're here to help people create meaningful, beautiful art that they'
                       <button 
                         style={getMicButtonStyle(false)} 
                         onClick={handleMicClick}
-                        title={voiceMode ? (isListening ? "Listening..." : "Click to speak") : "Enable voice mode"}
+                        title={voiceMode ? (hume.isListening ? "Listening..." : "Click to speak") : "Enable Hume voice mode"}
                       >
                         {getMicIcon()}
                       </button>
@@ -1064,7 +1248,7 @@ Remember: You're here to help people create meaningful, beautiful art that they'
         justifyContent: 'center',
         gap: '12px',
         padding: '10px 20px',
-        backgroundColor: '#F5F0EB',
+        backgroundColor: '#F0EBE6',
         borderBottom: '1px solid #DED8D1',
       },
       voiceModeText: {
