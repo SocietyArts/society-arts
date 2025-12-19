@@ -7,7 +7,7 @@
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     * {
       box-sizing: border-box;
@@ -17,14 +17,33 @@
     html, body, #root {
       height: 100%;
       width: 100%;
+      overflow: hidden;
     }
     body {
-      font-family: 'Source Sans 3', -apple-system, sans-serif;
+      font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: #F5F0EB;
+      font-size: 16px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
     @keyframes pulse {
       0%, 100% { opacity: 0.4; }
       50% { opacity: 1; }
+    }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #D4CCC4;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #B8A99A;
     }
   </style>
 </head>
@@ -275,7 +294,7 @@ Remember: You're here to help people create meaningful, beautiful art that they'
 
       return (
         <div style={styles.container}>
-          {/* Header */}
+          {/* Fixed Header */}
           <header style={styles.header}>
             <div style={styles.headerLeft}>
               <button style={styles.menuButton}>
@@ -302,7 +321,7 @@ Remember: You're here to help people create meaningful, beautiful art that they'
             </div>
           </header>
 
-          {/* Subheader */}
+          {/* Fixed Subheader */}
           <div style={styles.subheader}>
             <h2 style={styles.subheaderTitle}>Your Story, Your Style</h2>
             <p style={styles.subheaderText}>First add your story, then select your styles. When both are done, hit Generate and watch your idea come alive.</p>
@@ -314,7 +333,7 @@ Remember: You're here to help people create meaningful, beautiful art that they'
             </div>
           </div>
 
-          {/* Main Content */}
+          {/* Main Content - Scrollable */}
           <main style={styles.main}>
             {/* Left Column - Your Story */}
             <div style={styles.leftColumn}>
@@ -514,7 +533,7 @@ Remember: You're here to help people create meaningful, beautiful art that they'
             </div>
           </main>
 
-          {/* Footer */}
+          {/* Fixed Footer */}
           <footer style={styles.footer}>
             <button style={styles.saveButton}>Save Project</button>
             <button 
@@ -534,95 +553,101 @@ Remember: You're here to help people create meaningful, beautiful art that they'
 
     const styles = {
       container: {
-        minHeight: '100vh',
+        height: '100vh',
         backgroundColor: '#F5F0EB',
-        fontFamily: "'Source Sans 3', -apple-system, sans-serif",
+        fontFamily: "'Source Sans 3', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
         color: '#3D3530',
         display: 'flex',
         flexDirection: 'column',
+        overflow: 'hidden',
       },
       header: {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: '12px 24px',
+        padding: '14px 28px',
         backgroundColor: '#FAF8F5',
         borderBottom: '1px solid #E8E2DB',
         flexShrink: 0,
+        zIndex: 100,
       },
       headerLeft: {
         display: 'flex',
         alignItems: 'center',
-        gap: '12px',
+        gap: '14px',
       },
       menuButton: {
         background: 'none',
         border: 'none',
         cursor: 'pointer',
         color: '#3D3530',
-        padding: '6px',
+        padding: '8px',
         display: 'flex',
       },
       logo: {
-        fontFamily: "'Cormorant Garamond', serif",
-        fontSize: '18px',
+        fontFamily: "'Cormorant Garamond', Georgia, serif",
+        fontSize: '22px',
         fontWeight: '600',
-        letterSpacing: '2px',
+        letterSpacing: '3px',
         margin: 0,
         color: '#3D3530',
       },
       headerRight: {
         display: 'flex',
         alignItems: 'center',
-        gap: '10px',
+        gap: '12px',
       },
       cartButton: {
         background: 'none',
         border: 'none',
         cursor: 'pointer',
         color: '#3D3530',
-        padding: '6px',
+        padding: '8px',
         display: 'flex',
       },
       newProjectButton: {
         backgroundColor: '#8B5E3C',
         color: 'white',
         border: 'none',
-        padding: '10px 20px',
+        padding: '12px 24px',
         borderRadius: '24px',
-        fontSize: '14px',
+        fontSize: '15px',
         fontWeight: '500',
         cursor: 'pointer',
+        fontFamily: "'Source Sans 3', sans-serif",
       },
       loginButton: {
         backgroundColor: 'transparent',
         color: '#3D3530',
         border: '1px solid #D4CCC4',
-        padding: '10px 20px',
+        padding: '12px 24px',
         borderRadius: '24px',
-        fontSize: '14px',
+        fontSize: '15px',
         fontWeight: '500',
         cursor: 'pointer',
+        fontFamily: "'Source Sans 3', sans-serif",
       },
       subheader: {
-        padding: '16px 24px 12px',
+        padding: '18px 28px 14px',
         backgroundColor: '#FAF8F5',
         flexShrink: 0,
+        zIndex: 100,
       },
       subheaderTitle: {
-        fontFamily: "'Cormorant Garamond', serif",
-        fontSize: '16px',
+        fontFamily: "'Cormorant Garamond', Georgia, serif",
+        fontSize: '20px',
         fontWeight: '600',
-        margin: '0 0 4px 0',
+        margin: '0 0 6px 0',
         color: '#3D3530',
       },
       subheaderText: {
-        fontSize: '12px',
+        fontSize: '14px',
         color: '#7A7067',
-        margin: '0 0 12px 0',
+        margin: '0 0 14px 0',
+        lineHeight: '1.5',
       },
       progressBar: {
-        height: '5px',
+        height: '6px',
         backgroundColor: '#E8E2DB',
         borderRadius: '3px',
         overflow: 'hidden',
@@ -635,37 +660,36 @@ Remember: You're here to help people create meaningful, beautiful art that they'
       },
       main: {
         display: 'grid',
-        gridTemplateColumns: '280px 1fr 280px',
-        gap: '20px',
-        padding: '20px 24px',
+        gridTemplateColumns: '300px 1fr 300px',
+        gap: '24px',
+        padding: '24px 28px',
         flex: 1,
         minHeight: 0,
-        maxWidth: '1400px',
-        width: '100%',
-        margin: '0 auto',
+        overflow: 'hidden',
       },
       leftColumn: {
         display: 'flex',
         flexDirection: 'column',
-        gap: '12px',
+        gap: '14px',
         overflowY: 'auto',
         minWidth: 0,
+        paddingRight: '8px',
       },
       storyCard: {
         backgroundColor: '#FAF8F5',
-        borderRadius: '12px',
-        padding: '16px',
+        borderRadius: '14px',
+        padding: '18px',
         border: '2px solid transparent',
       },
       storyCardSelected: {
         borderColor: '#C75B3F',
       },
       storyHeaderSimple: {
-        marginBottom: '12px',
+        marginBottom: '14px',
       },
       radioOuter: {
-        width: '18px',
-        height: '18px',
+        width: '20px',
+        height: '20px',
         borderRadius: '50%',
         border: '2px solid #C75B3F',
         display: 'flex',
@@ -674,39 +698,40 @@ Remember: You're here to help people create meaningful, beautiful art that they'
         flexShrink: 0,
       },
       radioInner: {
-        width: '10px',
-        height: '10px',
+        width: '12px',
+        height: '12px',
         borderRadius: '50%',
         backgroundColor: '#C75B3F',
       },
       storyLabel: {
+        fontFamily: "'Source Sans 3', sans-serif",
         fontWeight: '600',
-        fontSize: '14px',
+        fontSize: '16px',
         color: '#3D3530',
       },
       storyContent: {
-        paddingLeft: '26px',
-        marginTop: '10px',
+        paddingLeft: '30px',
+        marginTop: '12px',
       },
       storyContentSimple: {
         paddingLeft: '0',
       },
       storyText: {
-        fontSize: '14px',
-        lineHeight: '1.6',
+        fontSize: '15px',
+        lineHeight: '1.65',
         color: '#3D3530',
         margin: 0,
       },
       storyPlaceholder: {
-        fontSize: '14px',
-        lineHeight: '1.6',
+        fontSize: '15px',
+        lineHeight: '1.65',
         color: '#B8A99A',
         margin: 0,
       },
       variationCard: {
         backgroundColor: '#FAF8F5',
-        borderRadius: '12px',
-        padding: '16px',
+        borderRadius: '14px',
+        padding: '18px',
         border: '2px solid transparent',
         cursor: 'pointer',
         transition: 'border-color 0.2s ease',
@@ -714,55 +739,58 @@ Remember: You're here to help people create meaningful, beautiful art that they'
       variationHeader: {
         display: 'flex',
         alignItems: 'center',
-        gap: '10px',
+        gap: '12px',
       },
       anotherTakeButton: {
         marginLeft: 'auto',
         background: 'none',
         border: 'none',
         color: '#C75B3F',
-        fontSize: '13px',
+        fontSize: '14px',
         cursor: 'pointer',
         display: 'flex',
         alignItems: 'center',
-        gap: '4px',
+        gap: '5px',
+        fontFamily: "'Source Sans 3', sans-serif",
       },
       chevron: {
-        fontSize: '10px',
+        fontSize: '11px',
       },
       centerColumn: {
         display: 'flex',
         flexDirection: 'column',
         minHeight: 0,
         minWidth: 0,
+        overflow: 'hidden',
       },
       chatContainer: {
         backgroundColor: '#EBE6E1',
-        borderRadius: '12px',
+        borderRadius: '14px',
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
         overflow: 'hidden',
       },
       titleDropdown: {
-        padding: '14px 20px',
+        padding: '16px 24px',
         borderBottom: '1px solid #DED8D1',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: '8px',
-        fontFamily: "'Cormorant Garamond', serif",
-        fontSize: '18px',
+        gap: '10px',
+        fontFamily: "'Cormorant Garamond', Georgia, serif",
+        fontSize: '20px',
         fontWeight: '500',
         color: '#3D3530',
+        flexShrink: 0,
       },
       messagesContainer: {
         flex: 1,
         overflowY: 'auto',
-        padding: '20px',
+        padding: '24px',
         display: 'flex',
         flexDirection: 'column',
-        gap: '16px',
+        gap: '18px',
       },
       welcomeContainer: {
         flex: 1,
@@ -771,20 +799,20 @@ Remember: You're here to help people create meaningful, beautiful art that they'
         alignItems: 'center',
         justifyContent: 'center',
         textAlign: 'center',
-        padding: '60px 30px',
+        padding: '60px 40px',
       },
       welcomeTitle: {
-        fontFamily: "'Cormorant Garamond', serif",
-        fontSize: '32px',
+        fontFamily: "'Cormorant Garamond', Georgia, serif",
+        fontSize: '36px',
         fontWeight: '500',
         color: '#3D3530',
-        marginBottom: '20px',
+        marginBottom: '24px',
       },
       welcomeText: {
-        fontSize: '15px',
+        fontSize: '17px',
         lineHeight: '1.7',
         color: '#7A7067',
-        maxWidth: '400px',
+        maxWidth: '420px',
         margin: 0,
       },
       userMessage: {
@@ -793,11 +821,11 @@ Remember: You're here to help people create meaningful, beautiful art that they'
       },
       userBubble: {
         backgroundColor: '#F5F0EB',
-        padding: '12px 16px',
+        padding: '14px 18px',
         borderRadius: '20px',
         maxWidth: '80%',
-        fontSize: '14px',
-        lineHeight: '1.5',
+        fontSize: '16px',
+        lineHeight: '1.55',
         color: '#3D3530',
       },
       assistantMessage: {
@@ -805,46 +833,47 @@ Remember: You're here to help people create meaningful, beautiful art that they'
         justifyContent: 'flex-start',
       },
       assistantText: {
-        fontSize: '14px',
-        lineHeight: '1.6',
+        fontSize: '16px',
+        lineHeight: '1.65',
         color: '#3D3530',
         margin: 0,
         maxWidth: '85%',
       },
       typingIndicator: {
         display: 'flex',
-        gap: '5px',
-        padding: '10px 0',
+        gap: '6px',
+        padding: '12px 0',
       },
       dot: {
-        width: '8px',
-        height: '8px',
+        width: '10px',
+        height: '10px',
         borderRadius: '50%',
         backgroundColor: '#A89F94',
         animation: 'pulse 1.2s ease-in-out infinite',
       },
       inputContainer: {
-        padding: '16px 20px',
+        padding: '18px 24px',
         borderTop: '1px solid #DED8D1',
+        flexShrink: 0,
       },
       inputWrapper: {
         display: 'flex',
         alignItems: 'center',
         backgroundColor: '#FFFFFF',
-        borderRadius: '28px',
-        padding: '8px 8px 8px 16px',
-        gap: '8px',
+        borderRadius: '30px',
+        padding: '10px 10px 10px 20px',
+        gap: '10px',
         border: '1px solid #E8E2DB',
       },
       inputIcon: {
         color: '#A89F94',
-        fontSize: '16px',
+        fontSize: '18px',
       },
       textInput: {
         flex: 1,
         border: 'none',
         outline: 'none',
-        fontSize: '14px',
+        fontSize: '16px',
         fontFamily: "'Source Sans 3', sans-serif",
         color: '#3D3530',
         backgroundColor: 'transparent',
@@ -854,7 +883,7 @@ Remember: You're here to help people create meaningful, beautiful art that they'
         border: 'none',
         cursor: 'pointer',
         color: '#A89F94',
-        padding: '8px',
+        padding: '10px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -863,8 +892,8 @@ Remember: You're here to help people create meaningful, beautiful art that they'
         backgroundColor: '#C75B3F',
         border: 'none',
         borderRadius: '50%',
-        width: '40px',
-        height: '40px',
+        width: '44px',
+        height: '44px',
         cursor: 'pointer',
         display: 'flex',
         alignItems: 'center',
@@ -874,28 +903,29 @@ Remember: You're here to help people create meaningful, beautiful art that they'
       rightColumn: {
         display: 'flex',
         flexDirection: 'column',
-        gap: '12px',
+        gap: '14px',
         overflowY: 'auto',
         minWidth: 0,
+        paddingLeft: '8px',
       },
       formatDropdown: {
         backgroundColor: '#FAF8F5',
-        borderRadius: '10px',
-        padding: '12px 16px',
+        borderRadius: '12px',
+        padding: '14px 18px',
         display: 'flex',
         alignItems: 'center',
-        gap: '8px',
-        fontSize: '14px',
+        gap: '10px',
+        fontSize: '15px',
         color: '#3D3530',
       },
       formatIcon: {
-        fontSize: '16px',
+        fontSize: '18px',
       },
       formatSelect: {
         marginLeft: 'auto',
         background: 'none',
         border: 'none',
-        fontSize: '14px',
+        fontSize: '15px',
         color: '#3D3530',
         fontFamily: "'Source Sans 3', sans-serif",
         cursor: 'pointer',
@@ -903,15 +933,15 @@ Remember: You're here to help people create meaningful, beautiful art that they'
         paddingRight: '4px',
       },
       selectChevron: {
-        fontSize: '10px',
+        fontSize: '11px',
         color: '#7A7067',
       },
       addStyleButton: {
         backgroundColor: '#FAF8F5',
         border: '1px solid #E8E2DB',
-        borderRadius: '10px',
-        padding: '16px 20px',
-        fontSize: '15px',
+        borderRadius: '12px',
+        padding: '18px 24px',
+        fontSize: '16px',
         color: '#3D3530',
         cursor: 'pointer',
         textAlign: 'center',
@@ -920,11 +950,11 @@ Remember: You're here to help people create meaningful, beautiful art that they'
       stylesGrid: {
         display: 'grid',
         gridTemplateColumns: '1fr 1fr',
-        gap: '12px',
+        gap: '14px',
       },
       styleCard: {
         backgroundColor: '#FAF8F5',
-        borderRadius: '10px',
+        borderRadius: '12px',
         overflow: 'hidden',
         cursor: 'pointer',
         border: '2px solid transparent',
@@ -946,24 +976,24 @@ Remember: You're here to help people create meaningful, beautiful art that they'
       },
       styleMenuButton: {
         position: 'absolute',
-        top: '8px',
-        right: '8px',
+        top: '10px',
+        right: '10px',
         background: 'rgba(255,255,255,0.9)',
         border: 'none',
         borderRadius: '50%',
-        width: '24px',
-        height: '24px',
+        width: '28px',
+        height: '28px',
         cursor: 'pointer',
-        fontSize: '14px',
+        fontSize: '16px',
         color: '#3D3530',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
       },
       styleName: {
-        padding: '10px',
+        padding: '12px',
         margin: 0,
-        fontSize: '13px',
+        fontSize: '14px',
         fontWeight: '500',
         color: '#3D3530',
       },
@@ -971,46 +1001,49 @@ Remember: You're here to help people create meaningful, beautiful art that they'
         display: 'flex',
         justifyContent: 'flex-end',
         alignItems: 'center',
-        gap: '12px',
-        padding: '14px 24px',
+        gap: '14px',
+        padding: '16px 28px',
         backgroundColor: '#FAF8F5',
         borderTop: '1px solid #E8E2DB',
         flexShrink: 0,
+        zIndex: 100,
       },
       saveButton: {
         backgroundColor: 'transparent',
         color: '#3D3530',
         border: '1px solid #D4CCC4',
-        padding: '12px 24px',
-        borderRadius: '24px',
-        fontSize: '14px',
+        padding: '14px 28px',
+        borderRadius: '26px',
+        fontSize: '15px',
         fontWeight: '500',
         cursor: 'pointer',
+        fontFamily: "'Source Sans 3', sans-serif",
       },
       createButton: {
         backgroundColor: '#8B5E3C',
         color: 'white',
         border: 'none',
-        padding: '12px 28px',
-        borderRadius: '24px',
-        fontSize: '14px',
+        padding: '14px 32px',
+        borderRadius: '26px',
+        fontSize: '15px',
         fontWeight: '500',
         cursor: 'pointer',
         display: 'flex',
         alignItems: 'center',
-        gap: '8px',
+        gap: '10px',
+        fontFamily: "'Source Sans 3', sans-serif",
       },
       arrow: {
-        fontSize: '16px',
+        fontSize: '18px',
       },
       helpButton: {
         backgroundColor: 'transparent',
         color: '#3D3530',
         border: '1px solid #D4CCC4',
         borderRadius: '50%',
-        width: '40px',
-        height: '40px',
-        fontSize: '16px',
+        width: '44px',
+        height: '44px',
+        fontSize: '18px',
         cursor: 'pointer',
         display: 'flex',
         alignItems: 'center',
