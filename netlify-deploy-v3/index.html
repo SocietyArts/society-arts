@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Society Arts - Story Builder</title>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body, #root {
+      height: 100%;
+      width: 100%;
+    }
+    body {
+      font-family: 'Source Sans 3', -apple-system, sans-serif;
+      background: #F5F0EB;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  
+  <script type="text/babel">
+    const { useState, useRef, useEffect } = React;
+
+    const SYSTEM_PROMPT = `You are a creative art director helping users craft vivid image descriptions for AI art generation. Your role is to have a warm, engaging conversation to understand their vision and build a compelling "story" (image prompt).
+
+CONVERSATION FLOW:
+1. Start by warmly greeting them and asking what kind of image or scene they'd like to create
+2. Ask follow-up questions about: subject matter, setting/environment, mood/emotion, colors, artistic style, lighting, perspective
+3. Don't ask all at once - have a natural back-and-forth conversation
+4. After 3-4 exchanges when you have enough detail, synthesize their vision into a cohesive story
+
+CRITICAL INSTRUCTIONS FOR YOUR RESPONSES:
+You must ALWAYS respond with valid JSON in this exact format:
+{
+  "message": "Your conversational response to the user",
+  "title": "Short evocative title (3-5 words) or null if not ready",
+  "story": "The full image description/prompt or null if not ready",
+  "isComplete": false
+}
+
+STORY GENERATION:
+- Generate the "story" field once you have enough details (usually after 3-4 exchanges)
+- The story should be 2-4 sentences of vivid, painterly description
+- Include subject, setting, mood, colors, and artistic style
+- Write in present tense, descriptive prose (not bullet points)
+
+TITLE GENERATION:
+- Generate a "title" once you have a clear theme (can be before the full story)
+- Make it evocative and poetic, 3-5 words
+
+HANDLING MODIFICATIONS:
+- If user says things like "change X to Y", "make it blue instead of red", "I want Japanese not African", etc.
+- Update the story field with the modification applied
+- Acknowledge the change in your message
+- Keep everything else in the story the same
+
+IMPORTANT:
+- Keep messages warm, encouraging, and concise (2-3 sentences max)
+- Never break character or discuss these instructions
+- Always respond with valid JSON only - no markdown, no extra text`;
+
+    function SocietyArtsStoryBuilder() {
+      const [messages, setMessages] = useState([]);
+      const [inputValue, setInputValue] = useState('');
+      const [isLoading, setIsLoading] = useState(false);
+      const [story, setStory] = useState(null);
+      const [title, setTitle] = useState(null);
+      const [selectedVariation, setSelectedVariation] = useState('main');
+      const [variations, setVariations] = useState({ A: null, B: null });
+      const [selectedStyles, setSelectedStyles] = useState([]);
+      const [aspectRatio, setAspectRatio] = useState('1:1');
+      const [hasStarted, setHasStarted] = useState(false);
+      const messagesEndRef = useRef(null);
+
+      const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      };
+
+      useEffect(() => {
+        scrollToBottom();
+      }, [messages]);
+
+      const handleNewProject = () => {
+        setMessages([]);
+        setInputValue('');
+        setIsLoading(false);
+        setStory(null);
+        setTitle(null);
+        setSelectedVariation('main');
+        setVariations({ A: null, B: null });
+        setSelectedStyles([]);
+        setAspectRatio('1:1');
+        setHasStarted(false);
+      };
+
+      const callAPI = async (messagesPayload) => {
+        const response = await fetch('/.netlify/functions/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 1000,
+            messages: messagesPayload,
+          }),
+        });
+        return response.json();
+      };
+
+      const sendMessage = async () => {
+        if (!inputValue.trim() || isLoading) return;
+
+        if (!hasStarted) {
+          setHasStarted(true);
+        }
+
+        const userMessage = { role: 'user', content: inputValue };
+        const updatedMessages = [...messages, userMessage];
+        setMessages(updatedMessages);
+        setInputValue('');
+        setIsLoading(true);
+
+        try {
+          let contextMessage = '';
+          if (story) {
+            contextMessage = `\n\n[CURRENT STORY STATE: "${story}"]\n[CURRENT TITLE: "${title || 'None yet'}"]\n\nIf the user is requesting a modification, update the story accordingly.`;
+          }
+
+          const userPrompt = updatedMessages.map(m => `${m.role}: ${m.content}`).join('\n');
+
+          const data = await callAPI([
+            { 
+              role: 'user', 
+              content: `${SYSTEM_PROMPT}${contextMessage}\n\n---\nConversation so far:\n${userPrompt}\n\nRespond as the assistant with valid JSON only.`
+            }
+          ]);
+          
+          if (data.error) {
+            throw new Error(data.error.message || 'API Error');
+          }
+          
+          if (data.content && data.content[0]) {
+            let responseText = data.content[0].text;
+            responseText = responseText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+            
+            try {
+              const parsed = JSON.parse(responseText);
+              
+              if (parsed.title) {
+                setTitle(parsed.title);
+              }
+              if (parsed.story) {
+                setStory(parsed.story);
+              }
+              
+              setMessages(prev => [...prev, {
+                role: 'assistant',
+                content: parsed.message || "I'd love to hear more about your vision!"
+              }]);
+            } catch (parseError) {
+              setMessages(prev => [...prev, {
+                role: 'assistant',
+                content: responseText
+              }]);
+            }
+          } else {
+            throw new Error('No response content');
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          setMessages(prev => [...prev, {
+            role: 'assistant',
+            content: "I apologize, but I'm having trouble connecting right now. Please try again in a moment."
+          }]);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      const handleKeyDown = (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          sendMessage();
+        }
+      };
+
+      const generateVariation = async (variationType) => {
+        if (!story) return;
+        setIsLoading(true);
+        
+        try {
+          const data = await callAPI([{
+            role: 'user',
+            content: `Take this image description and create an interesting variation. Keep the core subject and mood but change the perspective, add new details, or shift the emphasis. Original: "${story}". Respond with ONLY the new description text, no explanation, no quotes, no JSON.`
+          }]);
+          
+          if (data.error) {
+            throw new Error(data.error.message || 'API Error');
+          }
+          
+          if (data.content && data.content[0]) {
+            setVariations(prev => ({
+              ...prev,
+              [variationType]: data.content[0].text.trim()
+            }));
+          }
+        } catch (error) {
+          console.error('Error generating variation:', error);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      const styleOptions = [
+        { id: 1, name: 'Impressionist Dawn', image: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=200&h=200&fit=crop' },
+        { id: 2, name: 'Wild Watercolor Vibrance', image: 'https://images.unsplash.com/photo-1487530811176-3780de880c2d?w=200&h=200&fit=crop' },
+        { id: 3, name: 'Soulful Portraiture', image: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=200&h=200&fit=crop' },
+        { id: 4, name: 'Textured Earth Tones', image: 'https://images.unsplash.com/photo-1549289524-06cf8837ace5?w=200&h=200&fit=crop' }
+      ];
+
+      const toggleStyle = (styleId) => {
+        setSelectedStyles(prev => 
+          prev.includes(styleId) 
+            ? prev.filter(id => id !== styleId)
+            : [...prev, styleId]
+        );
+      };
+
+      return (
+        <div style={styles.container}>
+          {/* Header */}
+          <header style={styles.header}>
+            <div style={styles.headerLeft}>
+              <button style={styles.menuButton}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="3" y1="6" x2="21" y2="6"></line>
+                  <line x1="3" y1="12" x2="21" y2="12"></line>
+                  <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+              </button>
+              <h1 style={styles.logo}>SOCIETY ARTS</h1>
+            </div>
+            <div style={styles.headerRight}>
+              <button style={styles.cartButton}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="9" cy="21" r="1"></circle>
+                  <circle cx="20" cy="21" r="1"></circle>
+                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                </svg>
+              </button>
+              <button style={styles.newProjectButton} onClick={handleNewProject}>
+                New Project
+              </button>
+              <button style={styles.loginButton}>Log In</button>
+            </div>
+          </header>
+
+          {/* Subheader */}
+          <div style={styles.subheader}>
+            <h2 style={styles.subheaderTitle}>Your Story, Your Style</h2>
+            <p style={styles.subheaderText}>First add your story, then select your styles. When both are done, hit Generate and watch your idea come alive.</p>
+            <div style={styles.progressBar}>
+              <div style={{
+                ...styles.progressFill,
+                width: story ? (selectedStyles.length > 0 ? '100%' : '50%') : (hasStarted ? '15%' : '5%')
+              }}></div>
+            </div>
+          </div>
+
+          {/* Main Content */}
+          <main style={styles.main}>
+            {/* Left Column - Your Story */}
+            <div style={styles.leftColumn}>
+              <div style={styles.storyCard}>
+                <div style={styles.storyHeaderSimple}>
+                  <span style={styles.storyLabel}>Your Story</span>
+                </div>
+                <div style={styles.storyContentSimple}>
+                  {story ? (
+                    <p style={styles.storyText}>{story}</p>
+                  ) : (
+                    <p style={styles.storyPlaceholder}>
+                      Your story will appear here — once you've shared a moment worth remembering.
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {story && (
+                <>
+                  <div style={{
+                    ...styles.variationCard,
+                    ...(selectedVariation === 'A' ? styles.storyCardSelected : {})
+                  }} onClick={() => setSelectedVariation('A')}>
+                    <div style={styles.variationHeader}>
+                      <div style={styles.radioOuter}>
+                        {selectedVariation === 'A' && <div style={styles.radioInner}></div>}
+                      </div>
+                      <span style={styles.storyLabel}>Variation A</span>
+                      <button 
+                        style={styles.anotherTakeButton}
+                        onClick={(e) => { e.stopPropagation(); generateVariation('A'); }}
+                      >
+                        Another take <span style={styles.chevron}>▼</span>
+                      </button>
+                    </div>
+                    {variations.A && (
+                      <div style={styles.storyContent}>
+                        <p style={styles.storyText}>{variations.A}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div style={{
+                    ...styles.variationCard,
+                    ...(selectedVariation === 'B' ? styles.storyCardSelected : {})
+                  }} onClick={() => setSelectedVariation('B')}>
+                    <div style={styles.variationHeader}>
+                      <div style={styles.radioOuter}>
+                        {selectedVariation === 'B' && <div style={styles.radioInner}></div>}
+                      </div>
+                      <span style={styles.storyLabel}>Variation B</span>
+                      <button 
+                        style={styles.anotherTakeButton}
+                        onClick={(e) => { e.stopPropagation(); generateVariation('B'); }}
+                      >
+                        Another take <span style={styles.chevron}>▼</span>
+                      </button>
+                    </div>
+                    {variations.B && (
+                      <div style={styles.storyContent}>
+                        <p style={styles.storyText}>{variations.B}</p>
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Center Column - Chat */}
+            <div style={styles.centerColumn}>
+              <div style={styles.chatContainer}>
+                {title && (
+                  <div style={styles.titleDropdown}>
+                    <span>{title}</span>
+                    <span style={styles.chevron}>▼</span>
+                  </div>
+                )}
+                
+                <div style={styles.messagesContainer}>
+                  {!hasStarted ? (
+                    <div style={styles.welcomeContainer}>
+                      <h2 style={styles.welcomeTitle}>Welcome to Society Arts.</h2>
+                      <p style={styles.welcomeText}>
+                        I'm here to help create your beautiful work of art from your own idea or personal story. Let me know when you're ready to begin.
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      {messages.map((msg, index) => (
+                        <div 
+                          key={index} 
+                          style={msg.role === 'user' ? styles.userMessage : styles.assistantMessage}
+                        >
+                          {msg.role === 'user' ? (
+                            <div style={styles.userBubble}>{msg.content}</div>
+                          ) : (
+                            <p style={styles.assistantText}>{msg.content}</p>
+                          )}
+                        </div>
+                      ))}
+                      {isLoading && (
+                        <div style={styles.assistantMessage}>
+                          <div style={styles.typingIndicator}>
+                            <div style={{...styles.dot, animationDelay: '0s'}}></div>
+                            <div style={{...styles.dot, animationDelay: '0.2s'}}></div>
+                            <div style={{...styles.dot, animationDelay: '0.4s'}}></div>
+                          </div>
+                        </div>
+                      )}
+                      <div ref={messagesEndRef} />
+                    </>
+                  )}
+                </div>
+
+                <div style={styles.inputContainer}>
+                  <div style={styles.inputWrapper}>
+                    <span style={styles.inputIcon}>✎</span>
+                    <input
+                      type="text"
+                      style={styles.textInput}
+                      placeholder="Start your story..."
+                      value={inputValue}
+                      onChange={(e) => setInputValue(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      disabled={isLoading}
+                    />
+                    <button 
+                      style={{...styles.sendButton, opacity: inputValue.trim() ? 1 : 0.4}}
+                      onClick={sendMessage}
+                      disabled={isLoading || !inputValue.trim()}
+                    >
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                      </svg>
+                    </button>
+                    <button style={styles.micButton}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                        <line x1="12" y1="19" x2="12" y2="23"></line>
+                        <line x1="8" y1="23" x2="16" y2="23"></line>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column - Styles */}
+            <div style={styles.rightColumn}>
+              <div style={styles.formatDropdown}>
+                <span style={styles.formatIcon}>☐</span>
+                <span>Format</span>
+                <select 
+                  style={styles.formatSelect}
+                  value={aspectRatio}
+                  onChange={(e) => setAspectRatio(e.target.value)}
+                >
+                  <option value="1:1">1:1</option>
+                  <option value="16:9">16:9</option>
+                  <option value="9:16">9:16</option>
+                  <option value="4:3">4:3</option>
+                </select>
+                <span style={styles.selectChevron}>▼</span>
+              </div>
+
+              {selectedStyles.length === 0 && !hasStarted ? (
+                <button style={styles.addStyleButton}>
+                  Add style
+                </button>
+              ) : (
+                <div style={styles.stylesGrid}>
+                  {styleOptions.map((style) => (
+                    <div 
+                      key={style.id} 
+                      style={{
+                        ...styles.styleCard,
+                        ...(selectedStyles.includes(style.id) ? styles.styleCardSelected : {})
+                      }}
+                      onClick={() => toggleStyle(style.id)}
+                    >
+                      <div style={styles.styleImageContainer}>
+                        <img 
+                          src={style.image} 
+                          alt={style.name}
+                          style={styles.styleImage}
+                        />
+                        <button style={styles.styleMenuButton}>⋮</button>
+                      </div>
+                      <p style={styles.styleName}>{style.name}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </main>
+
+          {/* Footer */}
+          <footer style={styles.footer}>
+            <button style={styles.saveButton}>Save Project</button>
+            <button 
+              style={{
+                ...styles.createButton,
+                opacity: story && selectedStyles.length > 0 ? 1 : 0.6
+              }}
+              disabled={!story || selectedStyles.length === 0}
+            >
+              Create <span style={styles.arrow}>→</span>
+            </button>
+            <button style={styles.helpButton}>?</button>
+          </footer>
+        </div>
+      );
+    }
+
+    const styles = {
+      container: {
+        minHeight: '100vh',
+        backgroundColor: '#F5F0EB',
+        fontFamily: "'Source Sans 3', -apple-system, sans-serif",
+        color: '#3D3530',
+        display: 'flex',
+        flexDirection: 'column',
+      },
+      header: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '12px 24px',
+        backgroundColor: '#FAF8F5',
+        borderBottom: '1px solid #E8E2DB',
+        flexShrink: 0,
+      },
+      headerLeft: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '12px',
+      },
+      menuButton: {
+        background: 'none',
+        border: 'none',
+        cursor: 'pointer',
+        color: '#3D3530',
+        padding: '6px',
+        display: 'flex',
+      },
+      logo: {
+        fontFamily: "'Cormorant Garamond', serif",
+        fontSize: '18px',
+        fontWeight: '600',
+        letterSpacing: '2px',
+        margin: 0,
+        color: '#3D3530',
+      },
+      headerRight: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '10px',
+      },
+      cartButton: {
+        background: 'none',
+        border: 'none',
+        cursor: 'pointer',
+        color: '#3D3530',
+        padding: '6px',
+        display: 'flex',
+      },
+      newProjectButton: {
+        backgroundColor: '#8B5E3C',
+        color: 'white',
+        border: 'none',
+        padding: '10px 20px',
+        borderRadius: '24px',
+        fontSize: '14px',
+        fontWeight: '500',
+        cursor: 'pointer',
+      },
+      loginButton: {
+        backgroundColor: 'transparent',
+        color: '#3D3530',
+        border: '1px solid #D4CCC4',
+        padding: '10px 20px',
+        borderRadius: '24px',
+        fontSize: '14px',
+        fontWeight: '500',
+        cursor: 'pointer',
+      },
+      subheader: {
+        padding: '16px 24px 12px',
+        backgroundColor: '#FAF8F5',
+        flexShrink: 0,
+      },
+      subheaderTitle: {
+        fontFamily: "'Cormorant Garamond', serif",
+        fontSize: '16px',
+        fontWeight: '600',
+        margin: '0 0 4px 0',
+        color: '#3D3530',
+      },
+      subheaderText: {
+        fontSize: '12px',
+        color: '#7A7067',
+        margin: '0 0 12px 0',
+      },
+      progressBar: {
+        height: '5px',
+        backgroundColor: '#E8E2DB',
+        borderRadius: '3px',
+        overflow: 'hidden',
+      },
+      progressFill: {
+        height: '100%',
+        backgroundColor: '#C75B3F',
+        borderRadius: '3px',
+        transition: 'width 0.5s ease',
+      },
+      main: {
+        display: 'grid',
+        gridTemplateColumns: '280px 1fr 280px',
+        gap: '20px',
+        padding: '20px 24px',
+        flex: 1,
+        minHeight: 0,
+        maxWidth: '1400px',
+        width: '100%',
+        margin: '0 auto',
+      },
+      leftColumn: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '12px',
+        overflowY: 'auto',
+        minWidth: 0,
+      },
+      storyCard: {
+        backgroundColor: '#FAF8F5',
+        borderRadius: '12px',
+        padding: '16px',
+        border: '2px solid transparent',
+      },
+      storyCardSelected: {
+        borderColor: '#C75B3F',
+      },
+      storyHeaderSimple: {
+        marginBottom: '12px',
+      },
+      radioOuter: {
+        width: '18px',
+        height: '18px',
+        borderRadius: '50%',
+        border: '2px solid #C75B3F',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexShrink: 0,
+      },
+      radioInner: {
+        width: '10px',
+        height: '10px',
+        borderRadius: '50%',
+        backgroundColor: '#C75B3F',
+      },
+      storyLabel: {
+        fontWeight: '600',
+        fontSize: '14px',
+        color: '#3D3530',
+      },
+      storyContent: {
+        paddingLeft: '26px',
+        marginTop: '10px',
+      },
+      storyContentSimple: {
+        paddingLeft: '0',
+      },
+      storyText: {
+        fontSize: '14px',
+        lineHeight: '1.6',
+        color: '#3D3530',
+        margin: 0,
+      },
+      storyPlaceholder: {
+        fontSize: '14px',
+        lineHeight: '1.6',
+        color: '#B8A99A',
+        margin: 0,
+      },
+      variationCard: {
+        backgroundColor: '#FAF8F5',
+        borderRadius: '12px',
+        padding: '16px',
+        border: '2px solid transparent',
+        cursor: 'pointer',
+        transition: 'border-color 0.2s ease',
+      },
+      variationHeader: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '10px',
+      },
+      anotherTakeButton: {
+        marginLeft: 'auto',
+        background: 'none',
+        border: 'none',
+        color: '#C75B3F',
+        fontSize: '13px',
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '4px',
+      },
+      chevron: {
+        fontSize: '10px',
+      },
+      centerColumn: {
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: 0,
+        minWidth: 0,
+      },
+      chatContainer: {
+        backgroundColor: '#EBE6E1',
+        borderRadius: '12px',
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        overflow: 'hidden',
+      },
+      titleDropdown: {
+        padding: '14px 20px',
+        borderBottom: '1px solid #DED8D1',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '8px',
+        fontFamily: "'Cormorant Garamond', serif",
+        fontSize: '18px',
+        fontWeight: '500',
+        color: '#3D3530',
+      },
+      messagesContainer: {
+        flex: 1,
+        overflowY: 'auto',
+        padding: '20px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '16px',
+      },
+      welcomeContainer: {
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        textAlign: 'center',
+        padding: '60px 30px',
+      },
+      welcomeTitle: {
+        fontFamily: "'Cormorant Garamond', serif",
+        fontSize: '32px',
+        fontWeight: '500',
+        color: '#3D3530',
+        marginBottom: '20px',
+      },
+      welcomeText: {
+        fontSize: '15px',
+        lineHeight: '1.7',
+        color: '#7A7067',
+        maxWidth: '400px',
+        margin: 0,
+      },
+      userMessage: {
+        display: 'flex',
+        justifyContent: 'flex-end',
+      },
+      userBubble: {
+        backgroundColor: '#F5F0EB',
+        padding: '12px 16px',
+        borderRadius: '20px',
+        maxWidth: '80%',
+        fontSize: '14px',
+        lineHeight: '1.5',
+        color: '#3D3530',
+      },
+      assistantMessage: {
+        display: 'flex',
+        justifyContent: 'flex-start',
+      },
+      assistantText: {
+        fontSize: '14px',
+        lineHeight: '1.6',
+        color: '#3D3530',
+        margin: 0,
+        maxWidth: '85%',
+      },
+      typingIndicator: {
+        display: 'flex',
+        gap: '5px',
+        padding: '10px 0',
+      },
+      dot: {
+        width: '8px',
+        height: '8px',
+        borderRadius: '50%',
+        backgroundColor: '#A89F94',
+        animation: 'pulse 1.2s ease-in-out infinite',
+      },
+      inputContainer: {
+        padding: '16px 20px',
+        borderTop: '1px solid #DED8D1',
+      },
+      inputWrapper: {
+        display: 'flex',
+        alignItems: 'center',
+        backgroundColor: '#FFFFFF',
+        borderRadius: '28px',
+        padding: '8px 8px 8px 16px',
+        gap: '8px',
+        border: '1px solid #E8E2DB',
+      },
+      inputIcon: {
+        color: '#A89F94',
+        fontSize: '16px',
+      },
+      textInput: {
+        flex: 1,
+        border: 'none',
+        outline: 'none',
+        fontSize: '14px',
+        fontFamily: "'Source Sans 3', sans-serif",
+        color: '#3D3530',
+        backgroundColor: 'transparent',
+      },
+      sendButton: {
+        background: 'none',
+        border: 'none',
+        cursor: 'pointer',
+        color: '#A89F94',
+        padding: '8px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      },
+      micButton: {
+        backgroundColor: '#C75B3F',
+        border: 'none',
+        borderRadius: '50%',
+        width: '40px',
+        height: '40px',
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexShrink: 0,
+      },
+      rightColumn: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '12px',
+        overflowY: 'auto',
+        minWidth: 0,
+      },
+      formatDropdown: {
+        backgroundColor: '#FAF8F5',
+        borderRadius: '10px',
+        padding: '12px 16px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        fontSize: '14px',
+        color: '#3D3530',
+      },
+      formatIcon: {
+        fontSize: '16px',
+      },
+      formatSelect: {
+        marginLeft: 'auto',
+        background: 'none',
+        border: 'none',
+        fontSize: '14px',
+        color: '#3D3530',
+        fontFamily: "'Source Sans 3', sans-serif",
+        cursor: 'pointer',
+        appearance: 'none',
+        paddingRight: '4px',
+      },
+      selectChevron: {
+        fontSize: '10px',
+        color: '#7A7067',
+      },
+      addStyleButton: {
+        backgroundColor: '#FAF8F5',
+        border: '1px solid #E8E2DB',
+        borderRadius: '10px',
+        padding: '16px 20px',
+        fontSize: '15px',
+        color: '#3D3530',
+        cursor: 'pointer',
+        textAlign: 'center',
+        fontFamily: "'Source Sans 3', sans-serif",
+      },
+      stylesGrid: {
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+        gap: '12px',
+      },
+      styleCard: {
+        backgroundColor: '#FAF8F5',
+        borderRadius: '10px',
+        overflow: 'hidden',
+        cursor: 'pointer',
+        border: '2px solid transparent',
+        transition: 'border-color 0.2s ease, transform 0.2s ease',
+      },
+      styleCardSelected: {
+        borderColor: '#C75B3F',
+        transform: 'scale(1.02)',
+      },
+      styleImageContainer: {
+        position: 'relative',
+        aspectRatio: '1',
+      },
+      styleImage: {
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+        display: 'block',
+      },
+      styleMenuButton: {
+        position: 'absolute',
+        top: '8px',
+        right: '8px',
+        background: 'rgba(255,255,255,0.9)',
+        border: 'none',
+        borderRadius: '50%',
+        width: '24px',
+        height: '24px',
+        cursor: 'pointer',
+        fontSize: '14px',
+        color: '#3D3530',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      },
+      styleName: {
+        padding: '10px',
+        margin: 0,
+        fontSize: '13px',
+        fontWeight: '500',
+        color: '#3D3530',
+      },
+      footer: {
+        display: 'flex',
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+        gap: '12px',
+        padding: '14px 24px',
+        backgroundColor: '#FAF8F5',
+        borderTop: '1px solid #E8E2DB',
+        flexShrink: 0,
+      },
+      saveButton: {
+        backgroundColor: 'transparent',
+        color: '#3D3530',
+        border: '1px solid #D4CCC4',
+        padding: '12px 24px',
+        borderRadius: '24px',
+        fontSize: '14px',
+        fontWeight: '500',
+        cursor: 'pointer',
+      },
+      createButton: {
+        backgroundColor: '#8B5E3C',
+        color: 'white',
+        border: 'none',
+        padding: '12px 28px',
+        borderRadius: '24px',
+        fontSize: '14px',
+        fontWeight: '500',
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+      },
+      arrow: {
+        fontSize: '16px',
+      },
+      helpButton: {
+        backgroundColor: 'transparent',
+        color: '#3D3530',
+        border: '1px solid #D4CCC4',
+        borderRadius: '50%',
+        width: '40px',
+        height: '40px',
+        fontSize: '16px',
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      },
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<SocietyArtsStoryBuilder />);
+  </script>
+</body>
+</html>
