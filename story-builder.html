@@ -212,9 +212,8 @@
       const [isLoading, setIsLoading] = useState(false);
       const [story, setStory] = useState(null);
       const [title, setTitle] = useState(null);
-      const [selectedVariation, setSelectedVariation] = useState('main');
-      const [variations, setVariations] = useState({ A: null, B: null });
-      const [variationTypes, setVariationTypes] = useState({ A: 'mood', B: 'perspective' });
+      const [transformedStory, setTransformedStory] = useState(null);
+      const [transformLabel, setTransformLabel] = useState(null);
       const [selectedStyles, setSelectedStyles] = useState([]);
       const [aspectRatio, setAspectRatio] = useState('1:1');
       const [hasStarted, setHasStarted] = useState(false);
@@ -384,28 +383,16 @@
         }
       };
 
-      const generateVariation = async (variationKey) => {
-        if (!story) return;
-        setIsLoading(true);
-        
-        try {
-          const result = await Variations.generate(story, variationTypes[variationKey]);
-          
-          if (result.success) {
-            setVariations(prev => ({
-              ...prev,
-              [variationKey]: result.variation
-            }));
-          }
-        } catch (error) {
-          console.error('Error generating variation:', error);
-        } finally {
-          setIsLoading(false);
-        }
+      // Handle variation applied - updates the transformed story
+      const handleVariationApplied = (newStory, label) => {
+        setTransformedStory(newStory);
+        setTransformLabel(label);
       };
 
-      const handleVariationTypeChange = (variation, type) => {
-        setVariationTypes(prev => ({ ...prev, [variation]: type }));
+      // Clear transformation and go back to original
+      const handleClearTransform = () => {
+        setTransformedStory(null);
+        setTransformLabel(null);
       };
 
       const toggleStyle = (styleId) => {
@@ -448,14 +435,11 @@
               story={story}
               title={title}
               isVoiceMode={voiceMode}
-              selectedVariation={selectedVariation}
-              onSelectVariation={setSelectedVariation}
-              variations={variations}
-              onGenerateVariation={generateVariation}
               isLoading={isLoading}
-              variationTypes={variationTypes}
-              onVariationTypeChange={handleVariationTypeChange}
-              variationTypeOptions={Variations.TYPES}
+              transformedStory={transformedStory}
+              transformLabel={transformLabel}
+              onVariationApplied={handleVariationApplied}
+              onClearTransform={handleClearTransform}
             />
             
             {/* Center Column - Chat */}
