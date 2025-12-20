@@ -750,3 +750,221 @@
     justify-content: center;
   }
 }
+
+/* ========================================
+   UNIFIED INPUT (TEXT/VOICE)
+   ======================================== */
+
+.unified-input {
+  background: white;
+  border-radius: 28px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+/* TEXT MODE */
+.unified-input-text {
+  padding: 0;
+}
+
+.unified-input-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+}
+
+.unified-input-field {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 15px;
+  color: var(--color-text-primary);
+  outline: none;
+  font-family: var(--font-sans);
+}
+
+.unified-input-field::placeholder {
+  color: var(--color-text-muted);
+}
+
+.unified-input-field:disabled {
+  opacity: 0.6;
+}
+
+.unified-mode-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: var(--color-accent);
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.unified-mode-toggle:hover:not(:disabled) {
+  background: var(--color-accent-hover);
+  transform: scale(1.05);
+}
+
+.unified-mode-toggle:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* VOICE MODE */
+.unified-input-voice {
+  padding: 24px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 80px;
+}
+
+.unified-voice-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+  position: relative;
+}
+
+.unified-mic-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 2px solid var(--color-border);
+  background: white;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 2;
+}
+
+.unified-mic-button:hover:not(:disabled) {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.unified-mic-button:active:not(:disabled),
+.unified-mic-button.active {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: white;
+  transform: scale(1.05);
+}
+
+.unified-mic-button.speaking {
+  background: var(--color-surface-alt);
+  border-color: var(--color-border);
+  color: var(--color-accent);
+}
+
+.unified-mic-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Pulse ring animation */
+.voice-pulse-ring {
+  position: absolute;
+  left: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 2px solid var(--color-accent);
+  animation: pulse-ring 1.5s ease-out infinite;
+  z-index: 1;
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+.unified-voice-status {
+  font-size: 15px;
+  color: var(--color-text-secondary);
+  font-weight: var(--weight-medium);
+}
+
+.unified-input-voice.listening .unified-voice-status {
+  color: var(--color-accent);
+}
+
+.unified-input-voice.speaking .unified-voice-status {
+  color: var(--color-text-muted);
+}
+
+/* Text mode toggle in voice mode */
+.unified-mode-toggle-text {
+  background: var(--color-surface-alt);
+  color: var(--color-text-secondary);
+}
+
+.unified-mode-toggle-text:hover:not(:disabled) {
+  background: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+/* Voice mode state colors */
+.unified-input-voice.listening {
+  background: linear-gradient(135deg, #fff 0%, rgba(199, 91, 63, 0.05) 100%);
+}
+
+.unified-input-voice.speaking {
+  background: linear-gradient(135deg, #fff 0%, rgba(199, 91, 63, 0.03) 100%);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .unified-input-voice {
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px;
+  }
+  
+  .unified-voice-content {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .voice-pulse-ring {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  @keyframes pulse-ring {
+    0% {
+      transform: translateX(-50%) scale(1);
+      opacity: 0.8;
+    }
+    100% {
+      transform: translateX(-50%) scale(1.6);
+      opacity: 0;
+    }
+  }
+  
+  .unified-mode-toggle-text {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+  }
+}
