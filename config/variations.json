@@ -1,1 +1,42 @@
-
+{
+  "variations": {
+    "optimize": {
+      "id": "optimize",
+      "label": "Optimize",
+      "description": "Clean up my description for better results",
+      "icon": "sparkles",
+      "instructions": "You are refining a story for AI art generation. Take the user's story and distill it into a concise, powerful prompt.\n\nYour task:\n- Remove redundant words and repetitive ideas\n- Eliminate filler phrases like 'I want' or 'I'm thinking of'\n- Keep the core subject, emotion, and key visual details\n- Tighten to 2-4 clear, vivid sentences\n- Preserve any specific artistic references (colors, styles, moods)\n- Do NOT add new ideas - only clarify what's already there\n\nReturn only the optimized story, nothing else."
+    },
+    "enrich": {
+      "id": "enrich",
+      "label": "Enrich",
+      "description": "Add artistic depth to my idea",
+      "icon": "palette",
+      "instructions": "You are enhancing a story for AI art generation. Take the user's simple idea and add artistic richness they may not have considered.\n\nYour task:\n- Keep their original subject and core vision intact\n- Add evocative details about lighting (golden hour, soft diffused, dramatic shadows)\n- Suggest mood and atmosphere (peaceful, mysterious, nostalgic, vibrant)\n- Include composition hints (foreground elements, depth, focal points)\n- Add sensory details (textures, weather, time of day)\n- Suggest color palette direction if not specified\n- Expand to 3-5 rich, painterly sentences\n- Do NOT change their subject or override their stated preferences\n\nReturn only the enriched story, nothing else."
+    },
+    "simplify": {
+      "id": "simplify",
+      "label": "Simplify",
+      "description": "Strip it down to the essentials",
+      "icon": "minimize",
+      "instructions": "You are simplifying a story for AI art generation. Reduce the user's story to its most essential, powerful elements.\n\nYour task:\n- Identify the ONE main subject\n- Identify the ONE dominant mood or emotion\n- Remove all secondary characters, objects, and subplots\n- Strip decorative adjectives - keep only impactful ones\n- Result should be 1-2 sentences maximum\n- Think: What would a minimalist artist focus on?\n- Preserve the emotional core even as you remove detail\n\nReturn only the simplified story, nothing else."
+    },
+    "removePeople": {
+      "id": "removePeople",
+      "label": "Remove People",
+      "description": "Take out human figures",
+      "icon": "userMinus",
+      "instructions": "You are modifying a story for AI art generation. Remove all human figures while preserving the scene's essence.\n\nYour task:\n- Remove all people, figures, characters, and human references\n- If people were the main subject, shift focus to the environment they occupied\n- Preserve the mood, lighting, colors, and atmosphere\n- Keep objects, landscapes, architecture, and nature elements\n- If someone was holding something, show the object alone or resting somewhere\n- Maintain the emotional feeling - loneliness, warmth, mystery - without the humans\n- The scene should feel like the moment just before or after people were there\n\nReturn only the modified story, nothing else."
+    }
+  },
+  "settings": {
+    "model": "claude-sonnet-4-20250514",
+    "maxTokens": 500,
+    "temperature": 0.7
+  },
+  "_meta": {
+    "version": "1.0",
+    "lastUpdated": "2024-12-20",
+    "notes": "Edit the 'instructions' field for each variation to change how Claude transforms stories. Changes deploy automatically via Netlify."
+  }
+}
