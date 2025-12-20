@@ -179,7 +179,7 @@ const NAV_ITEMS = [
 ];
 
 const HELP_MENU_ITEMS = [
-  { id: 'how-it-works', label: 'How It Works', icon: 'howItWorks', href: '/under-construction.html?feature=How%20It%20Works' },
+  { id: 'how-it-works', label: 'How It Works', icon: 'howItWorks', action: 'howItWorks' },
   { id: 'quick-tips', label: 'Quick Tips for Getting Started', icon: 'quickTips', href: '/under-construction.html?feature=Quick%20Tips' },
   { id: 'new-chat', label: 'Start a New Chat', icon: 'newChat', action: 'newChat' },
   { id: 'updates', label: 'New Features & Updates', icon: 'updates', href: '/under-construction.html?feature=New%20Features' },
@@ -284,7 +284,7 @@ function NavSidebar({ isOpen, onClose, currentPage, onOpenStyleFinder }) {
 // HELP MENU COMPONENT
 // ========================================
 
-function HelpMenu({ isOpen, onClose, onNewChat }) {
+function HelpMenu({ isOpen, onClose, onNewChat, onOpenHowItWorks }) {
   const menuRef = React.useRef(null);
 
   React.useEffect(() => {
@@ -304,6 +304,8 @@ function HelpMenu({ isOpen, onClose, onNewChat }) {
   const handleItemClick = (item) => {
     if (item.action === 'newChat' && onNewChat) {
       onNewChat();
+    } else if (item.action === 'howItWorks' && onOpenHowItWorks) {
+      onOpenHowItWorks();
     } else if (item.href) {
       window.location.href = item.href;
     }
@@ -448,30 +450,235 @@ function Subheader({ title, description, progress }) {
 }
 
 // ========================================
+// HOW IT WORKS MODAL
+// ========================================
+
+function HowItWorksModal({ isOpen, onClose, onOpenArtBridge }) {
+  React.useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'hidden';
+    }
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = '';
+    };
+  }, [isOpen, onClose]);
+
+  return (
+    <div className={`help-modal-overlay ${isOpen ? 'open' : ''}`} onClick={onClose}>
+      <div className="help-modal hiw-modal" onClick={(e) => e.stopPropagation()}>
+        <button className="help-modal-close" onClick={onClose} aria-label="Close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+        
+        <div className="hiw-header">
+          <h2 className="hiw-title">How It Works</h2>
+          <p className="hiw-subtitle">
+            Society Arts transforms a personal story into a predictive art prompt through its proprietary 
+            Trust Layer — blending human emotion with machine precision.
+          </p>
+        </div>
+        
+        <div className="hiw-formula">
+          <div className="hiw-column">
+            <h3 className="hiw-column-title">Your Story</h3>
+            <p className="hiw-column-content">
+              A striking watercolor painting shows a determined woman carrying a large jug of water on her head in the 
+              vibrant light and heat of an African landscape. How does that feel? Children walk beside her, their 
+              figures simple yet lively, surrounded by bold, wild colors that echo the spirit and energy of Africa. 
+              The scene feels purposeful and full of hope, with sunlight shimmering off the water and dust.
+            </p>
+          </div>
+          
+          <div className="hiw-operator">
+            <span className="hiw-operator-symbol">+</span>
+          </div>
+          
+          <div className="hiw-column">
+            <h3 className="hiw-column-title">Our Predictive Prompt</h3>
+            <p className="hiw-column-content">
+              Rendered as a fine-art contemporary watercolor composition with fluid wet-on-wet technique and 
+              expressive pigment diffusion; vibrant translucent washes merge seamlessly with controlled bleeding 
+              and organic edge transitions across textured 300 gsm cold-pressed cotton paper. Layered transparent 
+              glazes establish luminous tonal depth and chromatic harmony, balancing saturated primaries with 
+              softened neutrals.
+            </p>
+          </div>
+          
+          <div className="hiw-operator">
+            <span className="hiw-operator-symbol">=</span>
+          </div>
+          
+          <div className="hiw-result">
+            <span className="hiw-result-text">Your<br/>Creation</span>
+          </div>
+        </div>
+        
+        <div className="hiw-trust">
+          <p className="hiw-trust-text">
+            Society Arts created this predictive prompt, then validated it through the{' '}
+            <span className="artbridge-link" onClick={onOpenArtBridge}>
+              ArtBridge Index (ABI)
+            </span>
+            {' '}— a rigorous quality system measuring composition, style fidelity, safety, and adaptability.
+          </p>
+          <p className="hiw-trust-text">
+            Only prompts that meet or exceed these benchmarks are accepted into the Society Arts ecosystem, ensuring every 
+            piece is emotionally aligned, technically consistent, and worthy of display.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ========================================
+// ARTBRIDGE MODAL
+// ========================================
+
+function ArtBridgeModal({ isOpen, onClose, onBack }) {
+  React.useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'hidden';
+    }
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = '';
+    };
+  }, [isOpen, onClose]);
+
+  const metrics = [
+    { name: 'Aesthetic & Composition', abbr: 'ACS', desc: 'visual balance and professional quality' },
+    { name: 'Style Fidelity & Consistency', abbr: 'SFCS', desc: 'steadiness of style across subjects' },
+    { name: 'Subject Reactivity', abbr: 'SRS', desc: 'intelligent adaptation when the subject changes' },
+    { name: 'Safety / SFW', abbr: 'SSS', desc: 'ensures every output is appropriate for all audiences' },
+    { name: 'Content Disentanglement', abbr: 'CDS', desc: 'preserves style while removing source bias' },
+    { name: 'Prompt Similarity', abbr: 'PSS', desc: 'tracks how closely the generated image reflects the prompt' }
+  ];
+
+  return (
+    <div className={`help-modal-overlay ${isOpen ? 'open' : ''}`} onClick={onClose}>
+      <div className="help-modal artbridge-modal" onClick={(e) => e.stopPropagation()}>
+        <button className="artbridge-back" onClick={onBack} aria-label="Back">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+          Back
+        </button>
+        
+        <button className="help-modal-close" onClick={onClose} aria-label="Close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+        
+        <div className="artbridge-header">
+          <h2 className="artbridge-title">ArtBridge: The Science Within</h2>
+          <p className="artbridge-subtitle">
+            What makes AI art predictable, personal, and print-worthy isn't magic — it's measurement.<br/>
+            The ArtBridge Index (ABI) translates creative intuition into data through six measurable dimensions:
+          </p>
+        </div>
+        
+        <div className="artbridge-metrics">
+          {metrics.map((metric, index) => (
+            <div key={index} className="artbridge-metric">
+              <span className="artbridge-metric-number">{index + 1}.</span>
+              <span>
+                <span className="artbridge-metric-name">{metric.name}</span>
+                {' '}
+                <span className="artbridge-metric-abbr">({metric.abbr})</span>
+                {' — '}
+                <span className="artbridge-metric-desc">{metric.desc}</span>
+              </span>
+            </div>
+          ))}
+        </div>
+        
+        <div className="artbridge-footer">
+          <p className="artbridge-footer-text">
+            Together, these six metrics form the scientific backbone of Society Arts —<br/>
+            quantifying creativity so that beauty becomes reproducible.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ========================================
 // FOOTER COMPONENT
 // ========================================
 
 function Footer({ children, onNewChat }) {
   const [helpOpen, setHelpOpen] = React.useState(false);
+  const [showHowItWorks, setShowHowItWorks] = React.useState(false);
+  const [showArtBridge, setShowArtBridge] = React.useState(false);
+
+  const handleOpenHowItWorks = () => {
+    setShowHowItWorks(true);
+  };
+
+  const handleCloseHowItWorks = () => {
+    setShowHowItWorks(false);
+    setShowArtBridge(false);
+  };
+
+  const handleOpenArtBridge = () => {
+    setShowArtBridge(true);
+  };
+
+  const handleBackToHowItWorks = () => {
+    setShowArtBridge(false);
+  };
 
   return (
-    <footer className="footer">
-      {children}
-      <div style={{ position: 'relative' }}>
-        <button 
-          className="help-btn" 
-          onClick={() => setHelpOpen(!helpOpen)}
-          aria-label="Help"
-        >
-          ?
-        </button>
-        <HelpMenu 
-          isOpen={helpOpen} 
-          onClose={() => setHelpOpen(false)} 
-          onNewChat={onNewChat}
-        />
-      </div>
-    </footer>
+    <>
+      <footer className="footer">
+        {children}
+        <div style={{ position: 'relative' }}>
+          <button 
+            className="help-btn" 
+            onClick={() => setHelpOpen(!helpOpen)}
+            aria-label="Help"
+          >
+            ?
+          </button>
+          <HelpMenu 
+            isOpen={helpOpen} 
+            onClose={() => setHelpOpen(false)} 
+            onNewChat={onNewChat}
+            onOpenHowItWorks={handleOpenHowItWorks}
+          />
+        </div>
+      </footer>
+      
+      {/* How It Works Modal */}
+      <HowItWorksModal 
+        isOpen={showHowItWorks && !showArtBridge}
+        onClose={handleCloseHowItWorks}
+        onOpenArtBridge={handleOpenArtBridge}
+      />
+      
+      {/* ArtBridge Modal */}
+      <ArtBridgeModal 
+        isOpen={showArtBridge}
+        onClose={handleCloseHowItWorks}
+        onBack={handleBackToHowItWorks}
+      />
+    </>
   );
 }
 
@@ -487,6 +694,8 @@ if (typeof window !== 'undefined') {
   window.SocietyArts.NavSidebar = NavSidebar;
   window.SocietyArts.HelpMenu = HelpMenu;
   window.SocietyArts.FormatSelector = FormatSelector;
+  window.SocietyArts.HowItWorksModal = HowItWorksModal;
+  window.SocietyArts.ArtBridgeModal = ArtBridgeModal;
   window.SocietyArts.Icons = Icons;
   window.SocietyArts.NAV_ITEMS = NAV_ITEMS;
   window.SocietyArts.HELP_MENU_ITEMS = HELP_MENU_ITEMS;
