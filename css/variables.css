@@ -1,0 +1,137 @@
+/* ========================================
+   SOCIETY ARTS - CSS VARIABLES
+   Centralized design tokens
+   Version: 2.0
+   ======================================== */
+
+:root {
+  /* ======== COLORS ======== */
+  
+  /* Background Colors */
+  --color-background: #F5F0EB;
+  --color-surface: #FAF8F5;
+  --color-surface-alt: #E8E3DD;
+  --color-surface-hover: #F0EBE6;
+  --color-surface-dark: #DED8D1;
+  
+  /* Text Colors */
+  --color-text-primary: #3D3530;
+  --color-text-secondary: #5C544D;
+  --color-text-muted: #7A7067;
+  --color-text-placeholder: #B5A99A;
+  --color-text-light: #A89F94;
+  
+  /* Brand Colors */
+  --color-accent: #C75B3F;
+  --color-accent-hover: #B54E34;
+  --color-accent-light: rgba(199, 91, 63, 0.1);
+  --color-button-primary: #8B7355;
+  --color-button-primary-hover: #7A6449;
+  --color-highlight: #C9A08A;
+  
+  /* State Colors */
+  --color-success: #4A9D6E;
+  --color-warning: #D4A84B;
+  --color-error: #C75B3F;
+  --color-info: #4A90A4;
+  --color-voice-listening: #C75B3F;
+  --color-voice-speaking: #4A90A4;
+  
+  /* Border Colors */
+  --color-border: #E8E2DB;
+  --color-border-light: #E0DAD4;
+  --color-border-medium: #D4CCC4;
+  --color-border-dark: #DED8D1;
+  
+  /* Overlay */
+  --color-overlay: rgba(0, 0, 0, 0.3);
+  --color-overlay-dark: rgba(0, 0, 0, 0.5);
+  
+  /* ======== TYPOGRAPHY ======== */
+  
+  /* Font Families */
+  --font-serif: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Source Sans 3', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  
+  /* Font Sizes */
+  --text-xs: 11px;
+  --text-sm: 13px;
+  --text-base: 15px;
+  --text-md: 16px;
+  --text-lg: 18px;
+  --text-xl: 24px;
+  --text-2xl: 32px;
+  --text-3xl: 40px;
+  --text-4xl: 48px;
+  
+  /* Font Weights */
+  --weight-light: 300;
+  --weight-normal: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  
+  /* Line Heights */
+  --leading-tight: 1.2;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.65;
+  
+  /* Letter Spacing */
+  --tracking-tight: -0.5px;
+  --tracking-normal: 0;
+  --tracking-wide: 0.3px;
+  --tracking-wider: 0.5px;
+  --tracking-widest: 4px;
+  
+  /* ======== SPACING ======== */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 20px;
+  --space-2xl: 24px;
+  --space-3xl: 28px;
+  --space-4xl: 40px;
+  --space-5xl: 60px;
+  
+  /* ======== BORDERS ======== */
+  --radius-sm: 3px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-xl: 18px;
+  --radius-2xl: 25px;
+  --radius-full: 9999px;
+  
+  /* ======== SHADOWS ======== */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
+  --shadow-modal: 0 25px 50px rgba(0, 0, 0, 0.25);
+  
+  /* ======== TRANSITIONS ======== */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.2s ease;
+  --transition-slow: 0.3s ease;
+  --transition-slower: 0.5s ease;
+  
+  /* ======== Z-INDEX ======== */
+  --z-base: 1;
+  --z-dropdown: 50;
+  --z-sticky: 100;
+  --z-overlay: 200;
+  --z-modal: 300;
+  --z-popover: 400;
+  --z-toast: 500;
+  
+  /* ======== LAYOUT ======== */
+  --header-height: 70px;
+  --subheader-height: 80px;
+  --footer-height: 68px;
+  --sidebar-width: 280px;
+  --nav-sidebar-width: 300px;
+  --modal-width-sm: 400px;
+  --modal-width-md: 600px;
+  --modal-width-lg: 900px;
+  --modal-width-xl: 1200px;
+}

@@ -1,0 +1,641 @@
+/* ========================================
+   SOCIETY ARTS - COMPONENTS
+   Reusable UI components
+   Version: 2.0
+   ======================================== */
+
+/* ========================================
+   BUTTONS
+   ======================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: 12px 22px;
+  border-radius: var(--radius-2xl);
+  font-size: 14px;
+  font-weight: var(--weight-medium);
+  font-family: var(--font-sans);
+  letter-spacing: var(--tracking-wide);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  border: none;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-sm {
+  padding: 8px 16px;
+  font-size: var(--text-sm);
+}
+
+.btn-lg {
+  padding: 16px 32px;
+  font-size: var(--text-md);
+}
+
+.btn-primary {
+  background-color: var(--color-button-primary);
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--color-button-primary-hover);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-medium);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: var(--color-surface);
+  border-color: var(--color-border-dark);
+}
+
+.btn-accent {
+  background-color: var(--color-accent);
+  color: white;
+}
+
+.btn-accent:hover:not(:disabled) {
+  background-color: var(--color-accent-hover);
+}
+
+.btn-ghost {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  padding: var(--space-sm);
+}
+
+.btn-ghost:hover {
+  color: var(--color-text-primary);
+  background-color: var(--color-surface-alt);
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-primary);
+  padding: var(--space-xs);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--transition-fast);
+  border-radius: var(--radius-md);
+}
+
+.btn-icon:hover {
+  color: var(--color-text-secondary);
+  background-color: var(--color-surface-alt);
+}
+
+.btn-circle {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 50%;
+}
+
+.btn-circle-sm {
+  width: 32px;
+  height: 32px;
+}
+
+.btn-circle-lg {
+  width: 48px;
+  height: 48px;
+}
+
+/* Mic Button */
+.btn-mic {
+  background-color: var(--color-accent);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all var(--transition-normal);
+  color: white;
+}
+
+.btn-mic.listening {
+  animation: listening-pulse 1.5s ease-in-out infinite;
+}
+
+.btn-mic.speaking {
+  background-color: var(--color-voice-speaking);
+  animation: speaking-wave 1s ease-in-out infinite;
+}
+
+.btn-mic.active {
+  border: 2px solid white;
+}
+
+/* ========================================
+   CARDS
+   ======================================== */
+
+.card {
+  background-color: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  border: 2px solid transparent;
+  transition: border-color var(--transition-normal);
+}
+
+.card-selected {
+  border-color: var(--color-accent);
+}
+
+.card-clickable {
+  cursor: pointer;
+}
+
+.card-clickable:hover {
+  border-color: var(--color-border-medium);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.card-title {
+  font-family: var(--font-serif);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-md);
+  color: var(--color-text-primary);
+}
+
+.card-content {
+  font-size: 14px;
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-secondary);
+}
+
+.card-placeholder {
+  color: var(--color-text-placeholder);
+}
+
+/* ========================================
+   INPUTS
+   ======================================== */
+
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  background-color: white;
+  border-radius: 28px;
+  padding: 10px 10px 10px 18px;
+  gap: var(--space-md);
+  border: 1px solid var(--color-border-light);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.input-wrapper:focus-within {
+  border-color: var(--color-border-medium);
+  box-shadow: 0 0 0 3px var(--color-accent-light);
+}
+
+.input-text {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: var(--text-base);
+  font-family: var(--font-sans);
+  color: var(--color-text-primary);
+  background: transparent;
+  min-width: 0;
+}
+
+.input-text::placeholder {
+  color: var(--color-text-placeholder);
+}
+
+.input-text:disabled {
+  opacity: 0.7;
+}
+
+/* Search Input */
+.search-input {
+  display: flex;
+  align-items: center;
+  background-color: var(--color-surface);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-md) var(--space-lg);
+  gap: var(--space-sm);
+  border: 1px solid var(--color-border-light);
+  transition: all var(--transition-fast);
+}
+
+.search-input:focus-within {
+  background-color: white;
+  border-color: var(--color-border-medium);
+}
+
+.search-input input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: var(--text-base);
+  color: var(--color-text-primary);
+}
+
+.search-input input::placeholder {
+  color: var(--color-text-placeholder);
+}
+
+/* ========================================
+   CHECKBOX
+   ======================================== */
+
+.checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  cursor: pointer;
+}
+
+.checkbox {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--color-border-medium);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.checkbox.checked {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.checkbox-label {
+  font-size: var(--text-base);
+  color: var(--color-text-primary);
+}
+
+/* ========================================
+   RADIO BUTTONS
+   ======================================== */
+
+.radio-outer {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--color-highlight);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+}
+
+.radio-outer.selected {
+  border-color: var(--color-accent);
+}
+
+.radio-inner {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--color-highlight);
+}
+
+.radio-outer.selected .radio-inner {
+  background-color: var(--color-accent);
+}
+
+/* ========================================
+   BADGES
+   ======================================== */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: var(--text-xs);
+  padding: 3px 8px;
+  border-radius: var(--radius-md);
+  font-weight: var(--weight-medium);
+}
+
+.badge-muted {
+  background-color: var(--color-surface-alt);
+  color: var(--color-text-muted);
+}
+
+.badge-accent {
+  background-color: var(--color-accent);
+  color: white;
+}
+
+.badge-count {
+  background-color: var(--color-surface-alt);
+  color: var(--color-text-muted);
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+}
+
+/* ========================================
+   PROGRESS BAR
+   ======================================== */
+
+.progress-bar {
+  height: 4px;
+  background-color: var(--color-border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: var(--color-accent);
+  border-radius: 2px;
+  transition: width var(--transition-slower);
+}
+
+/* ========================================
+   DROPDOWN
+   ======================================== */
+
+.dropdown {
+  position: relative;
+  background-color: var(--color-surface);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 14px;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.dropdown:hover {
+  background-color: var(--color-surface-hover);
+}
+
+.dropdown-select {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.dropdown-label {
+  font-weight: var(--weight-medium);
+}
+
+.dropdown-value {
+  margin-left: auto;
+  color: var(--color-text-secondary);
+}
+
+/* Dropdown Menu */
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--color-border);
+  padding: var(--space-sm) 0;
+  z-index: var(--z-dropdown);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all var(--transition-fast);
+}
+
+.dropdown-menu.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(var(--space-sm));
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.dropdown-item:hover {
+  background-color: var(--color-surface-alt);
+}
+
+.dropdown-item.selected {
+  background-color: var(--color-accent-light);
+  color: var(--color-accent);
+}
+
+/* ========================================
+   MESSAGE BUBBLES
+   ======================================== */
+
+.message {
+  display: flex;
+  margin-bottom: var(--space-lg);
+}
+
+.message-user {
+  justify-content: flex-end;
+}
+
+.message-assistant {
+  justify-content: flex-start;
+}
+
+.message-bubble {
+  padding: 12px 16px;
+  border-radius: var(--radius-xl);
+  max-width: 80%;
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+}
+
+.message-bubble-user {
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+}
+
+.message-bubble-assistant {
+  background: transparent;
+  color: var(--color-text-primary);
+  max-width: 85%;
+  padding: 0;
+}
+
+/* ========================================
+   TYPING INDICATOR
+   ======================================== */
+
+.typing-indicator {
+  display: flex;
+  gap: 5px;
+  padding: 10px 0;
+}
+
+.typing-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--color-text-light);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.typing-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* ========================================
+   TAGS
+   ======================================== */
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  background-color: var(--color-surface-alt);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border-light);
+}
+
+.tag-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+/* ========================================
+   COLOR PALETTE
+   ======================================== */
+
+.palette {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.palette-swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border-light);
+}
+
+/* ========================================
+   STYLE CARDS (for Style Finder)
+   ======================================== */
+
+.style-card {
+  background-color: var(--color-surface);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color var(--transition-normal), transform var(--transition-normal);
+}
+
+.style-card:hover {
+  transform: scale(1.02);
+}
+
+.style-card-selected {
+  border-color: var(--color-accent);
+}
+
+.style-card-image {
+  position: relative;
+  aspect-ratio: 1;
+}
+
+.style-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.style-card-menu {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  cursor: pointer;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.style-card:hover .style-card-menu {
+  opacity: 1;
+}
+
+.style-card-name {
+  padding: 10px 12px;
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-primary);
+  line-height: var(--leading-tight);
+}
+
+/* ========================================
+   DIVIDER
+   ======================================== */
+
+.divider {
+  height: 1px;
+  background-color: var(--color-border);
+  margin: var(--space-lg) 0;
+}
+
+.divider-vertical {
+  width: 1px;
+  height: 100%;
+  background-color: var(--color-border);
+  margin: 0 var(--space-lg);
+}

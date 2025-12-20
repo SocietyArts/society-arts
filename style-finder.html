@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Style Finder - Society Arts</title>
+  
+  <!-- React -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/header.css">
+  <link rel="stylesheet" href="/css/modals.css">
+  
+  <style>
+    .style-finder-page {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    }
+    
+    .sf-sidebar {
+      width: 260px;
+      background: var(--color-surface);
+      border-right: 1px solid var(--color-border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    
+    .sf-sidebar-header {
+      padding: var(--space-xl);
+      border-bottom: 1px solid var(--color-border);
+    }
+    
+    .sf-sidebar-title {
+      font-family: var(--font-serif);
+      font-size: var(--text-lg);
+      font-weight: var(--weight-medium);
+      margin-bottom: var(--space-lg);
+    }
+    
+    .sf-sidebar-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--space-lg) 0;
+    }
+    
+    .sf-nav-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      padding: var(--space-md) var(--space-xl);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      border-left: 3px solid transparent;
+      color: var(--color-text-primary);
+    }
+    
+    .sf-nav-item:hover { background: var(--color-surface-alt); }
+    .sf-nav-item.active {
+      background: var(--color-surface-alt);
+      border-left-color: var(--color-accent);
+    }
+    .sf-nav-item.active .sf-nav-label {
+      color: var(--color-accent);
+      font-weight: var(--weight-medium);
+    }
+    
+    .sf-nav-icon {
+      color: var(--color-text-muted);
+      width: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .sf-nav-item.active .sf-nav-icon { color: var(--color-accent); }
+    .sf-nav-label { flex: 1; font-size: var(--text-base); }
+    .sf-nav-count {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+      background: var(--color-surface-alt);
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+    }
+    
+    .sf-divider {
+      height: 1px;
+      background: var(--color-border);
+      margin: var(--space-md) var(--space-xl);
+    }
+    
+    .sf-category-group { margin-bottom: var(--space-sm); }
+    .sf-category-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-md) var(--space-xl);
+      cursor: pointer;
+      transition: background var(--transition-fast);
+    }
+    .sf-category-header:hover { background: var(--color-surface-alt); }
+    .sf-category-arrow {
+      color: var(--color-text-muted);
+      transition: transform var(--transition-fast);
+    }
+    .sf-category-arrow.expanded { transform: rotate(90deg); }
+    .sf-category-name { flex: 1; font-weight: var(--weight-medium); font-size: var(--text-base); }
+    .sf-category-count { font-size: var(--text-sm); color: var(--color-text-muted); }
+    
+    .sf-medium-list { display: none; padding-left: var(--space-2xl); }
+    .sf-medium-list.expanded { display: block; }
+    .sf-medium-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-sm) var(--space-xl);
+      cursor: pointer;
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      transition: all var(--transition-fast);
+    }
+    .sf-medium-item:hover { background: var(--color-surface-alt); }
+    .sf-medium-item.selected { color: var(--color-accent); font-weight: var(--weight-medium); }
+    .sf-medium-checkbox {
+      width: 16px; height: 16px;
+      border: 2px solid var(--color-border-medium);
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all var(--transition-fast);
+    }
+    .sf-medium-checkbox.checked { background: var(--color-accent); border-color: var(--color-accent); }
+    .sf-medium-name { flex: 1; }
+    .sf-medium-count { color: var(--color-text-muted); }
+    
+    .sf-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      overflow: hidden;
+    }
+    
+    .sf-toolbar {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+      padding: var(--space-lg) var(--space-2xl);
+      border-bottom: 1px solid var(--color-border);
+      background: var(--color-surface);
+    }
+    
+    .sf-search {
+      display: flex;
+      align-items: center;
+      background: var(--color-background);
+      border-radius: var(--radius-2xl);
+      padding: var(--space-sm) var(--space-lg);
+      gap: var(--space-sm);
+      flex: 1;
+      max-width: 400px;
+      border: 1px solid transparent;
+      transition: all var(--transition-fast);
+    }
+    .sf-search:focus-within { background: white; border-color: var(--color-border-medium); }
+    .sf-search input {
+      flex: 1; border: none; outline: none;
+      background: transparent; font-size: var(--text-base);
+    }
+    .sf-search input::placeholder { color: var(--color-text-placeholder); }
+    .sf-result-count { font-size: var(--text-sm); color: var(--color-text-muted); }
+    
+    .sf-view-toggle { display: flex; gap: var(--space-xs); margin-left: auto; }
+    .sf-view-btn {
+      padding: var(--space-sm); border: none; background: none;
+      color: var(--color-text-muted); border-radius: var(--radius-md);
+      cursor: pointer; transition: all var(--transition-fast);
+    }
+    .sf-view-btn:hover { background: var(--color-surface-alt); }
+    .sf-view-btn.active { background: var(--color-surface-alt); color: var(--color-text-primary); }
+    
+    .sf-grid-container { flex: 1; overflow-y: auto; padding: var(--space-2xl); }
+    .sf-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: var(--space-lg);
+    }
+    
+    .style-viewer-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--color-overlay-dark); z-index: var(--z-modal);
+      display: flex; align-items: center; justify-content: center;
+      padding: var(--space-2xl);
+      opacity: 0; visibility: hidden; transition: all var(--transition-normal);
+    }
+    .style-viewer-overlay.open { opacity: 1; visibility: visible; }
+    
+    .style-viewer {
+      background: white; border-radius: var(--radius-lg);
+      width: 100%; max-width: 1100px; height: 80vh;
+      display: flex; flex-direction: column; overflow: hidden;
+      transform: scale(0.95); transition: transform var(--transition-normal);
+    }
+    .style-viewer-overlay.open .style-viewer { transform: scale(1); }
+    
+    .sv-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: var(--space-lg) var(--space-2xl);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .sv-close {
+      background: none; border: none; cursor: pointer;
+      color: var(--color-text-muted); padding: var(--space-sm);
+      border-radius: var(--radius-md); transition: all var(--transition-fast);
+    }
+    .sv-close:hover { background: var(--color-surface-alt); color: var(--color-text-primary); }
+    
+    .sv-body { display: flex; flex: 1; min-height: 0; overflow: hidden; }
+    .sv-info {
+      width: 340px; padding: var(--space-2xl); overflow-y: auto;
+      border-right: 1px solid var(--color-border); flex-shrink: 0;
+    }
+    .sv-name {
+      font-family: var(--font-serif); font-size: var(--text-xl);
+      font-weight: var(--weight-medium); margin-bottom: var(--space-lg);
+      line-height: var(--leading-tight);
+    }
+    .sv-description {
+      font-size: var(--text-base); color: var(--color-text-secondary);
+      line-height: var(--leading-relaxed); margin-bottom: var(--space-xl);
+    }
+    .sv-section { margin-bottom: var(--space-xl); }
+    .sv-section-title {
+      font-size: var(--text-sm); font-weight: var(--weight-semibold);
+      color: var(--color-text-muted); text-transform: uppercase;
+      letter-spacing: 1px; margin-bottom: var(--space-sm);
+    }
+    .sv-tags { display: flex; flex-wrap: wrap; gap: var(--space-sm); }
+    .sv-palette { display: flex; gap: var(--space-sm); }
+    .sv-swatch {
+      width: 32px; height: 32px; border-radius: var(--radius-sm);
+      border: 1px solid var(--color-border-light);
+    }
+    .sv-actions {
+      display: flex; gap: var(--space-md); padding-top: var(--space-xl);
+      border-top: 1px solid var(--color-border); margin-top: var(--space-xl);
+    }
+    .sv-actions .btn { flex: 1; }
+    .sv-favorite {
+      width: 44px; height: 44px;
+      border: 1px solid var(--color-border-medium);
+      border-radius: var(--radius-md); background: white;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--color-text-muted);
+      transition: all var(--transition-fast); flex-shrink: 0;
+    }
+    .sv-favorite:hover { border-color: var(--color-accent); color: var(--color-accent); }
+    .sv-favorite.active { background: var(--color-accent); border-color: var(--color-accent); color: white; }
+    
+    .sv-images { flex: 1; display: flex; flex-direction: column; padding: var(--space-xl); min-width: 0; }
+    .sv-main-image {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      background: var(--color-surface-alt); border-radius: var(--radius-lg);
+      overflow: hidden; position: relative; min-height: 0;
+    }
+    .sv-main-image img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .sv-image-id {
+      position: absolute; bottom: var(--space-md); left: 50%;
+      transform: translateX(-50%); font-size: var(--text-sm);
+      color: var(--color-text-muted); background: rgba(255,255,255,0.9);
+      padding: var(--space-xs) var(--space-md); border-radius: var(--radius-md);
+    }
+    .sv-thumbnails {
+      display: flex; gap: var(--space-sm); margin-top: var(--space-lg);
+      overflow-x: auto; padding-bottom: var(--space-sm);
+    }
+    .sv-thumb {
+      width: 70px; height: 70px; border-radius: var(--radius-md);
+      overflow: hidden; cursor: pointer; border: 2px solid transparent;
+      flex-shrink: 0; transition: all var(--transition-fast);
+    }
+    .sv-thumb:hover { border-color: var(--color-border-medium); }
+    .sv-thumb.active { border-color: var(--color-accent); }
+    .sv-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  
+  <script type="text/babel" src="/js/shared/api.js"></script>
+  <script type="text/babel" src="/js/shared/header.js"></script>
+  <script type="text/babel" src="/js/style-finder/style-data.js"></script>
+  
+  <script type="text/babel">
+    const { useState, useMemo } = React;
+    const { Header, Footer, Icons } = window.SocietyArts;
+    const { StyleData } = window.SocietyArts;
+
+    const HeartIcon = ({ filled }) => (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.5">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+      </svg>
+    );
+    
+    const CheckIcon = () => (
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+    );
+
+    function StyleCard({ style, isSelected, onSelect, onView }) {
+      return (
+        <div className={`style-card ${isSelected ? 'style-card-selected' : ''}`} onClick={() => onView(style)}>
+          <div className="style-card-image">
+            <img src={style.thumbnail} alt={style.name} loading="lazy" />
+            <button className="style-card-menu" onClick={(e) => { e.stopPropagation(); onSelect(style.id); }}>
+              {isSelected ? <CheckIcon /> : (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                  <circle cx="12" cy="5" r="2"></circle>
+                  <circle cx="12" cy="12" r="2"></circle>
+                  <circle cx="12" cy="19" r="2"></circle>
+                </svg>
+              )}
+            </button>
+          </div>
+          <p className="style-card-name">{style.name}</p>
+        </div>
+      );
+    }
+
+    function StyleViewer({ style, isOpen, onClose, onAddToProject, isFavorite, onToggleFavorite }) {
+      const [activeImage, setActiveImage] = useState(0);
+      if (!style) return null;
+      const images = [style.thumbnail, ...Array(8).fill(style.thumbnail)];
+      
+      return (
+        <div className={`style-viewer-overlay ${isOpen ? 'open' : ''}`} onClick={onClose}>
+          <div className="style-viewer" onClick={(e) => e.stopPropagation()}>
+            <div className="sv-header">
+              <span style={{ fontSize: '14px', color: 'var(--color-text-muted)' }}>Style #{style.id}</span>
+              <button className="sv-close" onClick={onClose}><Icons.close /></button>
+            </div>
+            <div className="sv-body">
+              <div className="sv-info">
+                <h2 className="sv-name">{style.displayName || style.name}</h2>
+                <p className="sv-description">{style.description}</p>
+                <div className="sv-section">
+                  <h3 className="sv-section-title">Tags</h3>
+                  <div className="sv-tags">
+                    {style.tags.map((tag, i) => (<span key={i} className="tag">{tag}</span>))}
+                  </div>
+                </div>
+                <div className="sv-section">
+                  <h3 className="sv-section-title">Color Palette</h3>
+                  <div className="sv-palette">
+                    {style.palette.map((color, i) => (<div key={i} className="sv-swatch" style={{ backgroundColor: color }} title={color} />))}
+                  </div>
+                </div>
+                <div className="sv-section">
+                  <h3 className="sv-section-title">About This Style</h3>
+                  <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', lineHeight: 1.6 }}>{style.aboutText}</p>
+                </div>
+                <div className="sv-actions">
+                  <button className="btn btn-primary" onClick={() => onAddToProject(style.id)}>Add to Project</button>
+                  <button className={`sv-favorite ${isFavorite ? 'active' : ''}`} onClick={() => onToggleFavorite(style.id)}>
+                    <HeartIcon filled={isFavorite} />
+                  </button>
+                </div>
+              </div>
+              <div className="sv-images">
+                <div className="sv-main-image">
+                  <img src={images[activeImage]} alt={`${style.name} example ${activeImage + 1}`} />
+                  <span className="sv-image-id">Image {activeImage + 1} of {images.length}</span>
+                </div>
+                <div className="sv-thumbnails">
+                  {images.map((img, i) => (
+                    <div key={i} className={`sv-thumb ${activeImage === i ? 'active' : ''}`} onClick={() => setActiveImage(i)}>
+                      <img src={img} alt={`Thumbnail ${i + 1}`} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function StyleFinderApp() {
+      const [searchQuery, setSearchQuery] = useState('');
+      const [selectedMediums, setSelectedMediums] = useState([]);
+      const [expandedCategories, setExpandedCategories] = useState(['painting']);
+      const [activeNav, setActiveNav] = useState('explore');
+      const [selectedStyles, setSelectedStyles] = useState([]);
+      const [viewingStyle, setViewingStyle] = useState(null);
+      const [favorites, setFavorites] = useState(() => StyleData.getFavorites());
+      
+      const mediumCounts = useMemo(() => StyleData.getMediumStyleCounts(), []);
+      
+      const filteredStyles = useMemo(() => {
+        let styles = StyleData.SAMPLE_STYLES;
+        if (activeNav === 'favorites') styles = styles.filter(s => favorites.includes(s.id));
+        if (selectedMediums.length > 0) styles = styles.filter(s => selectedMediums.includes(s.mediumId));
+        if (searchQuery.trim()) styles = StyleData.searchStyles(searchQuery);
+        return styles;
+      }, [searchQuery, selectedMediums, activeNav, favorites]);
+      
+      const toggleCategory = (id) => setExpandedCategories(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+      const toggleMedium = (id) => setSelectedMediums(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+      const toggleStyleSelection = (id) => setSelectedStyles(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+      
+      const toggleFavorite = (id) => {
+        if (favorites.includes(id)) {
+          setFavorites(StyleData.removeFromFavorites(id));
+        } else {
+          setFavorites(StyleData.addToFavorites(id));
+        }
+      };
+      
+      const handleAddToProject = (id) => { toggleStyleSelection(id); setViewingStyle(null); };
+
+      return (
+        <div className="page-container">
+          <Header currentPage="style-finder" />
+          <main className="main-content style-finder-page">
+            <aside className="sf-sidebar">
+              <div className="sf-sidebar-header">
+                <h2 className="sf-sidebar-title">Style Finder</h2>
+                <div className="sf-search">
+                  <Icons.search />
+                  <input type="text" placeholder="Search styles..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+                </div>
+              </div>
+              <div className="sf-sidebar-content">
+                <div className={`sf-nav-item ${activeNav === 'favorites' ? 'active' : ''}`} onClick={() => setActiveNav('favorites')}>
+                  <span className="sf-nav-icon"><HeartIcon /></span>
+                  <span className="sf-nav-label">Favorites</span>
+                  <span className="sf-nav-count">{favorites.length}</span>
+                </div>
+                <div className={`sf-nav-item ${activeNav === 'explore' ? 'active' : ''}`} onClick={() => { setActiveNav('explore'); setSelectedMediums([]); }}>
+                  <span className="sf-nav-icon"><Icons.explore /></span>
+                  <span className="sf-nav-label">Explore All</span>
+                  <span className="sf-nav-count">{StyleData.SAMPLE_STYLES.length}</span>
+                </div>
+                <div className="sf-divider" />
+                {StyleData.MEDIUM_MATRIX.categories.map(cat => (
+                  <div key={cat.id} className="sf-category-group">
+                    <div className="sf-category-header" onClick={() => toggleCategory(cat.id)}>
+                      <span className={`sf-category-arrow ${expandedCategories.includes(cat.id) ? 'expanded' : ''}`}><Icons.chevronRight /></span>
+                      <span className="sf-category-name">{cat.name}</span>
+                      <span className="sf-category-count">{StyleData.getCategoryStyleCount(cat.id)}</span>
+                    </div>
+                    <div className={`sf-medium-list ${expandedCategories.includes(cat.id) ? 'expanded' : ''}`}>
+                      {cat.mediums.map(med => (
+                        <div key={med.id} className={`sf-medium-item ${selectedMediums.includes(med.id) ? 'selected' : ''}`} onClick={() => toggleMedium(med.id)}>
+                          <span className={`sf-medium-checkbox ${selectedMediums.includes(med.id) ? 'checked' : ''}`}>
+                            {selectedMediums.includes(med.id) && <CheckIcon />}
+                          </span>
+                          <span className="sf-medium-name">{med.name}</span>
+                          <span className="sf-medium-count">{mediumCounts[med.id] || 0}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </aside>
+            <div className="sf-main">
+              <div className="sf-toolbar">
+                <span className="sf-result-count">Showing {filteredStyles.length} styles</span>
+                <div className="sf-view-toggle">
+                  <button className="sf-view-btn active" title="Grid view">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      <rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect>
+                      <rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div className="sf-grid-container">
+                <div className="sf-grid">
+                  {filteredStyles.map(style => (
+                    <StyleCard key={style.id} style={style} isSelected={selectedStyles.includes(style.id)} onSelect={toggleStyleSelection} onView={setViewingStyle} />
+                  ))}
+                </div>
+                {filteredStyles.length === 0 && (
+                  <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--color-text-muted)' }}>
+                    <p style={{ fontSize: '18px', marginBottom: '8px' }}>No styles found</p>
+                    <p style={{ fontSize: '14px' }}>Try adjusting your search or filters</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </main>
+          <Footer>
+            {selectedStyles.length > 0 && (
+              <span style={{ marginRight: 'auto', color: 'var(--color-text-muted)', fontSize: '14px' }}>
+                {selectedStyles.length} style{selectedStyles.length > 1 ? 's' : ''} selected
+              </span>
+            )}
+            <a href="/story-builder.html" className="btn btn-primary">Continue to Story Builder<Icons.arrowRight /></a>
+          </Footer>
+          <StyleViewer style={viewingStyle} isOpen={!!viewingStyle} onClose={() => setViewingStyle(null)} onAddToProject={handleAddToProject} isFavorite={viewingStyle ? favorites.includes(viewingStyle.id) : false} onToggleFavorite={toggleFavorite} />
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<StyleFinderApp />);
+  </script>
+</body>
+</html>
