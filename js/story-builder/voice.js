@@ -76,94 +76,108 @@ function useVoiceInterface({ onUserMessage, onAssistantMessage }) {
   };
 
   const connect = async (configId = null) => {
-    try {
-      setError(null);
-      const accessToken = await API.getHumeToken();
-      
-      let wsUrl = `wss://api.hume.ai/v0/evi/chat?access_token=${accessToken}`;
-      if (configId) {
-        wsUrl += `&config_id=${configId}`;
-      }
-
-      socketRef.current = new WebSocket(wsUrl);
-
-      socketRef.current.onopen = () => {
-        console.log('Voice interface connected');
-        setIsConnected(true);
+    return new Promise(async (resolve, reject) => {
+      try {
+        setError(null);
+        console.log('Getting Hume token...');
+        const accessToken = await API.getHumeToken();
+        console.log('Token received, connecting to WebSocket...');
         
-        socketRef.current.send(JSON.stringify({
-          type: 'session_settings',
-          system_prompt: API.prompts.voiceMode,
-        }));
-      };
-
-      socketRef.current.onmessage = (event) => {
-        const message = JSON.parse(event.data);
-        
-        switch (message.type) {
-          case 'user_message':
-            if (message.message?.content) {
-              onUserMessage?.(message.message.content);
-            }
-            break;
-            
-          case 'assistant_message':
-            if (message.message?.content) {
-              currentAssistantMessageRef.current = message.message.content;
-            }
-            break;
-          
-          case 'assistant_end':
-            if (currentAssistantMessageRef.current) {
-              onAssistantMessage?.(currentAssistantMessageRef.current);
-              currentAssistantMessageRef.current = '';
-            }
-            break;
-            
-          case 'audio_output':
-            if (message.data) {
-              audioQueueRef.current.push(message.data);
-              playAudioQueue();
-            }
-            break;
-            
-          case 'user_interruption':
-            audioQueueRef.current = [];
-            break;
-            
-          case 'error':
-            console.error('Voice interface error:', message);
-            setError(message.message || 'An error occurred');
-            break;
+        let wsUrl = `wss://api.hume.ai/v0/evi/chat?access_token=${accessToken}`;
+        if (configId) {
+          wsUrl += `&config_id=${configId}`;
         }
-      };
 
-      socketRef.current.onerror = (err) => {
-        console.error('WebSocket error:', err);
-        setError('Connection error');
-        setIsConnected(false);
-      };
+        socketRef.current = new WebSocket(wsUrl);
 
-      socketRef.current.onclose = () => {
-        console.log('Voice interface disconnected');
-        setIsConnected(false);
-        setIsListening(false);
-      };
+        socketRef.current.onopen = () => {
+          console.log('WebSocket opened, sending session settings...');
+          setIsConnected(true);
+          
+          socketRef.current.send(JSON.stringify({
+            type: 'session_settings',
+            system_prompt: API.prompts.voiceMode,
+          }));
+          
+          console.log('Voice interface ready!');
+          resolve();
+        };
 
-    } catch (err) {
-      console.error('Failed to connect voice interface:', err);
-      setError(err.message);
-      throw err;
-    }
+        socketRef.current.onmessage = (event) => {
+          const message = JSON.parse(event.data);
+          console.log('Received message type:', message.type);
+          
+          switch (message.type) {
+            case 'user_message':
+              if (message.message?.content) {
+                console.log('User said:', message.message.content);
+                onUserMessage?.(message.message.content);
+              }
+              break;
+              
+            case 'assistant_message':
+              if (message.message?.content) {
+                console.log('Assistant says:', message.message.content);
+                currentAssistantMessageRef.current = message.message.content;
+              }
+              break;
+            
+            case 'assistant_end':
+              if (currentAssistantMessageRef.current) {
+                onAssistantMessage?.(currentAssistantMessageRef.current);
+                currentAssistantMessageRef.current = '';
+              }
+              break;
+              
+            case 'audio_output':
+              if (message.data) {
+                console.log('Received audio chunk');
+                audioQueueRef.current.push(message.data);
+                playAudioQueue();
+              }
+              break;
+              
+            case 'user_interruption':
+              audioQueueRef.current = [];
+              break;
+              
+            case 'error':
+              console.error('Voice interface error:', message);
+              setError(message.message || 'An error occurred');
+              break;
+          }
+        };
+
+        socketRef.current.onerror = (err) => {
+          console.error('WebSocket error:', err);
+          setError('Connection error');
+          setIsConnected(false);
+          reject(err);
+        };
+
+        socketRef.current.onclose = () => {
+          console.log('Voice interface disconnected');
+          setIsConnected(false);
+          setIsListening(false);
+        };
+
+      } catch (err) {
+        console.error('Failed to connect voice interface:', err);
+        setError(err.message);
+        reject(err);
+      }
+    });
   };
 
   const startListening = async () => {
+    console.log('startListening called');
     if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) {
-      console.error('WebSocket not connected');
+      console.error('WebSocket not connected, state:', socketRef.current?.readyState);
       return;
     }
 
     try {
+      console.log('Requesting microphone access...');
       const stream = await navigator.mediaDevices.getUserMedia({ 
         audio: {
           echoCancellation: true,
@@ -171,6 +185,7 @@ function useVoiceInterface({ onUserMessage, onAssistantMessage }) {
           autoGainControl: true,
         } 
       });
+      console.log('Microphone access granted');
       streamRef.current = stream;
 
       if (audioContextRef.current?.state === 'suspended') {
@@ -197,6 +212,7 @@ function useVoiceInterface({ onUserMessage, onAssistantMessage }) {
 
       mediaRecorderRef.current.start(100);
       setIsListening(true);
+      console.log('Now listening!');
     } catch (err) {
       console.error('Failed to start listening:', err);
       setError('Microphone access denied');
@@ -294,27 +310,20 @@ function UnifiedInput({
     
     if (!voice?.isConnected) return;
     
-    isHoldingRef.current = true;
-    voice.startListening();
+    // Toggle listening on click
+    if (voice.isListening) {
+      voice.stopListening();
+    } else {
+      voice.startListening();
+    }
   };
 
   const handleMicMouseUp = (e) => {
-    if (isTouch) return;
-    e.preventDefault();
-    
-    if (isHoldingRef.current && voice?.stopListening) {
-      isHoldingRef.current = false;
-      voice.stopListening();
-    }
+    // No-op - we're using toggle now, not hold-to-talk
   };
 
   const handleMicMouseLeave = (e) => {
-    if (isTouch) return;
-    
-    if (isHoldingRef.current && voice?.stopListening) {
-      isHoldingRef.current = false;
-      voice.stopListening();
-    }
+    // No-op - we're using toggle now, not hold-to-talk
   };
 
   // Mobile/Touch: Tap to toggle
@@ -336,8 +345,8 @@ function UnifiedInput({
     if (voice.error) return voice.error;
     if (!voice.isConnected) return 'Connecting...';
     if (voice.isSpeaking) return 'Speaking...';
-    if (voice.isListening) return isTouch ? 'Tap to stop' : 'Release to send';
-    return isTouch ? 'Tap to speak' : 'Hold to speak';
+    if (voice.isListening) return 'Listening... (tap to mute)';
+    return 'Muted (tap to unmute)';
   };
 
   // Early return if voice not ready
