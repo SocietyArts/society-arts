@@ -303,15 +303,26 @@
           setVoiceMode(false);
         } else if (enable && !voiceMode) {
           try {
-            await voice.connect();
-            setVoiceMode(true);
+            setVoiceMode(true); // Show voice UI immediately
             setHasStarted(true);
+            await voice.connect();
           } catch (err) {
             console.error('Failed to enable voice mode:', err);
+            setVoiceMode(false);
             alert('Failed to connect to voice service. Please try again.');
           }
         }
       };
+
+      // Auto-start listening when voice connects
+      useEffect(() => {
+        if (voiceMode && voice.isConnected && !voice.isListening && !voice.isSpeaking) {
+          const timer = setTimeout(() => {
+            voice.startListening();
+          }, 300);
+          return () => clearTimeout(timer);
+        }
+      }, [voiceMode, voice.isConnected]);
 
       const sendMessage = async () => {
         if (!inputValue.trim() || isLoading) return;
