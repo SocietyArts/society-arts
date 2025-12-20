@@ -18,7 +18,6 @@ function StoryInfoTooltip({ show, onClose }) {
         <ul>
           <li><strong>Auto-populates</strong> as you tell your story</li>
           <li><strong>Editable</strong> — type directly or refine any words</li>
-          <li><strong>Read aloud</strong> — click the speaker icon to hear it</li>
         </ul>
         <button className="story-info-close" onClick={onClose}>Got it</button>
       </div>
@@ -31,13 +30,10 @@ function StoryInfoTooltip({ show, onClose }) {
  */
 function StoryCard({ story, isVoiceMode, transformedStory, transformLabel, onClearTransform, onStoryChange }) {
   const [showInfo, setShowInfo] = React.useState(false);
-  const [isReading, setIsReading] = React.useState(false);
   const textareaRef = React.useRef(null);
-  const speechRef = React.useRef(null);
   
   const displayStory = transformedStory || story || '';
   const isTransformed = !!transformedStory;
-  const hasContent = displayStory.trim().length > 0;
 
   // Auto-resize textarea
   React.useEffect(() => {
@@ -47,48 +43,11 @@ function StoryCard({ story, isVoiceMode, transformedStory, transformLabel, onCle
     }
   }, [displayStory]);
 
-  // Cleanup speech on unmount
-  React.useEffect(() => {
-    return () => {
-      if (speechRef.current) {
-        window.speechSynthesis.cancel();
-      }
-    };
-  }, []);
-
   const handleTextChange = (e) => {
     const newValue = e.target.value;
     if (onStoryChange) {
       onStoryChange(newValue);
     }
-  };
-
-  const handleReadToMe = () => {
-    if (isReading) {
-      // Stop reading
-      window.speechSynthesis.cancel();
-      setIsReading(false);
-      return;
-    }
-
-    if (!displayStory.trim()) return;
-
-    // Start reading
-    const utterance = new SpeechSynthesisUtterance(displayStory);
-    utterance.rate = 0.9;
-    utterance.pitch = 1;
-    
-    utterance.onend = () => {
-      setIsReading(false);
-    };
-    
-    utterance.onerror = () => {
-      setIsReading(false);
-    };
-
-    speechRef.current = utterance;
-    setIsReading(true);
-    window.speechSynthesis.speak(utterance);
   };
 
   // Icons
@@ -100,19 +59,6 @@ function StoryCard({ story, isVoiceMode, transformedStory, transformLabel, onCle
     </svg>
   );
 
-  const SpeakerIcon = () => (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-      <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-    </svg>
-  );
-
-  const StopIcon = () => (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <rect x="6" y="6" width="12" height="12" rx="2"></rect>
-    </svg>
-  );
-
   return (
     <div className="card story-card">
       <div className="card-header">
@@ -121,15 +67,6 @@ function StoryCard({ story, isVoiceMode, transformedStory, transformLabel, onCle
           {isVoiceMode && <span className="badge badge-muted">🎤 Voice</span>}
           {isTransformed && (
             <span className="badge badge-accent">{transformLabel}</span>
-          )}
-          {hasContent && (
-            <button 
-              className={`story-action-btn ${isReading ? 'active' : ''}`}
-              onClick={handleReadToMe}
-              title={isReading ? 'Stop reading' : 'Read to me'}
-            >
-              {isReading ? <StopIcon /> : <SpeakerIcon />}
-            </button>
           )}
           <button 
             className={`story-action-btn ${showInfo ? 'active' : ''}`}
