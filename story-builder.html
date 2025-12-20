@@ -240,8 +240,8 @@
         }, 1000);
       }, []);
 
-      // Hume EVI
-      const hume = Voice.useHumeEVI({
+      // Voice Interface
+      const voice = Voice.useVoiceInterface({
         onUserMessage: handleVoiceUserMessage,
         onAssistantMessage: handleVoiceAssistantMessage,
       });
@@ -288,39 +288,28 @@
         setIsLoading(false);
         setStory(null);
         setTitle(null);
-        setSelectedVariation('main');
-        setVariations({ A: null, B: null });
+        setTransformedStory(null);
+        setTransformLabel(null);
         setSelectedStyles([]);
         setAspectRatio('1:1');
         setHasStarted(false);
         setVoiceMode(false);
-        hume.disconnect();
+        voice.disconnect();
       };
 
-      const toggleVoiceMode = async () => {
-        if (voiceMode) {
-          hume.disconnect();
+      const toggleVoiceMode = async (enable) => {
+        if (!enable && voiceMode) {
+          voice.disconnect();
           setVoiceMode(false);
-        } else {
+        } else if (enable && !voiceMode) {
           try {
-            await hume.connect();
+            await voice.connect();
             setVoiceMode(true);
             setHasStarted(true);
-            setTimeout(() => hume.startListening(), 500);
           } catch (err) {
             console.error('Failed to enable voice mode:', err);
-            alert('Failed to connect to voice service. Please check your Hume.ai credentials.');
+            alert('Failed to connect to voice service. Please try again.');
           }
-        }
-      };
-
-      const handleMicClick = async () => {
-        if (!voiceMode) {
-          await toggleVoiceMode();
-        } else if (hume.isListening) {
-          hume.stopListening();
-        } else if (!hume.isSpeaking) {
-          hume.startListening();
         }
       };
 
@@ -451,15 +440,6 @@
                 </div>
               )}
               
-              {voiceMode && (
-                <Voice.VoiceModeIndicator
-                  isListening={hume.isListening}
-                  isSpeaking={hume.isSpeaking}
-                  error={hume.error}
-                  onExit={toggleVoiceMode}
-                />
-              )}
-              
               <div className="messages-container">
                 {!hasStarted ? (
                   <div className="welcome-container">
@@ -467,40 +447,16 @@
                     <p className="welcome-text">
                       I'm here to help create your beautiful work of art from your own idea or personal story. Let me know when you're ready to begin.
                     </p>
-                    <div className="welcome-input-wrapper">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A89F94" strokeWidth="1.5">
-                        <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
-                      </svg>
-                      <input
-                        type="text"
-                        className="input-text"
-                        placeholder={hume.isListening ? "Listening..." : "Start your story..."}
-                        value={inputValue}
-                        onChange={(e) => setInputValue(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                        disabled={isLoading || hume.isListening}
-                      />
-                      <button 
-                        className="btn-icon"
-                        style={{ opacity: inputValue.trim() ? 1 : 0.4 }}
-                        onClick={sendMessage}
-                        disabled={isLoading || !inputValue.trim()}
-                      >
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                          <line x1="22" y1="2" x2="11" y2="13"></line>
-                          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                        </svg>
-                      </button>
-                      <Voice.MicButton
-                        voiceMode={voiceMode}
-                        isListening={hume.isListening}
-                        isSpeaking={hume.isSpeaking}
-                        onClick={handleMicClick}
-                      />
-                    </div>
-                    {!voiceMode && (
-                      <p className="voice-hint">Click the microphone to enable voice mode powered by Hume AI</p>
-                    )}
+                    <Voice.UnifiedInput
+                      voiceMode={voiceMode}
+                      onToggleMode={toggleVoiceMode}
+                      inputValue={inputValue}
+                      onInputChange={setInputValue}
+                      onSendMessage={sendMessage}
+                      isLoading={isLoading}
+                      voice={voice}
+                      placeholder="Start your story..."
+                    />
                   </div>
                 ) : (
                   <>
@@ -511,7 +467,7 @@
                         </div>
                       </div>
                     ))}
-                    {(isLoading || (voiceMode && hume.isListening)) && (
+                    {(isLoading || (voiceMode && voice.isListening)) && (
                       <div className="message message-assistant">
                         <div className="typing-indicator">
                           <div className="typing-dot"></div>
@@ -527,37 +483,16 @@
               
               {hasStarted && (
                 <div className="chat-input-area">
-                  <div className="input-wrapper">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A89F94" strokeWidth="1.5">
-                      <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
-                    </svg>
-                    <input
-                      type="text"
-                      className="input-text"
-                      placeholder={hume.isListening ? "Listening..." : "Continue your story..."}
-                      value={inputValue}
-                      onChange={(e) => setInputValue(e.target.value)}
-                      onKeyDown={handleKeyDown}
-                      disabled={isLoading || hume.isListening}
-                    />
-                    <button 
-                      className="btn-icon"
-                      style={{ opacity: inputValue.trim() ? 1 : 0.4 }}
-                      onClick={sendMessage}
-                      disabled={isLoading || !inputValue.trim()}
-                    >
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                        <line x1="22" y1="2" x2="11" y2="13"></line>
-                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                      </svg>
-                    </button>
-                    <Voice.MicButton
-                      voiceMode={voiceMode}
-                      isListening={hume.isListening}
-                      isSpeaking={hume.isSpeaking}
-                      onClick={handleMicClick}
-                    />
-                  </div>
+                  <Voice.UnifiedInput
+                    voiceMode={voiceMode}
+                    onToggleMode={toggleVoiceMode}
+                    inputValue={inputValue}
+                    onInputChange={setInputValue}
+                    onSendMessage={sendMessage}
+                    isLoading={isLoading}
+                    voice={voice}
+                    placeholder="Continue your story..."
+                  />
                 </div>
               )}
             </div>
