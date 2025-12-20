@@ -1,13 +1,20 @@
 /* ========================================
    SOCIETY ARTS - VOICE INTEGRATION
-   Hume EVI (Empathic Voice Interface)
-   Version: 2.0
+   Unified text/voice input system
+   Version: 3.0
    ======================================== */
 
 /**
- * Hume EVI React Hook
+ * Detect if user is on a touch device
  */
-function useHumeEVI({ onUserMessage, onAssistantMessage }) {
+function isTouchDevice() {
+  return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+}
+
+/**
+ * Voice Interface Hook
+ */
+function useVoiceInterface({ onUserMessage, onAssistantMessage }) {
   const [isConnected, setIsConnected] = React.useState(false);
   const [isListening, setIsListening] = React.useState(false);
   const [isSpeaking, setIsSpeaking] = React.useState(false);
@@ -81,7 +88,7 @@ function useHumeEVI({ onUserMessage, onAssistantMessage }) {
       socketRef.current = new WebSocket(wsUrl);
 
       socketRef.current.onopen = () => {
-        console.log('Hume EVI connected');
+        console.log('Voice interface connected');
         setIsConnected(true);
         
         socketRef.current.send(JSON.stringify({
@@ -96,14 +103,12 @@ function useHumeEVI({ onUserMessage, onAssistantMessage }) {
         switch (message.type) {
           case 'user_message':
             if (message.message?.content) {
-              console.log('User said:', message.message.content);
               onUserMessage?.(message.message.content);
             }
             break;
             
           case 'assistant_message':
             if (message.message?.content) {
-              console.log('Assistant said:', message.message.content);
               currentAssistantMessageRef.current = message.message.content;
             }
             break;
@@ -127,7 +132,7 @@ function useHumeEVI({ onUserMessage, onAssistantMessage }) {
             break;
             
           case 'error':
-            console.error('Hume EVI error:', message);
+            console.error('Voice interface error:', message);
             setError(message.message || 'An error occurred');
             break;
         }
@@ -140,13 +145,13 @@ function useHumeEVI({ onUserMessage, onAssistantMessage }) {
       };
 
       socketRef.current.onclose = () => {
-        console.log('Hume EVI disconnected');
+        console.log('Voice interface disconnected');
         setIsConnected(false);
         setIsListening(false);
       };
 
     } catch (err) {
-      console.error('Failed to connect to Hume EVI:', err);
+      console.error('Failed to connect voice interface:', err);
       setError(err.message);
       throw err;
     }
@@ -239,64 +244,195 @@ function useHumeEVI({ onUserMessage, onAssistantMessage }) {
 }
 
 /**
- * Voice Mode Indicator Component
+ * Unified Input Component
+ * Transforms between text and voice modes
  */
-function VoiceModeIndicator({ isListening, isSpeaking, error, onExit }) {
-  let statusText = '🎙️ Voice Mode (Hume EVI)';
-  if (isListening) statusText = '🎤 Listening...';
-  if (isSpeaking) statusText = '🔊 Speaking...';
-  if (error) statusText = '❌ ' + error;
+function UnifiedInput({ 
+  voiceMode,
+  onToggleMode,
+  inputValue,
+  onInputChange,
+  onSendMessage,
+  isLoading,
+  voice, // { isConnected, isListening, isSpeaking, error, startListening, stopListening }
+  placeholder = "Start your story..."
+}) {
+  const isTouch = React.useMemo(() => isTouchDevice(), []);
+  const inputRef = React.useRef(null);
+  const holdTimeoutRef = React.useRef(null);
+  const isHoldingRef = React.useRef(false);
 
+  // Handle key down in text mode
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey && inputValue.trim()) {
+      e.preventDefault();
+      onSendMessage();
+    }
+  };
+
+  // Toggle to voice mode
+  const handleSwitchToVoice = () => {
+    // Send any pending text first
+    if (inputValue.trim()) {
+      onSendMessage();
+    }
+    onToggleMode(true);
+  };
+
+  // Toggle to text mode
+  const handleSwitchToText = () => {
+    if (voice.isListening) {
+      voice.stopListening();
+    }
+    onToggleMode(false);
+  };
+
+  // Desktop: Press and hold to talk
+  const handleMicMouseDown = (e) => {
+    if (isTouch) return; // Let touch handlers deal with touch devices
+    e.preventDefault();
+    
+    if (!voice.isConnected) return;
+    
+    isHoldingRef.current = true;
+    voice.startListening();
+  };
+
+  const handleMicMouseUp = (e) => {
+    if (isTouch) return;
+    e.preventDefault();
+    
+    if (isHoldingRef.current) {
+      isHoldingRef.current = false;
+      voice.stopListening();
+    }
+  };
+
+  const handleMicMouseLeave = (e) => {
+    if (isTouch) return;
+    
+    if (isHoldingRef.current) {
+      isHoldingRef.current = false;
+      voice.stopListening();
+    }
+  };
+
+  // Mobile/Touch: Tap to toggle
+  const handleMicTouchStart = (e) => {
+    e.preventDefault();
+    
+    if (!voice.isConnected) return;
+    
+    if (voice.isListening) {
+      voice.stopListening();
+    } else {
+      voice.startListening();
+    }
+  };
+
+  // Get status text for voice mode
+  const getVoiceStatus = () => {
+    if (voice.error) return voice.error;
+    if (!voice.isConnected) return 'Connecting...';
+    if (voice.isSpeaking) return 'Speaking...';
+    if (voice.isListening) return isTouch ? 'Tap to stop' : 'Release to send';
+    return isTouch ? 'Tap to speak' : 'Hold to speak';
+  };
+
+  // Icons
+  const MicIcon = () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+      <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+      <line x1="12" y1="19" x2="12" y2="23"></line>
+      <line x1="8" y1="23" x2="16" y2="23"></line>
+    </svg>
+  );
+
+  const TextIcon = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <polyline points="4 7 4 4 20 4 20 7"></polyline>
+      <line x1="9" y1="20" x2="15" y2="20"></line>
+      <line x1="12" y1="4" x2="12" y2="20"></line>
+    </svg>
+  );
+
+  const PencilIcon = () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A89F94" strokeWidth="1.5">
+      <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+    </svg>
+  );
+
+  const SpeakerIcon = () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+      <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+    </svg>
+  );
+
+  // TEXT MODE
+  if (!voiceMode) {
+    return (
+      <div className="unified-input unified-input-text">
+        <div className="unified-input-inner">
+          <PencilIcon />
+          <input
+            ref={inputRef}
+            type="text"
+            className="unified-input-field"
+            placeholder={placeholder}
+            value={inputValue}
+            onChange={(e) => onInputChange(e.target.value)}
+            onKeyDown={handleKeyDown}
+            disabled={isLoading}
+          />
+          <button 
+            className="unified-mode-toggle"
+            onClick={handleSwitchToVoice}
+            title="Switch to voice mode"
+            disabled={isLoading}
+          >
+            <MicIcon />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // VOICE MODE
   return (
-    <div className="voice-mode-indicator">
-      <span className="voice-mode-text">{statusText}</span>
-      <button className="btn btn-sm btn-secondary" onClick={onExit}>
-        Exit Voice Mode
+    <div className={`unified-input unified-input-voice ${voice.isListening ? 'listening' : ''} ${voice.isSpeaking ? 'speaking' : ''}`}>
+      <div className="unified-voice-content">
+        {/* Pulsing ring when listening */}
+        {voice.isListening && (
+          <div className="voice-pulse-ring"></div>
+        )}
+        
+        {/* Main mic button */}
+        <button
+          className={`unified-mic-button ${voice.isListening ? 'active' : ''} ${voice.isSpeaking ? 'speaking' : ''}`}
+          onMouseDown={handleMicMouseDown}
+          onMouseUp={handleMicMouseUp}
+          onMouseLeave={handleMicMouseLeave}
+          onTouchStart={handleMicTouchStart}
+          disabled={!voice.isConnected || voice.isSpeaking}
+        >
+          {voice.isSpeaking ? <SpeakerIcon /> : <MicIcon />}
+        </button>
+        
+        {/* Status text */}
+        <span className="unified-voice-status">{getVoiceStatus()}</span>
+      </div>
+      
+      {/* Switch to text mode */}
+      <button 
+        className="unified-mode-toggle unified-mode-toggle-text"
+        onClick={handleSwitchToText}
+        title="Switch to text mode"
+      >
+        <TextIcon />
       </button>
     </div>
-  );
-}
-
-/**
- * Microphone Button Component
- */
-function MicButton({ voiceMode, isListening, isSpeaking, onClick, size = 'normal' }) {
-  const getClassName = () => {
-    let className = 'btn-mic';
-    if (size === 'large') className += ' btn-circle-lg';
-    if (isListening) className += ' listening';
-    if (isSpeaking) className += ' speaking';
-    if (voiceMode && !isListening && !isSpeaking) className += ' active';
-    return className;
-  };
-
-  const getIcon = () => {
-    if (isSpeaking) {
-      return (
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-          <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-        </svg>
-      );
-    }
-    return (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-        <line x1="12" y1="19" x2="12" y2="23"></line>
-        <line x1="8" y1="23" x2="16" y2="23"></line>
-      </svg>
-    );
-  };
-
-  const title = voiceMode 
-    ? (isListening ? "Listening..." : "Click to speak") 
-    : "Enable voice mode";
-
-  return (
-    <button className={getClassName()} onClick={onClick} title={title}>
-      {getIcon()}
-    </button>
   );
 }
 
@@ -304,8 +440,8 @@ function MicButton({ voiceMode, isListening, isSpeaking, onClick, size = 'normal
 if (typeof window !== 'undefined') {
   window.SocietyArts = window.SocietyArts || {};
   window.SocietyArts.Voice = {
-    useHumeEVI,
-    VoiceModeIndicator,
-    MicButton
+    useVoiceInterface,
+    UnifiedInput,
+    isTouchDevice
   };
 }
