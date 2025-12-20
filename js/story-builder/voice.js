@@ -273,10 +273,7 @@ function UnifiedInput({
   voice, // { isConnected, isListening, isSpeaking, error, startListening, stopListening }
   placeholder = "Start your story..."
 }) {
-  const isTouch = React.useMemo(() => isTouchDevice(), []);
   const inputRef = React.useRef(null);
-  const holdTimeoutRef = React.useRef(null);
-  const isHoldingRef = React.useRef(false);
 
   // Handle key down in text mode
   const handleKeyDown = (e) => {
@@ -303,34 +300,12 @@ function UnifiedInput({
     onToggleMode(false);
   };
 
-  // Desktop: Press and hold to talk
-  const handleMicMouseDown = (e) => {
-    if (isTouch) return; // Let touch handlers deal with touch devices
+  // Toggle mute/unmute (Zoom-style)
+  const handleMicClick = (e) => {
     e.preventDefault();
     
     if (!voice?.isConnected) return;
-    
-    // Toggle listening on click
-    if (voice.isListening) {
-      voice.stopListening();
-    } else {
-      voice.startListening();
-    }
-  };
-
-  const handleMicMouseUp = (e) => {
-    // No-op - we're using toggle now, not hold-to-talk
-  };
-
-  const handleMicMouseLeave = (e) => {
-    // No-op - we're using toggle now, not hold-to-talk
-  };
-
-  // Mobile/Touch: Tap to toggle
-  const handleMicTouchStart = (e) => {
-    e.preventDefault();
-    
-    if (!voice?.isConnected) return;
+    if (voice?.isSpeaking) return; // Don't allow mute toggle while AI is speaking
     
     if (voice.isListening) {
       voice.stopListening();
@@ -345,8 +320,8 @@ function UnifiedInput({
     if (voice.error) return voice.error;
     if (!voice.isConnected) return 'Connecting...';
     if (voice.isSpeaking) return 'Speaking...';
-    if (voice.isListening) return 'Listening... (tap to mute)';
-    return 'Muted (tap to unmute)';
+    if (voice.isListening) return 'Listening...';
+    return 'Muted';
   };
 
   // Early return if voice not ready
@@ -354,6 +329,25 @@ function UnifiedInput({
 
   // Icons
   const MicIcon = () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+      <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+      <line x1="12" y1="19" x2="12" y2="23"></line>
+      <line x1="8" y1="23" x2="16" y2="23"></line>
+    </svg>
+  );
+
+  const MicOffIcon = () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <line x1="1" y1="1" x2="23" y2="23"></line>
+      <path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path>
+      <path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"></path>
+      <line x1="12" y1="19" x2="12" y2="23"></line>
+      <line x1="8" y1="23" x2="16" y2="23"></line>
+    </svg>
+  );
+
+  const MicIconSmall = () => (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
       <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
       <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
@@ -383,6 +377,13 @@ function UnifiedInput({
     </svg>
   );
 
+  // Determine mic button icon
+  const getMicButtonIcon = () => {
+    if (voice?.isSpeaking) return <SpeakerIcon />;
+    if (voice?.isListening) return <MicIcon />;
+    return <MicOffIcon />;
+  };
+
   // TEXT MODE
   if (!voiceMode) {
     return (
@@ -405,7 +406,7 @@ function UnifiedInput({
             title="Switch to voice mode"
             disabled={isLoading}
           >
-            <MicIcon />
+            <MicIconSmall />
           </button>
         </div>
       </div>
@@ -413,24 +414,24 @@ function UnifiedInput({
   }
 
   // VOICE MODE
+  const isMuted = voice?.isConnected && !voice?.isListening && !voice?.isSpeaking;
+  
   return (
-    <div className={`unified-input unified-input-voice ${voice?.isListening ? 'listening' : ''} ${voice?.isSpeaking ? 'speaking' : ''}`}>
+    <div className={`unified-input unified-input-voice ${voice?.isListening ? 'listening' : ''} ${voice?.isSpeaking ? 'speaking' : ''} ${isMuted ? 'muted' : ''}`}>
       <div className="unified-voice-content">
         {/* Pulsing ring when listening */}
         {voice?.isListening && (
           <div className="voice-pulse-ring"></div>
         )}
         
-        {/* Main mic button */}
+        {/* Main mic button - Zoom style mute toggle */}
         <button
-          className={`unified-mic-button ${voice?.isListening ? 'active' : ''} ${voice?.isSpeaking ? 'speaking' : ''}`}
-          onMouseDown={handleMicMouseDown}
-          onMouseUp={handleMicMouseUp}
-          onMouseLeave={handleMicMouseLeave}
-          onTouchStart={handleMicTouchStart}
+          className={`unified-mic-button ${voice?.isListening ? 'active' : ''} ${voice?.isSpeaking ? 'speaking' : ''} ${isMuted ? 'muted' : ''}`}
+          onClick={handleMicClick}
           disabled={!voice?.isConnected || voice?.isSpeaking}
+          title={voice?.isListening ? 'Mute' : 'Unmute'}
         >
-          {voice?.isSpeaking ? <SpeakerIcon /> : <MicIcon />}
+          {getMicButtonIcon()}
         </button>
         
         {/* Status text */}
