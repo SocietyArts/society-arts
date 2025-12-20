@@ -166,26 +166,28 @@ const Icons = {
 // ========================================
 
 const NAV_ITEMS = [
-  { id: 'projects', label: 'Projects', icon: 'projects', href: '/pages/projects.html', badge: 56 },
-  { id: 'style-finder', label: 'Style Finder', icon: 'styleFinder', action: 'openStyleFinder' },
-  { id: 'gallery', label: 'Gallery', icon: 'gallery', href: '/pages/gallery.html' },
-  { id: 'collections', label: 'Collections', icon: 'collections', href: '/pages/collections.html', badge: 56 },
-  { id: 'favorites', label: 'Favorites', icon: 'favorites', href: '/pages/favorites.html', badge: 56 },
+  { id: 'story-builder', label: 'Story Builder', icon: 'newChat', href: '/story-builder.html' },
+  { id: 'style-finder', label: 'Style Finder', icon: 'styleFinder', href: '/style-finder.html' },
   { divider: true },
-  { id: 'pricing', label: 'Prints & Pricing', icon: 'pricing', href: '/pages/pricing.html' },
-  { id: 'help', label: 'Help', icon: 'help', href: '/pages/help/index.html' }
+  { id: 'projects', label: 'Projects', icon: 'projects', href: '/under-construction.html?feature=Projects', badge: 0 },
+  { id: 'gallery', label: 'Gallery', icon: 'gallery', href: '/under-construction.html?feature=Gallery' },
+  { id: 'collections', label: 'Collections', icon: 'collections', href: '/under-construction.html?feature=Collections', badge: 0 },
+  { id: 'favorites', label: 'Favorites', icon: 'favorites', href: '/under-construction.html?feature=Favorites', badge: 0 },
+  { divider: true },
+  { id: 'pricing', label: 'Prints & Pricing', icon: 'pricing', href: '/under-construction.html?feature=Prints%20%26%20Pricing' },
+  { id: 'help', label: 'Help', icon: 'help', href: '/under-construction.html?feature=Help' }
 ];
 
 const HELP_MENU_ITEMS = [
-  { id: 'how-it-works', label: 'How It Works', icon: 'howItWorks', href: '/pages/help/how-it-works.html' },
-  { id: 'quick-tips', label: 'Quick Tips for Getting Started', icon: 'quickTips', href: '/pages/help/quick-tips.html' },
+  { id: 'how-it-works', label: 'How It Works', icon: 'howItWorks', href: '/under-construction.html?feature=How%20It%20Works' },
+  { id: 'quick-tips', label: 'Quick Tips for Getting Started', icon: 'quickTips', href: '/under-construction.html?feature=Quick%20Tips' },
   { id: 'new-chat', label: 'Start a New Chat', icon: 'newChat', action: 'newChat' },
-  { id: 'updates', label: 'New Features & Updates', icon: 'updates', href: '/pages/help/updates.html' },
-  { id: 'tutorials', label: 'Help & Tutorials', icon: 'tutorials', href: '/pages/help/tutorials.html' },
-  { id: 'explore', label: 'Explore Ways to Create', icon: 'explore', href: '/pages/help/explore.html' },
-  { id: 'troubleshoot', label: 'Troubleshooting Guide', icon: 'troubleshoot', href: '/pages/help/troubleshooting.html' },
-  { id: 'feedback', label: 'Share Feedback', icon: 'feedback', action: 'feedback' },
-  { id: 'contact', label: 'Contact Us', icon: 'contact', href: '/pages/contact.html' }
+  { id: 'updates', label: 'New Features & Updates', icon: 'updates', href: '/under-construction.html?feature=New%20Features' },
+  { id: 'tutorials', label: 'Help & Tutorials', icon: 'tutorials', href: '/under-construction.html?feature=Tutorials' },
+  { id: 'explore', label: 'Explore Ways to Create', icon: 'explore', href: '/under-construction.html?feature=Explore' },
+  { id: 'troubleshoot', label: 'Troubleshooting Guide', icon: 'troubleshoot', href: '/under-construction.html?feature=Troubleshooting' },
+  { id: 'feedback', label: 'Share Feedback', icon: 'feedback', href: '/under-construction.html?feature=Feedback' },
+  { id: 'contact', label: 'Contact Us', icon: 'contact', href: '/under-construction.html?feature=Contact' }
 ];
 
 const FORMAT_OPTIONS = [
@@ -217,12 +219,10 @@ function NavSidebar({ isOpen, onClose, currentPage, onOpenStyleFinder }) {
   }, [isOpen, onClose]);
 
   const handleItemClick = (item) => {
-    if (item.action === 'openStyleFinder' && onOpenStyleFinder) {
-      onOpenStyleFinder();
-      onClose();
-    } else if (item.href) {
+    if (item.href) {
       window.location.href = item.href;
     }
+    onClose();
   };
 
   const getIcon = (iconName) => {
@@ -304,9 +304,6 @@ function HelpMenu({ isOpen, onClose, onNewChat }) {
   const handleItemClick = (item) => {
     if (item.action === 'newChat' && onNewChat) {
       onNewChat();
-    } else if (item.action === 'feedback') {
-      // Could open a feedback modal
-      alert('Feedback feature coming soon!');
     } else if (item.href) {
       window.location.href = item.href;
     }
