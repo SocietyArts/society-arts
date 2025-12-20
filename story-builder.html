@@ -210,7 +210,7 @@
       const [messages, setMessages] = useState([]);
       const [inputValue, setInputValue] = useState('');
       const [isLoading, setIsLoading] = useState(false);
-      const [story, setStory] = useState(null);
+      const [story, setStory] = useState('');
       const [title, setTitle] = useState(null);
       const [transformedStory, setTransformedStory] = useState(null);
       const [transformLabel, setTransformLabel] = useState(null);
@@ -286,7 +286,7 @@
         setMessages([]);
         setInputValue('');
         setIsLoading(false);
-        setStory(null);
+        setStory('');
         setTitle(null);
         setTransformedStory(null);
         setTransformLabel(null);
@@ -411,7 +411,8 @@
       const displayStyles = StyleData.SAMPLE_STYLES.slice(0, 4);
 
       // Calculate progress
-      const progress = story 
+      const hasStory = story && story.trim().length > 0;
+      const progress = hasStory 
         ? (selectedStyles.length > 0 ? 100 : 50) 
         : (hasStarted ? 15 : 5);
 
@@ -440,6 +441,14 @@
               transformLabel={transformLabel}
               onVariationApplied={handleVariationApplied}
               onClearTransform={handleClearTransform}
+              onStoryChange={(newStory) => {
+                // If editing transformed story, clear transform first
+                if (transformedStory) {
+                  setTransformedStory(newStory);
+                } else {
+                  setStory(newStory);
+                }
+              }}
             />
             
             {/* Center Column - Chat */}
