@@ -1,22 +1,41 @@
 /* ========================================
    SOCIETY ARTS - STORY PANEL
    Left sidebar for story display
-   Version: 2.0
+   Version: 3.0
    ======================================== */
 
 /**
  * Main Story Card Component
  */
-function StoryCard({ story, isVoiceMode }) {
+function StoryCard({ story, isVoiceMode, transformedStory, transformLabel, onClearTransform }) {
+  const displayStory = transformedStory || story;
+  const isTransformed = !!transformedStory;
+
   return (
     <div className="card">
       <div className="card-header" style={{ justifyContent: 'space-between' }}>
         <span className="card-title">Your Story</span>
-        {isVoiceMode && <span className="badge badge-muted">🎤 Voice</span>}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {isVoiceMode && <span className="badge badge-muted">🎤 Voice</span>}
+          {isTransformed && (
+            <span className="badge badge-accent">{transformLabel}</span>
+          )}
+        </div>
       </div>
       <div className="card-content">
-        {story ? (
-          <p>{story}</p>
+        {displayStory ? (
+          <>
+            <p>{displayStory}</p>
+            {isTransformed && (
+              <button 
+                className="btn btn-ghost btn-sm"
+                style={{ marginTop: '12px', fontSize: '12px' }}
+                onClick={onClearTransform}
+              >
+                ← Back to original
+              </button>
+            )}
+          </>
         ) : (
           <p className="card-placeholder">
             Your story will appear here — once you've shared a moment worth remembering.
@@ -28,70 +47,122 @@ function StoryCard({ story, isVoiceMode }) {
 }
 
 /**
- * Variation Card Component
+ * Variation Selector Component (integrated from variations.js)
  */
-function VariationCard({ 
-  label, 
-  variation, 
-  isSelected, 
-  onSelect, 
-  onGenerate, 
-  isLoading,
-  variationType,
-  onTypeChange,
-  variationTypes
-}) {
-  return (
-    <div 
-      className={`card card-clickable ${isSelected ? 'card-selected' : ''}`}
-      onClick={onSelect}
-    >
-      <div className="card-header">
-        <div className="radio-outer">
-          {isSelected && <div className="radio-inner"></div>}
-        </div>
-        <span className="card-title">{label}</span>
-        <button 
-          className="btn btn-ghost btn-sm"
-          style={{ marginLeft: 'auto', color: 'var(--color-highlight)' }}
-          onClick={(e) => { 
-            e.stopPropagation(); 
-            onGenerate(); 
-          }}
-          disabled={isLoading}
-        >
-          {isLoading ? 'Generating...' : 'Another take'} ▼
-        </button>
+function VariationSelector({ currentStory, onVariationApplied, disabled }) {
+  const [variations, setVariations] = React.useState({});
+  const [loading, setLoading] = React.useState(true);
+  const [generating, setGenerating] = React.useState(null);
+
+  // Load config on mount
+  React.useEffect(() => {
+    if (window.SocietyArts?.Variations?.loadConfig) {
+      window.SocietyArts.Variations.loadConfig().then(config => {
+        setVariations(config.variations);
+        setLoading(false);
+      });
+    } else {
+      setLoading(false);
+    }
+  }, []);
+
+  const handleVariationClick = async (typeId) => {
+    if (!currentStory || generating) return;
+    
+    setGenerating(typeId);
+    
+    try {
+      const result = await window.SocietyArts.Variations.generate(currentStory, typeId);
+      
+      if (result.success && onVariationApplied) {
+        onVariationApplied(result.variation, result.label);
+      } else if (!result.success) {
+        console.error('Variation failed:', result.error);
+      }
+    } catch (error) {
+      console.error('Variation error:', error);
+    }
+    
+    setGenerating(null);
+  };
+
+  const getIcon = (iconName) => {
+    const icons = {
+      sparkles: (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3z"/>
+          <path d="M5 19l1 3 1-3 3-1-3-1-1-3-1 3-3 1 3 1z"/>
+        </svg>
+      ),
+      palette: (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <circle cx="13.5" cy="6.5" r="1.5"/>
+          <circle cx="17.5" cy="10.5" r="1.5"/>
+          <circle cx="8.5" cy="7.5" r="1.5"/>
+          <circle cx="6.5" cy="12.5" r="1.5"/>
+          <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.555C21.965 6.012 17.461 2 12 2z"/>
+        </svg>
+      ),
+      minimize: (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <polyline points="4 14 10 14 10 20"/>
+          <polyline points="20 10 14 10 14 4"/>
+          <line x1="14" y1="10" x2="21" y2="3"/>
+          <line x1="3" y1="21" x2="10" y2="14"/>
+        </svg>
+      ),
+      userMinus: (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="8.5" cy="7" r="4"/>
+          <line x1="23" y1="11" x2="17" y2="11"/>
+        </svg>
+      )
+    };
+    return icons[iconName] || icons.sparkles;
+  };
+
+  if (loading) {
+    return (
+      <div className="variation-selector loading">
+        <span>Loading variations...</span>
       </div>
-      
-      {variationType && onTypeChange && variationTypes && (
-        <div style={{ paddingLeft: '28px', marginTop: '8px' }} onClick={(e) => e.stopPropagation()}>
-          <select 
-            value={variationType}
-            onChange={(e) => onTypeChange(e.target.value)}
-            style={{
-              fontSize: '12px',
-              padding: '4px 8px',
-              borderRadius: '4px',
-              border: '1px solid var(--color-border-light)',
-              backgroundColor: '#fff',
-              color: 'var(--color-text-secondary)',
-              cursor: 'pointer'
-            }}
+    );
+  }
+
+  const variationList = Object.values(variations);
+
+  if (variationList.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="variation-selector">
+      <div className="variation-label">Transform Your Story</div>
+      <div className="variation-buttons">
+        {variationList.map((variation) => (
+          <button
+            key={variation.id}
+            className={`variation-btn ${generating === variation.id ? 'generating' : ''}`}
+            onClick={() => handleVariationClick(variation.id)}
+            disabled={disabled || !currentStory || generating}
+            title={variation.description}
           >
-            {Object.values(variationTypes).map(type => (
-              <option key={type.id} value={type.id}>
-                {type.label}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
-      
-      {variation && (
-        <div className="card-content" style={{ paddingLeft: '28px', marginTop: '10px' }}>
-          <p>{variation}</p>
-        </div>
+            <span className="variation-btn-icon">
+              {generating === variation.id ? (
+                <svg className="spinner" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10" strokeDasharray="32" strokeDashoffset="12"/>
+                </svg>
+              ) : (
+                getIcon(variation.icon)
+              )}
+            </span>
+            <span className="variation-btn-label">{variation.label}</span>
+          </button>
+        ))}
+      </div>
+      {!currentStory && (
+        <div className="variation-hint">Share your story first to unlock variations</div>
       )}
     </div>
   );
@@ -104,45 +175,28 @@ function StoryPanel({
   story, 
   title,
   isVoiceMode,
-  selectedVariation,
-  onSelectVariation,
-  variations,
-  onGenerateVariation,
   isLoading,
-  variationTypes,
-  onVariationTypeChange,
-  variationTypeOptions
+  transformedStory,
+  transformLabel,
+  onVariationApplied,
+  onClearTransform
 }) {
   return (
     <div className="story-panel">
-      <StoryCard story={story} isVoiceMode={isVoiceMode} />
+      <StoryCard 
+        story={story} 
+        isVoiceMode={isVoiceMode}
+        transformedStory={transformedStory}
+        transformLabel={transformLabel}
+        onClearTransform={onClearTransform}
+      />
 
       {story && (
-        <>
-          <VariationCard
-            label="Variation A"
-            variation={variations.A}
-            isSelected={selectedVariation === 'A'}
-            onSelect={() => onSelectVariation('A')}
-            onGenerate={() => onGenerateVariation('A')}
-            isLoading={isLoading}
-            variationType={variationTypes?.A}
-            onTypeChange={(type) => onVariationTypeChange?.('A', type)}
-            variationTypes={variationTypeOptions}
-          />
-
-          <VariationCard
-            label="Variation B"
-            variation={variations.B}
-            isSelected={selectedVariation === 'B'}
-            onSelect={() => onSelectVariation('B')}
-            onGenerate={() => onGenerateVariation('B')}
-            isLoading={isLoading}
-            variationType={variationTypes?.B}
-            onTypeChange={(type) => onVariationTypeChange?.('B', type)}
-            variationTypes={variationTypeOptions}
-          />
-        </>
+        <VariationSelector
+          currentStory={story}
+          onVariationApplied={onVariationApplied}
+          disabled={isLoading}
+        />
       )}
     </div>
   );
@@ -153,7 +207,7 @@ if (typeof window !== 'undefined') {
   window.SocietyArts = window.SocietyArts || {};
   window.SocietyArts.StoryPanel = {
     StoryCard,
-    VariationCard,
+    VariationSelector,
     StoryPanel
   };
 }
