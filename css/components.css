@@ -869,6 +869,17 @@
   color: var(--color-accent);
 }
 
+.unified-mic-button.muted {
+  background: var(--color-surface-alt);
+  border-color: var(--color-border);
+  color: var(--color-text-muted);
+}
+
+.unified-mic-button.muted:hover:not(:disabled) {
+  border-color: var(--color-text-secondary);
+  color: var(--color-text-secondary);
+}
+
 .unified-mic-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
@@ -908,6 +919,10 @@
 }
 
 .unified-input-voice.speaking .unified-voice-status {
+  color: var(--color-text-muted);
+}
+
+.unified-input-voice.muted .unified-voice-status {
   color: var(--color-text-muted);
 }
 
