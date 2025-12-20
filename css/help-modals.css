@@ -1,0 +1,368 @@
+/* ========================================
+   SOCIETY ARTS - HELP MODALS
+   How It Works & ArtBridge overlays
+   Version: 2.0
+   ======================================== */
+
+/* ========================================
+   BASE MODAL OVERLAY
+   ======================================== */
+
+.help-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(61, 53, 48, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(3px);
+}
+
+.help-modal-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.help-modal {
+  background: #F5F0EB;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 780px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  transform: scale(0.95) translateY(20px);
+  transition: transform 0.3s ease;
+  position: relative;
+}
+
+.help-modal-overlay.open .help-modal {
+  transform: scale(1) translateY(0);
+}
+
+/* ========================================
+   HOW IT WORKS MODAL
+   ======================================== */
+
+.hiw-modal {
+  padding: 48px 48px 36px;
+}
+
+.hiw-header {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.hiw-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 42px;
+  font-weight: 400;
+  color: #3D3530;
+  margin-bottom: 16px;
+  letter-spacing: 1px;
+}
+
+.hiw-subtitle {
+  font-size: 15px;
+  color: #6B635B;
+  line-height: 1.6;
+  max-width: 540px;
+  margin: 0 auto;
+}
+
+/* Formula Section: Story + Prompt = Creation */
+.hiw-formula {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+.hiw-column {
+  flex: 1;
+  min-width: 0;
+}
+
+.hiw-column-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 20px;
+  font-weight: 500;
+  color: #3D3530;
+  text-align: center;
+  margin-bottom: 14px;
+}
+
+.hiw-column-content {
+  font-size: 13px;
+  color: #5C5650;
+  line-height: 1.65;
+}
+
+.hiw-operator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  margin-top: 50px;
+}
+
+.hiw-operator-symbol {
+  font-size: 28px;
+  color: #A89F94;
+  font-weight: 300;
+}
+
+.hiw-result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 100px;
+  margin-top: 40px;
+}
+
+.hiw-result-text {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 20px;
+  font-weight: 500;
+  color: #3D3530;
+  text-align: center;
+  line-height: 1.3;
+}
+
+/* Trust Section */
+.hiw-trust {
+  background: white;
+  border-radius: 12px;
+  padding: 24px 28px;
+  margin-bottom: 0;
+}
+
+.hiw-trust-text {
+  font-size: 14px;
+  color: #5C5650;
+  line-height: 1.7;
+  margin-bottom: 14px;
+}
+
+.hiw-trust-text:last-child {
+  margin-bottom: 0;
+}
+
+/* ArtBridge Link - Make it OBVIOUS */
+.artbridge-link {
+  color: #C75B3F;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  position: relative;
+  transition: all 0.2s ease;
+  background: linear-gradient(to right, #C75B3F, #C75B3F);
+  background-size: 100% 2px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  padding-bottom: 2px;
+}
+
+.artbridge-link:hover {
+  color: #a84832;
+  background-size: 100% 2px;
+}
+
+.artbridge-link::after {
+  content: ' →';
+  font-size: 0.95em;
+  transition: transform 0.2s ease;
+  display: inline-block;
+}
+
+.artbridge-link:hover::after {
+  transform: translateX(4px);
+}
+
+/* Close Button */
+.help-modal-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #A89F94;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.help-modal-close:hover {
+  background: rgba(0,0,0,0.05);
+  color: #3D3530;
+}
+
+/* ========================================
+   ARTBRIDGE MODAL
+   ======================================== */
+
+.artbridge-modal {
+  padding: 48px;
+  position: relative;
+}
+
+.artbridge-header {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.artbridge-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 36px;
+  font-weight: 400;
+  color: #3D3530;
+  margin-bottom: 16px;
+  letter-spacing: 0.5px;
+}
+
+.artbridge-subtitle {
+  font-size: 15px;
+  color: #6B635B;
+  line-height: 1.6;
+  max-width: 540px;
+  margin: 0 auto;
+}
+
+/* Metrics List */
+.artbridge-metrics {
+  background: white;
+  border-radius: 12px;
+  padding: 28px 36px;
+  margin-bottom: 28px;
+}
+
+.artbridge-metric {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid #E8E4DF;
+}
+
+.artbridge-metric:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.artbridge-metric:first-child {
+  padding-top: 0;
+}
+
+.artbridge-metric-number {
+  font-size: 15px;
+  font-weight: 600;
+  color: #C75B3F;
+  min-width: 24px;
+}
+
+.artbridge-metric-name {
+  font-weight: 600;
+  color: #3D3530;
+}
+
+.artbridge-metric-abbr {
+  color: #A89F94;
+  font-weight: 400;
+}
+
+.artbridge-metric-desc {
+  color: #5C5650;
+  font-weight: 400;
+}
+
+/* Footer */
+.artbridge-footer {
+  text-align: center;
+  padding-top: 20px;
+  border-top: 1px solid #E0DBD5;
+}
+
+.artbridge-footer-text {
+  font-size: 15px;
+  color: #5C5650;
+  line-height: 1.7;
+  font-style: italic;
+}
+
+/* Back Button */
+.artbridge-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #A89F94;
+  font-size: 14px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  position: absolute;
+  top: 20px;
+  left: 20px;
+}
+
+.artbridge-back:hover {
+  background: rgba(0,0,0,0.05);
+  color: #3D3530;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+  .help-modal {
+    max-width: 95vw;
+    margin: 16px;
+  }
+  
+  .hiw-modal,
+  .artbridge-modal {
+    padding: 32px 24px;
+  }
+  
+  .hiw-formula {
+    flex-direction: column;
+    gap: 24px;
+  }
+  
+  .hiw-operator {
+    margin-top: 0;
+    transform: rotate(90deg);
+  }
+  
+  .hiw-result {
+    margin-top: 0;
+  }
+  
+  .hiw-title {
+    font-size: 32px;
+  }
+  
+  .artbridge-title {
+    font-size: 28px;
+  }
+  
+  .artbridge-metrics {
+    padding: 20px 24px;
+  }
+}
