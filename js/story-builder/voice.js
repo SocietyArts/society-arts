@@ -281,7 +281,7 @@ function UnifiedInput({
 
   // Toggle to text mode
   const handleSwitchToText = () => {
-    if (voice.isListening) {
+    if (voice?.isListening) {
       voice.stopListening();
     }
     onToggleMode(false);
@@ -292,7 +292,7 @@ function UnifiedInput({
     if (isTouch) return; // Let touch handlers deal with touch devices
     e.preventDefault();
     
-    if (!voice.isConnected) return;
+    if (!voice?.isConnected) return;
     
     isHoldingRef.current = true;
     voice.startListening();
@@ -302,7 +302,7 @@ function UnifiedInput({
     if (isTouch) return;
     e.preventDefault();
     
-    if (isHoldingRef.current) {
+    if (isHoldingRef.current && voice?.stopListening) {
       isHoldingRef.current = false;
       voice.stopListening();
     }
@@ -311,7 +311,7 @@ function UnifiedInput({
   const handleMicMouseLeave = (e) => {
     if (isTouch) return;
     
-    if (isHoldingRef.current) {
+    if (isHoldingRef.current && voice?.stopListening) {
       isHoldingRef.current = false;
       voice.stopListening();
     }
@@ -321,7 +321,7 @@ function UnifiedInput({
   const handleMicTouchStart = (e) => {
     e.preventDefault();
     
-    if (!voice.isConnected) return;
+    if (!voice?.isConnected) return;
     
     if (voice.isListening) {
       voice.stopListening();
@@ -332,12 +332,16 @@ function UnifiedInput({
 
   // Get status text for voice mode
   const getVoiceStatus = () => {
+    if (!voice) return 'Connecting...';
     if (voice.error) return voice.error;
     if (!voice.isConnected) return 'Connecting...';
     if (voice.isSpeaking) return 'Speaking...';
     if (voice.isListening) return isTouch ? 'Tap to stop' : 'Release to send';
     return isTouch ? 'Tap to speak' : 'Hold to speak';
   };
+
+  // Early return if voice not ready
+  const isVoiceReady = voice && voice.isConnected !== undefined;
 
   // Icons
   const MicIcon = () => (
@@ -401,23 +405,23 @@ function UnifiedInput({
 
   // VOICE MODE
   return (
-    <div className={`unified-input unified-input-voice ${voice.isListening ? 'listening' : ''} ${voice.isSpeaking ? 'speaking' : ''}`}>
+    <div className={`unified-input unified-input-voice ${voice?.isListening ? 'listening' : ''} ${voice?.isSpeaking ? 'speaking' : ''}`}>
       <div className="unified-voice-content">
         {/* Pulsing ring when listening */}
-        {voice.isListening && (
+        {voice?.isListening && (
           <div className="voice-pulse-ring"></div>
         )}
         
         {/* Main mic button */}
         <button
-          className={`unified-mic-button ${voice.isListening ? 'active' : ''} ${voice.isSpeaking ? 'speaking' : ''}`}
+          className={`unified-mic-button ${voice?.isListening ? 'active' : ''} ${voice?.isSpeaking ? 'speaking' : ''}`}
           onMouseDown={handleMicMouseDown}
           onMouseUp={handleMicMouseUp}
           onMouseLeave={handleMicMouseLeave}
           onTouchStart={handleMicTouchStart}
-          disabled={!voice.isConnected || voice.isSpeaking}
+          disabled={!voice?.isConnected || voice?.isSpeaking}
         >
-          {voice.isSpeaking ? <SpeakerIcon /> : <MicIcon />}
+          {voice?.isSpeaking ? <SpeakerIcon /> : <MicIcon />}
         </button>
         
         {/* Status text */}
