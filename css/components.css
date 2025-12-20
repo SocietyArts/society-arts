@@ -639,3 +639,114 @@
   background-color: var(--color-border);
   margin: 0 var(--space-lg);
 }
+
+/* ========================================
+   VARIATION SELECTOR
+   ======================================== */
+
+.variation-selector {
+  padding: var(--space-lg);
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  margin-top: var(--space-md);
+}
+
+.variation-selector.loading {
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.variation-label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-md);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.variation-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.variation-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 10px 16px;
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.variation-btn:hover:not(:disabled) {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background: rgba(199, 91, 63, 0.05);
+}
+
+.variation-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.variation-btn.generating {
+  border-color: var(--color-accent);
+  background: rgba(199, 91, 63, 0.1);
+}
+
+.variation-btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+}
+
+.variation-btn:hover:not(:disabled) .variation-btn-icon {
+  color: var(--color-accent);
+}
+
+.variation-btn.generating .variation-btn-icon {
+  color: var(--color-accent);
+}
+
+.variation-btn-label {
+  white-space: nowrap;
+}
+
+.variation-hint {
+  margin-top: var(--space-md);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+/* Spinner animation */
+.variation-btn .spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .variation-buttons {
+    flex-direction: column;
+  }
+  
+  .variation-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
