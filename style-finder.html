@@ -147,6 +147,34 @@
             white-space: nowrap;
         }
         
+        /* Sort Dropdown */
+        .sort-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+        
+        .sort-container label {
+            font-size: 0.875rem;
+            color: var(--color-text-secondary, #666);
+        }
+        
+        .sort-select {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--color-border, #ddd);
+            border-radius: 6px;
+            font-size: 0.875rem;
+            background: white;
+            cursor: pointer;
+            min-width: 150px;
+        }
+        
+        .sort-select:focus {
+            outline: none;
+            border-color: var(--color-accent, #C75B3F);
+        }
+        
         /* Style Grid */
         .styles-grid {
             display: grid;
@@ -215,6 +243,20 @@
         
         .favorite-btn.active svg {
             fill: #e74c3c;
+        }
+        
+        /* Quality Score Badge */
+        .quality-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(0, 0, 0, 0.75);
+            color: #ffd700;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            z-index: 2;
         }
         
         /* Three-dot menu button */
@@ -881,6 +923,16 @@
         <main class="styles-main">
             <div class="search-bar">
                 <input type="text" class="search-input" id="searchInput" placeholder="Search styles... (try: photography black white)">
+                <div class="sort-container">
+                    <label for="sortSelect">Sort by:</label>
+                    <select class="sort-select" id="sortSelect">
+                        <option value="quality">Quality Score</option>
+                        <option value="newest">Newest Arrivals</option>
+                        <option value="featured">Featured</option>
+                        <option value="nameAsc">Name: A to Z</option>
+                        <option value="nameDesc">Name: Z to A</option>
+                    </select>
+                </div>
                 <span class="results-count" id="resultsCount">Loading...</span>
             </div>
             <div class="search-hint">Tip: Use multiple words to narrow results (e.g., "photography portrait dramatic")</div>
@@ -1014,6 +1066,7 @@
         const collectionModal = document.getElementById('collectionModal');
         const toast = document.getElementById('toast');
         const activeFiltersDisplay = document.getElementById('activeFiltersDisplay');
+        const sortSelect = document.getElementById('sortSelect');
         
         // Filter elements mapped to database columns
         const filterSelects = {
@@ -1151,6 +1204,7 @@
                                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                             </svg>
                         </button>
+                        ${style.quality_score ? `<span class="quality-badge" title="Quality Score">${style.quality_score.toFixed(1)}</span>` : ''}
                         <button class="menu-btn" 
                                 onclick="event.stopPropagation(); openContextMenu(event, '${style.id}', '${style.thumbnail}')"
                                 title="More options">
@@ -1255,6 +1309,15 @@
             updateResultsCount();
             updatePagination();
             updateActiveFiltersDisplay();
+            showLoading(false);
+        });
+        
+        // Sort handler
+        sortSelect.addEventListener('change', async () => {
+            showLoading(true);
+            await SocietyArts.setSort(sortSelect.value);
+            renderStyles();
+            updatePagination();
             showLoading(false);
         });
         
