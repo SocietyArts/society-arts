@@ -114,6 +114,7 @@
         /* Search Bar */
         .search-bar {
             display: flex;
+            flex-wrap: wrap;
             gap: 1rem;
             margin-bottom: 1.5rem;
             align-items: center;
@@ -121,6 +122,7 @@
         
         .search-input {
             flex: 1;
+            min-width: 200px;
             padding: 0.75rem 1rem;
             border: 1px solid var(--color-border, #ddd);
             border-radius: 8px;
@@ -171,6 +173,34 @@
         }
         
         .sort-select:focus {
+            outline: none;
+            border-color: var(--color-accent, #C75B3F);
+        }
+        
+        /* Quality Filter */
+        .quality-filter-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+        
+        .quality-filter-container label {
+            font-size: 0.875rem;
+            color: var(--color-text-secondary, #666);
+        }
+        
+        .quality-filter-select {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--color-border, #ddd);
+            border-radius: 6px;
+            font-size: 0.875rem;
+            background: white;
+            cursor: pointer;
+            min-width: 130px;
+        }
+        
+        .quality-filter-select:focus {
             outline: none;
             border-color: var(--color-accent, #C75B3F);
         }
@@ -259,37 +289,47 @@
             z-index: 2;
         }
         
-        /* Three-dot menu button */
-        .menu-btn {
-            position: absolute;
-            bottom: 8px;
-            right: 8px;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.9);
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.2s, background 0.2s;
-            z-index: 2;
-        }
-        
-        .menu-btn:hover {
-            background: white;
-            transform: scale(1.1);
-        }
-        
         .style-card-info {
-            padding: 1rem;
+            padding: 0.75rem 1rem;
+        }
+        
+        .style-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.25rem;
         }
         
         .style-card-id {
             font-size: 0.75rem;
             color: var(--color-text-secondary, #999);
-            margin-bottom: 0.25rem;
+        }
+        
+        /* Horizontal three-dot menu (Pinterest style) */
+        .menu-btn-horizontal {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.25rem;
+            display: flex;
+            gap: 3px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .style-card:hover .menu-btn-horizontal {
+            opacity: 1;
+        }
+        
+        .menu-btn-horizontal .dot {
+            width: 4px;
+            height: 4px;
+            background: var(--color-text-secondary, #999);
+            border-radius: 50%;
+        }
+        
+        .menu-btn-horizontal:hover .dot {
+            background: var(--color-text, #333);
         }
         
         .style-card-name {
@@ -803,6 +843,80 @@
             opacity: 1;
         }
         
+        /* Confirmation Modal */
+        .confirm-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 4000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .confirm-modal.active {
+            display: flex;
+        }
+        
+        .confirm-modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+        
+        .confirm-modal-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .confirm-modal-title {
+            margin: 0 0 0.5rem;
+            font-size: 1.25rem;
+        }
+        
+        .confirm-modal-text {
+            color: var(--color-text-secondary, #666);
+            margin-bottom: 1.5rem;
+            font-size: 0.9375rem;
+        }
+        
+        .confirm-modal-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+        
+        .confirm-btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        
+        .confirm-btn-cancel {
+            background: var(--color-surface, #f5f5f5);
+            color: var(--color-text, #333);
+        }
+        
+        .confirm-btn-cancel:hover {
+            background: var(--color-border, #e5e5e5);
+        }
+        
+        .confirm-btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .confirm-btn-danger:hover {
+            background: #c82333;
+        }
+        
         /* Responsive */
         @media (max-width: 768px) {
             .filter-sidebar {
@@ -926,11 +1040,23 @@
                 <div class="sort-container">
                     <label for="sortSelect">Sort by:</label>
                     <select class="sort-select" id="sortSelect">
-                        <option value="quality">Quality Score</option>
+                        <option value="quality">Quality: High to Low</option>
+                        <option value="qualityAsc">Quality: Low to High</option>
                         <option value="newest">Newest Arrivals</option>
                         <option value="featured">Featured</option>
                         <option value="nameAsc">Name: A to Z</option>
                         <option value="nameDesc">Name: Z to A</option>
+                    </select>
+                </div>
+                <div class="quality-filter-container">
+                    <label for="qualityFilter">Min Score:</label>
+                    <select class="quality-filter-select" id="qualityFilter">
+                        <option value="0">All Scores</option>
+                        <option value="6">6+ and above</option>
+                        <option value="7">7+ and above</option>
+                        <option value="8">8+ and above</option>
+                        <option value="9">9+ and above</option>
+                        <option value="10">10 only</option>
                     </select>
                 </div>
                 <span class="results-count" id="resultsCount">Loading...</span>
@@ -1007,7 +1133,7 @@
                 <polyline points="7 10 12 15 17 10"></polyline>
                 <line x1="12" y1="15" x2="12" y2="3"></line>
             </svg>
-            Report: Swap Image
+            Flag for Review
         </button>
         <button class="context-menu-item danger" id="menuReportDelete">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1015,7 +1141,7 @@
                 <line x1="12" y1="8" x2="12" y2="12"></line>
                 <line x1="12" y1="16" x2="12.01" y2="16"></line>
             </svg>
-            Report: Delete Style
+            Unlist Style
         </button>
     </div>
     
@@ -1040,6 +1166,19 @@
     
     <!-- Toast -->
     <div class="toast" id="toast"></div>
+    
+    <!-- Confirmation Modal -->
+    <div class="confirm-modal" id="confirmModal">
+        <div class="confirm-modal-content">
+            <div class="confirm-modal-icon">⚠️</div>
+            <h3 class="confirm-modal-title">Unlist This Style?</h3>
+            <p class="confirm-modal-text">This will remove the style from the public gallery. It can be restored later by an admin.</p>
+            <div class="confirm-modal-buttons">
+                <button class="confirm-btn confirm-btn-cancel" id="confirmCancel">Cancel</button>
+                <button class="confirm-btn confirm-btn-danger" id="confirmUnlist">Yes, Unlist</button>
+            </div>
+        </div>
+    </div>
     
     <!-- Scripts -->
     <script src="js/shared/supabase-client.js"></script>
@@ -1067,6 +1206,8 @@
         const toast = document.getElementById('toast');
         const activeFiltersDisplay = document.getElementById('activeFiltersDisplay');
         const sortSelect = document.getElementById('sortSelect');
+        const qualityFilter = document.getElementById('qualityFilter');
+        const confirmModal = document.getElementById('confirmModal');
         
         // Filter elements mapped to database columns
         const filterSelects = {
@@ -1205,18 +1346,18 @@
                             </svg>
                         </button>
                         ${style.quality_score ? `<span class="quality-badge" title="Quality Score">${style.quality_score.toFixed(1)}</span>` : ''}
-                        <button class="menu-btn" 
-                                onclick="event.stopPropagation(); openContextMenu(event, '${style.id}', '${style.thumbnail}')"
-                                title="More options">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                <circle cx="12" cy="5" r="2"></circle>
-                                <circle cx="12" cy="12" r="2"></circle>
-                                <circle cx="12" cy="19" r="2"></circle>
-                            </svg>
-                        </button>
                     </div>
                     <div class="style-card-info">
-                        <div class="style-card-id">${style.id}</div>
+                        <div class="style-card-header">
+                            <div class="style-card-id">${style.id}</div>
+                            <button class="menu-btn-horizontal" 
+                                    onclick="event.stopPropagation(); openContextMenu(event, '${style.id}', '${style.thumbnail}')"
+                                    title="More options">
+                                <span class="dot"></span>
+                                <span class="dot"></span>
+                                <span class="dot"></span>
+                            </button>
+                        </div>
                         <h3 class="style-card-name">${style.name || 'Untitled Style'}</h3>
                         ${style.tagline ? `<div class="style-card-tagline">${style.tagline}</div>` : ''}
                     </div>
@@ -1317,6 +1458,17 @@
             showLoading(true);
             await SocietyArts.setSort(sortSelect.value);
             renderStyles();
+            updatePagination();
+            showLoading(false);
+        });
+        
+        // Quality filter handler
+        qualityFilter.addEventListener('change', async () => {
+            showLoading(true);
+            await SocietyArts.setQualityThreshold(parseInt(qualityFilter.value));
+            populateFilterDropdowns();
+            renderStyles();
+            updateResultsCount();
             updatePagination();
             showLoading(false);
         });
@@ -1499,14 +1651,48 @@
         
         document.getElementById('menuReportSwap').addEventListener('click', async () => {
             if (!currentMenuStyleId) return;
-            const result = await SocietyArts.reportStyle(currentMenuStyleId, 'swap');
+            const result = await SocietyArts.reportStyleForReview(currentMenuStyleId);
             showToast(result.message, 5000);
         });
         
-        document.getElementById('menuReportDelete').addEventListener('click', async () => {
+        // Unlist style - show confirmation first
+        let styleToUnlist = null;
+        
+        document.getElementById('menuReportDelete').addEventListener('click', () => {
             if (!currentMenuStyleId) return;
-            const result = await SocietyArts.reportStyle(currentMenuStyleId, 'delete');
-            showToast(result.message, 5000);
+            styleToUnlist = currentMenuStyleId;
+            confirmModal.classList.add('active');
+        });
+        
+        document.getElementById('confirmCancel').addEventListener('click', () => {
+            styleToUnlist = null;
+            confirmModal.classList.remove('active');
+        });
+        
+        document.getElementById('confirmUnlist').addEventListener('click', async () => {
+            if (!styleToUnlist) return;
+            
+            confirmModal.classList.remove('active');
+            showLoading(true);
+            
+            const result = await SocietyArts.unlistStyle(styleToUnlist);
+            
+            if (result.success) {
+                renderStyles();
+                updateResultsCount();
+                updatePagination();
+            }
+            
+            showLoading(false);
+            showToast(result.message, 4000);
+            styleToUnlist = null;
+        });
+        
+        confirmModal.addEventListener('click', (e) => {
+            if (e.target === confirmModal) {
+                styleToUnlist = null;
+                confirmModal.classList.remove('active');
+            }
         });
         
         // ============================================
@@ -1596,7 +1782,10 @@
         // ============================================
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                if (lightbox.classList.contains('active')) {
+                if (confirmModal.classList.contains('active')) {
+                    styleToUnlist = null;
+                    confirmModal.classList.remove('active');
+                } else if (lightbox.classList.contains('active')) {
                     lightbox.classList.remove('active');
                 } else if (collectionModal.classList.contains('active')) {
                     collectionModal.classList.remove('active');
