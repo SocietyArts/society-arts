@@ -55,6 +55,19 @@ let activeFilters = {};
 let isLoading = false;
 let currentSearchTerm = '';
 let facetCounts = {}; // Stores available options with counts
+let currentSort = 'quality'; // Default sort
+
+// Sort options
+const SORT_OPTIONS = {
+    quality: { label: 'Quality Score', field: 'quality_score', direction: 'desc' },
+    newest: { label: 'Newest Arrivals', field: 'created_at', direction: 'desc' },
+    featured: { label: 'Featured', field: 'is_featured', direction: 'desc' },
+    nameAsc: { label: 'Name: A to Z', field: 'name', direction: 'asc' },
+    nameDesc: { label: 'Name: Z to A', field: 'name', direction: 'desc' }
+};
+
+// Cache for artbridge quality scores
+let qualityScores = {};
 
 // ============================================
 // INITIALIZATION
@@ -67,11 +80,11 @@ async function initializeStyleData() {
         // Load lookup tables in parallel
         await loadLookupTables();
         
-        // Load initial styles (no filters)
-        await loadStyles();
+        // Load quality scores from artbridge
+        await loadQualityScores();
         
-        // Build initial facet counts
-        await buildFacetCounts();
+        // Load initial styles (this also builds facet counts)
+        await loadStyles();
         
         console.log(`Loaded ${allStyles.length} styles`);
         return true;
@@ -79,6 +92,43 @@ async function initializeStyleData() {
         console.error('Failed to initialize style data:', error);
         return false;
     }
+}
+
+// ============================================
+// QUALITY SCORES FROM ARTBRIDGE
+// ============================================
+
+async function loadQualityScores() {
+    const { supabase } = window.SocietyArts;
+    
+    console.log('Loading quality scores from artbridge...');
+    
+    const { data, error } = await supabase
+        .from('style_artbridge')
+        .select('style_id, score');
+    
+    if (error) {
+        console.error('Failed to load artbridge scores:', error);
+        return;
+    }
+    
+    // Calculate average score per style
+    const scoresByStyle = {};
+    (data || []).forEach(row => {
+        if (!scoresByStyle[row.style_id]) {
+            scoresByStyle[row.style_id] = [];
+        }
+        scoresByStyle[row.style_id].push(row.score);
+    });
+    
+    // Compute averages
+    qualityScores = {};
+    Object.entries(scoresByStyle).forEach(([styleId, scores]) => {
+        const avg = scores.reduce((sum, s) => sum + s, 0) / scores.length;
+        qualityScores[styleId] = Math.round(avg * 100) / 100; // Round to 2 decimals
+    });
+    
+    console.log(`Loaded quality scores for ${Object.keys(qualityScores).length} styles`);
 }
 
 // ============================================
@@ -225,11 +275,26 @@ async function loadStyles(filters = {}) {
                 is_featured,
                 is_new,
                 is_active,
-                sref_code
+                sref_code,
+                created_at
             `)
             .eq('is_active', true)
             .not('name', 'is', null)
-            .order('name');
+            .limit(5000);  // Get all styles (default is 1000)
+        
+        // Apply sorting (skip DB sort for quality_score since it's calculated)
+        const sortConfig = SORT_OPTIONS[currentSort] || SORT_OPTIONS.quality;
+        if (currentSort !== 'quality') {
+            query = query.order(sortConfig.field, { ascending: sortConfig.direction === 'asc', nullsFirst: false });
+            
+            // Secondary sort by name for consistent ordering
+            if (sortConfig.field !== 'name') {
+                query = query.order('name', { ascending: true });
+            }
+        } else {
+            // For quality sort, just order by name initially, we'll re-sort client-side
+            query = query.order('name', { ascending: true });
+        }
         
         // If we have matching IDs from junction tables, filter by them
         if (matchingStyleIds !== null) {
@@ -261,8 +326,14 @@ async function loadStyles(filters = {}) {
         allStyles = (data || []).map(style => ({
             ...style,
             thumbnail: style.thumbnail_url || window.SocietyArts.getStyleImageUrl(style.id, 0),
-            images: window.SocietyArts.getAllStyleImageUrls(style.id)
+            images: window.SocietyArts.getAllStyleImageUrls(style.id),
+            quality_score: qualityScores[style.id] || 0
         }));
+        
+        // Sort client-side if sorting by quality_score (calculated field)
+        if (currentSort === 'quality') {
+            allStyles.sort((a, b) => b.quality_score - a.quality_score);
+        }
         
         // Re-apply search if there was one
         if (currentSearchTerm) {
@@ -408,6 +479,25 @@ async function applyFilters(filters) {
     console.log('applyFilters called:', filters);
     await loadStyles(filters);
     return filteredStyles;
+}
+
+async function setSort(sortKey) {
+    if (!SORT_OPTIONS[sortKey]) {
+        console.warn(`Invalid sort key: ${sortKey}`);
+        return;
+    }
+    currentSort = sortKey;
+    console.log('Sort changed to:', sortKey);
+    await loadStyles(activeFilters);
+    return filteredStyles;
+}
+
+function getCurrentSort() {
+    return currentSort;
+}
+
+function getSortOptions() {
+    return SORT_OPTIONS;
 }
 
 async function clearFilters() {
@@ -751,6 +841,16 @@ Object.assign(window.SocietyArts, {
     applyFilters,
     clearFilters,
     activeFilters: () => activeFilters,
+    
+    // Sorting
+    setSort,
+    getCurrentSort,
+    getSortOptions,
+    SORT_OPTIONS,
+    
+    // Quality Scores
+    getQualityScore: (styleId) => qualityScores[styleId] || 0,
+    qualityScores: () => qualityScores,
     
     // Pagination
     getPagedStyles,
