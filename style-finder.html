@@ -2903,10 +2903,14 @@
         async function signInWithGoogle() {
             const { supabase } = window.SocietyArts;
             
+            // Always redirect to production URL (works for both local testing and production)
+            const productionUrl = 'https://society-arts.netlify.app';
+            const currentPath = window.location.pathname;
+            
             const { data, error } = await supabase.auth.signInWithOAuth({
                 provider: 'google',
                 options: {
-                    redirectTo: window.location.origin + window.location.pathname
+                    redirectTo: productionUrl + currentPath
                 }
             });
             
@@ -2984,7 +2988,7 @@
                     data: {
                         full_name: name
                     },
-                    emailRedirectTo: window.location.origin + window.location.pathname
+                    emailRedirectTo: 'https://society-arts.netlify.app/style-finder.html'
                 }
             });
             
@@ -3015,7 +3019,7 @@
             const { supabase } = window.SocietyArts;
             
             const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: window.location.origin + '/reset-password'
+                redirectTo: 'https://society-arts.netlify.app/style-finder.html'
             });
             
             btn.classList.remove('loading');
