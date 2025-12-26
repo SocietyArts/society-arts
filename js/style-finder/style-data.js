@@ -56,15 +56,27 @@ let isLoading = false;
 let currentSearchTerm = '';
 let facetCounts = {}; // Stores available options with counts
 let currentSort = 'quality'; // Default sort
+let minQualityScore = 0; // Minimum quality score filter (0 = show all)
 
 // Sort options
 const SORT_OPTIONS = {
     quality: { label: 'Quality Score', field: 'quality_score', direction: 'desc' },
+    qualityAsc: { label: 'Quality: Low to High', field: 'quality_score', direction: 'asc' },
     newest: { label: 'Newest Arrivals', field: 'created_at', direction: 'desc' },
     featured: { label: 'Featured', field: 'is_featured', direction: 'desc' },
     nameAsc: { label: 'Name: A to Z', field: 'name', direction: 'asc' },
     nameDesc: { label: 'Name: Z to A', field: 'name', direction: 'desc' }
 };
+
+// Quality filter thresholds
+const QUALITY_THRESHOLDS = [
+    { value: 0, label: 'All Scores' },
+    { value: 6, label: '6+ and above' },
+    { value: 7, label: '7+ and above' },
+    { value: 8, label: '8+ and above' },
+    { value: 9, label: '9+ and above' },
+    { value: 10, label: '10 only' }
+];
 
 // Cache for artbridge quality scores
 let qualityScores = {};
@@ -167,18 +179,24 @@ async function buildFacetCounts(currentStyleIds = null) {
     
     facetCounts = {};
     
-    // For each junction table, count how many styles have each option
+    // Get list of style IDs to count within
+    let styleIdsToCount = currentStyleIds;
+    
+    // If no filter provided, get all active style IDs
+    if (!styleIdsToCount) {
+        const { data } = await supabase
+            .from('styles')
+            .select('id')
+            .eq('is_active', true);
+        styleIdsToCount = (data || []).map(s => s.id);
+    }
+    
+    // For each junction table, count how many of the filtered styles have each option
     const countPromises = Object.entries(JUNCTION_TABLES).map(async ([filterKey, config]) => {
-        let query = supabase
+        const { data, error } = await supabase
             .from(config.table)
-            .select(config.column);
-        
-        // If we have a current filter set, only count within those styles
-        if (currentStyleIds && currentStyleIds.length > 0) {
-            query = query.in('style_id', currentStyleIds);
-        }
-        
-        const { data, error } = await query;
+            .select(config.column)
+            .in('style_id', styleIdsToCount);
         
         if (error) {
             console.warn(`Failed to count ${config.table}:`, error);
@@ -196,7 +214,7 @@ async function buildFacetCounts(currentStyleIds = null) {
     });
     
     await Promise.all(countPromises);
-    console.log('Facet counts built');
+    console.log('Facet counts built for', styleIdsToCount.length, 'styles');
     return facetCounts;
 }
 
@@ -330,9 +348,20 @@ async function loadStyles(filters = {}) {
             quality_score: qualityScores[style.id] || 0
         }));
         
-        // Sort client-side if sorting by quality_score (calculated field)
-        if (currentSort === 'quality') {
-            allStyles.sort((a, b) => b.quality_score - a.quality_score);
+        // Apply quality score filter
+        if (minQualityScore > 0) {
+            allStyles = allStyles.filter(s => s.quality_score >= minQualityScore);
+            console.log(`After quality filter (>=${minQualityScore}): ${allStyles.length} styles`);
+        }
+        
+        // Sort client-side for quality_score (calculated field)
+        const sortConfig = SORT_OPTIONS[currentSort] || SORT_OPTIONS.quality;
+        if (sortConfig.field === 'quality_score') {
+            if (sortConfig.direction === 'desc') {
+                allStyles.sort((a, b) => b.quality_score - a.quality_score);
+            } else {
+                allStyles.sort((a, b) => a.quality_score - b.quality_score);
+            }
         }
         
         // Re-apply search if there was one
@@ -343,9 +372,9 @@ async function loadStyles(filters = {}) {
         }
         currentPage = 0;
         
-        // Always update facet counts based on current results
-        // Pass null when no filters to count all styles
-        await buildFacetCounts(matchingStyleIds);
+        // Update facet counts based on current filtered results
+        const filteredIds = filteredStyles.map(s => s.id);
+        await buildFacetCounts(filteredIds);
         
         return allStyles;
     } catch (error) {
@@ -490,6 +519,21 @@ async function setSort(sortKey) {
     console.log('Sort changed to:', sortKey);
     await loadStyles(activeFilters);
     return filteredStyles;
+}
+
+async function setQualityThreshold(threshold) {
+    minQualityScore = threshold;
+    console.log('Quality threshold changed to:', threshold);
+    await loadStyles(activeFilters);
+    return filteredStyles;
+}
+
+function getQualityThreshold() {
+    return minQualityScore;
+}
+
+function getQualityThresholds() {
+    return QUALITY_THRESHOLDS;
 }
 
 function getCurrentSort() {
@@ -781,11 +825,13 @@ function isStyleSaved(styleId) {
 }
 
 // ============================================
-// REPORT STYLE (Google Sheets)
+// REPORT STYLE - Update Supabase flags
 // ============================================
 
-async function reportStyle(styleId, reportType) {
-    const sheetId = reportType === 'swap' ? GOOGLE_SHEETS.swapImage : GOOGLE_SHEETS.deleteStyle;
+async function reportStyleForReview(styleId) {
+    // Flag for image swap review - we'll add to a review queue
+    // For now, still use Google Sheets but also track locally
+    const sheetId = GOOGLE_SHEETS.swapImage;
     const sheetUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/edit#gid=0`;
     
     try {
@@ -793,13 +839,60 @@ async function reportStyle(styleId, reportType) {
         window.open(sheetUrl, '_blank');
         return {
             success: true,
-            message: `Style ID "${styleId}" copied to clipboard. Please paste it in the opened spreadsheet.`
+            message: `Style ID "${styleId}" copied. Please paste in the Review spreadsheet.`
         };
     } catch (error) {
-        console.error('Report failed:', error);
+        console.error('Report for review failed:', error);
         return {
             success: false,
             message: 'Failed to report style. Please try again.'
+        };
+    }
+}
+
+async function unlistStyle(styleId) {
+    const { supabase } = window.SocietyArts;
+    
+    try {
+        const { error } = await supabase
+            .from('styles')
+            .update({ is_active: false, updated_at: new Date().toISOString() })
+            .eq('id', styleId);
+        
+        if (error) {
+            console.error('Failed to unlist style:', error);
+            return {
+                success: false,
+                message: `Failed to unlist style: ${error.message}`
+            };
+        }
+        
+        // Remove from local arrays
+        allStyles = allStyles.filter(s => s.id !== styleId);
+        filteredStyles = filteredStyles.filter(s => s.id !== styleId);
+        
+        return {
+            success: true,
+            message: `Style "${styleId}" has been unlisted and will no longer appear.`
+        };
+    } catch (error) {
+        console.error('Unlist error:', error);
+        return {
+            success: false,
+            message: 'Failed to unlist style. Please try again.'
+        };
+    }
+}
+
+// Legacy function for backward compatibility
+async function reportStyle(styleId, reportType) {
+    if (reportType === 'swap') {
+        return reportStyleForReview(styleId);
+    } else if (reportType === 'delete') {
+        // This should be called after confirmation
+        return { 
+            success: false, 
+            message: 'Use unlistStyle() after user confirmation' 
         };
     }
 }
@@ -848,6 +941,12 @@ Object.assign(window.SocietyArts, {
     getSortOptions,
     SORT_OPTIONS,
     
+    // Quality Score Filtering
+    setQualityThreshold,
+    getQualityThreshold,
+    getQualityThresholds,
+    QUALITY_THRESHOLDS,
+    
     // Quality Scores
     getQualityScore: (styleId) => qualityScores[styleId] || 0,
     qualityScores: () => qualityScores,
@@ -893,6 +992,8 @@ Object.assign(window.SocietyArts, {
     
     // Reporting
     reportStyle,
+    reportStyleForReview,
+    unlistStyle,
     
     // Download
     downloadImage,
