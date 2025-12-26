@@ -394,6 +394,16 @@ function FormatSelector({ value, onChange }) {
 
 function Header({ currentPage, onNewProject, onOpenStyleFinder }) {
   const [menuOpen, setMenuOpen] = React.useState(false);
+  const [authModalOpen, setAuthModalOpen] = React.useState(false);
+  
+  // Use auth hook
+  const { user, profile, isLoading, signOut } = window.SocietyArts.useAuth ? 
+    window.SocietyArts.useAuth() : 
+    { user: null, profile: null, isLoading: true, signOut: () => {} };
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
 
   return (
     <>
@@ -417,7 +427,21 @@ function Header({ currentPage, onNewProject, onOpenStyleFinder }) {
               New Project
             </button>
           )}
-          <button className="btn btn-secondary">Log In</button>
+          
+          {/* Auth Section */}
+          {isLoading ? (
+            <div style={{ width: '80px' }}></div>
+          ) : user && profile ? (
+            <window.SocietyArts.UserMenu 
+              user={user}
+              profile={profile}
+              onSignOut={handleSignOut}
+            />
+          ) : (
+            <button className="btn btn-secondary" onClick={() => setAuthModalOpen(true)}>
+              Sign In
+            </button>
+          )}
         </div>
       </header>
       
@@ -427,6 +451,14 @@ function Header({ currentPage, onNewProject, onOpenStyleFinder }) {
         currentPage={currentPage}
         onOpenStyleFinder={onOpenStyleFinder}
       />
+      
+      {/* Auth Modal */}
+      {window.SocietyArts.AuthModal && (
+        <window.SocietyArts.AuthModal 
+          isOpen={authModalOpen}
+          onClose={() => setAuthModalOpen(false)}
+        />
+      )}
     </>
   );
 }
