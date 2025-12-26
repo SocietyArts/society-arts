@@ -272,10 +272,9 @@ async function loadStyles(filters = {}) {
         }
         currentPage = 0;
         
-        // Update facet counts based on current results
-        if (matchingStyleIds !== null) {
-            await buildFacetCounts(matchingStyleIds);
-        }
+        // Always update facet counts based on current results
+        // Pass null when no filters to count all styles
+        await buildFacetCounts(matchingStyleIds);
         
         return allStyles;
     } catch (error) {
