@@ -355,7 +355,6 @@ async function loadStyles(filters = {}) {
         }
         
         // Sort client-side for quality_score (calculated field)
-        const sortConfig = SORT_OPTIONS[currentSort] || SORT_OPTIONS.quality;
         if (sortConfig.field === 'quality_score') {
             if (sortConfig.direction === 'desc') {
                 allStyles.sort((a, b) => b.quality_score - a.quality_score);
