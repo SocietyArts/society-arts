@@ -115,18 +115,34 @@ async function loadQualityScores() {
     
     console.log('Loading quality scores from artbridge...');
     
-    const { data, error } = await supabase
-        .from('style_artbridge')
-        .select('style_id, score');
+    // Need to paginate since there are ~10,500 rows (1761 styles x 6 metrics)
+    let allData = [];
+    let offset = 0;
+    const pageSize = 1000;
     
-    if (error) {
-        console.error('Failed to load artbridge scores:', error);
-        return;
+    while (true) {
+        const { data, error } = await supabase
+            .from('style_artbridge')
+            .select('style_id, score')
+            .range(offset, offset + pageSize - 1);
+        
+        if (error) {
+            console.error('Failed to load artbridge scores:', error);
+            break;
+        }
+        
+        if (!data || data.length === 0) break;
+        
+        allData = allData.concat(data);
+        console.log(`Loaded ${allData.length} artbridge scores so far...`);
+        
+        if (data.length < pageSize) break;
+        offset += pageSize;
     }
     
     // Calculate average score per style
     const scoresByStyle = {};
-    (data || []).forEach(row => {
+    allData.forEach(row => {
         if (!scoresByStyle[row.style_id]) {
             scoresByStyle[row.style_id] = [];
         }
@@ -300,9 +316,9 @@ async function loadStyles(filters = {}) {
             .not('name', 'is', null)
             .limit(5000);  // Get all styles (default is 1000)
         
-        // Apply sorting (skip DB sort for quality_score since it's calculated)
+        // Apply sorting (skip DB sort for quality_score since it's calculated client-side)
         const sortConfig = SORT_OPTIONS[currentSort] || SORT_OPTIONS.quality;
-        if (currentSort !== 'quality') {
+        if (sortConfig.field !== 'quality_score') {
             query = query.order(sortConfig.field, { ascending: sortConfig.direction === 'asc', nullsFirst: false });
             
             // Secondary sort by name for consistent ordering
@@ -310,7 +326,7 @@ async function loadStyles(filters = {}) {
                 query = query.order('name', { ascending: true });
             }
         } else {
-            // For quality sort, just order by name initially, we'll re-sort client-side
+            // For quality_score sorts, just order by name initially, we'll re-sort client-side
             query = query.order('name', { ascending: true });
         }
         
@@ -966,6 +982,7 @@ Object.assign(window.SocietyArts, {
     getLookupName,
     getLookupOptions,
     getLookupOptionsWithCounts,
+    getLookups: () => lookupTables,
     lookupTables: () => lookupTables,
     
     // Favorites
