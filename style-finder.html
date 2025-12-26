@@ -60,6 +60,15 @@
             border-color: var(--color-accent, #C75B3F);
         }
         
+        .filter-select option {
+            padding: 0.25rem;
+        }
+        
+        .filter-select option:disabled {
+            color: #999;
+            font-style: italic;
+        }
+        
         .clear-filters-btn {
             width: 100%;
             padding: 0.5rem 1rem;
@@ -84,6 +93,12 @@
             margin-bottom: 1rem;
             font-size: 0.75rem;
             color: var(--color-accent, #C75B3F);
+        }
+        
+        .filter-loading {
+            font-size: 0.75rem;
+            color: #999;
+            font-style: italic;
         }
         
         /* Main Content */
@@ -402,6 +417,21 @@
             color: var(--color-text-secondary, #666);
             line-height: 1.6;
             margin-bottom: 1.5rem;
+        }
+        
+        .style-modal-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .style-tag {
+            background: var(--color-surface, #f5f5f5);
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            color: var(--color-text-secondary, #666);
         }
         
         .style-modal-attributes {
@@ -877,6 +907,7 @@
                 <h2 class="style-modal-name" id="styleModalName"></h2>
                 <div class="style-modal-tagline" id="styleModalTagline"></div>
                 <p class="style-modal-description" id="styleModalDescription"></p>
+                <div class="style-modal-tags" id="styleModalTags"></div>
                 <div class="style-modal-attributes" id="styleModalAttributes">
                     <!-- Attributes inserted here -->
                 </div>
@@ -994,15 +1025,15 @@
             complexity: document.getElementById('filterComplexity')
         };
         
-        // Lookup table mapping
-        const filterToLookup = {
-            art_type_id: 'art_types',
-            primary_medium_id: 'mediums',
-            culture_id: 'cultures',
-            era_id: 'eras',
-            primary_palette_id: 'palettes',
-            primary_lighting_id: 'lighting',
-            primary_composition_id: 'compositions'
+        // Lookup table mapping for smart facets
+        const filterConfig = {
+            art_type_id: { lookup: 'art_types', label: 'Art Type' },
+            primary_medium_id: { lookup: 'mediums', label: 'Medium' },
+            culture_id: { lookup: 'cultures', label: 'Culture' },
+            era_id: { lookup: 'eras', label: 'Era' },
+            primary_palette_id: { lookup: 'palettes', label: 'Palette' },
+            primary_lighting_id: { lookup: 'lighting', label: 'Lighting' },
+            primary_composition_id: { lookup: 'compositions', label: 'Composition' }
         };
         
         // State for lightbox
@@ -1047,25 +1078,37 @@
             setTimeout(() => toast.classList.remove('active'), duration);
         }
         
+        // Populate dropdowns with counts (smart facets)
         function populateFilterDropdowns() {
             Object.entries(filterSelects).forEach(([filterKey, selectEl]) => {
-                if (filterKey === 'complexity') return;
+                if (filterKey === 'complexity') return; // Skip complexity
                 
-                const lookupTable = filterToLookup[filterKey];
-                const options = SocietyArts.getLookupOptions(lookupTable);
+                const config = filterConfig[filterKey];
+                if (!config) return;
                 
-                // Keep the first "All..." option
-                const firstOption = selectEl.options[0].outerHTML;
-                selectEl.innerHTML = firstOption;
+                // Get options with counts
+                const options = SocietyArts.getLookupOptionsWithCounts(config.lookup, filterKey);
                 
+                // Save current selection
+                const currentValue = selectEl.value;
+                
+                // Clear and rebuild
+                selectEl.innerHTML = `<option value="">All ${config.label}s (${options.reduce((sum, o) => sum + o.count, 0)})</option>`;
+                
+                // Add options that have results, with counts
                 options.forEach(opt => {
                     const option = document.createElement('option');
-                    option.value = opt.id;  // This is now a string like "ART001"
-                    option.textContent = opt.name;
+                    option.value = opt.id;
+                    option.textContent = `${opt.name} (${opt.count})`;
                     selectEl.appendChild(option);
                 });
                 
-                console.log(`Populated ${filterKey} with ${options.length} options`);
+                // Restore selection if still valid
+                if (currentValue && [...selectEl.options].some(o => o.value === currentValue)) {
+                    selectEl.value = currentValue;
+                }
+                
+                console.log(`Populated ${filterKey} with ${options.length} options (with counts)`);
             });
         }
         
@@ -1074,7 +1117,7 @@
             Object.entries(filterSelects).forEach(([key, el]) => {
                 if (el.value) {
                     const selectedOption = el.options[el.selectedIndex];
-                    activeFilters.push(selectedOption.textContent);
+                    activeFilters.push(selectedOption.textContent.split(' (')[0]); // Remove count
                 }
             });
             
@@ -1147,13 +1190,15 @@
         // Search & Filter Handlers
         // ============================================
         let searchTimeout;
-        function handleSearch(value) {
+        async function handleSearch(value) {
             clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                SocietyArts.searchStyles(value);
+            searchTimeout = setTimeout(async () => {
+                showLoading(true);
+                await SocietyArts.searchStyles(value);
                 renderStyles();
                 updateResultsCount();
                 updatePagination();
+                showLoading(false);
             }, 300);
         }
         
@@ -1163,7 +1208,7 @@
             handleSearch(e.target.value);
         });
         
-        // FIXED: Filter change handler - IDs are strings, not integers!
+        // Filter change handler
         Object.entries(filterSelects).forEach(([filterKey, selectEl]) => {
             selectEl.addEventListener('change', async () => {
                 console.log(`Filter changed: ${filterKey} = "${selectEl.value}"`);
@@ -1173,11 +1218,10 @@
                 const filters = {};
                 Object.entries(filterSelects).forEach(([key, el]) => {
                     if (el.value) {
-                        // Only parse complexity as integer, everything else is a string
                         if (key === 'complexity') {
                             filters[key] = parseInt(el.value);
                         } else {
-                            filters[key] = el.value;  // Keep as string!
+                            filters[key] = el.value;
                         }
                     }
                 });
@@ -1185,6 +1229,10 @@
                 console.log('Applying filters:', filters);
                 
                 await SocietyArts.applyFilters(filters);
+                
+                // Refresh dropdowns with new counts (smart facets)
+                populateFilterDropdowns();
+                
                 renderStyles();
                 updateResultsCount();
                 updatePagination();
@@ -1200,6 +1248,7 @@
             searchInput.value = '';
             sidebarSearch.value = '';
             await SocietyArts.clearFilters();
+            populateFilterDropdowns(); // Reset counts
             renderStyles();
             updateResultsCount();
             updatePagination();
@@ -1234,7 +1283,7 @@
         }
         
         // ============================================
-        // Style Modal
+        // Style Modal - Now shows all related attributes
         // ============================================
         async function openStyleModal(styleId) {
             showLoading(true);
@@ -1257,14 +1306,29 @@
             document.getElementById('styleModalTagline').textContent = style.tagline || '';
             document.getElementById('styleModalDescription').textContent = style.description || 'No description available.';
             
+            // Show tags from junction tables
+            const allTags = [
+                ...(style.artTypes || []),
+                ...(style.mediums || []),
+                ...(style.cultures || []),
+                ...(style.eras || []),
+                ...(style.palettes || []),
+                ...(style.lighting || []),
+                ...(style.compositions || [])
+            ];
+            
+            document.getElementById('styleModalTags').innerHTML = allTags.length > 0 
+                ? allTags.map(tag => `<span class="style-tag">${tag}</span>`).join('')
+                : '';
+            
             const attributes = [
-                ['Art Type', SocietyArts.getLookupName('art_types', style.art_type_id)],
-                ['Medium', SocietyArts.getLookupName('mediums', style.primary_medium_id)],
-                ['Culture', SocietyArts.getLookupName('cultures', style.culture_id)],
-                ['Era', SocietyArts.getLookupName('eras', style.era_id)],
-                ['Palette', SocietyArts.getLookupName('palettes', style.primary_palette_id)],
-                ['Lighting', SocietyArts.getLookupName('lighting', style.primary_lighting_id)],
-                ['Composition', SocietyArts.getLookupName('compositions', style.primary_composition_id)],
+                ['Art Types', style.artTypes?.join(', ')],
+                ['Mediums', style.mediums?.join(', ')],
+                ['Cultures', style.cultures?.join(', ')],
+                ['Eras', style.eras?.join(', ')],
+                ['Palettes', style.palettes?.join(', ')],
+                ['Lighting', style.lighting?.join(', ')],
+                ['Compositions', style.compositions?.join(', ')],
                 ['Complexity', style.complexity ? `Level ${style.complexity}` : null],
                 ['Best Format', style.best_format],
                 ['Best Size', style.best_size],
