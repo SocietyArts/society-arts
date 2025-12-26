@@ -1457,6 +1457,9 @@
         
         // Populate dropdowns with counts (smart facets)
         function populateFilterDropdowns() {
+            // Get actual filtered count (not sum of options)
+            const totalFilteredStyles = SocietyArts.filteredStyles().length;
+            
             Object.entries(filterSelects).forEach(([filterKey, selectEl]) => {
                 if (filterKey === 'complexity') return; // Skip complexity
                 
@@ -1469,8 +1472,8 @@
                 // Save current selection
                 const currentValue = selectEl.value;
                 
-                // Clear and rebuild
-                selectEl.innerHTML = `<option value="">All ${config.label}s (${options.reduce((sum, o) => sum + o.count, 0)})</option>`;
+                // Clear and rebuild - show actual filtered count, not sum of options
+                selectEl.innerHTML = `<option value="">All ${config.label}s (${totalFilteredStyles})</option>`;
                 
                 // Add options that have results, with counts
                 options.forEach(opt => {
