@@ -7,6 +7,12 @@
 
 const STYLES_PER_PAGE = 24;
 
+// Google Sheets for reporting
+const GOOGLE_SHEETS = {
+    swapImage: '1FmiVUFTZQ9_GvUzh1FR_iu5HJilnHyeIg4sVr3f7Ei4',
+    deleteStyle: '1_j2HLnfFhN1PdYEjiZz7PJPHUc5KqV2u63v2oHTrNrA'
+};
+
 // ============================================
 // LOOKUP TABLES (cached from Supabase)
 // ============================================
@@ -36,6 +42,7 @@ let filteredStyles = [];
 let currentPage = 0;
 let activeFilters = {};
 let isLoading = false;
+let currentSearchTerm = '';
 
 // ============================================
 // INITIALIZATION
@@ -155,13 +162,29 @@ async function loadStyles(filters = {}) {
             throw error;
         }
         
-        allStyles = (data || []).map(style => ({
-            ...style,
-            thumbnail: style.thumbnail_url || window.SocietyArts.getStyleImageUrl(style.id, 0),
-            images: window.SocietyArts.getAllStyleImageUrls(style.id)
-        }));
+        allStyles = (data || []).map(style => {
+            // Enrich style with lookup names for searching
+            return {
+                ...style,
+                thumbnail: style.thumbnail_url || window.SocietyArts.getStyleImageUrl(style.id, 0),
+                images: window.SocietyArts.getAllStyleImageUrls(style.id),
+                // Add searchable text from lookups
+                _artTypeName: getLookupName('art_types', style.art_type_id) || '',
+                _mediumName: getLookupName('mediums', style.primary_medium_id) || '',
+                _cultureName: getLookupName('cultures', style.culture_id) || '',
+                _eraName: getLookupName('eras', style.era_id) || '',
+                _paletteName: getLookupName('palettes', style.primary_palette_id) || '',
+                _lightingName: getLookupName('lighting', style.primary_lighting_id) || '',
+                _compositionName: getLookupName('compositions', style.primary_composition_id) || ''
+            };
+        });
         
-        filteredStyles = [...allStyles];
+        // Re-apply search if there was one
+        if (currentSearchTerm) {
+            searchStyles(currentSearchTerm);
+        } else {
+            filteredStyles = [...allStyles];
+        }
         currentPage = 0;
         
         return allStyles;
@@ -174,20 +197,42 @@ async function loadStyles(filters = {}) {
 }
 
 // ============================================
-// SEARCH & FILTERING
+// SMART SEARCH
 // ============================================
 
 function searchStyles(searchTerm) {
+    currentSearchTerm = searchTerm;
+    
     if (!searchTerm || searchTerm.trim() === '') {
         filteredStyles = [...allStyles];
-    } else {
-        const term = searchTerm.toLowerCase().trim();
-        filteredStyles = allStyles.filter(style => 
-            style.name?.toLowerCase().includes(term) ||
-            style.description?.toLowerCase().includes(term) ||
-            style.tagline?.toLowerCase().includes(term)
-        );
+        currentPage = 0;
+        return filteredStyles;
     }
+    
+    // Split search into multiple terms (space-separated)
+    const terms = searchTerm.toLowerCase().trim().split(/\s+/).filter(t => t.length > 0);
+    
+    filteredStyles = allStyles.filter(style => {
+        // Build searchable text from all relevant fields
+        const searchableText = [
+            style.name,
+            style.tagline,
+            style.description,
+            style.id,
+            style.sref_code,
+            style._artTypeName,
+            style._mediumName,
+            style._cultureName,
+            style._eraName,
+            style._paletteName,
+            style._lightingName,
+            style._compositionName
+        ].filter(Boolean).join(' ').toLowerCase();
+        
+        // ALL terms must match (AND logic)
+        return terms.every(term => searchableText.includes(term));
+    });
+    
     currentPage = 0;
     return filteredStyles;
 }
@@ -200,6 +245,7 @@ async function applyFilters(filters) {
 
 function clearFilters() {
     activeFilters = {};
+    currentSearchTerm = '';
     return loadStyles();
 }
 
@@ -285,7 +331,7 @@ async function getPromptsForStyle(styleId) {
 
 function getLookupName(tableName, id) {
     const table = lookupTables[tableName];
-    if (!table) return null;
+    if (!table || !id) return null;
     const item = table.find(row => row.id === id);
     return item?.name || null;
 }
@@ -337,6 +383,161 @@ function toggleFavorite(styleId) {
 }
 
 // ============================================
+// COLLECTIONS (localStorage)
+// ============================================
+
+const COLLECTIONS_KEY = 'society-arts-collections';
+
+function getCollections() {
+    try {
+        const stored = localStorage.getItem(COLLECTIONS_KEY);
+        return stored ? JSON.parse(stored) : [];
+    } catch {
+        return [];
+    }
+}
+
+function saveCollections(collections) {
+    localStorage.setItem(COLLECTIONS_KEY, JSON.stringify(collections));
+}
+
+function createCollection(name) {
+    const collections = getCollections();
+    const newCollection = {
+        id: 'col_' + Date.now(),
+        name: name,
+        styleIds: [],
+        createdAt: new Date().toISOString()
+    };
+    collections.push(newCollection);
+    saveCollections(collections);
+    return newCollection;
+}
+
+function deleteCollection(collectionId) {
+    const collections = getCollections().filter(c => c.id !== collectionId);
+    saveCollections(collections);
+    return collections;
+}
+
+function addToCollection(collectionId, styleId) {
+    const collections = getCollections();
+    const collection = collections.find(c => c.id === collectionId);
+    if (collection && !collection.styleIds.includes(styleId)) {
+        collection.styleIds.push(styleId);
+        saveCollections(collections);
+    }
+    return collections;
+}
+
+function removeFromCollection(collectionId, styleId) {
+    const collections = getCollections();
+    const collection = collections.find(c => c.id === collectionId);
+    if (collection) {
+        collection.styleIds = collection.styleIds.filter(id => id !== styleId);
+        saveCollections(collections);
+    }
+    return collections;
+}
+
+function getStyleCollections(styleId) {
+    return getCollections().filter(c => c.styleIds.includes(styleId));
+}
+
+// ============================================
+// SAVED STYLES (localStorage - separate from favorites)
+// ============================================
+
+const SAVED_KEY = 'society-arts-saved';
+
+function getSavedStyles() {
+    try {
+        const stored = localStorage.getItem(SAVED_KEY);
+        return stored ? JSON.parse(stored) : [];
+    } catch {
+        return [];
+    }
+}
+
+function saveStyle(styleId) {
+    const saved = getSavedStyles();
+    if (!saved.includes(styleId)) {
+        saved.push(styleId);
+        localStorage.setItem(SAVED_KEY, JSON.stringify(saved));
+    }
+    return saved;
+}
+
+function unsaveStyle(styleId) {
+    const saved = getSavedStyles().filter(id => id !== styleId);
+    localStorage.setItem(SAVED_KEY, JSON.stringify(saved));
+    return saved;
+}
+
+function isStyleSaved(styleId) {
+    return getSavedStyles().includes(styleId);
+}
+
+// ============================================
+// REPORT STYLE (Google Sheets)
+// ============================================
+
+async function reportStyle(styleId, reportType) {
+    const sheetId = reportType === 'swap' ? GOOGLE_SHEETS.swapImage : GOOGLE_SHEETS.deleteStyle;
+    const timestamp = new Date().toISOString();
+    
+    // Use Google Forms approach or direct sheet URL
+    // For now, we'll open a pre-filled Google Form or sheet
+    const sheetUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/edit#gid=0`;
+    
+    // Try to append via a simple fetch (may not work due to CORS)
+    // Fallback: copy to clipboard and open sheet
+    try {
+        // Copy style ID to clipboard
+        await navigator.clipboard.writeText(styleId);
+        
+        // Open the sheet
+        window.open(sheetUrl, '_blank');
+        
+        return {
+            success: true,
+            message: `Style ID "${styleId}" copied to clipboard. Please paste it in the opened spreadsheet.`
+        };
+    } catch (error) {
+        console.error('Report failed:', error);
+        return {
+            success: false,
+            message: 'Failed to report style. Please try again.'
+        };
+    }
+}
+
+// ============================================
+// DOWNLOAD IMAGE
+// ============================================
+
+async function downloadImage(imageUrl, filename) {
+    try {
+        const response = await fetch(imageUrl);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename || 'style-image.webp';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        return true;
+    } catch (error) {
+        console.error('Download failed:', error);
+        // Fallback: open in new tab
+        window.open(imageUrl, '_blank');
+        return false;
+    }
+}
+
+// ============================================
 // EXPORT
 // ============================================
 
@@ -378,6 +579,26 @@ Object.assign(window.SocietyArts, {
     removeFavorite,
     isFavorite,
     toggleFavorite,
+    
+    // Collections
+    getCollections,
+    createCollection,
+    deleteCollection,
+    addToCollection,
+    removeFromCollection,
+    getStyleCollections,
+    
+    // Saved
+    getSavedStyles,
+    saveStyle,
+    unsaveStyle,
+    isStyleSaved,
+    
+    // Reporting
+    reportStyle,
+    
+    // Download
+    downloadImage,
     
     // State
     allStyles: () => allStyles,
