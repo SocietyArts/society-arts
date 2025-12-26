@@ -868,19 +868,35 @@ async function reportStyleForReview(styleId) {
 async function unlistStyle(styleId) {
     const { supabase } = window.SocietyArts;
     
+    console.log('Attempting to unlist style:', styleId);
+    
     try {
-        const { error } = await supabase
+        const { data, error, count } = await supabase
             .from('styles')
             .update({ is_active: false, updated_at: new Date().toISOString() })
-            .eq('id', styleId);
+            .eq('id', styleId)
+            .select();
+        
+        console.log('Supabase update response:', { data, error, count });
         
         if (error) {
             console.error('Failed to unlist style:', error);
             return {
                 success: false,
-                message: `Failed to unlist style: ${error.message}`
+                message: `Failed to unlist style: ${error.message}\n\nThis may be due to database permissions. Check Supabase RLS policies.`
             };
         }
+        
+        // Check if any rows were actually updated
+        if (!data || data.length === 0) {
+            console.warn('No rows updated - style may not exist or RLS is blocking');
+            return {
+                success: false,
+                message: `Style "${styleId}" was not updated. Check database permissions (RLS policies).`
+            };
+        }
+        
+        console.log('Style successfully unlisted:', data);
         
         // Remove from local arrays
         allStyles = allStyles.filter(s => s.id !== styleId);
