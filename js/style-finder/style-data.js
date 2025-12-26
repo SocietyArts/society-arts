@@ -101,6 +101,8 @@ async function loadStyles(filters = {}) {
     const { supabase } = window.SocietyArts;
     isLoading = true;
     
+    console.log('loadStyles called with filters:', filters);
+    
     try {
         let query = supabase
             .from('styles')
@@ -130,37 +132,48 @@ async function loadStyles(filters = {}) {
             .not('name', 'is', null)
             .order('name');
         
-        // Apply filters
+        // Apply filters - IDs are strings (varchar), complexity is integer
         if (filters.art_type_id) {
+            console.log(`Filtering by art_type_id: "${filters.art_type_id}"`);
             query = query.eq('art_type_id', filters.art_type_id);
         }
         if (filters.primary_medium_id) {
+            console.log(`Filtering by primary_medium_id: "${filters.primary_medium_id}"`);
             query = query.eq('primary_medium_id', filters.primary_medium_id);
         }
         if (filters.culture_id) {
+            console.log(`Filtering by culture_id: "${filters.culture_id}"`);
             query = query.eq('culture_id', filters.culture_id);
         }
         if (filters.era_id) {
+            console.log(`Filtering by era_id: "${filters.era_id}"`);
             query = query.eq('era_id', filters.era_id);
         }
         if (filters.primary_palette_id) {
+            console.log(`Filtering by primary_palette_id: "${filters.primary_palette_id}"`);
             query = query.eq('primary_palette_id', filters.primary_palette_id);
         }
         if (filters.primary_lighting_id) {
+            console.log(`Filtering by primary_lighting_id: "${filters.primary_lighting_id}"`);
             query = query.eq('primary_lighting_id', filters.primary_lighting_id);
         }
         if (filters.primary_composition_id) {
+            console.log(`Filtering by primary_composition_id: "${filters.primary_composition_id}"`);
             query = query.eq('primary_composition_id', filters.primary_composition_id);
         }
         if (filters.complexity) {
+            console.log(`Filtering by complexity: ${filters.complexity}`);
             query = query.eq('complexity', filters.complexity);
         }
         
         const { data, error } = await query;
         
         if (error) {
+            console.error('Supabase query error:', error);
             throw error;
         }
+        
+        console.log(`Query returned ${data?.length || 0} styles`);
         
         allStyles = (data || []).map(style => {
             // Enrich style with lookup names for searching
@@ -239,6 +252,7 @@ function searchStyles(searchTerm) {
 
 async function applyFilters(filters) {
     activeFilters = { ...filters };
+    console.log('applyFilters called:', filters);
     await loadStyles(filters);
     return filteredStyles;
 }
@@ -484,14 +498,8 @@ function isStyleSaved(styleId) {
 
 async function reportStyle(styleId, reportType) {
     const sheetId = reportType === 'swap' ? GOOGLE_SHEETS.swapImage : GOOGLE_SHEETS.deleteStyle;
-    const timestamp = new Date().toISOString();
-    
-    // Use Google Forms approach or direct sheet URL
-    // For now, we'll open a pre-filled Google Form or sheet
     const sheetUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/edit#gid=0`;
     
-    // Try to append via a simple fetch (may not work due to CORS)
-    // Fallback: copy to clipboard and open sheet
     try {
         // Copy style ID to clipboard
         await navigator.clipboard.writeText(styleId);
@@ -518,20 +526,11 @@ async function reportStyle(styleId, reportType) {
 
 async function downloadImage(imageUrl, filename) {
     try {
-        const response = await fetch(imageUrl);
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename || 'style-image.webp';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
+        // Due to CORS, we'll open the image in a new tab for the user to save
+        window.open(imageUrl, '_blank');
         return true;
     } catch (error) {
         console.error('Download failed:', error);
-        // Fallback: open in new tab
         window.open(imageUrl, '_blank');
         return false;
     }
