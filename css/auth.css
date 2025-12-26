@@ -475,7 +475,7 @@
     box-shadow: var(--shadow-xl);
     border: 1px solid var(--color-border);
     padding: 8px 0;
-    z-index: var(--z-dropdown);
+    z-index: 200;
     opacity: 0;
     visibility: hidden;
     transform: translateY(-10px);
