@@ -6,7 +6,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const R2_BASE_URL = 'https://pub-acb560f551f141db830964aed1fa005f.r2.dev';
 
 // Initialize Supabase client
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Helper function to get image URL for a style
 function getStyleImageUrl(styleId, imageIndex = 0) {
@@ -21,7 +21,9 @@ function getAllStyleImageUrls(styleId) {
 
 // Export for use in other modules
 window.SocietyArts = window.SocietyArts || {};
-window.SocietyArts.supabase = supabase;
+window.SocietyArts.supabase = supabaseClient;
 window.SocietyArts.getStyleImageUrl = getStyleImageUrl;
 window.SocietyArts.getAllStyleImageUrls = getAllStyleImageUrls;
 window.SocietyArts.R2_BASE_URL = R2_BASE_URL;
+
+console.log('Supabase client initialized successfully');
