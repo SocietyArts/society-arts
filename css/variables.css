@@ -118,7 +118,7 @@
   /* ======== Z-INDEX ======== */
   --z-base: 1;
   --z-dropdown: 50;
-  --z-sticky: 100;
+  --z-sticky: 150;
   --z-overlay: 200;
   --z-modal: 300;
   --z-popover: 400;

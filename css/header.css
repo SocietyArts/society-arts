@@ -33,17 +33,27 @@
 }
 
 .logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.logo-image {
+  height: 28px;
+  width: auto;
+}
+
+.logo-text {
   font-family: var(--font-serif);
   font-size: var(--text-xl);
   font-weight: var(--weight-medium);
   letter-spacing: var(--tracking-widest);
   margin: 0;
   color: var(--color-text-primary);
-  text-decoration: none;
 }
 
 .logo:hover {
-  color: var(--color-text-primary);
+  opacity: 0.9;
 }
 
 /* ========================================
