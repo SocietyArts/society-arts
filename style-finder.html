@@ -76,6 +76,16 @@
             background: var(--color-border, #e5e5e5);
         }
         
+        .active-filters {
+            background: rgba(199, 91, 63, 0.1);
+            border: 1px solid var(--color-accent, #C75B3F);
+            border-radius: 6px;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.75rem;
+            color: var(--color-accent, #C75B3F);
+        }
+        
         /* Main Content */
         .styles-main {
             flex: 1;
@@ -569,23 +579,6 @@
             color: #dc3545;
         }
         
-        /* Sub-menu for Report */
-        .context-submenu {
-            display: none;
-            position: absolute;
-            left: 100%;
-            top: 0;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.15);
-            min-width: 180px;
-            margin-left: 4px;
-        }
-        
-        .context-menu-item:hover .context-submenu {
-            display: block;
-        }
-        
         /* Collection Modal */
         .collection-modal {
             display: none;
@@ -779,6 +772,8 @@
     <div class="style-finder-page">
         <!-- Filter Sidebar -->
         <aside class="filter-sidebar">
+            <div id="activeFiltersDisplay" class="active-filters" style="display:none;"></div>
+            
             <div class="filter-section">
                 <h3>Search</h3>
                 <input type="text" class="filter-select" id="sidebarSearch" placeholder="Search styles...">
@@ -985,6 +980,7 @@
         const contextMenu = document.getElementById('contextMenu');
         const collectionModal = document.getElementById('collectionModal');
         const toast = document.getElementById('toast');
+        const activeFiltersDisplay = document.getElementById('activeFiltersDisplay');
         
         // Filter elements mapped to database columns
         const filterSelects = {
@@ -1058,15 +1054,36 @@
                 const lookupTable = filterToLookup[filterKey];
                 const options = SocietyArts.getLookupOptions(lookupTable);
                 
-                selectEl.innerHTML = selectEl.options[0].outerHTML;
+                // Keep the first "All..." option
+                const firstOption = selectEl.options[0].outerHTML;
+                selectEl.innerHTML = firstOption;
                 
                 options.forEach(opt => {
                     const option = document.createElement('option');
-                    option.value = opt.id;
+                    option.value = opt.id;  // This is now a string like "ART001"
                     option.textContent = opt.name;
                     selectEl.appendChild(option);
                 });
+                
+                console.log(`Populated ${filterKey} with ${options.length} options`);
             });
+        }
+        
+        function updateActiveFiltersDisplay() {
+            const activeFilters = [];
+            Object.entries(filterSelects).forEach(([key, el]) => {
+                if (el.value) {
+                    const selectedOption = el.options[el.selectedIndex];
+                    activeFilters.push(selectedOption.textContent);
+                }
+            });
+            
+            if (activeFilters.length > 0) {
+                activeFiltersDisplay.style.display = 'block';
+                activeFiltersDisplay.textContent = `Active: ${activeFilters.join(', ')}`;
+            } else {
+                activeFiltersDisplay.style.display = 'none';
+            }
         }
         
         function renderStyles() {
@@ -1146,19 +1163,33 @@
             handleSearch(e.target.value);
         });
         
+        // FIXED: Filter change handler - IDs are strings, not integers!
         Object.entries(filterSelects).forEach(([filterKey, selectEl]) => {
             selectEl.addEventListener('change', async () => {
+                console.log(`Filter changed: ${filterKey} = "${selectEl.value}"`);
+                
                 showLoading(true);
+                
                 const filters = {};
                 Object.entries(filterSelects).forEach(([key, el]) => {
                     if (el.value) {
-                        filters[key] = parseInt(el.value);
+                        // Only parse complexity as integer, everything else is a string
+                        if (key === 'complexity') {
+                            filters[key] = parseInt(el.value);
+                        } else {
+                            filters[key] = el.value;  // Keep as string!
+                        }
                     }
                 });
+                
+                console.log('Applying filters:', filters);
+                
                 await SocietyArts.applyFilters(filters);
                 renderStyles();
                 updateResultsCount();
                 updatePagination();
+                updateActiveFiltersDisplay();
+                
                 showLoading(false);
             });
         });
@@ -1172,6 +1203,7 @@
             renderStyles();
             updateResultsCount();
             updatePagination();
+            updateActiveFiltersDisplay();
             showLoading(false);
         });
         
@@ -1328,13 +1360,7 @@
         document.getElementById('menuSave').addEventListener('click', async () => {
             if (!currentMenuStyleId) return;
             SocietyArts.saveStyle(currentMenuStyleId);
-            
-            // Also trigger image download
-            if (currentMenuImageUrl) {
-                await SocietyArts.downloadImage(currentMenuImageUrl, `${currentMenuStyleId}-thumbnail.webp`);
-            }
-            
-            showToast('Style saved! Image download started.');
+            showToast('Style saved to your collection!');
         });
         
         document.getElementById('menuAddToCollection').addEventListener('click', () => {
