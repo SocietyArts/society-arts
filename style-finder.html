@@ -13,11 +13,64 @@
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/header.css">
     <link rel="stylesheet" href="css/modals.css">
+    <link rel="stylesheet" href="css/auth.css">
     
     <!-- Supabase Client Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
+        /* Site Header */
+        .site-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: var(--color-surface, #fff);
+            border-bottom: 1px solid var(--color-border, #e5e5e5);
+            z-index: 100;
+        }
+        
+        .header-content {
+            display: flex;
+            align-items: center;
+            height: 100%;
+            padding: 0 1.5rem;
+            max-width: 100%;
+            gap: 2rem;
+        }
+        
+        .header-content .logo {
+            font-family: var(--font-serif, Georgia, serif);
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: var(--color-text-primary, #333);
+            text-decoration: none;
+            letter-spacing: 0.1em;
+            white-space: nowrap;
+        }
+        
+        .header-nav {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        .header-nav a {
+            color: var(--color-text-secondary, #666);
+            text-decoration: none;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        
+        .header-nav a:hover {
+            color: var(--color-text-primary, #333);
+        }
+        
+        .header-nav a.active {
+            color: var(--color-accent, #C75B3F);
+        }
+        
         /* Style Finder Page Specific Styles */
         .style-finder-page {
             display: flex;
@@ -696,6 +749,11 @@
             color: var(--color-text, #333);
         }
         
+        /* Admin Edit Button in Style Modal */
+        .style-modal-info .admin-edit-btn {
+            margin-top: 1.5rem;
+        }
+        
         /* Lightbox for zoomed images */
         .lightbox {
             display: none;
@@ -1102,6 +1160,64 @@
                 <a href="story-builder.html">Story Builder</a>
                 <a href="style-finder.html" class="active">Style Finder</a>
             </nav>
+            
+            <!-- Auth Section -->
+            <div class="header-auth" id="headerAuth">
+                <!-- Sign In Button (shown when logged out) -->
+                <button class="sign-in-btn" id="signInBtn" onclick="openAuthModal()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    Sign In
+                </button>
+                
+                <!-- User Menu (shown when logged in) -->
+                <div class="user-menu-container" id="userMenuContainer" style="display: none;">
+                    <button class="user-avatar-btn" id="userAvatarBtn" onclick="toggleUserMenu()">
+                        <div class="user-avatar" id="userAvatar">
+                            <span id="userInitials">U</span>
+                        </div>
+                        <span class="user-name" id="userName">User</span>
+                        <svg class="user-menu-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
+                    
+                    <div class="user-dropdown" id="userDropdown">
+                        <div class="user-dropdown-header">
+                            <div class="user-dropdown-name" id="dropdownUserName">User</div>
+                            <div class="user-dropdown-email" id="dropdownUserEmail">user@example.com</div>
+                            <span class="user-dropdown-role" id="dropdownUserRole" style="display: none;">Admin</span>
+                        </div>
+                        <button class="user-dropdown-item" onclick="openProfileModal()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            Profile
+                        </button>
+                        <button class="user-dropdown-item" id="adminUsersBtn" onclick="openAdminUsersModal()" style="display: none;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                            Manage Users
+                        </button>
+                        <div class="user-dropdown-divider"></div>
+                        <button class="user-dropdown-item logout" onclick="handleLogout()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                <polyline points="16 17 21 12 16 7"></polyline>
+                                <line x1="21" y1="12" x2="9" y2="12"></line>
+                            </svg>
+                            Sign Out
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </header>
     
@@ -1268,6 +1384,14 @@
                 <div class="style-modal-attributes" id="styleModalAttributes">
                     <!-- Attributes inserted here -->
                 </div>
+                <!-- Admin Edit Button (shown only for admins) -->
+                <button class="admin-edit-btn" id="adminEditStyleBtn" style="display: none;" onclick="openEditStyleModal(currentModalStyleId)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                    Edit Style
+                </button>
             </div>
         </div>
     </div>
@@ -1357,6 +1481,446 @@
         </div>
     </div>
     
+    <!-- ============================================ -->
+    <!-- AUTH MODAL -->
+    <!-- ============================================ -->
+    <div class="auth-modal-overlay" id="authModalOverlay">
+        <div class="auth-modal" id="authModal">
+            <button class="auth-modal-close" onclick="closeAuthModal()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            
+            <!-- Welcome View (Default) -->
+            <div class="auth-view" id="authViewWelcome">
+                <div class="auth-header">
+                    <h1 class="auth-title">Welcome</h1>
+                    <p class="auth-subtitle">Start exploring and creating – sign in to never lose your results.</p>
+                </div>
+                
+                <div class="auth-social-buttons">
+                    <!-- Google -->
+                    <button class="auth-social-btn" onclick="signInWithGoogle()">
+                        <span class="auth-social-icon google">
+                            <svg viewBox="0 0 24 24" width="20" height="20">
+                                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                            </svg>
+                        </span>
+                        Continue with Google
+                    </button>
+                    
+                    <!-- Apple (Coming Soon) -->
+                    <button class="auth-social-btn disabled" onclick="showUnderConstruction('Apple')">
+                        <span class="auth-social-icon">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                                <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+                            </svg>
+                        </span>
+                        Continue with Apple
+                    </button>
+                    
+                    <!-- Facebook (Coming Soon) -->
+                    <button class="auth-social-btn disabled" onclick="showUnderConstruction('Facebook')">
+                        <span class="auth-social-icon">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="#1877F2">
+                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                            </svg>
+                        </span>
+                        Continue with Facebook
+                    </button>
+                </div>
+                
+                <div class="auth-divider">
+                    <span class="auth-divider-line"></span>
+                    <span class="auth-divider-text">or</span>
+                    <span class="auth-divider-line"></span>
+                </div>
+                
+                <form class="auth-form" onsubmit="handleEmailSubmit(event)">
+                    <div class="auth-input-group">
+                        <input type="email" class="auth-input" id="authEmailInput" placeholder="Email address" required>
+                    </div>
+                    <button type="submit" class="auth-submit-btn" id="authEmailBtn">Continue with Email</button>
+                </form>
+                
+                <div class="auth-footer">
+                    Already have an account? <span class="auth-footer-link" onclick="showAuthView('signin')">Sign In</span>
+                </div>
+            </div>
+            
+            <!-- Sign In View -->
+            <div class="auth-view" id="authViewSignin" style="display: none;">
+                <span class="auth-back-link" onclick="showAuthView('welcome')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                    Back
+                </span>
+                
+                <div class="auth-header">
+                    <h1 class="auth-title">Welcome Back</h1>
+                    <p class="auth-subtitle">Sign in to your account</p>
+                </div>
+                
+                <div id="authSigninMessage"></div>
+                
+                <form class="auth-form" onsubmit="handleSignIn(event)">
+                    <div class="auth-input-group">
+                        <label class="auth-input-label">Email</label>
+                        <input type="email" class="auth-input" id="signinEmail" placeholder="Enter your email" required>
+                    </div>
+                    <div class="auth-input-group">
+                        <label class="auth-input-label">Password</label>
+                        <div class="auth-password-wrapper">
+                            <input type="password" class="auth-input" id="signinPassword" placeholder="Enter your password" required>
+                            <button type="button" class="auth-password-toggle" onclick="togglePasswordVisibility('signinPassword')">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="auth-forgot-link">
+                        <a onclick="showAuthView('forgot')">Forgot password?</a>
+                    </div>
+                    <button type="submit" class="auth-submit-btn" id="signinBtn">Sign In</button>
+                </form>
+                
+                <div class="auth-footer">
+                    Don't have an account? <span class="auth-footer-link" onclick="showAuthView('welcome')">Sign Up</span>
+                </div>
+            </div>
+            
+            <!-- Sign Up View -->
+            <div class="auth-view" id="authViewSignup" style="display: none;">
+                <span class="auth-back-link" onclick="showAuthView('welcome')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                    Back
+                </span>
+                
+                <div class="auth-header">
+                    <h1 class="auth-title">Create Account</h1>
+                    <p class="auth-subtitle">Join Society Arts today</p>
+                </div>
+                
+                <div id="authSignupMessage"></div>
+                
+                <form class="auth-form" onsubmit="handleSignUp(event)">
+                    <div class="auth-input-group">
+                        <label class="auth-input-label">Display Name</label>
+                        <input type="text" class="auth-input" id="signupName" placeholder="Enter your name" required>
+                    </div>
+                    <div class="auth-input-group">
+                        <label class="auth-input-label">Email</label>
+                        <input type="email" class="auth-input" id="signupEmail" placeholder="Enter your email" required>
+                    </div>
+                    <div class="auth-input-group">
+                        <label class="auth-input-label">Password</label>
+                        <div class="auth-password-wrapper">
+                            <input type="password" class="auth-input" id="signupPassword" placeholder="Create a password (min. 8 characters)" required minlength="8">
+                            <button type="button" class="auth-password-toggle" onclick="togglePasswordVisibility('signupPassword')">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="auth-input-group">
+                        <label class="auth-input-label">Confirm Password</label>
+                        <div class="auth-password-wrapper">
+                            <input type="password" class="auth-input" id="signupPasswordConfirm" placeholder="Confirm your password" required>
+                            <button type="button" class="auth-password-toggle" onclick="togglePasswordVisibility('signupPasswordConfirm')">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="submit" class="auth-submit-btn" id="signupBtn">Create Account</button>
+                </form>
+                
+                <p class="auth-terms">
+                    By creating an account, you agree to our <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>.
+                </p>
+                
+                <div class="auth-footer">
+                    Already have an account? <span class="auth-footer-link" onclick="showAuthView('signin')">Sign In</span>
+                </div>
+            </div>
+            
+            <!-- Forgot Password View -->
+            <div class="auth-view" id="authViewForgot" style="display: none;">
+                <span class="auth-back-link" onclick="showAuthView('signin')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                    Back
+                </span>
+                
+                <div class="auth-header">
+                    <h1 class="auth-title">Reset Password</h1>
+                    <p class="auth-subtitle">Enter your email and we'll send you a link to reset your password.</p>
+                </div>
+                
+                <div id="authForgotMessage"></div>
+                
+                <form class="auth-form" onsubmit="handleForgotPassword(event)">
+                    <div class="auth-input-group">
+                        <label class="auth-input-label">Email</label>
+                        <input type="email" class="auth-input" id="forgotEmail" placeholder="Enter your email" required>
+                    </div>
+                    <button type="submit" class="auth-submit-btn" id="forgotBtn">Send Reset Link</button>
+                </form>
+                
+                <div class="auth-footer">
+                    Remember your password? <span class="auth-footer-link" onclick="showAuthView('signin')">Sign In</span>
+                </div>
+            </div>
+            
+            <!-- Under Construction View -->
+            <div class="auth-view" id="authViewConstruction" style="display: none;">
+                <span class="auth-back-link" onclick="showAuthView('welcome')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                    Back
+                </span>
+                
+                <div class="under-construction">
+                    <div class="under-construction-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                            <line x1="12" y1="9" x2="12" y2="13"></line>
+                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                        </svg>
+                    </div>
+                    <h2 id="constructionTitle">Coming Soon</h2>
+                    <p id="constructionText">This login option is coming soon. Please use Google or email sign-in for now.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ============================================ -->
+    <!-- PROFILE MODAL -->
+    <!-- ============================================ -->
+    <div class="auth-modal-overlay" id="profileModalOverlay">
+        <div class="auth-modal profile-modal" id="profileModal">
+            <button class="auth-modal-close" onclick="closeProfileModal()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            
+            <div class="profile-header">
+                <div class="profile-avatar-section">
+                    <div class="profile-avatar" id="profileAvatar">
+                        <span id="profileInitials">U</span>
+                    </div>
+                    <label class="profile-avatar-edit" for="avatarUpload">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                            <circle cx="12" cy="13" r="4"></circle>
+                        </svg>
+                    </label>
+                    <input type="file" id="avatarUpload" accept="image/*" style="display: none;" onchange="handleAvatarUpload(event)">
+                </div>
+                <div class="profile-info">
+                    <h2 id="profileName">User Name</h2>
+                    <p id="profileEmail">user@example.com</p>
+                    <span class="profile-role-badge" id="profileRole" style="display: none;">Admin</span>
+                </div>
+            </div>
+            
+            <div class="profile-section">
+                <h3 class="profile-section-title">Account Information</h3>
+                <div class="profile-field">
+                    <span class="profile-field-label">Display Name</span>
+                    <div class="profile-field-value">
+                        <span class="profile-field-text" id="profileDisplayName">User</span>
+                        <span class="profile-field-edit" onclick="editProfileField('displayName')">Edit</span>
+                    </div>
+                </div>
+                <div class="profile-field">
+                    <span class="profile-field-label">Email</span>
+                    <div class="profile-field-value">
+                        <span class="profile-field-text" id="profileEmailField">user@example.com</span>
+                    </div>
+                </div>
+                <div class="profile-field">
+                    <span class="profile-field-label">Password</span>
+                    <div class="profile-field-value">
+                        <span class="profile-field-text">••••••••</span>
+                        <span class="profile-field-edit" onclick="editProfileField('password')">Change</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="profile-section" id="profileAdminSection" style="display: none;">
+                <h3 class="profile-section-title">Admin Settings</h3>
+                <div class="profile-field">
+                    <span class="profile-field-label">Role</span>
+                    <div class="profile-field-value">
+                        <span class="profile-field-text" id="profileRoleText">Admin</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ============================================ -->
+    <!-- EDIT STYLE MODAL (Admin Only) -->
+    <!-- ============================================ -->
+    <div class="auth-modal-overlay" id="editStyleModalOverlay">
+        <div class="auth-modal edit-style-modal" id="editStyleModal">
+            <button class="auth-modal-close" onclick="closeEditStyleModal()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            
+            <div class="edit-style-header">
+                <div class="edit-style-thumbnail" id="editStyleThumbnail">
+                    <img src="" alt="Style thumbnail">
+                </div>
+                <div class="edit-style-meta">
+                    <h3>Edit Style</h3>
+                    <span class="edit-style-id" id="editStyleId">ABC-123</span>
+                    <p class="edit-style-id-note">Style ID cannot be changed</p>
+                </div>
+            </div>
+            
+            <form class="auth-form" id="editStyleForm" onsubmit="handleSaveStyle(event)">
+                <div class="edit-form-section">
+                    <h4 class="edit-form-section-title">Basic Information</h4>
+                    
+                    <div class="edit-form-group">
+                        <label class="edit-form-label">Style Name</label>
+                        <input type="text" class="edit-form-input" id="editStyleName" placeholder="Enter style name" required>
+                    </div>
+                    
+                    <div class="edit-form-group">
+                        <label class="edit-form-label">Tagline</label>
+                        <input type="text" class="edit-form-input" id="editStyleTagline" placeholder="Short description">
+                    </div>
+                    
+                    <div class="edit-form-group">
+                        <label class="edit-form-label">Description</label>
+                        <textarea class="edit-form-input edit-form-textarea" id="editStyleDescription" placeholder="Full description"></textarea>
+                    </div>
+                </div>
+                
+                <div class="edit-form-section">
+                    <h4 class="edit-form-section-title">Categories</h4>
+                    
+                    <div class="edit-category-grid">
+                        <div class="edit-form-group">
+                            <label class="edit-form-label">Art Type</label>
+                            <select class="edit-form-select" id="editStyleArtType">
+                                <option value="">Select art type...</option>
+                            </select>
+                        </div>
+                        
+                        <div class="edit-form-group">
+                            <label class="edit-form-label">Medium</label>
+                            <select class="edit-form-select" id="editStyleMedium">
+                                <option value="">Select medium...</option>
+                            </select>
+                        </div>
+                        
+                        <div class="edit-form-group">
+                            <label class="edit-form-label">Era</label>
+                            <select class="edit-form-select" id="editStyleEra">
+                                <option value="">Select era...</option>
+                            </select>
+                        </div>
+                        
+                        <div class="edit-form-group">
+                            <label class="edit-form-label">Culture</label>
+                            <select class="edit-form-select" id="editStyleCulture">
+                                <option value="">Select culture...</option>
+                            </select>
+                        </div>
+                        
+                        <div class="edit-form-group">
+                            <label class="edit-form-label">Palette</label>
+                            <select class="edit-form-select" id="editStylePalette">
+                                <option value="">Select palette...</option>
+                            </select>
+                        </div>
+                        
+                        <div class="edit-form-group">
+                            <label class="edit-form-label">Lighting</label>
+                            <select class="edit-form-select" id="editStyleLighting">
+                                <option value="">Select lighting...</option>
+                            </select>
+                        </div>
+                        
+                        <div class="edit-form-group">
+                            <label class="edit-form-label">Composition</label>
+                            <select class="edit-form-select" id="editStyleComposition">
+                                <option value="">Select composition...</option>
+                            </select>
+                        </div>
+                        
+                        <div class="edit-form-group">
+                            <label class="edit-form-label">Complexity</label>
+                            <select class="edit-form-select" id="editStyleComplexity">
+                                <option value="">Select complexity...</option>
+                                <option value="1">1 - Simple</option>
+                                <option value="2">2 - Low</option>
+                                <option value="3">3 - Medium</option>
+                                <option value="4">4 - High</option>
+                                <option value="5">5 - Complex</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="edit-form-section">
+                    <h4 class="edit-form-section-title">Visibility</h4>
+                    <div class="edit-form-group">
+                        <label class="checkbox-wrapper">
+                            <div class="checkbox" id="editStyleFeaturedCheckbox">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                            </div>
+                            <span class="checkbox-label">Featured Style</span>
+                        </label>
+                    </div>
+                    <div class="edit-form-group">
+                        <label class="checkbox-wrapper">
+                            <div class="checkbox" id="editStyleNewCheckbox">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                            </div>
+                            <span class="checkbox-label">Mark as New</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="edit-modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditStyleModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="saveStyleBtn">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="js/shared/supabase-client.js"></script>
     <script src="js/style-finder/style-data.js"></script>
@@ -1875,8 +2439,20 @@
                 </div>
             `).join('');
             
+            // Track current style for admin editing
+            currentModalStyleId = styleId;
+            
+            // Show/hide admin edit button
+            const adminEditBtn = document.getElementById('adminEditStyleBtn');
+            if (adminEditBtn) {
+                adminEditBtn.style.display = isAdmin() ? 'inline-flex' : 'none';
+            }
+            
             styleModal.classList.add('active');
         }
+        
+        // Variable to track current style in modal
+        let currentModalStyleId = null;
         
         styleModalClose.addEventListener('click', () => styleModal.classList.remove('active'));
         styleModal.addEventListener('click', (e) => {
@@ -2121,9 +2697,689 @@
         });
         
         // ============================================
+        // AUTHENTICATION SYSTEM
+        // ============================================
+        
+        // Auth State
+        let currentUser = null;
+        let userProfile = null;
+        let currentEditStyleId = null;
+        
+        // Initialize Auth on page load
+        async function initializeAuth() {
+            const { supabase } = window.SocietyArts;
+            
+            // Check current session
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            if (session) {
+                currentUser = session.user;
+                await loadUserProfile();
+                updateAuthUI();
+            }
+            
+            // Listen for auth changes
+            supabase.auth.onAuthStateChange(async (event, session) => {
+                console.log('Auth event:', event);
+                
+                if (event === 'SIGNED_IN' && session) {
+                    currentUser = session.user;
+                    await loadUserProfile();
+                    updateAuthUI();
+                    closeAuthModal();
+                    showToast('Signed in successfully!');
+                } else if (event === 'SIGNED_OUT') {
+                    currentUser = null;
+                    userProfile = null;
+                    updateAuthUI();
+                    showToast('Signed out');
+                }
+            });
+        }
+        
+        // Load user profile from database
+        async function loadUserProfile() {
+            if (!currentUser) return;
+            
+            const { supabase } = window.SocietyArts;
+            
+            const { data, error } = await supabase
+                .from('user_profiles')
+                .select('*')
+                .eq('id', currentUser.id)
+                .single();
+            
+            if (error) {
+                console.error('Error loading profile:', error);
+                // Profile might not exist yet - create it
+                if (error.code === 'PGRST116') {
+                    await createUserProfile();
+                }
+                return;
+            }
+            
+            userProfile = data;
+            console.log('Loaded user profile:', userProfile);
+        }
+        
+        // Create user profile if it doesn't exist
+        async function createUserProfile() {
+            if (!currentUser) return;
+            
+            const { supabase } = window.SocietyArts;
+            
+            const displayName = currentUser.user_metadata?.full_name || 
+                               currentUser.user_metadata?.name || 
+                               currentUser.email.split('@')[0];
+            
+            const { data, error } = await supabase
+                .from('user_profiles')
+                .insert({
+                    id: currentUser.id,
+                    email: currentUser.email,
+                    display_name: displayName,
+                    role: currentUser.email === 'steve@societyarts.com' ? 'super_admin' : 'user'
+                })
+                .select()
+                .single();
+            
+            if (error) {
+                console.error('Error creating profile:', error);
+                return;
+            }
+            
+            userProfile = data;
+        }
+        
+        // Update UI based on auth state
+        function updateAuthUI() {
+            const signInBtn = document.getElementById('signInBtn');
+            const userMenuContainer = document.getElementById('userMenuContainer');
+            
+            if (currentUser && userProfile) {
+                // Show user menu, hide sign in button
+                signInBtn.style.display = 'none';
+                userMenuContainer.style.display = 'block';
+                
+                // Update user info
+                const initials = getInitials(userProfile.display_name || currentUser.email);
+                document.getElementById('userInitials').textContent = initials;
+                document.getElementById('userName').textContent = userProfile.display_name || 'User';
+                document.getElementById('dropdownUserName').textContent = userProfile.display_name || 'User';
+                document.getElementById('dropdownUserEmail').textContent = currentUser.email;
+                
+                // Show role badge if admin
+                const roleBadge = document.getElementById('dropdownUserRole');
+                const adminUsersBtn = document.getElementById('adminUsersBtn');
+                
+                if (userProfile.role === 'admin' || userProfile.role === 'super_admin') {
+                    roleBadge.textContent = userProfile.role === 'super_admin' ? 'Super Admin' : 'Admin';
+                    roleBadge.style.display = 'inline-block';
+                    
+                    if (userProfile.role === 'super_admin') {
+                        adminUsersBtn.style.display = 'flex';
+                    }
+                } else {
+                    roleBadge.style.display = 'none';
+                    adminUsersBtn.style.display = 'none';
+                }
+                
+                // Handle avatar
+                const avatarEl = document.getElementById('userAvatar');
+                if (userProfile.avatar_url) {
+                    avatarEl.innerHTML = `<img src="${userProfile.avatar_url}" alt="Avatar">`;
+                } else {
+                    avatarEl.innerHTML = `<span id="userInitials">${initials}</span>`;
+                }
+            } else {
+                // Show sign in button, hide user menu
+                signInBtn.style.display = 'flex';
+                userMenuContainer.style.display = 'none';
+            }
+        }
+        
+        function getInitials(name) {
+            if (!name) return 'U';
+            const parts = name.trim().split(/\s+/);
+            if (parts.length >= 2) {
+                return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+            }
+            return name.substring(0, 2).toUpperCase();
+        }
+        
+        // Check if current user is admin
+        function isAdmin() {
+            return userProfile && (userProfile.role === 'admin' || userProfile.role === 'super_admin');
+        }
+        
+        function isSuperAdmin() {
+            return userProfile && userProfile.role === 'super_admin';
+        }
+        
+        // ============================================
+        // AUTH MODAL FUNCTIONS
+        // ============================================
+        
+        function openAuthModal() {
+            document.getElementById('authModalOverlay').classList.add('open');
+            showAuthView('welcome');
+        }
+        
+        function closeAuthModal() {
+            document.getElementById('authModalOverlay').classList.remove('open');
+        }
+        
+        function showAuthView(view) {
+            // Hide all views
+            document.querySelectorAll('.auth-view').forEach(v => v.style.display = 'none');
+            
+            // Show requested view
+            const viewElement = document.getElementById(`authView${view.charAt(0).toUpperCase() + view.slice(1)}`);
+            if (viewElement) {
+                viewElement.style.display = 'block';
+            }
+            
+            // Clear any messages
+            document.querySelectorAll('[id$="Message"]').forEach(el => el.innerHTML = '');
+        }
+        
+        function showUnderConstruction(provider) {
+            document.getElementById('constructionTitle').textContent = `${provider} Sign In Coming Soon`;
+            document.getElementById('constructionText').textContent = `${provider} login is coming soon. Please use Google or email sign-in for now.`;
+            showAuthView('construction');
+        }
+        
+        // Toggle password visibility
+        function togglePasswordVisibility(inputId) {
+            const input = document.getElementById(inputId);
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+        
+        // ============================================
+        // AUTH HANDLERS
+        // ============================================
+        
+        // Google Sign In
+        async function signInWithGoogle() {
+            const { supabase } = window.SocietyArts;
+            
+            const { data, error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: window.location.origin + window.location.pathname
+                }
+            });
+            
+            if (error) {
+                console.error('Google sign in error:', error);
+                showAuthMessage('authSigninMessage', 'error', 'Failed to sign in with Google. Please try again.');
+            }
+        }
+        
+        // Email submit (check if user exists)
+        async function handleEmailSubmit(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('authEmailInput').value.trim();
+            
+            // Pre-fill email in signup form and show it
+            document.getElementById('signupEmail').value = email;
+            showAuthView('signup');
+        }
+        
+        // Sign In
+        async function handleSignIn(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('signinEmail').value.trim();
+            const password = document.getElementById('signinPassword').value;
+            const btn = document.getElementById('signinBtn');
+            
+            btn.classList.add('loading');
+            btn.disabled = true;
+            
+            const { supabase } = window.SocietyArts;
+            
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email,
+                password
+            });
+            
+            btn.classList.remove('loading');
+            btn.disabled = false;
+            
+            if (error) {
+                showAuthMessage('authSigninMessage', 'error', error.message);
+                return;
+            }
+            
+            // Success - auth state change will handle the rest
+        }
+        
+        // Sign Up
+        async function handleSignUp(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const password = document.getElementById('signupPassword').value;
+            const passwordConfirm = document.getElementById('signupPasswordConfirm').value;
+            const btn = document.getElementById('signupBtn');
+            
+            // Validate passwords match
+            if (password !== passwordConfirm) {
+                showAuthMessage('authSignupMessage', 'error', 'Passwords do not match.');
+                return;
+            }
+            
+            btn.classList.add('loading');
+            btn.disabled = true;
+            
+            const { supabase } = window.SocietyArts;
+            
+            const { data, error } = await supabase.auth.signUp({
+                email,
+                password,
+                options: {
+                    data: {
+                        full_name: name
+                    },
+                    emailRedirectTo: window.location.origin + window.location.pathname
+                }
+            });
+            
+            btn.classList.remove('loading');
+            btn.disabled = false;
+            
+            if (error) {
+                showAuthMessage('authSignupMessage', 'error', error.message);
+                return;
+            }
+            
+            // Check if email confirmation is required
+            if (data.user && !data.session) {
+                showAuthMessage('authSignupMessage', 'success', 'Check your email for a confirmation link to complete your registration.');
+            }
+        }
+        
+        // Forgot Password
+        async function handleForgotPassword(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('forgotEmail').value.trim();
+            const btn = document.getElementById('forgotBtn');
+            
+            btn.classList.add('loading');
+            btn.disabled = true;
+            
+            const { supabase } = window.SocietyArts;
+            
+            const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+                redirectTo: window.location.origin + '/reset-password'
+            });
+            
+            btn.classList.remove('loading');
+            btn.disabled = false;
+            
+            if (error) {
+                showAuthMessage('authForgotMessage', 'error', error.message);
+                return;
+            }
+            
+            showAuthMessage('authForgotMessage', 'success', 'If an account exists with this email, you will receive a password reset link.');
+        }
+        
+        // Logout
+        async function handleLogout() {
+            const { supabase } = window.SocietyArts;
+            
+            const { error } = await supabase.auth.signOut();
+            
+            if (error) {
+                console.error('Logout error:', error);
+            }
+            
+            closeUserMenu();
+        }
+        
+        function showAuthMessage(elementId, type, message) {
+            const el = document.getElementById(elementId);
+            if (el) {
+                el.innerHTML = `<div class="auth-message ${type}">${message}</div>`;
+            }
+        }
+        
+        // ============================================
+        // USER MENU FUNCTIONS
+        // ============================================
+        
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userDropdown');
+            const btn = document.getElementById('userAvatarBtn');
+            
+            dropdown.classList.toggle('open');
+            btn.classList.toggle('open');
+        }
+        
+        function closeUserMenu() {
+            document.getElementById('userDropdown').classList.remove('open');
+            document.getElementById('userAvatarBtn').classList.remove('open');
+        }
+        
+        // Close user menu when clicking outside
+        document.addEventListener('click', (e) => {
+            const userMenuContainer = document.getElementById('userMenuContainer');
+            if (userMenuContainer && !userMenuContainer.contains(e.target)) {
+                closeUserMenu();
+            }
+        });
+        
+        // ============================================
+        // PROFILE MODAL FUNCTIONS
+        // ============================================
+        
+        function openProfileModal() {
+            closeUserMenu();
+            
+            if (!currentUser || !userProfile) return;
+            
+            // Populate profile data
+            const initials = getInitials(userProfile.display_name);
+            document.getElementById('profileInitials').textContent = initials;
+            document.getElementById('profileName').textContent = userProfile.display_name || 'User';
+            document.getElementById('profileEmail').textContent = currentUser.email;
+            document.getElementById('profileDisplayName').textContent = userProfile.display_name || 'Not set';
+            document.getElementById('profileEmailField').textContent = currentUser.email;
+            
+            // Handle avatar
+            const avatarEl = document.getElementById('profileAvatar');
+            if (userProfile.avatar_url) {
+                avatarEl.innerHTML = `<img src="${userProfile.avatar_url}" alt="Avatar">`;
+            } else {
+                avatarEl.innerHTML = `<span id="profileInitials">${initials}</span>`;
+            }
+            
+            // Show role badge and admin section if applicable
+            const roleBadge = document.getElementById('profileRole');
+            const adminSection = document.getElementById('profileAdminSection');
+            
+            if (userProfile.role === 'admin' || userProfile.role === 'super_admin') {
+                roleBadge.textContent = userProfile.role === 'super_admin' ? 'Super Admin' : 'Admin';
+                roleBadge.style.display = 'inline-block';
+                adminSection.style.display = 'block';
+                document.getElementById('profileRoleText').textContent = 
+                    userProfile.role === 'super_admin' ? 'Super Admin' : 'Admin';
+            } else {
+                roleBadge.style.display = 'none';
+                adminSection.style.display = 'none';
+            }
+            
+            document.getElementById('profileModalOverlay').classList.add('open');
+        }
+        
+        function closeProfileModal() {
+            document.getElementById('profileModalOverlay').classList.remove('open');
+        }
+        
+        async function editProfileField(field) {
+            const newValue = prompt(`Enter new ${field === 'displayName' ? 'display name' : field}:`);
+            
+            if (!newValue || !newValue.trim()) return;
+            
+            const { supabase } = window.SocietyArts;
+            
+            if (field === 'displayName') {
+                const { error } = await supabase
+                    .from('user_profiles')
+                    .update({ display_name: newValue.trim(), updated_at: new Date().toISOString() })
+                    .eq('id', currentUser.id);
+                
+                if (error) {
+                    showToast('Failed to update display name');
+                    return;
+                }
+                
+                userProfile.display_name = newValue.trim();
+                updateAuthUI();
+                openProfileModal(); // Refresh
+                showToast('Display name updated!');
+            } else if (field === 'password') {
+                const { error } = await supabase.auth.updateUser({
+                    password: newValue
+                });
+                
+                if (error) {
+                    showToast('Failed to update password: ' + error.message);
+                    return;
+                }
+                
+                showToast('Password updated!');
+            }
+        }
+        
+        async function handleAvatarUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                showToast('Please select an image file');
+                return;
+            }
+            
+            // Validate file size (max 2MB)
+            if (file.size > 2 * 1024 * 1024) {
+                showToast('Image must be less than 2MB');
+                return;
+            }
+            
+            const { supabase } = window.SocietyArts;
+            
+            // Upload to storage
+            const fileExt = file.name.split('.').pop();
+            const filePath = `${currentUser.id}/avatar.${fileExt}`;
+            
+            const { data: uploadData, error: uploadError } = await supabase.storage
+                .from('avatars')
+                .upload(filePath, file, { upsert: true });
+            
+            if (uploadError) {
+                console.error('Upload error:', uploadError);
+                showToast('Failed to upload avatar');
+                return;
+            }
+            
+            // Get public URL
+            const { data: urlData } = supabase.storage
+                .from('avatars')
+                .getPublicUrl(filePath);
+            
+            // Update profile
+            const { error: updateError } = await supabase
+                .from('user_profiles')
+                .update({ avatar_url: urlData.publicUrl, updated_at: new Date().toISOString() })
+                .eq('id', currentUser.id);
+            
+            if (updateError) {
+                console.error('Update error:', updateError);
+                showToast('Failed to update profile');
+                return;
+            }
+            
+            userProfile.avatar_url = urlData.publicUrl;
+            updateAuthUI();
+            openProfileModal(); // Refresh
+            showToast('Avatar updated!');
+        }
+        
+        // ============================================
+        // ADMIN USER MANAGEMENT
+        // ============================================
+        
+        async function openAdminUsersModal() {
+            closeUserMenu();
+            
+            if (!isSuperAdmin()) {
+                showToast('Only super admins can manage users');
+                return;
+            }
+            
+            // TODO: Implement admin users modal
+            showToast('User management coming soon!');
+        }
+        
+        // ============================================
+        // EDIT STYLE MODAL (Admin Only)
+        // ============================================
+        
+        async function openEditStyleModal(styleId) {
+            if (!isAdmin()) {
+                showToast('Only admins can edit styles');
+                return;
+            }
+            
+            currentEditStyleId = styleId;
+            
+            // Get style data
+            const style = SocietyArts.getStyleById(styleId);
+            if (!style) {
+                showToast('Style not found');
+                return;
+            }
+            
+            // Populate form
+            document.getElementById('editStyleThumbnail').querySelector('img').src = style.thumbnail;
+            document.getElementById('editStyleId').textContent = style.id;
+            document.getElementById('editStyleName').value = style.name || '';
+            document.getElementById('editStyleTagline').value = style.tagline || '';
+            document.getElementById('editStyleDescription').value = style.description || '';
+            
+            // Populate dropdowns
+            await populateEditStyleDropdowns();
+            
+            // Set current values (would need to load from junction tables)
+            document.getElementById('editStyleComplexity').value = style.complexity || '';
+            
+            // Set checkboxes
+            const featuredCheckbox = document.getElementById('editStyleFeaturedCheckbox');
+            const newCheckbox = document.getElementById('editStyleNewCheckbox');
+            
+            featuredCheckbox.classList.toggle('checked', style.is_featured);
+            newCheckbox.classList.toggle('checked', style.is_new);
+            
+            // Add click handlers for checkboxes
+            featuredCheckbox.onclick = () => featuredCheckbox.classList.toggle('checked');
+            newCheckbox.onclick = () => newCheckbox.classList.toggle('checked');
+            
+            document.getElementById('editStyleModalOverlay').classList.add('open');
+        }
+        
+        function closeEditStyleModal() {
+            document.getElementById('editStyleModalOverlay').classList.remove('open');
+            currentEditStyleId = null;
+        }
+        
+        async function populateEditStyleDropdowns() {
+            const lookups = SocietyArts.getLookups();
+            
+            const dropdownMap = {
+                'editStyleArtType': 'art_types',
+                'editStyleMedium': 'mediums',
+                'editStyleEra': 'eras',
+                'editStyleCulture': 'cultures',
+                'editStylePalette': 'palettes',
+                'editStyleLighting': 'lighting',
+                'editStyleComposition': 'compositions'
+            };
+            
+            Object.entries(dropdownMap).forEach(([selectId, lookupTable]) => {
+                const select = document.getElementById(selectId);
+                const options = lookups[lookupTable] || [];
+                
+                // Keep first option
+                select.innerHTML = select.options[0].outerHTML;
+                
+                options.forEach(opt => {
+                    const option = document.createElement('option');
+                    option.value = opt.id;
+                    option.textContent = opt.name;
+                    select.appendChild(option);
+                });
+            });
+        }
+        
+        async function handleSaveStyle(event) {
+            event.preventDefault();
+            
+            if (!currentEditStyleId || !isAdmin()) return;
+            
+            const { supabase } = window.SocietyArts;
+            
+            const updates = {
+                name: document.getElementById('editStyleName').value.trim(),
+                tagline: document.getElementById('editStyleTagline').value.trim(),
+                description: document.getElementById('editStyleDescription').value.trim(),
+                complexity: parseInt(document.getElementById('editStyleComplexity').value) || null,
+                is_featured: document.getElementById('editStyleFeaturedCheckbox').classList.contains('checked'),
+                is_new: document.getElementById('editStyleNewCheckbox').classList.contains('checked'),
+                updated_at: new Date().toISOString()
+            };
+            
+            const btn = document.getElementById('saveStyleBtn');
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+            
+            const { error } = await supabase
+                .from('styles')
+                .update(updates)
+                .eq('id', currentEditStyleId);
+            
+            btn.disabled = false;
+            btn.textContent = 'Save Changes';
+            
+            if (error) {
+                console.error('Save error:', error);
+                showToast('Failed to save changes: ' + error.message);
+                return;
+            }
+            
+            // TODO: Update junction tables for categories
+            
+            showToast('Style updated successfully!');
+            closeEditStyleModal();
+            
+            // Refresh the styles
+            await SocietyArts.applyFilters({});
+            renderStyles();
+        }
+        
+        // Close modals when clicking overlay
+        document.getElementById('authModalOverlay').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeAuthModal();
+        });
+        
+        document.getElementById('profileModalOverlay').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeProfileModal();
+        });
+        
+        document.getElementById('editStyleModalOverlay').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeEditStyleModal();
+        });
+        
+        // Close modals with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeAuthModal();
+                closeProfileModal();
+                closeEditStyleModal();
+            }
+        });
+        
+        // ============================================
         // Start
         // ============================================
         initialize();
+        initializeAuth();
     </script>
 </body>
 </html>
