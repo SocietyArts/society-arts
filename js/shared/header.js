@@ -169,10 +169,10 @@ const NAV_ITEMS = [
   { id: 'story-builder', label: 'Story Builder', icon: 'newChat', href: '/story-builder.html' },
   { id: 'style-finder', label: 'Style Finder', icon: 'styleFinder', href: '/style-finder.html' },
   { divider: true },
-  { id: 'projects', label: 'Projects', icon: 'projects', href: '/under-construction.html?feature=Projects', badge: 0 },
+  { id: 'projects', label: 'Projects', icon: 'projects', href: '/projects.html', showCount: 'projects' },
   { id: 'gallery', label: 'Gallery', icon: 'gallery', href: '/under-construction.html?feature=Gallery' },
-  { id: 'collections', label: 'Collections', icon: 'collections', href: '/under-construction.html?feature=Collections', badge: 0 },
-  { id: 'favorites', label: 'Favorites', icon: 'favorites', href: '/under-construction.html?feature=Favorites', badge: 0 },
+  { id: 'collections', label: 'Collections', icon: 'collections', href: '/under-construction.html?feature=Collections' },
+  { id: 'favorites', label: 'Favorites', icon: 'favorites', href: '/favorites.html', showCount: 'favorites' },
   { divider: true },
   { id: 'pricing', label: 'Prints & Pricing', icon: 'pricing', href: '/under-construction.html?feature=Prints%20%26%20Pricing' },
   { id: 'help', label: 'Help', icon: 'help', href: '/under-construction.html?feature=Help' }
@@ -203,6 +203,28 @@ const FORMAT_OPTIONS = [
 // ========================================
 
 function NavSidebar({ isOpen, onClose, currentPage, onOpenStyleFinder }) {
+  const [counts, setCounts] = React.useState({ projects: 0, favorites: 0 });
+
+  // Load counts when sidebar opens
+  React.useEffect(() => {
+    if (isOpen && window.SocietyArts.AuthState?.user) {
+      // Get project count
+      if (window.SocietyArts.ProjectState) {
+        setCounts(prev => ({ 
+          ...prev, 
+          projects: window.SocietyArts.ProjectState.projects?.length || 0 
+        }));
+      }
+      // Get favorite count
+      if (window.SocietyArts.getFavoriteCount) {
+        setCounts(prev => ({ 
+          ...prev, 
+          favorites: window.SocietyArts.getFavoriteCount() || 0 
+        }));
+      }
+    }
+  }, [isOpen]);
+
   // Close on escape key
   React.useEffect(() => {
     const handleEscape = (e) => {
@@ -228,6 +250,11 @@ function NavSidebar({ isOpen, onClose, currentPage, onOpenStyleFinder }) {
   const getIcon = (iconName) => {
     const IconComponent = Icons[iconName];
     return IconComponent ? <IconComponent /> : null;
+  };
+
+  const getCount = (countType) => {
+    if (!window.SocietyArts.AuthState?.user) return null;
+    return counts[countType] || 0;
   };
 
   return (
@@ -268,7 +295,9 @@ function NavSidebar({ isOpen, onClose, currentPage, onOpenStyleFinder }) {
                   >
                     <span className="nav-link-icon">{getIcon(item.icon)}</span>
                     <span>{item.label}</span>
-                    {item.badge && <span className="nav-link-badge">{item.badge}</span>}
+                    {item.showCount && getCount(item.showCount) > 0 && (
+                      <span className="nav-link-badge">{getCount(item.showCount)}</span>
+                    )}
                   </a>
                 </li>
               )
@@ -416,7 +445,13 @@ function Header({ currentPage, onNewProject, onOpenStyleFinder }) {
           >
             <Icons.menu />
           </button>
-          <a href="/" className="logo">SOCIETY ARTS</a>
+          <a href="/" className="logo">
+            <img 
+              src="https://pub-d4d49982f29749dea52e2eb37c29ad51.r2.dev/site-assets/SA_Wordmark_Brown@1x.png" 
+              alt="Society Arts" 
+              className="logo-image"
+            />
+          </a>
         </div>
         <div className="header-right">
           <button className="btn-icon" aria-label="Cart">
