@@ -2938,7 +2938,7 @@
             const { supabase } = window.SocietyArts;
             
             // Always redirect to production URL (works for both local testing and production)
-            const productionUrl = 'https://society-arts.netlify.app';
+            const productionUrl = 'https://studio.societyarts.com';
             const currentPath = window.location.pathname;
             
             const { data, error } = await supabase.auth.signInWithOAuth({
@@ -3022,7 +3022,7 @@
                     data: {
                         full_name: name
                     },
-                    emailRedirectTo: 'https://society-arts.netlify.app/style-finder.html'
+                    emailRedirectTo: 'https://studio.societyarts.com/style-finder.html'
                 }
             });
             
@@ -3053,7 +3053,7 @@
             const { supabase } = window.SocietyArts;
             
             const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: 'https://society-arts.netlify.app/style-finder.html'
+                redirectTo: 'https://studio.societyarts.com/style-finder.html'
             });
             
             btn.classList.remove('loading');
