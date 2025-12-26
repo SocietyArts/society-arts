@@ -944,11 +944,49 @@ async function downloadImage(imageUrl, filename) {
 }
 
 // ============================================
+// SAMPLE STYLES (for StoryBuilder before data loads)
+// ============================================
+
+const SAMPLE_STYLES = [
+    {
+        id: 'watercolor-dreams',
+        name: 'Watercolor Dreams',
+        thumbnail: 'https://pub-d4d49982f29749dea52e2eb37c29ad51.r2.dev/watercolor-dreams/watercolor-dreams_1.webp'
+    },
+    {
+        id: 'oil-portrait',
+        name: 'Oil Portrait',
+        thumbnail: 'https://pub-d4d49982f29749dea52e2eb37c29ad51.r2.dev/oil-portrait/oil-portrait_1.webp'
+    },
+    {
+        id: 'digital-sunset',
+        name: 'Digital Sunset',
+        thumbnail: 'https://pub-d4d49982f29749dea52e2eb37c29ad51.r2.dev/digital-sunset/digital-sunset_1.webp'
+    },
+    {
+        id: 'impressionist-garden',
+        name: 'Impressionist Garden',
+        thumbnail: 'https://pub-d4d49982f29749dea52e2eb37c29ad51.r2.dev/impressionist-garden/impressionist-garden_1.webp'
+    }
+];
+
+// StyleData object for backward compatibility
+const StyleData = {
+    SAMPLE_STYLES,
+    getStyleById,
+    allStyles: () => allStyles,
+    filteredStyles: () => filteredStyles
+};
+
+// ============================================
 // EXPORT
 // ============================================
 
 window.SocietyArts = window.SocietyArts || {};
 Object.assign(window.SocietyArts, {
+    // StyleData object (for story-builder)
+    StyleData,
+    SAMPLE_STYLES,
     // Initialization
     initializeStyleData,
     
