@@ -107,6 +107,13 @@
             box-shadow: 0 0 0 3px rgba(199, 91, 63, 0.1);
         }
         
+        .search-hint {
+            font-size: 0.75rem;
+            color: var(--color-text-secondary, #999);
+            margin-top: -1rem;
+            margin-bottom: 1rem;
+        }
+        
         .results-count {
             color: var(--color-text-secondary, #666);
             font-size: 0.875rem;
@@ -127,6 +134,7 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             transition: transform 0.2s, box-shadow 0.2s;
             cursor: pointer;
+            position: relative;
         }
         
         .style-card:hover {
@@ -171,6 +179,7 @@
             align-items: center;
             justify-content: center;
             transition: transform 0.2s;
+            z-index: 2;
         }
         
         .favorite-btn:hover {
@@ -179,6 +188,29 @@
         
         .favorite-btn.active svg {
             fill: #e74c3c;
+        }
+        
+        /* Three-dot menu button */
+        .menu-btn {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.9);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s, background 0.2s;
+            z-index: 2;
+        }
+        
+        .menu-btn:hover {
+            background: white;
+            transform: scale(1.1);
         }
         
         .style-card-info {
@@ -325,11 +357,12 @@
             object-fit: cover;
             border-radius: 8px;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
         
         .style-modal-gallery img:hover {
             transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
         
         .style-modal-info {
@@ -385,6 +418,324 @@
             color: var(--color-text, #333);
         }
         
+        /* Lightbox for zoomed images */
+        .lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            cursor: zoom-out;
+        }
+        
+        .lightbox.active {
+            display: flex;
+        }
+        
+        .lightbox-content {
+            position: relative;
+            max-width: 95vw;
+            max-height: 95vh;
+        }
+        
+        .lightbox-image {
+            max-width: 95vw;
+            max-height: 95vh;
+            object-fit: contain;
+            border-radius: 8px;
+            cursor: default;
+        }
+        
+        .lightbox-close {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+        
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 2rem;
+            padding: 1rem;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+        
+        .lightbox-nav:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .lightbox-prev {
+            left: 1rem;
+        }
+        
+        .lightbox-next {
+            right: 1rem;
+        }
+        
+        .lightbox-counter {
+            position: absolute;
+            bottom: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 0.875rem;
+        }
+        
+        .lightbox-zoom-hint {
+            position: absolute;
+            bottom: -40px;
+            right: 0;
+            color: rgba(255,255,255,0.7);
+            font-size: 0.75rem;
+        }
+        
+        /* Zoomed state */
+        .lightbox-image.zoomed {
+            max-width: none;
+            max-height: none;
+            cursor: grab;
+        }
+        
+        .lightbox-image.zoomed.dragging {
+            cursor: grabbing;
+        }
+        
+        /* Context Menu / Dropdown */
+        .context-menu {
+            display: none;
+            position: fixed;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+            min-width: 200px;
+            z-index: 3000;
+            overflow: hidden;
+        }
+        
+        .context-menu.active {
+            display: block;
+        }
+        
+        .context-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-size: 0.9375rem;
+            color: var(--color-text, #333);
+        }
+        
+        .context-menu-item:hover {
+            background: var(--color-surface, #f5f5f5);
+        }
+        
+        .context-menu-item svg {
+            width: 20px;
+            height: 20px;
+            color: var(--color-text-secondary, #666);
+        }
+        
+        .context-menu-divider {
+            height: 1px;
+            background: var(--color-border, #e5e5e5);
+            margin: 0.25rem 0;
+        }
+        
+        .context-menu-item.danger {
+            color: #dc3545;
+        }
+        
+        .context-menu-item.danger svg {
+            color: #dc3545;
+        }
+        
+        /* Sub-menu for Report */
+        .context-submenu {
+            display: none;
+            position: absolute;
+            left: 100%;
+            top: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+            min-width: 180px;
+            margin-left: 4px;
+        }
+        
+        .context-menu-item:hover .context-submenu {
+            display: block;
+        }
+        
+        /* Collection Modal */
+        .collection-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .collection-modal.active {
+            display: flex;
+        }
+        
+        .collection-modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+            max-height: 70vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .collection-modal-header {
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--color-border, #e5e5e5);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .collection-modal-header h3 {
+            margin: 0;
+            font-size: 1.125rem;
+        }
+        
+        .collection-modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--color-text-secondary, #666);
+        }
+        
+        .collection-modal-body {
+            padding: 1rem;
+            overflow-y: auto;
+            flex: 1;
+        }
+        
+        .collection-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .collection-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border: 1px solid var(--color-border, #ddd);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .collection-item:hover {
+            border-color: var(--color-accent, #C75B3F);
+            background: rgba(199, 91, 63, 0.05);
+        }
+        
+        .collection-item.selected {
+            border-color: var(--color-accent, #C75B3F);
+            background: rgba(199, 91, 63, 0.1);
+        }
+        
+        .collection-item-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--color-surface, #f5f5f5);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .collection-item-info {
+            flex: 1;
+        }
+        
+        .collection-item-name {
+            font-weight: 500;
+        }
+        
+        .collection-item-count {
+            font-size: 0.75rem;
+            color: var(--color-text-secondary, #999);
+        }
+        
+        .create-collection-form {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--color-border, #e5e5e5);
+        }
+        
+        .create-collection-input {
+            flex: 1;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--color-border, #ddd);
+            border-radius: 6px;
+            font-size: 0.875rem;
+        }
+        
+        .create-collection-btn {
+            padding: 0.5rem 1rem;
+            background: var(--color-accent, #C75B3F);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            white-space: nowrap;
+        }
+        
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #333;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            z-index: 4000;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .toast.active {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        
         /* Responsive */
         @media (max-width: 768px) {
             .filter-sidebar {
@@ -398,6 +749,11 @@
             
             .style-modal-gallery {
                 grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .lightbox-nav {
+                padding: 0.5rem;
+                font-size: 1.5rem;
             }
         }
     </style>
@@ -497,9 +853,10 @@
         <!-- Styles Grid -->
         <main class="styles-main">
             <div class="search-bar">
-                <input type="text" class="search-input" id="searchInput" placeholder="Search styles...">
+                <input type="text" class="search-input" id="searchInput" placeholder="Search styles... (try: photography black white)">
                 <span class="results-count" id="resultsCount">Loading...</span>
             </div>
+            <div class="search-hint">Tip: Use multiple words to narrow results (e.g., "photography portrait dramatic")</div>
             
             <div class="styles-grid" id="stylesGrid">
                 <!-- Styles will be inserted here -->
@@ -532,6 +889,78 @@
         </div>
     </div>
     
+    <!-- Lightbox for zoomed images -->
+    <div class="lightbox" id="lightbox">
+        <div class="lightbox-content">
+            <button class="lightbox-close" id="lightboxClose">×</button>
+            <button class="lightbox-nav lightbox-prev" id="lightboxPrev">‹</button>
+            <img class="lightbox-image" id="lightboxImage" src="" alt="Zoomed style image">
+            <button class="lightbox-nav lightbox-next" id="lightboxNext">›</button>
+            <div class="lightbox-counter" id="lightboxCounter">1 / 10</div>
+            <div class="lightbox-zoom-hint">Click image to zoom in/out</div>
+        </div>
+    </div>
+    
+    <!-- Context Menu -->
+    <div class="context-menu" id="contextMenu">
+        <button class="context-menu-item" id="menuSave">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                <polyline points="7 3 7 8 15 8"></polyline>
+            </svg>
+            Save
+        </button>
+        <button class="context-menu-item" id="menuAddToCollection">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+            Add to Collection
+        </button>
+        <div class="context-menu-divider"></div>
+        <button class="context-menu-item" id="menuReportSwap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Report: Swap Image
+        </button>
+        <button class="context-menu-item danger" id="menuReportDelete">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            Report: Delete Style
+        </button>
+    </div>
+    
+    <!-- Collection Modal -->
+    <div class="collection-modal" id="collectionModal">
+        <div class="collection-modal-content">
+            <div class="collection-modal-header">
+                <h3>Add to Collection</h3>
+                <button class="collection-modal-close" id="collectionModalClose">×</button>
+            </div>
+            <div class="collection-modal-body">
+                <div class="collection-list" id="collectionList">
+                    <!-- Collections inserted here -->
+                </div>
+                <div class="create-collection-form">
+                    <input type="text" class="create-collection-input" id="newCollectionName" placeholder="New collection name...">
+                    <button class="create-collection-btn" id="createCollectionBtn">Create</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+    
     <!-- Scripts -->
     <script src="js/shared/supabase-client.js"></script>
     <script src="js/style-finder/style-data.js"></script>
@@ -550,6 +979,12 @@
         const clearFiltersBtn = document.getElementById('clearFiltersBtn');
         const styleModal = document.getElementById('styleModal');
         const styleModalClose = document.getElementById('styleModalClose');
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImage = document.getElementById('lightboxImage');
+        const lightboxCounter = document.getElementById('lightboxCounter');
+        const contextMenu = document.getElementById('contextMenu');
+        const collectionModal = document.getElementById('collectionModal');
+        const toast = document.getElementById('toast');
         
         // Filter elements mapped to database columns
         const filterSelects = {
@@ -563,7 +998,7 @@
             complexity: document.getElementById('filterComplexity')
         };
         
-        // Lookup table mapping (column -> lookup table)
+        // Lookup table mapping
         const filterToLookup = {
             art_type_id: 'art_types',
             primary_medium_id: 'mediums',
@@ -572,8 +1007,16 @@
             primary_palette_id: 'palettes',
             primary_lighting_id: 'lighting',
             primary_composition_id: 'compositions'
-            // complexity is not a lookup - it's direct values
         };
+        
+        // State for lightbox
+        let lightboxImages = [];
+        let lightboxIndex = 0;
+        let isZoomed = false;
+        
+        // State for context menu
+        let currentMenuStyleId = null;
+        let currentMenuImageUrl = null;
         
         // ============================================
         // Initialize
@@ -602,15 +1045,19 @@
             loadingOverlay.classList.toggle('active', show);
         }
         
+        function showToast(message, duration = 3000) {
+            toast.textContent = message;
+            toast.classList.add('active');
+            setTimeout(() => toast.classList.remove('active'), duration);
+        }
+        
         function populateFilterDropdowns() {
             Object.entries(filterSelects).forEach(([filterKey, selectEl]) => {
-                // Skip complexity - it has hardcoded options
                 if (filterKey === 'complexity') return;
                 
                 const lookupTable = filterToLookup[filterKey];
                 const options = SocietyArts.getLookupOptions(lookupTable);
                 
-                // Clear existing options except first
                 selectEl.innerHTML = selectEl.options[0].outerHTML;
                 
                 options.forEach(opt => {
@@ -636,9 +1083,19 @@
                         <img src="${style.thumbnail}" alt="${style.name}" 
                              onerror="this.parentElement.innerHTML='<div class=\\'placeholder\\'>Image not available</div>'">
                         <button class="favorite-btn ${SocietyArts.isFavorite(style.id) ? 'active' : ''}" 
-                                onclick="event.stopPropagation(); toggleFavorite('${style.id}', this)">
+                                onclick="event.stopPropagation(); toggleFavorite('${style.id}', this)"
+                                title="Add to favorites">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                            </svg>
+                        </button>
+                        <button class="menu-btn" 
+                                onclick="event.stopPropagation(); openContextMenu(event, '${style.id}', '${style.thumbnail}')"
+                                title="More options">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <circle cx="12" cy="5" r="2"></circle>
+                                <circle cx="12" cy="12" r="2"></circle>
+                                <circle cx="12" cy="19" r="2"></circle>
                             </svg>
                         </button>
                     </div>
@@ -650,7 +1107,6 @@
                 </div>
             `).join('');
             
-            // Add click handlers
             document.querySelectorAll('.style-card').forEach(card => {
                 card.addEventListener('click', () => openStyleModal(card.dataset.styleId));
             });
@@ -671,10 +1127,8 @@
         }
         
         // ============================================
-        // Event Handlers
+        // Search & Filter Handlers
         // ============================================
-        
-        // Search
         let searchTimeout;
         function handleSearch(value) {
             clearTimeout(searchTimeout);
@@ -692,15 +1146,13 @@
             handleSearch(e.target.value);
         });
         
-        // Filters
         Object.entries(filterSelects).forEach(([filterKey, selectEl]) => {
             selectEl.addEventListener('change', async () => {
                 showLoading(true);
                 const filters = {};
                 Object.entries(filterSelects).forEach(([key, el]) => {
                     if (el.value) {
-                        // Complexity is stored as integer, others as IDs
-                        filters[key] = key === 'complexity' ? parseInt(el.value) : parseInt(el.value);
+                        filters[key] = parseInt(el.value);
                     }
                 });
                 await SocietyArts.applyFilters(filters);
@@ -723,28 +1175,35 @@
             showLoading(false);
         });
         
+        // ============================================
         // Pagination
+        // ============================================
         prevPageBtn.addEventListener('click', () => {
             SocietyArts.prevPage();
             renderStyles();
             updatePagination();
-            window.scrollTo(0, 0);
+            document.querySelector('.styles-main').scrollTo(0, 0);
         });
         
         nextPageBtn.addEventListener('click', () => {
             SocietyArts.nextPage();
             renderStyles();
             updatePagination();
-            window.scrollTo(0, 0);
+            document.querySelector('.styles-main').scrollTo(0, 0);
         });
         
+        // ============================================
         // Favorites
+        // ============================================
         function toggleFavorite(styleId, btn) {
             const result = SocietyArts.toggleFavorite(styleId);
             btn.classList.toggle('active', result.added);
+            showToast(result.added ? 'Added to favorites' : 'Removed from favorites');
         }
         
-        // Modal
+        // ============================================
+        // Style Modal
+        // ============================================
         async function openStyleModal(styleId) {
             showLoading(true);
             const style = await SocietyArts.getStyleById(styleId);
@@ -752,20 +1211,20 @@
             
             if (!style) return;
             
-            // Populate gallery
+            lightboxImages = style.images;
+            
             const galleryHtml = style.images.map((url, i) => 
                 `<img src="${url}" alt="${style.name} - Image ${i + 1}" 
+                      onclick="openLightbox(${i})"
                       onerror="this.style.display='none'">`
             ).join('');
             document.getElementById('styleModalGallery').innerHTML = galleryHtml;
             
-            // Populate info
             document.getElementById('styleModalId').textContent = style.id;
             document.getElementById('styleModalName').textContent = style.name || 'Untitled Style';
             document.getElementById('styleModalTagline').textContent = style.tagline || '';
             document.getElementById('styleModalDescription').textContent = style.description || 'No description available.';
             
-            // Populate attributes
             const attributes = [
                 ['Art Type', SocietyArts.getLookupName('art_types', style.art_type_id)],
                 ['Medium', SocietyArts.getLookupName('mediums', style.primary_medium_id)],
@@ -790,20 +1249,214 @@
             styleModal.classList.add('active');
         }
         
-        styleModalClose.addEventListener('click', () => {
-            styleModal.classList.remove('active');
+        styleModalClose.addEventListener('click', () => styleModal.classList.remove('active'));
+        styleModal.addEventListener('click', (e) => {
+            if (e.target === styleModal) styleModal.classList.remove('active');
         });
         
-        styleModal.addEventListener('click', (e) => {
-            if (e.target === styleModal) {
-                styleModal.classList.remove('active');
+        // ============================================
+        // Lightbox
+        // ============================================
+        function openLightbox(index) {
+            lightboxIndex = index;
+            updateLightbox();
+            lightbox.classList.add('active');
+        }
+        
+        function updateLightbox() {
+            lightboxImage.src = lightboxImages[lightboxIndex];
+            lightboxCounter.textContent = `${lightboxIndex + 1} / ${lightboxImages.length}`;
+            lightboxImage.classList.remove('zoomed');
+            isZoomed = false;
+        }
+        
+        document.getElementById('lightboxClose').addEventListener('click', () => {
+            lightbox.classList.remove('active');
+        });
+        
+        document.getElementById('lightboxPrev').addEventListener('click', (e) => {
+            e.stopPropagation();
+            lightboxIndex = (lightboxIndex - 1 + lightboxImages.length) % lightboxImages.length;
+            updateLightbox();
+        });
+        
+        document.getElementById('lightboxNext').addEventListener('click', (e) => {
+            e.stopPropagation();
+            lightboxIndex = (lightboxIndex + 1) % lightboxImages.length;
+            updateLightbox();
+        });
+        
+        lightboxImage.addEventListener('click', (e) => {
+            e.stopPropagation();
+            isZoomed = !isZoomed;
+            lightboxImage.classList.toggle('zoomed', isZoomed);
+            if (isZoomed) {
+                lightboxImage.style.width = '150%';
+                lightboxImage.style.maxWidth = 'none';
+            } else {
+                lightboxImage.style.width = '';
+                lightboxImage.style.maxWidth = '';
             }
         });
         
-        // Keyboard
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox) {
+                lightbox.classList.remove('active');
+            }
+        });
+        
+        // ============================================
+        // Context Menu
+        // ============================================
+        function openContextMenu(event, styleId, imageUrl) {
+            event.preventDefault();
+            currentMenuStyleId = styleId;
+            currentMenuImageUrl = imageUrl;
+            
+            const x = Math.min(event.clientX, window.innerWidth - 220);
+            const y = Math.min(event.clientY, window.innerHeight - 200);
+            
+            contextMenu.style.left = x + 'px';
+            contextMenu.style.top = y + 'px';
+            contextMenu.classList.add('active');
+        }
+        
+        document.addEventListener('click', () => {
+            contextMenu.classList.remove('active');
+        });
+        
+        document.getElementById('menuSave').addEventListener('click', async () => {
+            if (!currentMenuStyleId) return;
+            SocietyArts.saveStyle(currentMenuStyleId);
+            
+            // Also trigger image download
+            if (currentMenuImageUrl) {
+                await SocietyArts.downloadImage(currentMenuImageUrl, `${currentMenuStyleId}-thumbnail.webp`);
+            }
+            
+            showToast('Style saved! Image download started.');
+        });
+        
+        document.getElementById('menuAddToCollection').addEventListener('click', () => {
+            if (!currentMenuStyleId) return;
+            openCollectionModal();
+        });
+        
+        document.getElementById('menuReportSwap').addEventListener('click', async () => {
+            if (!currentMenuStyleId) return;
+            const result = await SocietyArts.reportStyle(currentMenuStyleId, 'swap');
+            showToast(result.message, 5000);
+        });
+        
+        document.getElementById('menuReportDelete').addEventListener('click', async () => {
+            if (!currentMenuStyleId) return;
+            const result = await SocietyArts.reportStyle(currentMenuStyleId, 'delete');
+            showToast(result.message, 5000);
+        });
+        
+        // ============================================
+        // Collection Modal
+        // ============================================
+        function openCollectionModal() {
+            renderCollectionList();
+            collectionModal.classList.add('active');
+        }
+        
+        function renderCollectionList() {
+            const collections = SocietyArts.getCollections();
+            const styleCollections = SocietyArts.getStyleCollections(currentMenuStyleId);
+            const styleCollectionIds = styleCollections.map(c => c.id);
+            
+            if (collections.length === 0) {
+                document.getElementById('collectionList').innerHTML = 
+                    '<p style="color:#999;text-align:center;padding:1rem;">No collections yet. Create one below!</p>';
+                return;
+            }
+            
+            document.getElementById('collectionList').innerHTML = collections.map(col => `
+                <div class="collection-item ${styleCollectionIds.includes(col.id) ? 'selected' : ''}" 
+                     onclick="toggleCollection('${col.id}')">
+                    <div class="collection-item-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                        </svg>
+                    </div>
+                    <div class="collection-item-info">
+                        <div class="collection-item-name">${col.name}</div>
+                        <div class="collection-item-count">${col.styleIds.length} style${col.styleIds.length !== 1 ? 's' : ''}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function toggleCollection(collectionId) {
+            const collections = SocietyArts.getStyleCollections(currentMenuStyleId);
+            const isInCollection = collections.some(c => c.id === collectionId);
+            
+            if (isInCollection) {
+                SocietyArts.removeFromCollection(collectionId, currentMenuStyleId);
+                showToast('Removed from collection');
+            } else {
+                SocietyArts.addToCollection(collectionId, currentMenuStyleId);
+                showToast('Added to collection');
+            }
+            
+            renderCollectionList();
+        }
+        
+        document.getElementById('collectionModalClose').addEventListener('click', () => {
+            collectionModal.classList.remove('active');
+        });
+        
+        collectionModal.addEventListener('click', (e) => {
+            if (e.target === collectionModal) collectionModal.classList.remove('active');
+        });
+        
+        document.getElementById('createCollectionBtn').addEventListener('click', () => {
+            const input = document.getElementById('newCollectionName');
+            const name = input.value.trim();
+            
+            if (!name) {
+                showToast('Please enter a collection name');
+                return;
+            }
+            
+            SocietyArts.createCollection(name);
+            input.value = '';
+            renderCollectionList();
+            showToast(`Collection "${name}" created`);
+        });
+        
+        document.getElementById('newCollectionName').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('createCollectionBtn').click();
+            }
+        });
+        
+        // ============================================
+        // Keyboard Navigation
+        // ============================================
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && styleModal.classList.contains('active')) {
-                styleModal.classList.remove('active');
+            if (e.key === 'Escape') {
+                if (lightbox.classList.contains('active')) {
+                    lightbox.classList.remove('active');
+                } else if (collectionModal.classList.contains('active')) {
+                    collectionModal.classList.remove('active');
+                } else if (styleModal.classList.contains('active')) {
+                    styleModal.classList.remove('active');
+                }
+                contextMenu.classList.remove('active');
+            }
+            
+            if (lightbox.classList.contains('active')) {
+                if (e.key === 'ArrowLeft') {
+                    document.getElementById('lightboxPrev').click();
+                } else if (e.key === 'ArrowRight') {
+                    document.getElementById('lightboxNext').click();
+                }
             }
         });
         
