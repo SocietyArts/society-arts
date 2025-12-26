@@ -12,21 +12,19 @@ const STYLES_PER_PAGE = 24;
 // ============================================
 
 let lookupTables = {
-    art_movements: [],
-    brushwork_textures: [],
-    color_palettes: [],
-    composition_framings: [],
-    cultural_origins: [],
-    emotional_tones: [],
-    historical_periods: [],
-    lighting_moods: [],
+    art_types: [],
+    compositions: [],
+    cultures: [],
+    eras: [],
+    inspirations: [],
+    lighting: [],
     mediums: [],
-    pattern_motifs: [],
-    primary_colors: [],
-    style_categories: [],
-    style_complexities: [],
-    subject_matters: [],
-    technical_skills: []
+    occasions: [],
+    palettes: [],
+    subjects: [],
+    techniques: [],
+    themes: [],
+    vibes: []
 };
 
 // ============================================
@@ -102,71 +100,53 @@ async function loadStyles(filters = {}) {
             .select(`
                 id,
                 name,
+                tagline,
                 description,
-                medium_id,
-                style_category_id,
-                art_movement_id,
-                historical_period_id,
-                cultural_origin_id,
-                subject_matter_id,
-                emotional_tone_id,
-                color_palette_id,
-                primary_color_id,
-                lighting_mood_id,
-                composition_framing_id,
-                brushwork_texture_id,
-                pattern_motif_id,
-                style_complexity_id,
-                technical_skill_id
+                thumbnail_url,
+                art_type_id,
+                culture_id,
+                era_id,
+                primary_medium_id,
+                primary_palette_id,
+                primary_lighting_id,
+                primary_composition_id,
+                complexity,
+                best_format,
+                best_size,
+                audience_rating,
+                is_featured,
+                is_new,
+                is_active,
+                sref_code
             `)
+            .eq('is_active', true)
             .not('name', 'is', null)
             .order('name');
         
         // Apply filters
-        if (filters.medium_id) {
-            query = query.eq('medium_id', filters.medium_id);
+        if (filters.art_type_id) {
+            query = query.eq('art_type_id', filters.art_type_id);
         }
-        if (filters.style_category_id) {
-            query = query.eq('style_category_id', filters.style_category_id);
+        if (filters.primary_medium_id) {
+            query = query.eq('primary_medium_id', filters.primary_medium_id);
         }
-        if (filters.art_movement_id) {
-            query = query.eq('art_movement_id', filters.art_movement_id);
+        if (filters.culture_id) {
+            query = query.eq('culture_id', filters.culture_id);
         }
-        if (filters.historical_period_id) {
-            query = query.eq('historical_period_id', filters.historical_period_id);
+        if (filters.era_id) {
+            query = query.eq('era_id', filters.era_id);
         }
-        if (filters.cultural_origin_id) {
-            query = query.eq('cultural_origin_id', filters.cultural_origin_id);
+        if (filters.primary_palette_id) {
+            query = query.eq('primary_palette_id', filters.primary_palette_id);
         }
-        if (filters.subject_matter_id) {
-            query = query.eq('subject_matter_id', filters.subject_matter_id);
+        if (filters.primary_lighting_id) {
+            query = query.eq('primary_lighting_id', filters.primary_lighting_id);
         }
-        if (filters.emotional_tone_id) {
-            query = query.eq('emotional_tone_id', filters.emotional_tone_id);
+        if (filters.primary_composition_id) {
+            query = query.eq('primary_composition_id', filters.primary_composition_id);
         }
-        if (filters.color_palette_id) {
-            query = query.eq('color_palette_id', filters.color_palette_id);
-        }
-        if (filters.primary_color_id) {
-            query = query.eq('primary_color_id', filters.primary_color_id);
-        }
-        if (filters.lighting_mood_id) {
-            query = query.eq('lighting_mood_id', filters.lighting_mood_id);
-        }
-        if (filters.composition_framing_id) {
-            query = query.eq('composition_framing_id', filters.composition_framing_id);
-        }
-        if (filters.brushwork_texture_id) {
-            query = query.eq('brushwork_texture_id', filters.brushwork_texture_id);
-        }
-        if (filters.pattern_motif_id) {
-            query = query.eq('pattern_motif_id', filters.pattern_motif_id);
-        }
-        if (filters.style_complexity_id) {
-            query = query.eq('style_complexity_id', filters.style_complexity_id);
-        }
-        if (filters.technical_skill_id) {
-            query = query.eq('technical_skill_id', filters.technical_skill_id);
+        if (filters.complexity) {
+            query = query.eq('complexity', filters.complexity);
         }
         
         const { data, error } = await query;
@@ -177,7 +157,7 @@ async function loadStyles(filters = {}) {
         
         allStyles = (data || []).map(style => ({
             ...style,
-            thumbnail: window.SocietyArts.getStyleImageUrl(style.id, 0),
+            thumbnail: style.thumbnail_url || window.SocietyArts.getStyleImageUrl(style.id, 0),
             images: window.SocietyArts.getAllStyleImageUrls(style.id)
         }));
         
@@ -204,7 +184,8 @@ function searchStyles(searchTerm) {
         const term = searchTerm.toLowerCase().trim();
         filteredStyles = allStyles.filter(style => 
             style.name?.toLowerCase().includes(term) ||
-            style.description?.toLowerCase().includes(term)
+            style.description?.toLowerCase().includes(term) ||
+            style.tagline?.toLowerCase().includes(term)
         );
     }
     currentPage = 0;
@@ -276,7 +257,7 @@ async function getStyleById(styleId) {
     
     return {
         ...data,
-        thumbnail: window.SocietyArts.getStyleImageUrl(styleId, 0),
+        thumbnail: data.thumbnail_url || window.SocietyArts.getStyleImageUrl(styleId, 0),
         images: window.SocietyArts.getAllStyleImageUrls(styleId)
     };
 }
