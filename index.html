@@ -128,7 +128,7 @@
   <script type="text/babel">
     function HomePage() {
       // Get components inside the function to ensure they're loaded
-      const { Header, Sidebar, Icons } = window.SocietyArts || {};
+      const { Header, Sidebar, Footer, Icons } = window.SocietyArts || {};
       
       if (!Sidebar) {
         return React.createElement('div', { className: 'loading-state' }, 'Loading...');

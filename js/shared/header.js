@@ -387,6 +387,32 @@ if (typeof React !== 'undefined') {
     };
 
     // ========================================
+    // FOOTER COMPONENT
+    // ========================================
+    const Footer = ({ children }) => {
+        return React.createElement('footer', {
+            className: 'app-footer',
+            style: {
+                height: 'var(--footer-height, 56px)',
+                padding: '0 var(--space-xl, 24px)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+                gap: 'var(--space-lg, 16px)',
+                borderTop: '1px solid var(--color-border, #E7E2DC)',
+                background: 'var(--color-surface, #F9F8F6)',
+                flexShrink: 0
+            }
+        }, children || React.createElement('span', {
+            style: { 
+                marginRight: 'auto', 
+                color: 'var(--color-text-muted)', 
+                fontSize: '14px' 
+            }
+        }, '© 2024 Society Arts'));
+    };
+
+    // ========================================
     // LEGACY COMPONENTS (for compatibility)
     // ========================================
     const NavSidebar = () => null; // No longer needed
@@ -398,6 +424,7 @@ if (typeof React !== 'undefined') {
     window.SocietyArts = window.SocietyArts || {};
     window.SocietyArts.Header = Header;
     window.SocietyArts.Sidebar = Sidebar;
+    window.SocietyArts.Footer = Footer;
     window.SocietyArts.NavSidebar = NavSidebar; // Legacy
     window.SocietyArts.Subheader = Subheader; // Legacy
     window.SocietyArts.FormatSelector = FormatSelector;
