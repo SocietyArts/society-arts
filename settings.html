@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings - Society Arts</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="https://pub-acb560f551f141db830964aed1fa005f.r2.dev/site-assets/SA_Monogram_Black%401x%201x1.png">
+  
+  <!-- React -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  
+  <!-- Fonts - Familjen Grotesk + Domine -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Domine:wght@400;500;600;700&family=Familjen+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/header.css">
+  <link rel="stylesheet" href="/css/auth.css">
+  <link rel="stylesheet" href="/css/help-modals.css">
+  
+  <style>
+    .settings-content {
+      flex: 1;
+      padding: var(--space-2xl);
+      overflow-y: auto;
+    }
+    
+    .settings-header {
+      margin-bottom: var(--space-2xl);
+    }
+    
+    .settings-title {
+      font-family: var(--font-serif);
+      font-size: var(--text-3xl);
+      font-weight: var(--weight-medium);
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-xs);
+    }
+    
+    .settings-subtitle {
+      font-size: var(--text-base);
+      color: var(--color-text-muted);
+    }
+    
+    .settings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: var(--space-xl);
+      max-width: 1000px;
+    }
+    
+    .settings-card {
+      background: white;
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--color-border-light);
+      padding: var(--space-xl);
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    
+    .settings-card:hover {
+      border-color: var(--color-border-dark);
+      box-shadow: 0 4px 12px rgba(62, 35, 24, 0.08);
+    }
+    
+    .settings-card-header {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-md);
+      margin-bottom: var(--space-md);
+    }
+    
+    .settings-card-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-lg);
+      background: var(--color-tan-10);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-brown);
+      flex-shrink: 0;
+    }
+    
+    .settings-card-icon svg {
+      width: 24px;
+      height: 24px;
+    }
+    
+    .settings-card-title {
+      font-family: var(--font-serif);
+      font-size: var(--text-lg);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-xs);
+    }
+    
+    .settings-card-desc {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+      line-height: var(--leading-relaxed);
+    }
+    
+    .settings-card-items {
+      margin-top: var(--space-lg);
+      padding-top: var(--space-md);
+      border-top: 1px solid var(--color-border-light);
+    }
+    
+    .settings-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-sm) 0;
+    }
+    
+    .settings-item:not(:last-child) {
+      border-bottom: 1px solid var(--color-border-light);
+    }
+    
+    .settings-item-label {
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+    }
+    
+    .settings-item-value {
+      font-size: var(--text-sm);
+      color: var(--color-text-primary);
+      font-weight: var(--weight-medium);
+    }
+    
+    .settings-toggle {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      border-radius: 12px;
+      border: none;
+      background: var(--color-tan-20);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .settings-toggle.active {
+      background: var(--color-accent);
+    }
+    
+    .settings-toggle-knob {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: white;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+      transition: transform 0.2s ease;
+    }
+    
+    .settings-toggle.active .settings-toggle-knob {
+      transform: translateX(20px);
+    }
+    
+    /* Account Section */
+    .account-section {
+      grid-column: 1 / -1;
+      background: linear-gradient(135deg, var(--color-tan-10) 0%, white 100%);
+      border: 1px solid var(--color-tan-20);
+    }
+    
+    .account-section .settings-card-icon {
+      background: var(--color-brown);
+      color: white;
+    }
+    
+    .account-info {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+      margin-top: var(--space-lg);
+    }
+    
+    .account-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--color-tan) 0%, var(--color-brown) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: var(--text-xl);
+      font-weight: var(--weight-bold);
+    }
+    
+    .account-details h3 {
+      font-size: var(--text-lg);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-xs);
+    }
+    
+    .account-details p {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+    }
+    
+    .account-badge {
+      display: inline-block;
+      margin-top: var(--space-sm);
+      padding: 4px 10px;
+      background: var(--color-accent);
+      color: white;
+      font-size: 11px;
+      font-weight: var(--weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-radius: var(--radius-sm);
+    }
+    
+    .account-actions {
+      display: flex;
+      gap: var(--space-sm);
+      margin-top: var(--space-lg);
+    }
+    
+    /* Coming Soon Badge */
+    .coming-soon {
+      position: relative;
+    }
+    
+    .coming-soon::after {
+      content: 'Coming Soon';
+      position: absolute;
+      top: var(--space-md);
+      right: var(--space-md);
+      padding: 4px 8px;
+      background: var(--color-tan-40);
+      color: var(--color-brown);
+      font-size: 10px;
+      font-weight: var(--weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-radius: var(--radius-sm);
+    }
+    
+    .coming-soon:hover {
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+    
+    @media (max-width: 768px) {
+      .settings-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .account-section {
+        grid-column: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="text/babel" src="/js/shared/supabase-client.js"></script>
+  <script type="text/babel" src="/js/shared/api.js"></script>
+  <script type="text/babel" src="/js/shared/auth.js"></script>
+  <script type="text/babel" src="/js/shared/header.js"></script>
+  
+  <!-- Settings App -->
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    function SettingsPage() {
+      // Get shared components inside the function to ensure they're loaded
+      const { Header, Sidebar, Icons } = window.SocietyArts || {};
+      
+      // Loading check
+      if (!Sidebar || !Header) {
+        return React.createElement('div', { className: 'loading-state' }, 'Loading...');
+      }
+      
+      const { user, profile, isLoading: authLoading } = window.SocietyArts.useAuth();
+      const [authModalOpen, setAuthModalOpen] = useState(false);
+      
+      // Settings state
+      const [settings, setSettings] = useState({
+        emailNotifications: true,
+        projectReminders: true,
+        newStyles: false,
+        darkMode: false,
+        autoSave: true,
+        voiceMode: true
+      });
+      
+      const toggleSetting = (key) => {
+        setSettings(prev => ({ ...prev, [key]: !prev[key] }));
+      };
+      
+      const getInitials = () => {
+        if (!profile?.display_name) return 'U';
+        return profile.display_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+      };
+      
+      const goToPage = (page) => {
+        window.location.href = `under-construction.html?feature=${encodeURIComponent(page)}`;
+      };
+      
+      // Icons
+      const UserIcon = () => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+      );
+      
+      const BellIcon = () => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+        </svg>
+      );
+      
+      const PaletteIcon = () => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <circle cx="13.5" cy="6.5" r="1.5"></circle>
+          <circle cx="17.5" cy="10.5" r="1.5"></circle>
+          <circle cx="8.5" cy="7.5" r="1.5"></circle>
+          <circle cx="6.5" cy="12.5" r="1.5"></circle>
+          <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.555C21.965 6.012 17.461 2 12 2z"></path>
+        </svg>
+      );
+      
+      const SettingsIcon = () => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+      );
+      
+      const PrinterIcon = () => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <polyline points="6 9 6 2 18 2 18 9"></polyline>
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+          <rect x="6" y="14" width="12" height="8"></rect>
+        </svg>
+      );
+      
+      const CreditCardIcon = () => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+          <line x1="1" y1="10" x2="23" y2="10"></line>
+        </svg>
+      );
+      
+      const ShieldIcon = () => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        </svg>
+      );
+      
+      const Toggle = ({ active, onClick }) => (
+        <button 
+          className={`settings-toggle ${active ? 'active' : ''}`}
+          onClick={onClick}
+        >
+          <span className="settings-toggle-knob"></span>
+        </button>
+      );
+
+      return (
+        <div className="page-container">
+          <Sidebar />
+          <Header user={user} profile={profile} />
+          
+          <main className="settings-content">
+            <div className="settings-header">
+              <h1 className="settings-title">Settings</h1>
+              <p className="settings-subtitle">Manage your account and preferences</p>
+            </div>
+            
+            {!user ? (
+              <div className="login-prompt">
+                <h2>Sign in to access settings</h2>
+                <p>Create an account or sign in to manage your preferences.</p>
+                <button 
+                  className="btn btn-primary"
+                  onClick={() => setAuthModalOpen(true)}
+                >
+                  Sign In
+                </button>
+              </div>
+            ) : (
+              <div className="settings-grid">
+                {/* Account Section */}
+                <div className="settings-card account-section" onClick={() => goToPage('Profile Settings')}>
+                  <div className="settings-card-header">
+                    <div className="settings-card-icon"><UserIcon /></div>
+                    <div>
+                      <div className="settings-card-title">Account</div>
+                      <div className="settings-card-desc">Manage your profile and account settings</div>
+                    </div>
+                  </div>
+                  <div className="account-info">
+                    <div className="account-avatar">{getInitials()}</div>
+                    <div className="account-details">
+                      <h3>{profile?.display_name || 'User'}</h3>
+                      <p>{user?.email}</p>
+                      {profile?.role === 'super_admin' && <span className="account-badge">Admin</span>}
+                    </div>
+                  </div>
+                  <div className="account-actions">
+                    <button className="btn btn-secondary" onClick={(e) => { e.stopPropagation(); goToPage('Edit Profile'); }}>
+                      Edit Profile
+                    </button>
+                    <button className="btn btn-ghost" onClick={(e) => { e.stopPropagation(); goToPage('Change Password'); }}>
+                      Change Password
+                    </button>
+                  </div>
+                </div>
+                
+                {/* Notifications */}
+                <div className="settings-card" onClick={(e) => e.stopPropagation()}>
+                  <div className="settings-card-header">
+                    <div className="settings-card-icon"><BellIcon /></div>
+                    <div>
+                      <div className="settings-card-title">Notifications</div>
+                      <div className="settings-card-desc">Control how and when you receive updates</div>
+                    </div>
+                  </div>
+                  <div className="settings-card-items">
+                    <div className="settings-item">
+                      <span className="settings-item-label">Email notifications</span>
+                      <Toggle active={settings.emailNotifications} onClick={() => toggleSetting('emailNotifications')} />
+                    </div>
+                    <div className="settings-item">
+                      <span className="settings-item-label">Project reminders</span>
+                      <Toggle active={settings.projectReminders} onClick={() => toggleSetting('projectReminders')} />
+                    </div>
+                    <div className="settings-item">
+                      <span className="settings-item-label">New style alerts</span>
+                      <Toggle active={settings.newStyles} onClick={() => toggleSetting('newStyles')} />
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Appearance */}
+                <div className="settings-card" onClick={(e) => e.stopPropagation()}>
+                  <div className="settings-card-header">
+                    <div className="settings-card-icon"><PaletteIcon /></div>
+                    <div>
+                      <div className="settings-card-title">Appearance</div>
+                      <div className="settings-card-desc">Customize how Society Arts looks</div>
+                    </div>
+                  </div>
+                  <div className="settings-card-items">
+                    <div className="settings-item">
+                      <span className="settings-item-label">Dark mode</span>
+                      <Toggle active={settings.darkMode} onClick={() => toggleSetting('darkMode')} />
+                    </div>
+                    <div className="settings-item">
+                      <span className="settings-item-label">Style grid size</span>
+                      <span className="settings-item-value">Medium</span>
+                    </div>
+                    <div className="settings-item">
+                      <span className="settings-item-label">Default aspect ratio</span>
+                      <span className="settings-item-value">1:1 Square</span>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Story Builder Preferences */}
+                <div className="settings-card" onClick={(e) => e.stopPropagation()}>
+                  <div className="settings-card-header">
+                    <div className="settings-card-icon"><SettingsIcon /></div>
+                    <div>
+                      <div className="settings-card-title">Story Builder</div>
+                      <div className="settings-card-desc">Configure your creative workflow</div>
+                    </div>
+                  </div>
+                  <div className="settings-card-items">
+                    <div className="settings-item">
+                      <span className="settings-item-label">Auto-save drafts</span>
+                      <Toggle active={settings.autoSave} onClick={() => toggleSetting('autoSave')} />
+                    </div>
+                    <div className="settings-item">
+                      <span className="settings-item-label">Enable voice input</span>
+                      <Toggle active={settings.voiceMode} onClick={() => toggleSetting('voiceMode')} />
+                    </div>
+                    <div className="settings-item">
+                      <span className="settings-item-label">AI assistant style</span>
+                      <span className="settings-item-value">Conversational</span>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Print & Shipping (Coming Soon) */}
+                <div className="settings-card coming-soon">
+                  <div className="settings-card-header">
+                    <div className="settings-card-icon"><PrinterIcon /></div>
+                    <div>
+                      <div className="settings-card-title">Print & Shipping</div>
+                      <div className="settings-card-desc">Manage shipping addresses and print preferences</div>
+                    </div>
+                  </div>
+                  <div className="settings-card-items">
+                    <div className="settings-item">
+                      <span className="settings-item-label">Default paper type</span>
+                      <span className="settings-item-value">Matte</span>
+                    </div>
+                    <div className="settings-item">
+                      <span className="settings-item-label">Saved addresses</span>
+                      <span className="settings-item-value">0 addresses</span>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Billing (Coming Soon) */}
+                <div className="settings-card coming-soon">
+                  <div className="settings-card-header">
+                    <div className="settings-card-icon"><CreditCardIcon /></div>
+                    <div>
+                      <div className="settings-card-title">Billing</div>
+                      <div className="settings-card-desc">Payment methods and order history</div>
+                    </div>
+                  </div>
+                  <div className="settings-card-items">
+                    <div className="settings-item">
+                      <span className="settings-item-label">Payment methods</span>
+                      <span className="settings-item-value">None saved</span>
+                    </div>
+                    <div className="settings-item">
+                      <span className="settings-item-label">Total orders</span>
+                      <span className="settings-item-value">0 orders</span>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Privacy & Security */}
+                <div className="settings-card" onClick={() => goToPage('Privacy & Security')}>
+                  <div className="settings-card-header">
+                    <div className="settings-card-icon"><ShieldIcon /></div>
+                    <div>
+                      <div className="settings-card-title">Privacy & Security</div>
+                      <div className="settings-card-desc">Control your data and account security</div>
+                    </div>
+                  </div>
+                  <div className="settings-card-items">
+                    <div className="settings-item">
+                      <span className="settings-item-label">Two-factor auth</span>
+                      <span className="settings-item-value">Disabled</span>
+                    </div>
+                    <div className="settings-item">
+                      <span className="settings-item-label">Data sharing</span>
+                      <span className="settings-item-value">Analytics only</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </main>
+          
+          {/* Auth Modal */}
+          {authModalOpen && (
+            <div className="auth-modal-overlay" onClick={() => setAuthModalOpen(false)}>
+              <div className="auth-modal" onClick={e => e.stopPropagation()}>
+                <button className="auth-modal-close" onClick={() => setAuthModalOpen(false)}>×</button>
+                <div id="authModalContent"></div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    
+    // Wait for all components to be loaded
+    function waitForComponents(callback, maxAttempts = 50) {
+      let attempts = 0;
+      const check = () => {
+        attempts++;
+        if (window.SocietyArts?.Sidebar && window.SocietyArts?.Header && window.SocietyArts?.useAuth) {
+          callback();
+        } else if (attempts < maxAttempts) {
+          setTimeout(check, 100);
+        } else {
+          console.error('Components failed to load');
+          callback();
+        }
+      };
+      check();
+    }
+    
+    waitForComponents(() => {
+      root.render(<SettingsPage />);
+    });
+  </script>
+</body>
+</html>

@@ -126,9 +126,14 @@
   
   <!-- Homepage App -->
   <script type="text/babel">
-    const { Header, Sidebar, Icons } = window.SocietyArts;
-
     function HomePage() {
+      // Get components inside the function to ensure they're loaded
+      const { Header, Sidebar, Icons } = window.SocietyArts || {};
+      
+      if (!Sidebar) {
+        return React.createElement('div', { className: 'loading-state' }, 'Loading...');
+      }
+
       return (
         <div className="page-container">
           <Sidebar />
@@ -212,7 +217,27 @@
     }
 
     const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<HomePage />);
+    
+    // Wait for all components to be loaded
+    function waitForComponents(callback, maxAttempts = 50) {
+      let attempts = 0;
+      const check = () => {
+        attempts++;
+        if (window.SocietyArts?.Sidebar && window.SocietyArts?.Header) {
+          callback();
+        } else if (attempts < maxAttempts) {
+          setTimeout(check, 100);
+        } else {
+          console.error('Components failed to load');
+          callback(); // Try anyway
+        }
+      };
+      check();
+    }
+    
+    waitForComponents(() => {
+      root.render(<HomePage />);
+    });
   </script>
 </body>
 </html>

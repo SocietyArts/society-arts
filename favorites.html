@@ -213,9 +213,16 @@
   <!-- Favorites App -->
   <script type="text/babel">
     const { useState, useEffect } = React;
-    const { Header, Sidebar, Icons } = window.SocietyArts;
 
     function FavoritesPage() {
+      // Get shared components inside the function to ensure they're loaded
+      const { Header, Sidebar, Icons } = window.SocietyArts || {};
+      
+      // Loading check
+      if (!Sidebar || !Header) {
+        return React.createElement('div', { className: 'loading-state' }, 'Loading...');
+      }
+      
       const { user, profile, isLoading: authLoading } = window.SocietyArts.useAuth();
       const { favorites, isStyleFavorited, removeFavorite, loadFavorites } = window.SocietyArts.useFavorites();
       const [styles, setStyles] = useState([]);
@@ -392,7 +399,27 @@
     }
 
     const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<FavoritesPage />);
+    
+    // Wait for all components to be loaded
+    function waitForComponents(callback, maxAttempts = 50) {
+      let attempts = 0;
+      const check = () => {
+        attempts++;
+        if (window.SocietyArts?.Sidebar && window.SocietyArts?.Header && window.SocietyArts?.useAuth) {
+          callback();
+        } else if (attempts < maxAttempts) {
+          setTimeout(check, 100);
+        } else {
+          console.error('Components failed to load');
+          callback();
+        }
+      };
+      check();
+    }
+    
+    waitForComponents(() => {
+      root.render(<FavoritesPage />);
+    });
   </script>
 </body>
 </html>
