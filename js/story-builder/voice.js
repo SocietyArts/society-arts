@@ -287,16 +287,17 @@ function useVoiceInterface({ onUserMessage, onAssistantMessage }) {
 }
 
 /**
- * Waveform Animation Component
+ * Waveform Icon Component (for voice mode button)
  */
-function Waveform({ active, speaking }) {
-  const bars = 5;
+function WaveformIcon({ size = 20 }) {
   return (
-    <div className={`waveform ${active ? 'active' : ''} ${speaking ? 'speaking' : ''}`}>
-      {[...Array(bars)].map((_, i) => (
-        <div key={i} className="waveform-bar" style={{ animationDelay: `${i * 0.1}s` }}></div>
-      ))}
-    </div>
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
+      <rect x="4" y="10" width="2" height="4" rx="1" />
+      <rect x="8" y="7" width="2" height="10" rx="1" />
+      <rect x="12" y="4" width="2" height="16" rx="1" />
+      <rect x="16" y="7" width="2" height="10" rx="1" />
+      <rect x="20" y="10" width="2" height="4" rx="1" />
+    </svg>
   );
 }
 
@@ -319,7 +320,7 @@ function FutureFeatureModal({ isOpen, onClose }) {
 
 /**
  * Unified Input Component
- * Text mode with dictation, Voice mode with waveform and speaker control
+ * ChatGPT-style input with text/voice modes
  */
 function UnifiedInput({ 
   voiceMode,
@@ -345,12 +346,17 @@ function UnifiedInput({
       recognitionRef.current.continuous = true;
       recognitionRef.current.interimResults = true;
       
+      let finalTranscript = '';
       recognitionRef.current.onresult = (event) => {
-        let transcript = '';
+        let interimTranscript = '';
         for (let i = event.resultIndex; i < event.results.length; i++) {
-          transcript += event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            finalTranscript += event.results[i][0].transcript;
+          } else {
+            interimTranscript += event.results[i][0].transcript;
+          }
         }
-        onInputChange(inputValue + transcript);
+        onInputChange(finalTranscript + interimTranscript);
       };
       
       recognitionRef.current.onend = () => {
@@ -365,7 +371,7 @@ function UnifiedInput({
     };
   }, []);
 
-  // Handle key down in text mode
+  // Handle key down
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey && inputValue.trim()) {
       e.preventDefault();
@@ -383,7 +389,7 @@ function UnifiedInput({
   };
 
   // Handle voice mode toggle with auth check
-  const handleVoiceToggle = () => {
+  const handleVoiceModeToggle = () => {
     if (onRequireAuth && !window.SocietyArts?.AuthState?.user) {
       onRequireAuth();
       return;
@@ -404,15 +410,6 @@ function UnifiedInput({
     }
   };
 
-  // Voice mode controls
-  const handleMicToggle = () => {
-    if (voice?.isMuted) {
-      voice.toggleMute();
-    } else {
-      voice.toggleMute();
-    }
-  };
-
   // Icons
   const PlusIcon = () => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -421,156 +418,117 @@ function UnifiedInput({
     </svg>
   );
 
-  const MicIcon = ({ muted }) => (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+  const MicIcon = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
       <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
       <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
       <line x1="12" y1="19" x2="12" y2="23"></line>
       <line x1="8" y1="23" x2="16" y2="23"></line>
-      {muted && <line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" strokeWidth="2"></line>}
     </svg>
   );
 
-  const SpeakerIcon = ({ muted }) => (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+  const MicMutedIcon = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+      <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+      <line x1="12" y1="19" x2="12" y2="23"></line>
+      <line x1="8" y1="23" x2="16" y2="23"></line>
+      <line x1="1" y1="1" x2="23" y2="23" strokeWidth="2"></line>
+    </svg>
+  );
+
+  const SpeakerIcon = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
       <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-      {muted ? (
-        <line x1="23" y1="9" x2="17" y2="15"></line>
-      ) : (
-        <>
-          <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
-          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-        </>
-      )}
-      {muted && <line x1="17" y1="9" x2="23" y2="15"></line>}
+      <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+      <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
     </svg>
   );
 
-  const SendIcon = () => (
+  const SpeakerMutedIcon = () => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <line x1="22" y1="2" x2="11" y2="13"></line>
-      <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+      <line x1="23" y1="9" x2="17" y2="15"></line>
+      <line x1="17" y1="9" x2="23" y2="15"></line>
     </svg>
   );
 
-  const KeyboardIcon = () => (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect>
-      <path d="M6 8h.001M10 8h.001M14 8h.001M18 8h.001M8 12h.001M12 12h.001M16 12h.001M7 16h10"></path>
-    </svg>
-  );
-
-  // Voice mode UI
-  if (voiceMode) {
-    return (
-      <div className="voice-mode-input">
-        {/* Speaker toggle (left) */}
-        <button 
-          className={`voice-control-btn speaker-btn ${voice?.speakerMuted ? 'muted' : ''}`}
-          onClick={() => voice?.toggleSpeaker()}
-          title={voice?.speakerMuted ? 'Unmute speaker' : 'Mute speaker'}
-        >
-          <SpeakerIcon muted={voice?.speakerMuted} />
-        </button>
-        
-        {/* Central waveform area */}
-        <div className="voice-waveform-area">
-          <Waveform active={voice?.isListening} speaking={voice?.isSpeaking} />
-          <span className="voice-status">
-            {voice?.error ? voice.error :
-             !voice?.isConnected ? 'Connecting...' :
-             voice?.isSpeaking ? 'Speaking...' :
-             voice?.isListening && !voice?.isMuted ? 'Listening...' :
-             voice?.isMuted ? 'Mic muted' : 'Ready'}
-          </span>
-        </div>
-        
-        {/* Mic mute toggle (right) */}
-        <button 
-          className={`voice-control-btn mic-btn ${voice?.isMuted ? 'muted' : ''}`}
-          onClick={() => voice?.toggleMute()}
-          title={voice?.isMuted ? 'Unmute microphone' : 'Mute microphone'}
-        >
-          <MicIcon muted={voice?.isMuted} />
-        </button>
-        
-        {/* Text mode toggle */}
-        <button 
-          className="voice-control-btn text-mode-btn"
-          onClick={handleVoiceToggle}
-          title="Switch to text mode"
-        >
-          <KeyboardIcon />
-        </button>
-        
-        <FutureFeatureModal 
-          isOpen={showFutureModal} 
-          onClose={() => setShowFutureModal(false)} 
-        />
-      </div>
-    );
-  }
-
-  // Text mode UI
+  // Common wrapper
   return (
-    <div className="text-mode-input">
-      {/* Plus button for future feature */}
+    <div className="chat-input-wrapper">
+      {/* Plus button */}
       <button 
-        className="input-action-btn plus-btn"
+        className="input-icon-btn plus-btn"
         onClick={() => setShowFutureModal(true)}
         title="Add media"
       >
         <PlusIcon />
       </button>
       
-      {/* Text input */}
-      <div className="text-input-wrapper">
-        <input
-          ref={inputRef}
-          type="text"
-          className="text-input-field"
-          placeholder={placeholder}
-          value={inputValue}
-          onChange={(e) => onInputChange(e.target.value)}
-          onKeyDown={handleKeyDown}
-          disabled={isLoading}
-        />
-      </div>
+      {/* Text input - always visible */}
+      <input
+        ref={inputRef}
+        type="text"
+        className="chat-text-input"
+        placeholder={voiceMode ? "Type" : placeholder}
+        value={inputValue}
+        onChange={(e) => onInputChange(e.target.value)}
+        onKeyDown={handleKeyDown}
+        disabled={isLoading}
+      />
       
-      {/* Dictation mic button */}
-      <button 
-        className={`input-action-btn dictate-btn ${isDictating ? 'active' : ''}`}
-        onClick={toggleDictation}
-        title="Dictate text"
-        disabled={!recognitionRef.current}
-      >
-        <MicIcon muted={false} />
-        {isDictating && <span className="dictate-pulse"></span>}
-      </button>
-      
-      {/* Send or Voice toggle */}
-      {inputValue.trim() ? (
-        <button 
-          className="input-action-btn send-btn"
-          onClick={handleSend}
-          disabled={isLoading}
-          title="Send message"
-        >
-          <SendIcon />
-        </button>
+      {/* Right side controls depend on mode */}
+      {voiceMode ? (
+        // Voice mode: Speaker mute, Mic mute, End button
+        <>
+          <button 
+            className={`input-icon-btn speaker-btn ${voice?.speakerMuted ? 'muted' : ''}`}
+            onClick={() => voice?.toggleSpeaker()}
+            title={voice?.speakerMuted ? 'Unmute speaker' : 'Mute speaker'}
+          >
+            {voice?.speakerMuted ? <SpeakerMutedIcon /> : <SpeakerIcon />}
+          </button>
+          
+          <button 
+            className={`input-icon-btn mic-btn ${voice?.isMuted ? 'muted' : ''}`}
+            onClick={() => voice?.toggleMute()}
+            title={voice?.isMuted ? 'Unmute microphone' : 'Mute microphone'}
+          >
+            {voice?.isMuted ? <MicMutedIcon /> : <MicIcon />}
+          </button>
+          
+          <button 
+            className="voice-end-btn"
+            onClick={handleVoiceModeToggle}
+            title="End voice mode"
+          >
+            <span className="voice-end-dots">
+              <span></span><span></span><span></span>
+            </span>
+            <span className="voice-end-text">End</span>
+          </button>
+        </>
       ) : (
-        <button 
-          className="input-action-btn voice-mode-btn"
-          onClick={handleVoiceToggle}
-          title="Switch to voice mode"
-        >
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-            <line x1="12" y1="19" x2="12" y2="23"></line>
-            <line x1="8" y1="23" x2="16" y2="23"></line>
-          </svg>
-        </button>
+        // Text mode: Dictate mic, Voice mode button
+        <>
+          <button 
+            className={`input-icon-btn dictate-btn ${isDictating ? 'active' : ''}`}
+            onClick={toggleDictation}
+            title="Dictate"
+            disabled={!recognitionRef.current}
+          >
+            <MicIcon />
+            {isDictating && <span className="dictate-pulse"></span>}
+          </button>
+          
+          <button 
+            className="voice-mode-btn"
+            onClick={handleVoiceModeToggle}
+            title="Use voice mode"
+          >
+            <WaveformIcon size={18} />
+          </button>
+        </>
       )}
       
       <FutureFeatureModal 
@@ -587,7 +545,7 @@ if (typeof window !== 'undefined') {
   window.SocietyArts.Voice = {
     useVoiceInterface,
     UnifiedInput,
-    Waveform,
+    WaveformIcon,
     FutureFeatureModal,
     isTouchDevice
   };

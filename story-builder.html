@@ -604,50 +604,45 @@
     }
     
     /* ========================================
-       NEW INPUT SYSTEM - Text & Voice Modes
+       ChatGPT-STYLE INPUT SYSTEM
        ======================================== */
     
-    /* Text Mode Input */
-    .text-mode-input {
+    .chat-input-wrapper {
       display: flex;
       align-items: center;
-      gap: var(--space-sm);
+      gap: 8px;
       width: 100%;
-      max-width: 600px;
-      background: white;
+      background: var(--color-surface);
       border: 1px solid var(--color-border-medium);
-      border-radius: 28px;
+      border-radius: 24px;
       padding: 8px 12px;
       transition: all 0.2s;
     }
     
-    .text-mode-input:focus-within {
-      border-color: var(--color-accent);
-      box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
+    .chat-input-wrapper:focus-within {
+      border-color: var(--color-border-dark);
+      box-shadow: 0 0 0 2px rgba(62, 35, 24, 0.08);
     }
     
-    .text-input-wrapper {
+    /* Text Input Field */
+    .chat-text-input {
       flex: 1;
-      display: flex;
-      align-items: center;
-    }
-    
-    .text-input-field {
-      width: 100%;
       border: none;
       outline: none;
       font-size: var(--text-base);
-      padding: 8px;
+      padding: 8px 4px;
       background: transparent;
+      min-width: 0;
     }
     
-    .text-input-field::placeholder {
+    .chat-text-input::placeholder {
       color: var(--color-text-muted);
     }
     
-    .input-action-btn {
-      width: 40px;
-      height: 40px;
+    /* Icon Buttons (Plus, Dictate, Speaker, Mic) */
+    .input-icon-btn {
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       border: none;
       background: transparent;
@@ -658,22 +653,26 @@
       color: var(--color-text-muted);
       transition: all 0.15s;
       flex-shrink: 0;
+      position: relative;
     }
     
-    .input-action-btn:hover {
+    .input-icon-btn:hover {
       background: var(--color-tan-10);
       color: var(--color-text-primary);
     }
     
-    .input-action-btn.plus-btn {
-      color: var(--color-text-muted);
+    .input-icon-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
     }
     
-    .input-action-btn.dictate-btn {
-      position: relative;
+    /* Plus Button */
+    .input-icon-btn.plus-btn {
+      color: var(--color-text-secondary);
     }
     
-    .input-action-btn.dictate-btn.active {
+    /* Dictate Button */
+    .input-icon-btn.dictate-btn.active {
       color: var(--color-accent);
       background: var(--color-accent-light);
     }
@@ -686,42 +685,23 @@
       animation: pulse 1.5s infinite;
     }
     
-    .input-action-btn.send-btn {
-      background: var(--color-brown);
-      color: white;
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(1.4); opacity: 0; }
     }
     
-    .input-action-btn.send-btn:hover {
-      background: var(--color-brown-dark);
+    /* Speaker/Mic Muted State */
+    .input-icon-btn.muted {
+      color: #dc2626;
     }
     
-    .input-action-btn.voice-mode-btn {
-      background: var(--color-tan-20);
-      color: var(--color-brown);
-    }
-    
-    .input-action-btn.voice-mode-btn:hover {
-      background: var(--color-tan-40);
-    }
-    
-    /* Voice Mode Input */
-    .voice-mode-input {
-      display: flex;
-      align-items: center;
-      gap: var(--space-md);
-      width: 100%;
-      max-width: 500px;
-      background: linear-gradient(135deg, var(--color-brown) 0%, var(--color-brown-dark) 100%);
-      border-radius: 28px;
-      padding: 12px 20px;
-    }
-    
-    .voice-control-btn {
-      width: 44px;
-      height: 44px;
+    /* Voice Mode Button (Waveform) */
+    .voice-mode-btn {
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       border: none;
-      background: rgba(255,255,255,0.15);
+      background: var(--color-text-primary);
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -731,83 +711,57 @@
       flex-shrink: 0;
     }
     
-    .voice-control-btn:hover {
-      background: rgba(255,255,255,0.25);
+    .voice-mode-btn:hover {
+      background: var(--color-brown);
+      transform: scale(1.05);
     }
     
-    .voice-control-btn.muted {
-      background: rgba(220, 38, 38, 0.3);
-    }
-    
-    .voice-control-btn.text-mode-btn {
-      background: rgba(255,255,255,0.9);
-      color: var(--color-brown);
-    }
-    
-    .voice-control-btn.text-mode-btn:hover {
-      background: white;
-    }
-    
-    .voice-waveform-area {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: var(--space-xs);
-    }
-    
-    .voice-status {
-      font-size: var(--text-sm);
-      color: rgba(255,255,255,0.8);
-      text-align: center;
-    }
-    
-    /* Waveform Animation */
-    .waveform {
+    /* Voice End Button (Red with dots) */
+    .voice-end-btn {
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 4px;
-      height: 32px;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: none;
+      background: #dc2626;
+      color: white;
+      font-size: 14px;
+      font-weight: var(--weight-medium);
+      cursor: pointer;
+      transition: all 0.15s;
+      flex-shrink: 0;
     }
     
-    .waveform-bar {
+    .voice-end-btn:hover {
+      background: #b91c1c;
+    }
+    
+    .voice-end-dots {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+    
+    .voice-end-dots span {
       width: 4px;
-      height: 8px;
-      background: rgba(255,255,255,0.4);
-      border-radius: 2px;
-      transition: height 0.1s;
+      height: 4px;
+      border-radius: 50%;
+      background: white;
+      animation: dot-pulse 1s ease-in-out infinite;
     }
     
-    .waveform.active .waveform-bar {
-      animation: waveform-idle 1s ease-in-out infinite;
+    .voice-end-dots span:nth-child(1) { animation-delay: 0s; }
+    .voice-end-dots span:nth-child(2) { animation-delay: 0.15s; }
+    .voice-end-dots span:nth-child(3) { animation-delay: 0.3s; }
+    
+    @keyframes dot-pulse {
+      0%, 100% { opacity: 0.4; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.2); }
     }
     
-    .waveform.speaking .waveform-bar {
-      animation: waveform-speaking 0.4s ease-in-out infinite;
-    }
-    
-    @keyframes waveform-idle {
-      0%, 100% { height: 8px; background: rgba(255,255,255,0.4); }
-      50% { height: 16px; background: rgba(255,255,255,0.6); }
-    }
-    
-    @keyframes waveform-speaking {
-      0%, 100% { height: 8px; }
-      25% { height: 24px; }
-      50% { height: 16px; }
-      75% { height: 28px; }
-    }
-    
-    .waveform-bar:nth-child(1) { animation-delay: 0s; }
-    .waveform-bar:nth-child(2) { animation-delay: 0.1s; }
-    .waveform-bar:nth-child(3) { animation-delay: 0.2s; }
-    .waveform-bar:nth-child(4) { animation-delay: 0.1s; }
-    .waveform-bar:nth-child(5) { animation-delay: 0s; }
-    
-    @keyframes pulse {
-      0% { transform: scale(1); opacity: 1; }
-      100% { transform: scale(1.5); opacity: 0; }
+    .voice-end-text {
+      font-weight: var(--weight-semibold);
     }
     
     /* Future Feature Modal */
