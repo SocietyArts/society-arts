@@ -4,12 +4,13 @@
 -- Run this SQL in Supabase SQL Editor
 -- =============================================
 
--- 1. Create user role enum (only if it doesn't exist)
+-- 1. Create user role enum (skip if already exists)
 DO $$ 
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'user_role') THEN
-        CREATE TYPE user_role AS ENUM ('user', 'admin', 'super_admin');
-    END IF;
+    CREATE TYPE user_role AS ENUM ('user', 'admin', 'super_admin');
+EXCEPTION
+    WHEN duplicate_object THEN 
+        RAISE NOTICE 'type "user_role" already exists, skipping';
 END $$;
 
 -- 2. Create user_profiles table
