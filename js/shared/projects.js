@@ -215,7 +215,7 @@ async function loadUserFavorites() {
     try {
         const { data, error } = await supabase
             .from('user_favorites')
-            .select('style_id, created_at')
+            .select('style_id, style_name, created_at')
             .eq('user_id', AuthState.user.id)
             .order('created_at', { ascending: false });
 
@@ -230,7 +230,7 @@ async function loadUserFavorites() {
     }
 }
 
-async function addFavorite(styleId) {
+async function addFavorite(styleId, styleName) {
     const { supabase, AuthState } = window.SocietyArts;
     if (!supabase || !AuthState?.user) {
         throw new Error('Must be logged in to add favorites');
@@ -241,7 +241,8 @@ async function addFavorite(styleId) {
             .from('user_favorites')
             .insert({
                 user_id: AuthState.user.id,
-                style_id: styleId
+                style_id: styleId,
+                style_name: styleName || null
             })
             .select()
             .single();
@@ -254,7 +255,11 @@ async function addFavorite(styleId) {
             throw error;
         }
 
-        userFavorites.unshift({ style_id: styleId, created_at: new Date().toISOString() });
+        userFavorites.unshift({ 
+            style_id: styleId, 
+            style_name: styleName,
+            created_at: new Date().toISOString() 
+        });
         return true;
     } catch (error) {
         console.error('Failed to add favorite:', error);

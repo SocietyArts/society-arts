@@ -53,57 +53,76 @@
       margin-left: var(--space-md);
     }
     
-    .favorites-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: var(--space-lg);
+    /* Table View */
+    .favorites-table {
+      width: 100%;
+      border-collapse: collapse;
     }
     
-    .favorite-card {
-      position: relative;
-      aspect-ratio: 1;
-      border-radius: var(--radius-lg);
-      overflow: hidden;
+    .favorites-table th {
+      text-align: left;
+      padding: var(--space-md) var(--space-lg);
+      border-bottom: 2px solid var(--color-border);
+      font-weight: var(--weight-semibold);
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .favorites-table td {
+      padding: var(--space-md) var(--space-lg);
+      border-bottom: 1px solid var(--color-border);
+      vertical-align: middle;
+    }
+    
+    .favorites-table tr:hover {
+      background: var(--color-surface-alt);
+    }
+    
+    .favorites-table tr {
       cursor: pointer;
-      transition: transform 0.2s;
+      transition: background 0.2s;
     }
     
-    .favorite-card:hover {
-      transform: scale(1.02);
+    .favorite-thumbnail {
+      width: 60px;
+      height: 60px;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      flex-shrink: 0;
     }
     
-    .favorite-card img {
+    .favorite-thumbnail img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
     
-    .favorite-overlay {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      padding: var(--space-md);
-      background: linear-gradient(transparent, rgba(0,0,0,0.7));
-      color: white;
+    .style-id-cell {
+      font-family: monospace;
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
     }
     
-    .favorite-name {
-      font-size: var(--text-sm);
+    .style-name-cell {
       font-weight: var(--weight-medium);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    }
+    
+    .date-cell {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+    }
+    
+    .action-cell {
+      text-align: right;
     }
     
     .favorite-heart {
-      position: absolute;
-      top: var(--space-sm);
-      right: var(--space-sm);
       width: 36px;
       height: 36px;
       border-radius: 50%;
-      background: rgba(255,255,255,0.9);
+      background: transparent;
       border: none;
       cursor: pointer;
       display: flex;
@@ -114,7 +133,7 @@
     }
     
     .favorite-heart:hover {
-      background: white;
+      background: #fee2e2;
       transform: scale(1.1);
     }
     
@@ -166,6 +185,13 @@
       color: var(--color-text-muted);
       margin-bottom: var(--space-xl);
     }
+    
+    @media (max-width: 768px) {
+      .favorites-table th:nth-child(1),
+      .favorites-table td:nth-child(1) {
+        display: none;
+      }
+    }
   </style>
 </head>
 <body>
@@ -198,10 +224,11 @@
 
       const loadFavoritesData = async () => {
         setIsLoading(true);
-        await loadFavorites();
+        const loadedFavorites = await loadFavorites();
         
-        // Load style details for each favorite
-        const favoriteIds = window.SocietyArts.getFavoriteStyleIds();
+        // Get unique style IDs
+        const favoriteIds = loadedFavorites.map(f => f.style_id);
+        
         if (favoriteIds.length > 0 && window.SocietyArts.supabase) {
           const { data } = await window.SocietyArts.supabase
             .from('styles')
@@ -209,7 +236,16 @@
             .in('id', favoriteIds);
           
           if (data) {
-            setStyles(data);
+            // Merge style data with favorite data (for dates)
+            const stylesWithDates = data.map(style => {
+              const fav = loadedFavorites.find(f => f.style_id === style.id);
+              return {
+                ...style,
+                created_at: fav?.created_at,
+                style_name: fav?.style_name || style.name
+              };
+            });
+            setStyles(stylesWithDates);
           }
         }
         setIsLoading(false);
@@ -225,11 +261,22 @@
         window.location.href = `/style-finder.html?style=${styleId}`;
       };
 
-      const getStyleImage = (style) => {
-        if (style.image_urls?.length > 0) {
+      const getStyleImage = (styleId) => {
+        const style = styles.find(s => s.id === styleId);
+        if (style?.image_urls?.length > 0) {
           return style.image_urls[0];
         }
-        return `https://pub-d4d49982f29749dea52e2eb37c29ad51.r2.dev/${style.id}/${style.id}_1.webp`;
+        return `https://pub-d4d49982f29749dea52e2eb37c29ad51.r2.dev/${styleId}/${styleId}_1.webp`;
+      };
+
+      const formatDate = (dateString) => {
+        if (!dateString) return '-';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { 
+          month: 'short', 
+          day: 'numeric',
+          year: 'numeric'
+        });
       };
 
       return (
@@ -276,35 +323,51 @@
                     </a>
                   </div>
                 ) : (
-                  <div className="favorites-grid">
-                    {styles.map(style => (
-                      <div 
-                        key={style.id}
-                        className="favorite-card"
-                        onClick={() => handleStyleClick(style.id)}
-                      >
-                        <img 
-                          src={getStyleImage(style)}
-                          alt={style.name}
-                          onError={e => {
-                            e.target.src = `https://pub-d4d49982f29749dea52e2eb37c29ad51.r2.dev/${style.id}/${style.id}_1.webp`;
-                          }}
-                        />
-                        <button
-                          className="favorite-heart"
-                          onClick={(e) => handleRemoveFavorite(e, style.id)}
-                          title="Remove from favorites"
+                  <table className="favorites-table">
+                    <thead>
+                      <tr>
+                        <th style={{width: '80px'}}></th>
+                        <th>Style ID</th>
+                        <th>Title</th>
+                        <th>Date Added</th>
+                        <th style={{width: '60px'}}></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {styles.map(style => (
+                        <tr 
+                          key={style.id}
+                          onClick={() => handleStyleClick(style.id)}
                         >
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="1">
-                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                          </svg>
-                        </button>
-                        <div className="favorite-overlay">
-                          <div className="favorite-name">{style.name}</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                          <td>
+                            <div className="favorite-thumbnail">
+                              <img 
+                                src={getStyleImage(style.id)}
+                                alt={style.name}
+                                onError={e => {
+                                  e.target.src = `https://pub-d4d49982f29749dea52e2eb37c29ad51.r2.dev/${style.id}/${style.id}_1.webp`;
+                                }}
+                              />
+                            </div>
+                          </td>
+                          <td className="style-id-cell">{style.id}</td>
+                          <td className="style-name-cell">{style.name}</td>
+                          <td className="date-cell">{formatDate(style.created_at)}</td>
+                          <td className="action-cell">
+                            <button
+                              className="favorite-heart"
+                              onClick={(e) => handleRemoveFavorite(e, style.id)}
+                              title="Remove from favorites"
+                            >
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="1">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                              </svg>
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 )}
               </>
             )}
