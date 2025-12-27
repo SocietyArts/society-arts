@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Work - Society Arts</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="https://pub-acb560f551f141db830964aed1fa005f.r2.dev/site-assets/SA_Monogram_Black%401x%201x1.png">
+  
+  <!-- React -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/shared/supabase-client.js"></script>
+  
+  <!-- Fonts - Familjen Grotesk + Domine -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Domine:wght@400;500;600;700&family=Familjen+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/header.css">
+  <link rel="stylesheet" href="/css/auth.css">
+  <link rel="stylesheet" href="/css/help-modals.css">
+  
+  <style>
+    .collections-content {
+      flex: 1;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: var(--space-2xl);
+      width: 100%;
+    }
+    
+    .collections-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-2xl);
+    }
+    
+    .collections-title {
+      font-family: var(--font-serif);
+      font-size: var(--text-3xl);
+      font-weight: var(--weight-normal);
+      margin: 0;
+    }
+    
+    .collections-count {
+      color: var(--color-text-muted);
+      font-size: var(--text-lg);
+      margin-left: var(--space-md);
+    }
+    
+    .sort-buttons {
+      display: flex;
+      gap: var(--space-sm);
+    }
+    
+    .sort-btn {
+      padding: 8px 16px;
+      border: 1px solid var(--color-border);
+      border-radius: 20px;
+      background: white;
+      cursor: pointer;
+      font-size: 13px;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+    
+    .sort-btn.active {
+      background: var(--color-text-primary);
+      color: white;
+      border-color: var(--color-text-primary);
+    }
+    
+    .collections-grid {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+    
+    .project-card {
+      display: flex;
+      align-items: center;
+      padding: var(--space-lg);
+      background: var(--color-surface-alt);
+      border-radius: var(--radius-lg);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .project-card:hover {
+      background: var(--color-surface-hover);
+      transform: translateY(-1px);
+    }
+    
+    .project-thumbnail {
+      width: 80px;
+      height: 80px;
+      border-radius: var(--radius-md);
+      background: var(--color-border);
+      margin-right: var(--space-lg);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    
+    .project-thumbnail img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .project-info {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .project-title {
+      font-family: var(--font-serif);
+      font-size: var(--text-lg);
+      font-weight: var(--weight-semibold);
+      margin: 0 0 4px 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .project-preview {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .project-meta {
+      text-align: right;
+      margin-left: var(--space-lg);
+      flex-shrink: 0;
+    }
+    
+    .project-date {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+    }
+    
+    .project-styles {
+      font-size: var(--text-sm);
+      margin-top: 4px;
+    }
+    
+    .project-actions {
+      display: flex;
+      gap: var(--space-sm);
+      margin-left: var(--space-lg);
+    }
+    
+    .action-btn {
+      padding: var(--space-sm);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--color-text-muted);
+      border-radius: var(--radius-md);
+      transition: all 0.2s;
+    }
+    
+    .action-btn:hover {
+      background: var(--color-surface);
+    }
+    
+    .action-btn.delete:hover {
+      color: #dc2626;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: var(--space-5xl) var(--space-xl);
+    }
+    
+    .empty-icon {
+      width: 80px;
+      height: 80px;
+      background: var(--color-surface-alt);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto var(--space-xl);
+      color: var(--color-text-muted);
+    }
+    
+    .empty-title {
+      font-family: var(--font-serif);
+      font-size: var(--text-xl);
+      margin-bottom: var(--space-sm);
+    }
+    
+    .empty-text {
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-xl);
+    }
+    
+    .loading-state {
+      text-align: center;
+      padding: var(--space-5xl);
+      color: var(--color-text-muted);
+    }
+    
+    .login-prompt {
+      text-align: center;
+      padding: var(--space-5xl) var(--space-xl);
+    }
+    
+    .login-prompt h2 {
+      font-family: var(--font-serif);
+      margin-bottom: var(--space-md);
+    }
+    
+    .login-prompt p {
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-xl);
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  
+  <!-- Shared Components -->
+  <script src="/js/shared/api.js"></script>
+  <script src="/js/shared/auth.js"></script>
+  <script src="/js/shared/collections.js"></script>
+  <script src="/js/shared/header.js"></script>
+  
+  <!-- Collections App -->
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    function CollectionsPage() {
+      // Get shared components inside the function to ensure they're loaded
+      const { Header, Sidebar, Footer, Icons } = window.SocietyArts || {};
+      
+      // Loading check
+      if (!Sidebar || !Header) {
+        return React.createElement('div', { className: 'loading-state' }, 'Loading...');
+      }
+      
+      const { user, profile, isLoading: authLoading } = window.SocietyArts.useAuth();
+      const { collections, isLoading, loadCollections, deleteProject } = window.SocietyArts.useCollections();
+      const [sortBy, setSortBy] = useState('date');
+      const [deleteModal, setDeleteModal] = useState({ open: false, project: null });
+      const [authModalOpen, setAuthModalOpen] = useState(false);
+
+      useEffect(() => {
+        if (user) {
+          loadCollections();
+        }
+      }, [user]);
+
+      const sortedCollections = React.useMemo(() => {
+        const sorted = [...collections];
+        if (sortBy === 'title') {
+          sorted.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+        } else {
+          sorted.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+        }
+        return sorted;
+      }, [collections, sortBy]);
+
+      const handleOpenProject = (project) => {
+        window.location.href = `/story-builder.html?project=${project.id}`;
+      };
+
+      const handleDeleteProject = async () => {
+        if (deleteModal.project) {
+          await deleteProject(deleteModal.project.id);
+          setDeleteModal({ open: false, project: null });
+        }
+      };
+
+      const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+        
+        if (diffDays === 0) return 'Today';
+        if (diffDays === 1) return 'Yesterday';
+        if (diffDays < 7) return `${diffDays} days ago`;
+        
+        return date.toLocaleDateString('en-US', { 
+          month: 'short', 
+          day: 'numeric',
+          year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
+        });
+      };
+
+      return (
+        <div className="page-container">
+          <Sidebar />
+          <Header user={user} profile={profile} />
+          
+          <main className="main-content collections-content">
+            {authLoading ? (
+              <div className="loading-state">Loading...</div>
+            ) : !user ? (
+              <div className="login-prompt">
+                <h2>Sign in to view your collections</h2>
+                <p>Create an account or sign in to save and manage your collections.</p>
+                <button 
+                  className="btn btn-primary"
+                  onClick={() => setAuthModalOpen(true)}
+                >
+                  Sign In
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="collections-header">
+                  <h1 className="collections-title">
+                    My Collections
+                    <span className="collections-count">({collections.length})</span>
+                  </h1>
+                  
+                  <div className="sort-buttons">
+                    <button
+                      className={`sort-btn ${sortBy === 'date' ? 'active' : ''}`}
+                      onClick={() => setSortBy('date')}
+                    >
+                      By Date
+                    </button>
+                    <button
+                      className={`sort-btn ${sortBy === 'title' ? 'active' : ''}`}
+                      onClick={() => setSortBy('title')}
+                    >
+                      By Title
+                    </button>
+                  </div>
+                </div>
+
+                {isLoading ? (
+                  <div className="loading-state">Loading collections...</div>
+                ) : sortedCollections.length === 0 ? (
+                  <div className="empty-state">
+                    <div className="empty-icon">
+                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                      </svg>
+                    </div>
+                    <h3 className="empty-title">No collections yet</h3>
+                    <p className="empty-text">Start creating your first project by telling your story.</p>
+                    <a href="/story-builder.html" className="btn btn-primary">
+                      Start Creating
+                      <Icons.arrowRight />
+                    </a>
+                  </div>
+                ) : (
+                  <div className="collections-grid">
+                    {sortedCollections.map(project => (
+                      <div 
+                        key={project.id}
+                        className="project-card"
+                        onClick={() => handleOpenProject(project)}
+                      >
+                        <div className="project-thumbnail">
+                          {project.selected_styles?.[0] && (
+                            <img 
+                              src={`https://pub-d4d49982f29749dea52e2eb37c29ad51.r2.dev/${project.selected_styles[0]}/${project.selected_styles[0]}_1.webp`}
+                              alt=""
+                              onError={e => e.target.style.display = 'none'}
+                            />
+                          )}
+                        </div>
+                        
+                        <div className="project-info">
+                          <h3 className="project-title">
+                            {project.title || 'Untitled Project'}
+                          </h3>
+                          <p className="project-preview">
+                            {project.story ? project.story.slice(0, 80) + (project.story.length > 80 ? '...' : '') : 'No story yet'}
+                          </p>
+                        </div>
+                        
+                        <div className="project-meta">
+                          <div className="project-date">{formatDate(project.updated_at)}</div>
+                          <div className="project-styles">
+                            {project.selected_styles?.length || 0} style{project.selected_styles?.length !== 1 ? 's' : ''}
+                          </div>
+                        </div>
+                        
+                        <div className="project-actions">
+                          <button
+                            className="action-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOpenProject(project);
+                            }}
+                            title="Edit project"
+                          >
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                          </button>
+                          <button
+                            className="action-btn delete"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDeleteModal({ open: true, project });
+                            }}
+                            title="Delete project"
+                          >
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <polyline points="3 6 5 6 21 6"></polyline>
+                              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+          </main>
+          
+          <Footer />
+          
+          {/* Delete Confirmation Modal */}
+          <window.SocietyArts.DeleteProjectModal
+            isOpen={deleteModal.open}
+            onClose={() => setDeleteModal({ open: false, project: null })}
+            onConfirm={handleDeleteProject}
+            projectTitle={deleteModal.project?.title}
+          />
+          
+          {/* Auth Modal */}
+          <window.SocietyArts.AuthModal 
+            isOpen={authModalOpen}
+            onClose={() => setAuthModalOpen(false)}
+          />
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    
+    // Wait for all components to be loaded
+    function waitForComponents(callback, maxAttempts = 50) {
+      let attempts = 0;
+      const check = () => {
+        attempts++;
+        if (window.SocietyArts?.Sidebar && window.SocietyArts?.Header && window.SocietyArts?.useAuth) {
+          callback();
+        } else if (attempts < maxAttempts) {
+          setTimeout(check, 100);
+        } else {
+          console.error('Components failed to load');
+          callback();
+        }
+      };
+      check();
+    }
+    
+    waitForComponents(() => {
+      root.render(<CollectionsPage />);
+    });
+  </script>
+</body>
+</html>

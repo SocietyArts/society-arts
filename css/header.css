@@ -18,11 +18,46 @@
 }
 
 /* ========================================
+   PERSISTENT LOGO BAR (Always visible)
+   ======================================== */
+.logo-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--logo-bar-height);
+    background-color: var(--color-surface, #F9F8F6);
+    border-bottom: 1px solid var(--color-tan-20, #E7E2DC);
+    z-index: 250;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+}
+
+.logo-bar-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+}
+
+.logo-bar-icon {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+}
+
+.logo-bar-text {
+    height: 18px;
+    width: auto;
+}
+
+/* ========================================
    PERSISTENT SIDEBAR
    ======================================== */
 .app-sidebar {
     position: fixed;
-    top: 0;
+    top: var(--logo-bar-height);
     left: 0;
     bottom: 0;
     width: var(--sidebar-width-collapsed);

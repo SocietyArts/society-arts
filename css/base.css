@@ -78,7 +78,8 @@ input, select, textarea {
   display: flex;
   flex-direction: column;
   background: var(--color-background);
-  padding-top: 64px; /* Account for fixed header */
+  padding-top: var(--logo-bar-height, 48px); /* Account for fixed logo bar */
+  padding-left: var(--sidebar-width-collapsed, 50px); /* Account for sidebar */
 }
 
 .main-content {

@@ -28,10 +28,20 @@
   <link rel="stylesheet" href="/css/auth.css">
   
   <style>
-    /* Story Builder Layout */
+    /* Story Builder - Fixed Layout with only chat scrolling */
+    .page-container {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      padding-left: var(--sidebar-width-collapsed, 50px);
+      padding-top: var(--logo-bar-height, 48px);
+    }
+    
+    /* Story Builder Layout - 3 columns with proportional sizing */
     .story-builder-layout {
       display: grid;
-      grid-template-columns: var(--sidebar-width) 1fr var(--sidebar-width);
+      grid-template-columns: minmax(280px, 1fr) minmax(400px, 2fr) minmax(280px, 1fr);
       gap: var(--space-xl);
       padding: var(--space-xl) var(--space-2xl);
       flex: 1;
@@ -39,6 +49,7 @@
       overflow: hidden;
     }
     
+    /* Left and Right panels - no scroll, fixed content */
     .story-panel {
       display: flex;
       flex-direction: column;
@@ -46,15 +57,17 @@
       overflow-y: auto;
       min-width: 0;
       padding-right: var(--space-xs);
+      max-height: 100%;
     }
     
-    /* Chat Container */
+    /* Chat Container - this is what scrolls */
     .chat-container {
       background-color: var(--color-tan-10);
       border-radius: var(--radius-lg);
       display: flex;
       flex-direction: column;
       height: 100%;
+      max-height: 100%;
       overflow: hidden;
     }
     
@@ -80,6 +93,7 @@
       padding: var(--space-md) var(--space-xl);
       background-color: var(--color-surface-hover);
       border-bottom: 1px solid var(--color-border-dark);
+      flex-shrink: 0;
     }
     
     .voice-mode-text {
@@ -88,6 +102,7 @@
       font-weight: var(--weight-medium);
     }
     
+    /* Messages - THIS is the scrollable area */
     .messages-container {
       flex: 1;
       overflow-y: auto;
@@ -95,6 +110,36 @@
       display: flex;
       flex-direction: column;
       gap: var(--space-lg);
+    }
+    
+    /* Styles panel - scrollable within its bounds */
+    .styles-panel {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+      overflow-y: auto;
+      max-height: 100%;
+    }
+    
+    /* Footer - fixed at bottom */
+    .app-footer {
+      flex-shrink: 0;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 1200px) {
+      .story-builder-layout {
+        grid-template-columns: minmax(240px, 1fr) minmax(350px, 2fr) minmax(240px, 1fr);
+        gap: var(--space-lg);
+        padding: var(--space-lg);
+      }
+    }
+    
+    @media (max-width: 900px) {
+      .story-builder-layout {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr auto;
+      }
     }
     
     /* Welcome State */

@@ -1071,6 +1071,7 @@ Object.assign(window.SocietyArts, {
     // State
     allStyles: () => allStyles,
     filteredStyles: () => filteredStyles,
+    getStyleFromCache: (styleId) => allStyles.find(s => s.id === styleId),
     isLoading: () => isLoading,
     STYLES_PER_PAGE
 });

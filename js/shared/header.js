@@ -15,13 +15,13 @@ const SIDEBAR_CONFIG = {
     wordmarkUrl: 'https://pub-acb560f551f141db830964aed1fa005f.r2.dev/site-assets/SA_Wordmark_Brown%401x.png',
     logoAlt: 'Society Arts',
     
-    // Main navigation items
+    // Main navigation items - Updated order: Home, Story Builder, Style Finder, Favorites, Collections
     navItems: [
         { id: 'home', label: 'Home', href: 'index.html', icon: 'home' },
-        { id: 'style-finder', label: 'Style Finder', href: 'style-finder.html', icon: 'grid' },
         { id: 'story-builder', label: 'Story Builder', href: 'story-builder.html', icon: 'edit' },
+        { id: 'style-finder', label: 'Style Finder', href: 'style-finder.html', icon: 'grid' },
         { id: 'favorites', label: 'Favorites', href: 'favorites.html', icon: 'heart' },
-        { id: 'projects', label: 'Projects', href: 'projects.html', icon: 'folder' }
+        { id: 'collections', label: 'Collections', href: 'collections.html', icon: 'layers' }
     ],
     
     // Bottom navigation items
@@ -41,6 +41,7 @@ const HEADER_ICONS = {
     edit: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>`,
     heart: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>`,
     folder: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>`,
+    layers: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`,
     settings: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>`,
     help: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`,
     
@@ -51,6 +52,7 @@ const HEADER_ICONS = {
     logout: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>`,
     users: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>`,
     close: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`,
+    filter: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>`,
     
     // Help modal icons
     book: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>`,
@@ -69,9 +71,11 @@ function getCurrentPageId() {
     const pageMap = {
         'index': 'home',
         'style-finder': 'style-finder',
+        'style-finder-2': 'style-finder',
         'story-builder': 'story-builder',
         'favorites': 'favorites',
-        'projects': 'projects'
+        'collections': 'collections',
+        'projects': 'collections'
     };
     return pageMap[page] || 'home';
 }
@@ -145,24 +149,24 @@ if (typeof React !== 'undefined') {
         };
 
         return React.createElement(React.Fragment, null,
-            // Sidebar
+            // Persistent Logo Bar (always visible at top)
+            React.createElement('div', { className: 'logo-bar' },
+                React.createElement('a', { href: 'index.html', className: 'logo-bar-link' },
+                    React.createElement('img', {
+                        src: SIDEBAR_CONFIG.monogramUrl,
+                        alt: SIDEBAR_CONFIG.logoAlt,
+                        className: 'logo-bar-icon'
+                    }),
+                    React.createElement('img', {
+                        src: SIDEBAR_CONFIG.wordmarkUrl,
+                        alt: SIDEBAR_CONFIG.logoAlt,
+                        className: 'logo-bar-text'
+                    })
+                )
+            ),
+            
+            // Sidebar (below logo bar)
             React.createElement('aside', { className: 'app-sidebar' },
-                // Logo section
-                React.createElement('div', { className: 'sidebar-logo' },
-                    React.createElement('a', { href: 'index.html', className: 'sidebar-logo-link' },
-                        React.createElement('img', {
-                            src: SIDEBAR_CONFIG.monogramUrl,
-                            alt: SIDEBAR_CONFIG.logoAlt,
-                            className: 'sidebar-logo-icon'
-                        }),
-                        React.createElement('img', {
-                            src: SIDEBAR_CONFIG.wordmarkUrl,
-                            alt: SIDEBAR_CONFIG.logoAlt,
-                            className: 'sidebar-logo-text'
-                        })
-                    )
-                ),
-                
                 // Main navigation
                 React.createElement('nav', { className: 'sidebar-nav' },
                     React.createElement('ul', { className: 'sidebar-nav-list' },

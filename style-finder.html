@@ -357,7 +357,7 @@
         .search-input {
             width: 100%;
             padding: 12px 16px;
-            padding-right: 40px;
+            padding-right: 80px;
             border: 1px solid var(--color-tan-20, #E7E2DC);
             border-radius: 9999px;
             font-family: 'Familjen Grotesk', sans-serif;
@@ -365,6 +365,114 @@
             color: var(--color-brown, #3E2318);
             background: white;
             transition: all 0.15s ease;
+        }
+        
+        /* Advanced Search Button */
+        .advanced-search-btn {
+            position: absolute;
+            right: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--color-brown-60, #8B7B75);
+            padding: 6px;
+            border-radius: 6px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+        }
+        
+        .advanced-search-btn:hover {
+            background: var(--color-tan-20, #E7E2DC);
+            color: var(--color-brown, #3E2318);
+        }
+        
+        .advanced-search-btn.active {
+            background: var(--color-orange-dark, #C73314);
+            color: white;
+        }
+        
+        /* Advanced Search Dropdown */
+        .advanced-search-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            width: 320px;
+            background: white;
+            border: 1px solid var(--color-tan-20, #E7E2DC);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(62, 35, 24, 0.15);
+            z-index: 100;
+            display: none;
+            padding: 16px;
+        }
+        
+        .advanced-search-dropdown.open {
+            display: block;
+        }
+        
+        .advanced-search-dropdown h4 {
+            font-family: 'Familjen Grotesk', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--color-brown, #3E2318);
+            margin: 0 0 12px 0;
+        }
+        
+        .search-filter-group {
+            margin-bottom: 12px;
+        }
+        
+        .search-filter-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Familjen Grotesk', sans-serif;
+            font-size: 13px;
+            color: var(--color-brown, #3E2318);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+            transition: background 0.15s ease;
+        }
+        
+        .search-filter-label:hover {
+            background: var(--color-tan-10, #F3F1EE);
+        }
+        
+        .search-filter-label input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--color-orange-dark, #C73314);
+        }
+        
+        .search-filter-label input[type="radio"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--color-orange-dark, #C73314);
+        }
+        
+        .search-apply-btn {
+            width: 100%;
+            padding: 10px 16px;
+            background: var(--color-brown, #3E2318);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Familjen Grotesk', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: background 0.15s ease;
+        }
+        
+        .search-apply-btn:hover {
+            background: var(--color-brown-80, #5C4336);
         }
         
         .search-input::placeholder {
@@ -548,11 +656,35 @@
             border-color: var(--color-tan-40, #CFC5B9);
         }
         
-        /* Style Grid - A++ Brand */
+        /* Style Grid - A++ Brand - 6 columns on large screens */
         .styles-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 16px;
+        }
+        
+        @media (max-width: 1600px) {
+            .styles-grid {
+                grid-template-columns: repeat(5, 1fr);
+            }
+        }
+        
+        @media (max-width: 1200px) {
+            .styles-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        @media (max-width: 900px) {
+            .styles-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .styles-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
         
         .style-card {
@@ -700,8 +832,9 @@
             background: var(--color-brown, #3E2318);
         }
         
+        /* Card info - Hidden by default, title shows in menu */
         .style-card-info {
-            padding: 8px 12px 12px;
+            display: none;
         }
         
         /* Card Title - A++ Typography: Familjen Grotesk SemiBold 17px */
@@ -1312,6 +1445,21 @@
             color: #dc3545;
         }
         
+        /* Context Menu Header (shows style name) */
+        .context-menu-header {
+            padding: 12px 16px;
+            font-family: 'Familjen Grotesk', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--color-brown, #3E2318);
+            border-bottom: 1px solid var(--color-tan-20, #E7E2DC);
+            background: var(--color-tan-5, #F9F8F6);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 250px;
+        }
+        
         /* Collection Modal */
         .collection-modal {
             display: none;
@@ -1536,15 +1684,10 @@
             background: #c82333;
         }
         
-        /* Responsive */
+        /* Responsive - Small screens */
         @media (max-width: 768px) {
             .filter-sidebar {
                 display: none;
-            }
-            
-            .styles-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 1rem;
             }
             
             .style-modal-gallery {
@@ -1866,8 +2009,52 @@
             <div class="sticky-header">
                 <div class="search-bar">
                     <div class="search-input-wrapper">
-                        <input type="text" class="search-input" id="searchInput" placeholder="Search styles... (try: photography black white)">
+                        <input type="text" class="search-input" id="searchInput" placeholder="Search styles...">
+                        <button class="advanced-search-btn" id="advancedSearchBtn" title="Advanced search options">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                            </svg>
+                        </button>
                         <button class="search-clear-btn" id="searchClearBtn" title="Clear search">✕</button>
+                        
+                        <!-- Advanced Search Dropdown -->
+                        <div class="advanced-search-dropdown" id="advancedSearchDropdown">
+                            <h4>Search Options</h4>
+                            <div class="search-filter-group">
+                                <label class="search-filter-label">
+                                    <input type="radio" name="searchField" value="all" checked>
+                                    Search all fields
+                                </label>
+                                <label class="search-filter-label">
+                                    <input type="radio" name="searchField" value="name">
+                                    Title only
+                                </label>
+                                <label class="search-filter-label">
+                                    <input type="radio" name="searchField" value="tagline">
+                                    Tagline only
+                                </label>
+                                <label class="search-filter-label">
+                                    <input type="radio" name="searchField" value="tags">
+                                    Tags only
+                                </label>
+                            </div>
+                            <h4>Match Type</h4>
+                            <div class="search-filter-group">
+                                <label class="search-filter-label">
+                                    <input type="radio" name="matchType" value="any" checked>
+                                    Match any word
+                                </label>
+                                <label class="search-filter-label">
+                                    <input type="radio" name="matchType" value="all">
+                                    Match all words
+                                </label>
+                                <label class="search-filter-label">
+                                    <input type="radio" name="matchType" value="exact">
+                                    Exact phrase
+                                </label>
+                            </div>
+                            <button class="search-apply-btn" id="applySearchOptions">Apply</button>
+                        </div>
                     </div>
                     <div class="sort-container">
                         <label for="sortSelect">Sort:</label>
@@ -2055,6 +2242,9 @@
     
     <!-- Context Menu -->
     <div class="context-menu" id="contextMenu">
+        <div class="context-menu-header" id="contextMenuHeader">
+            <!-- Style name inserted dynamically -->
+        </div>
         <button class="context-menu-item" id="menuSave">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
@@ -2835,6 +3025,47 @@
         }
         
         searchInput.addEventListener('input', (e) => handleSearch(e.target.value));
+        
+        // Advanced Search Toggle
+        const advancedSearchBtn = document.getElementById('advancedSearchBtn');
+        const advancedSearchDropdown = document.getElementById('advancedSearchDropdown');
+        const applySearchOptions = document.getElementById('applySearchOptions');
+        
+        // Search options state
+        let searchOptions = {
+            field: 'all',
+            matchType: 'any'
+        };
+        
+        advancedSearchBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            advancedSearchDropdown.classList.toggle('open');
+            advancedSearchBtn.classList.toggle('active', advancedSearchDropdown.classList.contains('open'));
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!advancedSearchDropdown.contains(e.target) && e.target !== advancedSearchBtn) {
+                advancedSearchDropdown.classList.remove('open');
+                advancedSearchBtn.classList.remove('active');
+            }
+        });
+        
+        applySearchOptions.addEventListener('click', () => {
+            // Get selected options
+            const fieldRadio = document.querySelector('input[name="searchField"]:checked');
+            const matchRadio = document.querySelector('input[name="matchType"]:checked');
+            
+            searchOptions.field = fieldRadio ? fieldRadio.value : 'all';
+            searchOptions.matchType = matchRadio ? matchRadio.value : 'any';
+            
+            // Close dropdown
+            advancedSearchDropdown.classList.remove('open');
+            advancedSearchBtn.classList.toggle('active', searchOptions.field !== 'all' || searchOptions.matchType !== 'any');
+            
+            // Re-run search with new options
+            handleSearch(searchInput.value);
+        });
         
         // Search clear button
         searchClearBtn.addEventListener('click', async () => {
@@ -3730,10 +3961,16 @@
         // ============================================
         // Context Menu
         // ============================================
+        const contextMenuHeader = document.getElementById('contextMenuHeader');
+        
         function openContextMenu(event, styleId, imageUrl) {
             event.preventDefault();
             currentMenuStyleId = styleId;
             currentMenuImageUrl = imageUrl;
+            
+            // Get style name from cached data (synchronous)
+            const style = SocietyArts.getStyleFromCache(styleId);
+            contextMenuHeader.textContent = style ? style.name : 'Style Options';
             
             const x = Math.min(event.clientX, window.innerWidth - 220);
             const y = Math.min(event.clientY, window.innerHeight - 200);
