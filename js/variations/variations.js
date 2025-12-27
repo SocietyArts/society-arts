@@ -61,7 +61,7 @@ function getFallbackConfig() {
       },
       removePeople: {
         id: 'removePeople',
-        label: 'Remove People',
+        label: 'No People',
         description: 'Take out human figures',
         icon: 'userMinus',
         instructions: 'Remove all human figures while preserving the scene, mood, and atmosphere. Focus on environment, objects, and nature.'

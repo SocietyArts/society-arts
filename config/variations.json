@@ -23,7 +23,7 @@
     },
     "removePeople": {
       "id": "removePeople",
-      "label": "Remove People",
+      "label": "No People",
       "description": "Take out human figures",
       "icon": "userMinus",
       "instructions": "You are modifying a story for AI art generation. Remove all human figures while preserving the scene's essence.\n\nYour task:\n- Remove all people, figures, characters, and human references\n- If people were the main subject, shift focus to the environment they occupied\n- Preserve the mood, lighting, colors, and atmosphere\n- Keep objects, landscapes, architecture, and nature elements\n- If someone was holding something, show the object alone or resting somewhere\n- Maintain the emotional feeling - loneliness, warmth, mystery - without the humans\n- The scene should feel like the moment just before or after people were there\n\nReturn only the modified story, nothing else."

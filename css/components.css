@@ -754,25 +754,128 @@
 
 /* ========================================
    UNIFIED INPUT (TEXT/VOICE)
+   New design: Text input + push-to-talk + voice toggle
    ======================================== */
 
-.unified-input {
-  background: white;
-  border-radius: 28px;
-  transition: all 0.3s ease;
-  position: relative;
+/* Main wrapper - horizontal layout */
+.unified-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 560px;
 }
 
-/* TEXT MODE */
+/* Push-to-talk section - appears when voice mode is on */
+.push-to-talk-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.push-to-talk-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 2px solid var(--color-tan-40, #CFC5B9);
+  background: white;
+  color: var(--color-brown-60, #8B7B75);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+.push-to-talk-btn:hover:not(:disabled) {
+  border-color: var(--color-accent, #C73314);
+  color: var(--color-accent, #C73314);
+}
+
+.push-to-talk-btn:active:not(:disabled),
+.push-to-talk-btn.active {
+  background: var(--color-accent, #C73314);
+  border-color: var(--color-accent, #C73314);
+  color: white;
+  transform: scale(1.08);
+  box-shadow: 0 4px 20px rgba(199, 51, 20, 0.3);
+}
+
+.push-to-talk-btn.speaking {
+  background: var(--color-tan-10, #F3F1EE);
+  border-color: var(--color-tan-40, #CFC5B9);
+  color: var(--color-accent, #C73314);
+  cursor: not-allowed;
+}
+
+.push-to-talk-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Pulse animation when actively listening */
+.push-to-talk-pulse {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid var(--color-accent, #C73314);
+  animation: push-pulse 1.2s ease-out infinite;
+  pointer-events: none;
+}
+
+@keyframes push-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+
+.push-to-talk-status {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-brown-60, #8B7B75);
+  white-space: nowrap;
+}
+
+.push-to-talk-btn.active + .push-to-talk-status,
+.push-to-talk-section:has(.push-to-talk-btn.active) .push-to-talk-status {
+  color: var(--color-accent, #C73314);
+}
+
+/* Text input section */
 .unified-input-text {
-  padding: 0;
+  flex: 1;
+  background: white;
+  border-radius: 28px;
+  border: 1px solid var(--color-tan-20, #E7E2DC);
+  transition: all 0.2s ease;
+  min-width: 0;
+}
+
+.unified-input-text:focus-within {
+  border-color: var(--color-tan-40, #CFC5B9);
+  box-shadow: 0 0 0 3px rgba(135, 111, 81, 0.1);
+}
+
+.unified-input-text.voice-active {
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 .unified-input-inner {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 14px 20px;
+  padding: 12px 18px;
 }
 
 .unified-input-field {
@@ -780,209 +883,113 @@
   border: none;
   background: transparent;
   font-size: 15px;
-  color: var(--color-text-primary);
+  color: var(--color-brown, #3E2318);
   outline: none;
   font-family: var(--font-sans);
+  min-width: 0;
 }
 
 .unified-input-field::placeholder {
-  color: var(--color-text-muted);
+  color: var(--color-brown-60, #8B7B75);
 }
 
 .unified-input-field:disabled {
   opacity: 0.6;
 }
 
-.unified-mode-toggle {
+/* Voice toggle switch */
+.voice-toggle-container {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: none;
-  background: var(--color-accent);
-  color: white;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  gap: 8px;
   flex-shrink: 0;
 }
 
-.unified-mode-toggle:hover:not(:disabled) {
-  background: var(--color-accent-hover);
-  transform: scale(1.05);
+.voice-toggle-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-brown-60, #8B7B75);
 }
 
-.unified-mode-toggle:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* VOICE MODE */
-.unified-input-voice {
-  padding: 24px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-height: 80px;
-}
-
-.unified-voice-content {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex: 1;
+.voice-toggle-switch {
   position: relative;
-}
-
-.unified-mic-button {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  border: 2px solid var(--color-border);
-  background: white;
-  color: var(--color-text-secondary);
+  width: 44px;
+  height: 26px;
+  border-radius: 13px;
+  border: none;
+  background: var(--color-tan-20, #E7E2DC);
   cursor: pointer;
   transition: all 0.2s ease;
-  z-index: 2;
+  padding: 0;
 }
 
-.unified-mic-button:hover:not(:disabled) {
-  border-color: var(--color-accent);
-  color: var(--color-accent);
+.voice-toggle-switch:hover:not(:disabled) {
+  background: var(--color-tan-40, #CFC5B9);
 }
 
-.unified-mic-button:active:not(:disabled),
-.unified-mic-button.active {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-  color: white;
-  transform: scale(1.05);
+.voice-toggle-switch.active {
+  background: var(--color-accent, #C73314);
 }
 
-.unified-mic-button.speaking {
-  background: var(--color-surface-alt);
-  border-color: var(--color-border);
-  color: var(--color-accent);
-}
-
-.unified-mic-button.muted {
-  background: var(--color-surface-alt);
-  border-color: var(--color-border);
-  color: var(--color-text-muted);
-}
-
-.unified-mic-button.muted:hover:not(:disabled) {
-  border-color: var(--color-text-secondary);
-  color: var(--color-text-secondary);
-}
-
-.unified-mic-button:disabled {
+.voice-toggle-switch:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-/* Pulse ring animation */
-.voice-pulse-ring {
+.voice-toggle-knob {
   position: absolute;
-  left: 0;
-  width: 56px;
-  height: 56px;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
-  border: 2px solid var(--color-accent);
-  animation: pulse-ring 1.5s ease-out infinite;
-  z-index: 1;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s ease;
 }
 
-@keyframes pulse-ring {
-  0% {
-    transform: scale(1);
-    opacity: 0.8;
-  }
-  100% {
-    transform: scale(1.6);
-    opacity: 0;
-  }
+.voice-toggle-switch.active .voice-toggle-knob {
+  transform: translateX(18px);
 }
 
-.unified-voice-status {
-  font-size: 15px;
-  color: var(--color-text-secondary);
-  font-weight: var(--weight-medium);
-}
-
-.unified-input-voice.listening .unified-voice-status {
-  color: var(--color-accent);
-}
-
-.unified-input-voice.speaking .unified-voice-status {
-  color: var(--color-text-muted);
-}
-
-.unified-input-voice.muted .unified-voice-status {
-  color: var(--color-text-muted);
-}
-
-/* Text mode toggle in voice mode */
-.unified-mode-toggle-text {
-  background: var(--color-surface-alt);
-  color: var(--color-text-secondary);
-}
-
-.unified-mode-toggle-text:hover:not(:disabled) {
-  background: var(--color-border);
-  color: var(--color-text-primary);
-}
-
-/* Voice mode state colors */
-.unified-input-voice.listening {
-  background: linear-gradient(135deg, #fff 0%, rgba(199, 91, 63, 0.05) 100%);
-}
-
-.unified-input-voice.speaking {
-  background: linear-gradient(135deg, #fff 0%, rgba(199, 91, 63, 0.03) 100%);
-}
-
-/* Responsive */
-@media (max-width: 480px) {
-  .unified-input-voice {
-    flex-direction: column;
-    gap: 16px;
-    padding: 20px;
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .unified-input-wrapper {
+    flex-wrap: wrap;
+    gap: 10px;
   }
   
-  .unified-voice-content {
-    flex-direction: column;
-    text-align: center;
+  .push-to-talk-section {
+    order: -1;
+    width: 100%;
+    justify-content: center;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--color-tan-20, #E7E2DC);
+    margin-bottom: 4px;
   }
   
-  .voice-pulse-ring {
-    left: 50%;
-    transform: translateX(-50%);
+  .unified-input-text {
+    flex: 1;
+    min-width: 150px;
   }
   
-  @keyframes pulse-ring {
-    0% {
-      transform: translateX(-50%) scale(1);
-      opacity: 0.8;
-    }
-    100% {
-      transform: translateX(-50%) scale(1.6);
-      opacity: 0;
-    }
+  .voice-toggle-container {
+    flex-shrink: 0;
   }
-  
-  .unified-mode-toggle-text {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    width: 36px;
-    height: 36px;
-  }
+}
+
+/* Legacy classes for backward compatibility */
+.unified-input {
+  display: none;
+}
+
+.unified-input-voice,
+.unified-mode-toggle,
+.unified-mic-button,
+.unified-voice-content,
+.unified-voice-status,
+.voice-pulse-ring {
+  display: none;
 }
 
 /* ========================================

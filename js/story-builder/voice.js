@@ -261,7 +261,7 @@ function useVoiceInterface({ onUserMessage, onAssistantMessage }) {
 
 /**
  * Unified Input Component
- * Transforms between text and voice modes
+ * Text mode with voice toggle, push-to-talk when voice enabled
  */
 function UnifiedInput({ 
   voiceMode,
@@ -274,6 +274,7 @@ function UnifiedInput({
   placeholder = "Start your story..."
 }) {
   const inputRef = React.useRef(null);
+  const [isHolding, setIsHolding] = React.useState(false);
 
   // Handle key down in text mode
   const handleKeyDown = (e) => {
@@ -283,34 +284,29 @@ function UnifiedInput({
     }
   };
 
-  // Toggle to voice mode
-  const handleSwitchToVoice = () => {
-    // Send any pending text first
-    if (inputValue.trim()) {
-      onSendMessage();
-    }
-    onToggleMode(true);
+  // Handle voice mode toggle
+  const handleVoiceToggle = () => {
+    onToggleMode(!voiceMode);
   };
 
-  // Toggle to text mode
-  const handleSwitchToText = () => {
-    if (voice?.isListening) {
-      voice.stopListening();
-    }
-    onToggleMode(false);
-  };
-
-  // Toggle mute/unmute (Zoom-style)
-  const handleMicClick = (e) => {
+  // Push-to-talk handlers
+  const handlePushStart = (e) => {
     e.preventDefault();
+    if (!voice?.isConnected || voice?.isSpeaking) return;
     
+    setIsHolding(true);
+    if (!voice.isListening) {
+      voice.startListening();
+    }
+  };
+
+  const handlePushEnd = (e) => {
+    e.preventDefault();
     if (!voice?.isConnected) return;
-    if (voice?.isSpeaking) return; // Don't allow mute toggle while AI is speaking
     
+    setIsHolding(false);
     if (voice.isListening) {
       voice.stopListening();
-    } else {
-      voice.startListening();
     }
   };
 
@@ -321,46 +317,25 @@ function UnifiedInput({
     if (!voice.isConnected) return 'Connecting...';
     if (voice.isSpeaking) return 'Speaking...';
     if (voice.isListening) return 'Listening...';
-    return 'Muted';
+    return 'Hold to talk';
   };
-
-  // Early return if voice not ready
-  const isVoiceReady = voice && voice.isConnected !== undefined;
 
   // Icons
   const MicIcon = () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
       <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
       <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-      <line x1="12" y1="19" x2="12" y2="23"></line>
-      <line x1="8" y1="23" x2="16" y2="23"></line>
-    </svg>
-  );
-
-  const MicOffIcon = () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <line x1="1" y1="1" x2="23" y2="23"></line>
-      <path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path>
-      <path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"></path>
       <line x1="12" y1="19" x2="12" y2="23"></line>
       <line x1="8" y1="23" x2="16" y2="23"></line>
     </svg>
   );
 
   const MicIconSmall = () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
       <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
       <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
       <line x1="12" y1="19" x2="12" y2="23"></line>
       <line x1="8" y1="23" x2="16" y2="23"></line>
-    </svg>
-  );
-
-  const TextIcon = () => (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <polyline points="4 7 4 4 20 4 20 7"></polyline>
-      <line x1="9" y1="20" x2="15" y2="20"></line>
-      <line x1="12" y1="4" x2="12" y2="20"></line>
     </svg>
   );
 
@@ -371,81 +346,73 @@ function UnifiedInput({
   );
 
   const SpeakerIcon = () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
       <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
       <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
     </svg>
   );
 
-  // Determine mic button icon
-  const getMicButtonIcon = () => {
-    if (voice?.isSpeaking) return <SpeakerIcon />;
-    if (voice?.isListening) return <MicIcon />;
-    return <MicOffIcon />;
-  };
+  // Voice Toggle Switch Component
+  const VoiceToggle = ({ enabled, onChange, disabled }) => (
+    <div className="voice-toggle-container">
+      <span className="voice-toggle-label">Voice</span>
+      <button 
+        className={`voice-toggle-switch ${enabled ? 'active' : ''}`}
+        onClick={onChange}
+        disabled={disabled}
+        aria-label={enabled ? 'Disable voice mode' : 'Enable voice mode'}
+      >
+        <span className="voice-toggle-knob"></span>
+      </button>
+    </div>
+  );
 
-  // TEXT MODE
-  if (!voiceMode) {
-    return (
-      <div className="unified-input unified-input-text">
+  // Combined layout with text input + optional push-to-talk + voice toggle
+  return (
+    <div className="unified-input-wrapper">
+      {/* Push-to-talk button - only visible when voice mode is on */}
+      {voiceMode && (
+        <div className="push-to-talk-section">
+          <button
+            className={`push-to-talk-btn ${voice?.isListening ? 'active' : ''} ${voice?.isSpeaking ? 'speaking' : ''}`}
+            onMouseDown={handlePushStart}
+            onMouseUp={handlePushEnd}
+            onMouseLeave={handlePushEnd}
+            onTouchStart={handlePushStart}
+            onTouchEnd={handlePushEnd}
+            onTouchCancel={handlePushEnd}
+            disabled={!voice?.isConnected || voice?.isSpeaking}
+          >
+            {voice?.isSpeaking ? <SpeakerIcon /> : <MicIcon />}
+            {voice?.isListening && <div className="push-to-talk-pulse"></div>}
+          </button>
+          <span className="push-to-talk-status">{getVoiceStatus()}</span>
+        </div>
+      )}
+
+      {/* Text input - always visible but dimmed when voice active */}
+      <div className={`unified-input-text ${voiceMode ? 'voice-active' : ''}`}>
         <div className="unified-input-inner">
           <PencilIcon />
           <input
             ref={inputRef}
             type="text"
             className="unified-input-field"
-            placeholder={placeholder}
+            placeholder={voiceMode ? "Voice mode active..." : placeholder}
             value={inputValue}
             onChange={(e) => onInputChange(e.target.value)}
             onKeyDown={handleKeyDown}
-            disabled={isLoading}
+            disabled={isLoading || voiceMode}
           />
-          <button 
-            className="unified-mode-toggle"
-            onClick={handleSwitchToVoice}
-            title="Switch to voice mode"
-            disabled={isLoading}
-          >
-            <MicIconSmall />
-          </button>
         </div>
       </div>
-    );
-  }
 
-  // VOICE MODE
-  const isMuted = voice?.isConnected && !voice?.isListening && !voice?.isSpeaking;
-  
-  return (
-    <div className={`unified-input unified-input-voice ${voice?.isListening ? 'listening' : ''} ${voice?.isSpeaking ? 'speaking' : ''} ${isMuted ? 'muted' : ''}`}>
-      <div className="unified-voice-content">
-        {/* Pulsing ring when listening */}
-        {voice?.isListening && (
-          <div className="voice-pulse-ring"></div>
-        )}
-        
-        {/* Main mic button - Zoom style mute toggle */}
-        <button
-          className={`unified-mic-button ${voice?.isListening ? 'active' : ''} ${voice?.isSpeaking ? 'speaking' : ''} ${isMuted ? 'muted' : ''}`}
-          onClick={handleMicClick}
-          disabled={!voice?.isConnected || voice?.isSpeaking}
-          title={voice?.isListening ? 'Mute' : 'Unmute'}
-        >
-          {getMicButtonIcon()}
-        </button>
-        
-        {/* Status text */}
-        <span className="unified-voice-status">{getVoiceStatus()}</span>
-      </div>
-      
-      {/* Switch to text mode */}
-      <button 
-        className="unified-mode-toggle unified-mode-toggle-text"
-        onClick={handleSwitchToText}
-        title="Switch to text mode"
-      >
-        <TextIcon />
-      </button>
+      {/* Voice toggle - always on right */}
+      <VoiceToggle 
+        enabled={voiceMode}
+        onChange={handleVoiceToggle}
+        disabled={isLoading}
+      />
     </div>
   );
 }
