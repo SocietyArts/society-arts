@@ -1,63 +1,85 @@
 /* ========================================
    SOCIETY ARTS - CSS VARIABLES
-   Centralized design tokens
-   Version: 2.0
+   Brand Design System v3.0
    ======================================== */
 
 :root {
-  /* ======== COLORS ======== */
+  /* ======== BRAND COLORS ======== */
+  
+  /* Brown Scale (Primary Text) */
+  --color-brown: rgba(62, 35, 24, 1);           /* #3E2318 - Primary text, headings */
+  --color-brown-60: rgba(139, 123, 117, 1);     /* #8B7B75 - Secondary text */
+  --color-brown-40: rgba(178, 167, 163, 1);     /* #B2A7A3 - Muted text */
+  
+  /* Tan Scale (Backgrounds) */
+  --color-tan: rgba(135, 111, 81, 1);           /* #876F51 - Accent tan */
+  --color-tan-60: rgba(183, 169, 151, 1);       /* #B7A997 */
+  --color-tan-40: rgba(207, 197, 185, 1);       /* #CFC5B9 */
+  --color-tan-20: rgba(231, 226, 220, 1);       /* #E7E2DC */
+  --color-tan-10: rgba(243, 241, 238, 1);       /* #F3F1EE - Light background */
+  --color-tan-5: rgba(249, 248, 246, 1);        /* #F9F8F6 - Lightest background */
+  --color-beige: rgba(234, 228, 218, 1);        /* #EAE4DA - Main background */
+  
+  /* Accent Colors */
+  --color-orange: rgba(243, 62, 24, 1);         /* #F33E18 - Bright accent */
+  --color-orange-dark: rgba(199, 51, 20, 1);    /* #C73314 - Primary accent/CTA */
+  
+  /* Utility Colors */
+  --color-black: rgba(0, 0, 0, 1);
+  --color-white: rgba(255, 255, 255, 1);
+  
+  /* ======== SEMANTIC COLORS ======== */
   
   /* Background Colors */
-  --color-background: #F5F0EB;
-  --color-surface: #FAF8F5;
-  --color-surface-alt: #E8E3DD;
-  --color-surface-hover: #F0EBE6;
-  --color-surface-dark: #DED8D1;
+  --color-background: var(--color-beige);
+  --color-surface: var(--color-tan-5);
+  --color-surface-alt: var(--color-tan-10);
+  --color-surface-hover: var(--color-tan-20);
+  --color-surface-dark: var(--color-tan-40);
   
   /* Text Colors */
-  --color-text-primary: #3D3530;
-  --color-text-secondary: #5C544D;
-  --color-text-muted: #7A7067;
-  --color-text-placeholder: #B5A99A;
-  --color-text-light: #A89F94;
+  --color-text-primary: var(--color-brown);
+  --color-text-secondary: var(--color-brown-60);
+  --color-text-muted: var(--color-brown-60);
+  --color-text-placeholder: var(--color-brown-40);
+  --color-text-light: var(--color-brown-40);
   
-  /* Brand Colors */
-  --color-accent: #C75B3F;
-  --color-accent-hover: #B54E34;
-  --color-accent-light: rgba(199, 91, 63, 0.1);
-  --color-button-primary: #8B7355;
-  --color-button-primary-hover: #7A6449;
-  --color-highlight: #C9A08A;
+  /* Brand/Accent Colors */
+  --color-accent: var(--color-orange-dark);
+  --color-accent-hover: var(--color-orange);
+  --color-accent-light: rgba(199, 51, 20, 0.1);
+  --color-button-primary: var(--color-brown);
+  --color-button-primary-hover: rgba(62, 35, 24, 0.9);
+  --color-highlight: var(--color-tan);
   
   /* State Colors */
   --color-success: #4A9D6E;
   --color-warning: #D4A84B;
-  --color-error: #C75B3F;
+  --color-error: var(--color-orange-dark);
   --color-info: #4A90A4;
-  --color-voice-listening: #C75B3F;
-  --color-voice-speaking: #4A90A4;
   
   /* Border Colors */
-  --color-border: #E8E2DB;
-  --color-border-light: #E0DAD4;
-  --color-border-medium: #D4CCC4;
-  --color-border-dark: #DED8D1;
+  --color-border: var(--color-tan-20);
+  --color-border-light: var(--color-tan-10);
+  --color-border-medium: var(--color-tan-40);
+  --color-border-dark: var(--color-tan-60);
   
   /* Overlay */
-  --color-overlay: rgba(0, 0, 0, 0.3);
-  --color-overlay-dark: rgba(0, 0, 0, 0.5);
+  --color-overlay: rgba(62, 35, 24, 0.3);
+  --color-overlay-dark: rgba(62, 35, 24, 0.5);
   
   /* ======== TYPOGRAPHY ======== */
   
   /* Font Families */
-  --font-serif: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
-  --font-sans: 'Source Sans 3', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-primary: 'Familjen Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-serif: 'Domine', Georgia, 'Times New Roman', serif;
+  --font-sans: var(--font-primary);
   
   /* Font Sizes */
   --text-xs: 11px;
-  --text-sm: 13px;
+  --text-sm: 14px;
   --text-base: 15px;
-  --text-md: 16px;
+  --text-md: 17px;
   --text-lg: 18px;
   --text-xl: 24px;
   --text-2xl: 32px;
@@ -65,14 +87,18 @@
   --text-4xl: 48px;
   
   /* Font Weights */
-  --weight-light: 300;
-  --weight-normal: 400;
+  --weight-regular: 400;
   --weight-medium: 500;
   --weight-semibold: 600;
   --weight-bold: 700;
   
+  /* Legacy weight names for compatibility */
+  --weight-light: 400;
+  --weight-normal: 400;
+  
   /* Line Heights */
   --leading-tight: 1.2;
+  --leading-snug: 1.3;      /* 130% - Used in brand spec */
   --leading-normal: 1.5;
   --leading-relaxed: 1.65;
   
@@ -95,19 +121,19 @@
   --space-5xl: 60px;
   
   /* ======== BORDERS ======== */
-  --radius-sm: 3px;
-  --radius-md: 10px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
   --radius-lg: 12px;
-  --radius-xl: 18px;
-  --radius-2xl: 25px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
   --radius-full: 9999px;
   
   /* ======== SHADOWS ======== */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
-  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
-  --shadow-modal: 0 25px 50px rgba(0, 0, 0, 0.25);
+  --shadow-sm: 0 1px 2px rgba(62, 35, 24, 0.05);
+  --shadow-md: 0 4px 6px rgba(62, 35, 24, 0.07);
+  --shadow-lg: 0 10px 15px rgba(62, 35, 24, 0.1);
+  --shadow-xl: 0 20px 25px rgba(62, 35, 24, 0.15);
+  --shadow-modal: 0 25px 50px rgba(62, 35, 24, 0.25);
   
   /* ======== TRANSITIONS ======== */
   --transition-fast: 0.15s ease;
@@ -117,21 +143,70 @@
   
   /* ======== Z-INDEX ======== */
   --z-base: 1;
-  --z-dropdown: 50;
+  --z-dropdown: 100;
   --z-sticky: 150;
   --z-overlay: 200;
+  --z-sidebar: 250;
   --z-modal: 300;
   --z-popover: 400;
   --z-toast: 500;
+  --z-dropdown-menu: 9999;
   
   /* ======== LAYOUT ======== */
-  --header-height: 70px;
-  --subheader-height: 80px;
-  --footer-height: 68px;
-  --sidebar-width: 280px;
-  --nav-sidebar-width: 300px;
+  --header-height: 64px;
+  --subheader-height: 56px;
+  --footer-height: 60px;
+  --sidebar-width: 300px;
+  --nav-sidebar-width: 320px;
+  --progress-bar-height: 48px;
   --modal-width-sm: 400px;
   --modal-width-md: 600px;
   --modal-width-lg: 900px;
   --modal-width-xl: 1200px;
+}
+
+/* ======== TYPOGRAPHY UTILITY CLASSES ======== */
+
+/* Headings - Domine (serif) used sparingly */
+.heading-serif {
+  font-family: var(--font-serif);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-snug);
+  color: var(--color-text-primary);
+}
+
+/* Card Title - Familjen Grotesk SemiBold 17pt */
+.text-card-title {
+  font-family: var(--font-primary);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-md);
+  line-height: var(--leading-snug);
+  color: var(--color-text-primary);
+}
+
+/* Card Subtitle - Familjen Grotesk Regular 14pt */
+.text-card-subtitle {
+  font-family: var(--font-primary);
+  font-weight: var(--weight-regular);
+  font-size: var(--text-sm);
+  line-height: var(--leading-snug);
+  color: var(--color-text-primary);
+}
+
+/* Descriptive Text - Familjen Grotesk Regular 14pt, muted */
+.text-description {
+  font-family: var(--font-primary);
+  font-weight: var(--weight-regular);
+  font-size: var(--text-sm);
+  line-height: var(--leading-snug);
+  color: var(--color-text-muted);
+}
+
+/* Button Text */
+.text-button {
+  font-family: var(--font-primary);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-sm);
+  line-height: 1;
+  letter-spacing: var(--tracking-wide);
 }

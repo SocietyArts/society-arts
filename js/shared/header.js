@@ -169,9 +169,7 @@ const NAV_ITEMS = [
   { id: 'story-builder', label: 'Story Builder', icon: 'newChat', href: '/story-builder.html' },
   { id: 'style-finder', label: 'Style Finder', icon: 'styleFinder', href: '/style-finder.html' },
   { divider: true },
-  { id: 'projects', label: 'Projects', icon: 'projects', href: '/projects.html', showCount: 'projects' },
-  { id: 'gallery', label: 'Gallery', icon: 'gallery', href: '/under-construction.html?feature=Gallery' },
-  { id: 'collections', label: 'Collections', icon: 'collections', href: '/under-construction.html?feature=Collections' },
+  { id: 'your-work', label: 'Your Work', icon: 'projects', href: '/projects.html', showCount: 'projects' },
   { id: 'favorites', label: 'Favorites', icon: 'favorites', href: '/favorites.html', showCount: 'favorites' },
   { divider: true },
   { id: 'pricing', label: 'Prints & Pricing', icon: 'pricing', href: '/under-construction.html?feature=Prints%20%26%20Pricing' },
@@ -433,6 +431,18 @@ function Header({ currentPage, onNewProject, onOpenStyleFinder }) {
   const handleSignOut = async () => {
     await signOut();
   };
+  
+  const handleCartClick = () => {
+    window.location.href = '/under-construction.html?feature=Shopping%20Cart';
+  };
+  
+  const handleNewProject = () => {
+    if (onNewProject) {
+      onNewProject();
+    } else {
+      window.location.href = '/story-builder.html';
+    }
+  };
 
   return (
     <>
@@ -447,21 +457,19 @@ function Header({ currentPage, onNewProject, onOpenStyleFinder }) {
           </button>
           <a href="/" className="logo">
             <img 
-              src="https://pub-d4d49982f29749dea52e2eb37c29ad51.r2.dev/site-assets/SA_Wordmark_Brown@1x.png" 
+              src="https://pub-d4d49982f29749dea52e2eb37c29ad51.r2.dev/site-assets/SA_Wordmark_Brown_1x.png" 
               alt="Society Arts" 
               className="logo-image"
             />
           </a>
         </div>
         <div className="header-right">
-          <button className="btn-icon" aria-label="Cart">
+          <button className="btn-icon" aria-label="Cart" onClick={handleCartClick}>
             <Icons.cart />
           </button>
-          {onNewProject && (
-            <button className="btn btn-primary" onClick={onNewProject}>
-              New Project
-            </button>
-          )}
+          <button className="btn btn-primary" onClick={handleNewProject}>
+            New Project
+          </button>
           
           {/* Auth Section */}
           {isLoading ? (
@@ -474,7 +482,7 @@ function Header({ currentPage, onNewProject, onOpenStyleFinder }) {
             />
           ) : (
             <button className="btn btn-secondary" onClick={() => setAuthModalOpen(true)}>
-              Sign In
+              Log In
             </button>
           )}
         </div>

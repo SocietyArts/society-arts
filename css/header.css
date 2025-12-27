@@ -1,7 +1,6 @@
 /* ========================================
    SOCIETY ARTS - HEADER & NAVIGATION
-   Header, sidebar nav, help menu, footer
-   Version: 2.0
+   Brand Design System v3.0
    ======================================== */
 
 /* ========================================
@@ -12,9 +11,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--space-lg) var(--space-2xl);
-  background-color: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
+  padding: 0 var(--space-xl);
+  background-color: var(--color-tan-5);
+  border-bottom: 1px solid var(--color-tan-20);
   flex-shrink: 0;
   z-index: var(--z-sticky);
   height: var(--header-height);
@@ -31,9 +30,10 @@
   align-items: center;
   gap: var(--space-md);
   position: relative;
-  z-index: 100;
+  z-index: var(--z-dropdown-menu);
 }
 
+/* Logo */
 .logo {
   display: flex;
   align-items: center;
@@ -41,21 +41,101 @@
 }
 
 .logo-image {
-  height: 28px;
+  height: 24px;
   width: auto;
 }
 
 .logo-text {
-  font-family: var(--font-serif);
-  font-size: var(--text-xl);
-  font-weight: var(--weight-medium);
-  letter-spacing: var(--tracking-widest);
+  font-family: var(--font-primary);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-wide);
   margin: 0;
   color: var(--color-text-primary);
 }
 
 .logo:hover {
-  opacity: 0.9;
+  opacity: 0.85;
+}
+
+/* ========================================
+   BUTTONS - Brand Styled
+   ======================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: 10px 20px;
+  font-family: var(--font-primary);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  line-height: 1;
+  border-radius: var(--radius-full);
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background-color: var(--color-brown);
+  color: var(--color-white);
+}
+
+.btn-primary:hover {
+  background-color: var(--color-button-primary-hover);
+  color: var(--color-white);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--color-brown);
+  border: 1.5px solid var(--color-brown);
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-tan-10);
+}
+
+.btn-accent {
+  background-color: var(--color-orange-dark);
+  color: var(--color-white);
+}
+
+.btn-accent:hover {
+  background-color: var(--color-orange);
+  color: var(--color-white);
+}
+
+.btn-ghost {
+  background-color: transparent;
+  color: var(--color-brown);
+}
+
+.btn-ghost:hover {
+  background-color: var(--color-tan-10);
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-primary);
+  padding: var(--space-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  transition: background-color var(--transition-fast);
+}
+
+.btn-icon:hover {
+  background-color: var(--color-tan-10);
 }
 
 /* ========================================
@@ -78,7 +158,7 @@
 }
 
 .hamburger-btn:hover {
-  background-color: var(--color-surface-alt);
+  background-color: var(--color-tan-10);
 }
 
 /* ========================================
@@ -110,8 +190,8 @@
   width: var(--nav-sidebar-width);
   max-width: 85vw;
   height: 100%;
-  background-color: var(--color-surface);
-  z-index: var(--z-modal);
+  background-color: var(--color-tan-5);
+  z-index: var(--z-sidebar);
   transform: translateX(-100%);
   transition: transform var(--transition-slow);
   display: flex;
@@ -126,9 +206,14 @@
 .nav-header {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: space-between;
   padding: var(--space-lg) var(--space-xl);
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-tan-20);
+}
+
+.nav-logo {
+  height: 20px;
+  width: auto;
 }
 
 .nav-close-btn {
@@ -145,7 +230,7 @@
 }
 
 .nav-close-btn:hover {
-  background-color: var(--color-surface-alt);
+  background-color: var(--color-tan-10);
   color: var(--color-text-primary);
 }
 
@@ -157,8 +242,8 @@
 .nav-search-input {
   display: flex;
   align-items: center;
-  background-color: var(--color-surface-alt);
-  border-radius: var(--radius-2xl);
+  background-color: var(--color-tan-10);
+  border-radius: var(--radius-full);
   padding: var(--space-md) var(--space-lg);
   gap: var(--space-sm);
   border: 1px solid transparent;
@@ -166,8 +251,8 @@
 }
 
 .nav-search-input:focus-within {
-  background-color: white;
-  border-color: var(--color-border-medium);
+  background-color: var(--color-white);
+  border-color: var(--color-tan-40);
 }
 
 .nav-search-input input {
@@ -175,12 +260,17 @@
   border: none;
   outline: none;
   background: transparent;
-  font-size: var(--text-base);
+  font-family: var(--font-primary);
+  font-size: var(--text-sm);
   color: var(--color-text-primary);
 }
 
 .nav-search-input input::placeholder {
   color: var(--color-text-placeholder);
+}
+
+.nav-search-input svg {
+  color: var(--color-text-muted);
 }
 
 .nav-content {
@@ -204,19 +294,21 @@
   padding: var(--space-md) var(--space-xl);
   color: var(--color-text-primary);
   text-decoration: none;
-  font-size: var(--text-base);
-  font-weight: var(--weight-normal);
+  font-family: var(--font-primary);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-regular);
   transition: all var(--transition-fast);
   border-left: 3px solid transparent;
   cursor: pointer;
 }
 
 .nav-link:hover {
-  background-color: var(--color-surface-alt);
+  background-color: var(--color-tan-10);
+  color: var(--color-text-primary);
 }
 
 .nav-link.active {
-  background-color: var(--color-surface-alt);
+  background-color: var(--color-tan-10);
   border-left-color: var(--color-accent);
   color: var(--color-accent);
   font-weight: var(--weight-medium);
@@ -238,17 +330,119 @@
 
 .nav-link-badge {
   margin-left: auto;
-  background-color: var(--color-surface-alt);
+  background-color: var(--color-tan-20);
   color: var(--color-text-muted);
-  font-size: var(--text-sm);
+  font-size: 12px;
   padding: 2px 10px;
   border-radius: var(--radius-full);
 }
 
 .nav-divider {
   height: 1px;
-  background-color: var(--color-border);
+  background-color: var(--color-tan-20);
   margin: var(--space-lg) var(--space-xl);
+}
+
+/* Nav Section Labels */
+.nav-section-label {
+  padding: var(--space-lg) var(--space-xl) var(--space-sm);
+  font-family: var(--font-primary);
+  font-size: 12px;
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ========================================
+   PROGRESS BAR (Step Indicator)
+   ======================================== */
+
+.progress-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md) var(--space-xl);
+  background-color: var(--color-tan-10);
+  border-bottom: 1px solid var(--color-tan-20);
+  height: var(--progress-bar-height);
+  gap: var(--space-lg);
+}
+
+.progress-step {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  cursor: pointer;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-full);
+  transition: all var(--transition-fast);
+}
+
+.progress-step:hover {
+  background-color: var(--color-tan-20);
+}
+
+.progress-step-number {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-primary);
+  font-size: 12px;
+  font-weight: var(--weight-semibold);
+  background-color: var(--color-tan-40);
+  color: var(--color-white);
+  transition: all var(--transition-fast);
+}
+
+.progress-step.active .progress-step-number {
+  background-color: var(--color-accent);
+}
+
+.progress-step.completed .progress-step-number {
+  background-color: var(--color-brown);
+}
+
+.progress-step-label {
+  font-family: var(--font-primary);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-regular);
+  color: var(--color-text-muted);
+  transition: all var(--transition-fast);
+}
+
+.progress-step.active .progress-step-label {
+  color: var(--color-accent);
+  font-weight: var(--weight-medium);
+}
+
+.progress-step.completed .progress-step-label {
+  color: var(--color-text-primary);
+}
+
+.progress-connector {
+  width: 40px;
+  height: 2px;
+  background-color: var(--color-tan-40);
+  transition: all var(--transition-fast);
+}
+
+.progress-connector.completed {
+  background-color: var(--color-brown);
+}
+
+/* Checkmark for completed steps */
+.progress-step.completed .progress-step-number::after {
+  content: '✓';
+  font-size: 14px;
+}
+
+/* Hide number when completed */
+.progress-step.completed .progress-step-number span {
+  display: none;
 }
 
 /* ========================================
@@ -258,23 +452,24 @@
 .help-btn {
   background-color: transparent;
   color: var(--color-text-primary);
-  border: 1px solid var(--color-border-medium);
+  border: 1.5px solid var(--color-tan-40);
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  font-size: var(--text-md);
-  font-weight: var(--weight-medium);
+  width: 36px;
+  height: 36px;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-sans);
+  font-family: var(--font-primary);
   transition: all var(--transition-fast);
   position: relative;
 }
 
 .help-btn:hover {
-  background-color: var(--color-surface-alt);
+  background-color: var(--color-tan-10);
+  border-color: var(--color-tan-60);
 }
 
 .help-menu {
@@ -282,11 +477,11 @@
   bottom: calc(100% + var(--space-md));
   right: 0;
   width: 280px;
-  background: white;
+  background: var(--color-white);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-xl);
-  border: 1px solid var(--color-border);
-  padding: var(--space-md) 0;
+  border: 1px solid var(--color-tan-20);
+  padding: var(--space-sm) 0;
   z-index: var(--z-popover);
   opacity: 0;
   visibility: hidden;
@@ -307,7 +502,8 @@
   padding: var(--space-md) var(--space-xl);
   color: var(--color-text-primary);
   text-decoration: none;
-  font-size: var(--text-base);
+  font-family: var(--font-primary);
+  font-size: var(--text-sm);
   transition: background-color var(--transition-fast);
   cursor: pointer;
   border: none;
@@ -317,7 +513,7 @@
 }
 
 .help-menu-item:hover {
-  background-color: var(--color-surface-alt);
+  background-color: var(--color-tan-10);
 }
 
 .help-menu-icon {
@@ -331,7 +527,7 @@
 
 .help-menu-divider {
   height: 1px;
-  background-color: var(--color-border);
+  background-color: var(--color-tan-20);
   margin: var(--space-sm) var(--space-lg);
 }
 
@@ -340,8 +536,8 @@
    ======================================== */
 
 .subheader {
-  padding: var(--space-lg) var(--space-2xl) 14px;
-  background-color: var(--color-surface);
+  padding: var(--space-lg) var(--space-xl);
+  background-color: var(--color-tan-5);
   flex-shrink: 0;
   z-index: 50;
   position: relative;
@@ -349,18 +545,18 @@
 
 .subheader-title {
   font-family: var(--font-serif);
-  font-size: var(--text-lg);
-  font-weight: var(--weight-semibold);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-regular);
   margin: 0 0 var(--space-xs) 0;
   color: var(--color-text-primary);
-  letter-spacing: var(--tracking-wider);
 }
 
 .subheader-text {
+  font-family: var(--font-primary);
   font-size: var(--text-sm);
   color: var(--color-text-muted);
-  margin: 0 0 var(--space-md) 0;
-  line-height: var(--leading-normal);
+  margin: 0;
+  line-height: var(--leading-snug);
 }
 
 /* ========================================
@@ -372,12 +568,18 @@
   justify-content: flex-end;
   align-items: center;
   gap: var(--space-md);
-  padding: 14px var(--space-2xl);
-  background-color: var(--color-surface);
-  border-top: 1px solid var(--color-border);
+  padding: var(--space-md) var(--space-xl);
+  background-color: var(--color-tan-5);
+  border-top: 1px solid var(--color-tan-20);
   flex-shrink: 0;
   z-index: var(--z-sticky);
   height: var(--footer-height);
+}
+
+.footer-text {
+  font-family: var(--font-primary);
+  font-size: 13px;
+  color: var(--color-text-muted);
 }
 
 /* ========================================
@@ -386,9 +588,9 @@
 
 .format-selector {
   position: relative;
-  background-color: var(--color-surface);
+  background-color: var(--color-tan-10);
   border-radius: var(--radius-md);
-  padding: 14px 16px;
+  padding: 12px 16px;
   display: flex;
   align-items: center;
   gap: var(--space-sm);
@@ -397,7 +599,7 @@
 }
 
 .format-selector:hover {
-  background-color: var(--color-surface-hover);
+  background-color: var(--color-tan-20);
 }
 
 .format-selector-icon {
@@ -405,14 +607,15 @@
 }
 
 .format-selector-label {
+  font-family: var(--font-primary);
   font-weight: var(--weight-medium);
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 
 .format-selector-value {
   margin-left: auto;
-  color: var(--color-text-secondary);
-  font-size: 14px;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
 }
 
 .format-dropdown {
@@ -420,10 +623,10 @@
   top: calc(100% + var(--space-sm));
   left: 0;
   right: 0;
-  background: white;
+  background: var(--color-white);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-tan-20);
   padding: var(--space-sm);
   z-index: var(--z-dropdown);
   opacity: 0;
@@ -449,7 +652,7 @@
 }
 
 .format-option:hover {
-  background-color: var(--color-surface-alt);
+  background-color: var(--color-tan-10);
 }
 
 .format-option.selected {
@@ -471,11 +674,43 @@
 }
 
 .format-option-label {
-  font-size: var(--text-base);
+  font-family: var(--font-primary);
+  font-size: var(--text-sm);
   color: var(--color-text-primary);
 }
 
 .format-option.selected .format-option-label {
   color: var(--color-accent);
   font-weight: var(--weight-medium);
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+  .header {
+    padding: 0 var(--space-lg);
+  }
+  
+  .logo-image {
+    height: 20px;
+  }
+  
+  .btn {
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+  
+  .progress-bar {
+    padding: var(--space-sm) var(--space-lg);
+  }
+  
+  .progress-step-label {
+    display: none;
+  }
+  
+  .progress-connector {
+    width: 24px;
+  }
 }
