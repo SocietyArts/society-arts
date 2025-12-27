@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Your Work - Society Arts</title>
+  <title>Collections - Society Arts</title>
   
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="https://pub-acb560f551f141db830964aed1fa005f.r2.dev/site-assets/SA_Monogram_Black%401x%201x1.png">
@@ -17,7 +17,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/js/shared/supabase-client.js"></script>
   
-  <!-- Fonts - Familjen Grotesk + Domine -->
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Domine:wght@400;500;600;700&family=Familjen+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -33,7 +33,7 @@
   <style>
     .collections-content {
       flex: 1;
-      max-width: 900px;
+      max-width: 1000px;
       margin: 0 auto;
       padding: var(--space-2xl);
       width: 100%;
@@ -59,127 +59,136 @@
       margin-left: var(--space-md);
     }
     
-    .sort-buttons {
-      display: flex;
-      gap: var(--space-sm);
-    }
-    
-    .sort-btn {
-      padding: 8px 16px;
-      border: 1px solid var(--color-border);
-      border-radius: 20px;
-      background: white;
-      cursor: pointer;
-      font-size: 13px;
-      font-family: inherit;
-      transition: all 0.2s;
-    }
-    
-    .sort-btn.active {
-      background: var(--color-text-primary);
-      color: white;
-      border-color: var(--color-text-primary);
-    }
-    
     .collections-grid {
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-md);
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--space-lg);
     }
     
-    .project-card {
-      display: flex;
-      align-items: center;
-      padding: var(--space-lg);
+    .collection-card {
       background: var(--color-surface-alt);
       border-radius: var(--radius-lg);
+      padding: var(--space-xl);
       cursor: pointer;
       transition: all 0.2s;
+      border: 1px solid var(--color-border-light);
     }
     
-    .project-card:hover {
-      background: var(--color-surface-hover);
-      transform: translateY(-1px);
+    .collection-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(62, 35, 24, 0.1);
     }
     
-    .project-thumbnail {
-      width: 80px;
-      height: 80px;
-      border-radius: var(--radius-md);
-      background: var(--color-border);
-      margin-right: var(--space-lg);
-      overflow: hidden;
-      flex-shrink: 0;
+    .collection-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: var(--space-md);
     }
     
-    .project-thumbnail img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    
-    .project-info {
-      flex: 1;
-      min-width: 0;
-    }
-    
-    .project-title {
+    .collection-name {
       font-family: var(--font-serif);
       font-size: var(--text-lg);
-      font-weight: var(--weight-semibold);
-      margin: 0 0 4px 0;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    
-    .project-preview {
-      font-size: var(--text-sm);
-      color: var(--color-text-muted);
+      font-weight: var(--weight-medium);
       margin: 0;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
     
-    .project-meta {
-      text-align: right;
-      margin-left: var(--space-lg);
-      flex-shrink: 0;
-    }
-    
-    .project-date {
+    .collection-count {
       font-size: var(--text-sm);
       color: var(--color-text-muted);
+      background: var(--color-tan-10);
+      padding: 4px 10px;
+      border-radius: 12px;
     }
     
-    .project-styles {
+    .collection-description {
       font-size: var(--text-sm);
-      margin-top: 4px;
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-md);
     }
     
-    .project-actions {
+    .collection-preview {
       display: flex;
-      gap: var(--space-sm);
-      margin-left: var(--space-lg);
+      gap: 8px;
     }
     
-    .action-btn {
-      padding: var(--space-sm);
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: var(--color-text-muted);
+    .collection-preview-img {
+      width: 48px;
+      height: 48px;
       border-radius: var(--radius-md);
+      object-fit: cover;
+      background: var(--color-tan-10);
+    }
+    
+    .collection-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--space-sm);
+      margin-top: var(--space-md);
+      padding-top: var(--space-md);
+      border-top: 1px solid var(--color-border-light);
+    }
+    
+    .collection-action-btn {
+      padding: 6px 12px;
+      border: none;
+      background: transparent;
+      color: var(--color-text-muted);
+      font-size: var(--text-sm);
+      cursor: pointer;
+      border-radius: var(--radius-sm);
+      transition: all 0.15s;
+    }
+    
+    .collection-action-btn:hover {
+      background: var(--color-tan-10);
+      color: var(--color-text-primary);
+    }
+    
+    .collection-action-btn.danger:hover {
+      background: #fee;
+      color: #c00;
+    }
+    
+    .new-collection-card {
+      background: transparent;
+      border: 2px dashed var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      cursor: pointer;
       transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 180px;
     }
     
-    .action-btn:hover {
-      background: var(--color-surface);
+    .new-collection-card:hover {
+      border-color: var(--color-accent);
+      background: var(--color-accent-light);
     }
     
-    .action-btn.delete:hover {
-      color: #dc2626;
+    .new-collection-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--color-tan-10);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: var(--space-md);
+      color: var(--color-text-muted);
+    }
+    
+    .new-collection-card:hover .new-collection-icon {
+      background: var(--color-accent);
+      color: white;
+    }
+    
+    .new-collection-text {
+      font-size: var(--text-base);
+      color: var(--color-text-muted);
     }
     
     .empty-state {
@@ -190,12 +199,12 @@
     .empty-icon {
       width: 80px;
       height: 80px;
-      background: var(--color-surface-alt);
+      margin: 0 auto var(--space-xl);
+      background: var(--color-tan-10);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 0 auto var(--space-xl);
       color: var(--color-text-muted);
     }
     
@@ -230,6 +239,51 @@
       color: var(--color-text-muted);
       margin-bottom: var(--space-xl);
     }
+    
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    
+    .modal-content {
+      background: white;
+      border-radius: var(--radius-xl);
+      padding: var(--space-xl);
+      width: 100%;
+      max-width: 400px;
+      margin: var(--space-md);
+    }
+    
+    .modal-title {
+      font-family: var(--font-serif);
+      font-size: var(--text-xl);
+      margin-bottom: var(--space-lg);
+    }
+    
+    .modal-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-size: var(--text-base);
+      margin-bottom: var(--space-md);
+    }
+    
+    .modal-input:focus {
+      outline: none;
+      border-color: var(--color-accent);
+    }
+    
+    .modal-actions {
+      display: flex;
+      gap: var(--space-sm);
+      justify-content: flex-end;
+    }
   </style>
 </head>
 <body>
@@ -238,7 +292,6 @@
   <!-- Shared Components -->
   <script src="/js/shared/api.js"></script>
   <script src="/js/shared/auth.js"></script>
-  <script src="/js/shared/collections.js"></script>
   <script src="/js/shared/header.js"></script>
   
   <!-- Collections App -->
@@ -246,19 +299,18 @@
     const { useState, useEffect } = React;
 
     function CollectionsPage() {
-      // Get shared components inside the function to ensure they're loaded
-      const { Header, Sidebar, Footer, Icons } = window.SocietyArts || {};
+      const { Header, Sidebar, Footer } = window.SocietyArts || {};
       
-      // Loading check
       if (!Sidebar || !Header) {
         return React.createElement('div', { className: 'loading-state' }, 'Loading...');
       }
       
       const { user, profile, isLoading: authLoading } = window.SocietyArts.useAuth();
-      const { collections, isLoading, loadCollections, deleteProject } = window.SocietyArts.useCollections();
-      const [sortBy, setSortBy] = useState('date');
-      const [deleteModal, setDeleteModal] = useState({ open: false, project: null });
+      const { collections, isLoading, loadCollections, createCollection, deleteCollection } = window.SocietyArts.useCollections();
       const [authModalOpen, setAuthModalOpen] = useState(false);
+      const [createModalOpen, setCreateModalOpen] = useState(false);
+      const [newName, setNewName] = useState('');
+      const [newDescription, setNewDescription] = useState('');
 
       useEffect(() => {
         if (user) {
@@ -266,55 +318,48 @@
         }
       }, [user]);
 
-      const sortedCollections = React.useMemo(() => {
-        const sorted = [...collections];
-        if (sortBy === 'title') {
-          sorted.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
-        } else {
-          sorted.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
-        }
-        return sorted;
-      }, [collections, sortBy]);
-
-      const handleOpenProject = (project) => {
-        window.location.href = `/story-builder.html?project=${project.id}`;
+      const handleCreate = async () => {
+        if (!newName.trim()) return;
+        await createCollection(newName.trim(), newDescription.trim());
+        setNewName('');
+        setNewDescription('');
+        setCreateModalOpen(false);
       };
 
-      const handleDeleteProject = async () => {
-        if (deleteModal.project) {
-          await deleteProject(deleteModal.project.id);
-          setDeleteModal({ open: false, project: null });
+      const handleDelete = async (e, collectionId) => {
+        e.stopPropagation();
+        if (confirm('Delete this collection? This cannot be undone.')) {
+          await deleteCollection(collectionId);
         }
       };
 
-      const formatDate = (dateString) => {
-        const date = new Date(dateString);
-        const now = new Date();
-        const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
-        
-        if (diffDays === 0) return 'Today';
-        if (diffDays === 1) return 'Yesterday';
-        if (diffDays < 7) return `${diffDays} days ago`;
-        
-        return date.toLocaleDateString('en-US', { 
-          month: 'short', 
-          day: 'numeric',
-          year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
-        });
+      const getStyleImage = (styleId) => {
+        return `https://pub-d4d49982f29749dea52e2eb37c29ad51.r2.dev/${styleId}/${styleId}_1.webp`;
       };
+
+      const AuthModal = window.SocietyArts.AuthModal;
 
       return (
         <div className="page-container">
           <Sidebar />
           <Header user={user} profile={profile} />
           
-          <main className="main-content collections-content">
-            {authLoading ? (
+          <main className="collections-content">
+            <div className="collections-header">
+              <h1 className="collections-title">
+                Collections
+                {collections.length > 0 && (
+                  <span className="collections-count">({collections.length})</span>
+                )}
+              </h1>
+            </div>
+            
+            {authLoading || isLoading ? (
               <div className="loading-state">Loading...</div>
             ) : !user ? (
               <div className="login-prompt">
                 <h2>Sign in to view your collections</h2>
-                <p>Create an account or sign in to save and manage your collections.</p>
+                <p>Create collections to organize your favorite styles.</p>
                 <button 
                   className="btn btn-primary"
                   onClick={() => setAuthModalOpen(true)}
@@ -322,159 +367,132 @@
                   Sign In
                 </button>
               </div>
-            ) : (
-              <>
-                <div className="collections-header">
-                  <h1 className="collections-title">
-                    My Collections
-                    <span className="collections-count">({collections.length})</span>
-                  </h1>
-                  
-                  <div className="sort-buttons">
-                    <button
-                      className={`sort-btn ${sortBy === 'date' ? 'active' : ''}`}
-                      onClick={() => setSortBy('date')}
-                    >
-                      By Date
-                    </button>
-                    <button
-                      className={`sort-btn ${sortBy === 'title' ? 'active' : ''}`}
-                      onClick={() => setSortBy('title')}
-                    >
-                      By Title
-                    </button>
-                  </div>
+            ) : collections.length === 0 ? (
+              <div className="empty-state">
+                <div className="empty-icon">
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                    <polyline points="2 17 12 22 22 17"></polyline>
+                    <polyline points="2 12 12 17 22 12"></polyline>
+                  </svg>
                 </div>
-
-                {isLoading ? (
-                  <div className="loading-state">Loading collections...</div>
-                ) : sortedCollections.length === 0 ? (
-                  <div className="empty-state">
-                    <div className="empty-icon">
-                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                        <rect x="3" y="3" width="7" height="7"></rect>
-                        <rect x="14" y="3" width="7" height="7"></rect>
-                        <rect x="14" y="14" width="7" height="7"></rect>
-                        <rect x="3" y="14" width="7" height="7"></rect>
-                      </svg>
+                <h2 className="empty-title">No collections yet</h2>
+                <p className="empty-text">Create your first collection to organize styles.</p>
+                <button 
+                  className="btn btn-primary"
+                  onClick={() => setCreateModalOpen(true)}
+                >
+                  Create Collection
+                </button>
+              </div>
+            ) : (
+              <div className="collections-grid">
+                <div 
+                  className="new-collection-card"
+                  onClick={() => setCreateModalOpen(true)}
+                >
+                  <div className="new-collection-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <line x1="12" y1="5" x2="12" y2="19"></line>
+                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                  </div>
+                  <span className="new-collection-text">New Collection</span>
+                </div>
+                
+                {collections.map((collection) => (
+                  <div key={collection.id} className="collection-card">
+                    <div className="collection-card-header">
+                      <h3 className="collection-name">{collection.name}</h3>
+                      <span className="collection-count">
+                        {(collection.styles || []).length} styles
+                      </span>
                     </div>
-                    <h3 className="empty-title">No collections yet</h3>
-                    <p className="empty-text">Start creating your first project by telling your story.</p>
-                    <a href="/story-builder.html" className="btn btn-primary">
-                      Start Creating
-                      <Icons.arrowRight />
-                    </a>
-                  </div>
-                ) : (
-                  <div className="collections-grid">
-                    {sortedCollections.map(project => (
-                      <div 
-                        key={project.id}
-                        className="project-card"
-                        onClick={() => handleOpenProject(project)}
-                      >
-                        <div className="project-thumbnail">
-                          {project.selected_styles?.[0] && (
-                            <img 
-                              src={`https://pub-d4d49982f29749dea52e2eb37c29ad51.r2.dev/${project.selected_styles[0]}/${project.selected_styles[0]}_1.webp`}
-                              alt=""
-                              onError={e => e.target.style.display = 'none'}
-                            />
-                          )}
-                        </div>
-                        
-                        <div className="project-info">
-                          <h3 className="project-title">
-                            {project.title || 'Untitled Project'}
-                          </h3>
-                          <p className="project-preview">
-                            {project.story ? project.story.slice(0, 80) + (project.story.length > 80 ? '...' : '') : 'No story yet'}
-                          </p>
-                        </div>
-                        
-                        <div className="project-meta">
-                          <div className="project-date">{formatDate(project.updated_at)}</div>
-                          <div className="project-styles">
-                            {project.selected_styles?.length || 0} style{project.selected_styles?.length !== 1 ? 's' : ''}
-                          </div>
-                        </div>
-                        
-                        <div className="project-actions">
-                          <button
-                            className="action-btn"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleOpenProject(project);
-                            }}
-                            title="Edit project"
-                          >
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                            </svg>
-                          </button>
-                          <button
-                            className="action-btn delete"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setDeleteModal({ open: true, project });
-                            }}
-                            title="Delete project"
-                          >
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                              <polyline points="3 6 5 6 21 6"></polyline>
-                              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                            </svg>
-                          </button>
-                        </div>
+                    
+                    {collection.description && (
+                      <p className="collection-description">{collection.description}</p>
+                    )}
+                    
+                    {(collection.styles || []).length > 0 && (
+                      <div className="collection-preview">
+                        {(collection.styles || []).slice(0, 4).map((styleId) => (
+                          <img 
+                            key={styleId}
+                            src={getStyleImage(styleId)}
+                            alt=""
+                            className="collection-preview-img"
+                            onError={(e) => e.target.style.display = 'none'}
+                          />
+                        ))}
                       </div>
-                    ))}
+                    )}
+                    
+                    <div className="collection-actions">
+                      <button 
+                        className="collection-action-btn danger"
+                        onClick={(e) => handleDelete(e, collection.id)}
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </div>
-                )}
-              </>
+                ))}
+              </div>
             )}
           </main>
           
           <Footer />
           
-          {/* Delete Confirmation Modal */}
-          <window.SocietyArts.DeleteProjectModal
-            isOpen={deleteModal.open}
-            onClose={() => setDeleteModal({ open: false, project: null })}
-            onConfirm={handleDeleteProject}
-            projectTitle={deleteModal.project?.title}
-          />
+          {authModalOpen && (
+            <AuthModal 
+              isOpen={authModalOpen}
+              onClose={() => setAuthModalOpen(false)}
+            />
+          )}
           
-          {/* Auth Modal */}
-          <window.SocietyArts.AuthModal 
-            isOpen={authModalOpen}
-            onClose={() => setAuthModalOpen(false)}
-          />
+          {createModalOpen && (
+            <div className="modal-overlay" onClick={() => setCreateModalOpen(false)}>
+              <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                <h2 className="modal-title">New Collection</h2>
+                <input 
+                  type="text"
+                  className="modal-input"
+                  placeholder="Collection name"
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  autoFocus
+                />
+                <input 
+                  type="text"
+                  className="modal-input"
+                  placeholder="Description (optional)"
+                  value={newDescription}
+                  onChange={(e) => setNewDescription(e.target.value)}
+                />
+                <div className="modal-actions">
+                  <button 
+                    className="btn btn-ghost"
+                    onClick={() => setCreateModalOpen(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    className="btn btn-primary"
+                    onClick={handleCreate}
+                    disabled={!newName.trim()}
+                  >
+                    Create
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       );
     }
 
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    
-    // Wait for all components to be loaded
-    function waitForComponents(callback, maxAttempts = 50) {
-      let attempts = 0;
-      const check = () => {
-        attempts++;
-        if (window.SocietyArts?.Sidebar && window.SocietyArts?.Header && window.SocietyArts?.useAuth) {
-          callback();
-        } else if (attempts < maxAttempts) {
-          setTimeout(check, 100);
-        } else {
-          console.error('Components failed to load');
-          callback();
-        }
-      };
-      check();
-    }
-    
-    waitForComponents(() => {
-      root.render(<CollectionsPage />);
+    window.SocietyArts.initializeAuth().then(() => {
+      ReactDOM.createRoot(document.getElementById('root')).render(<CollectionsPage />);
     });
   </script>
 </body>

@@ -149,14 +149,9 @@ if (typeof React !== 'undefined') {
         };
 
         return React.createElement(React.Fragment, null,
-            // Persistent Logo Bar (always visible at top)
+            // Persistent Logo Bar (always visible at top) - wordmark only
             React.createElement('div', { className: 'logo-bar' },
                 React.createElement('a', { href: 'index.html', className: 'logo-bar-link' },
-                    React.createElement('img', {
-                        src: SIDEBAR_CONFIG.monogramUrl,
-                        alt: SIDEBAR_CONFIG.logoAlt,
-                        className: 'logo-bar-icon'
-                    }),
                     React.createElement('img', {
                         src: SIDEBAR_CONFIG.wordmarkUrl,
                         alt: SIDEBAR_CONFIG.logoAlt,

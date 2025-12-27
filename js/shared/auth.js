@@ -739,6 +739,271 @@ if (typeof React !== 'undefined') {
     };
 
     // ========================================
+    // FAVORITES HOOK (Supabase-based)
+    // ========================================
+    function useFavorites() {
+        const [favorites, setFavorites] = useState([]);
+        const [isLoading, setIsLoading] = useState(false);
+
+        const loadFavorites = async () => {
+            const { supabase } = window.SocietyArts;
+            if (!AuthState.user || !supabase) return [];
+            
+            setIsLoading(true);
+            try {
+                const { data, error } = await supabase
+                    .from('user_favorites')
+                    .select('*')
+                    .eq('user_id', AuthState.user.id)
+                    .order('created_at', { ascending: false });
+                
+                if (error) {
+                    console.error('Failed to load favorites:', error);
+                    return [];
+                }
+                
+                setFavorites(data || []);
+                return data || [];
+            } catch (err) {
+                console.error('Favorites error:', err);
+                return [];
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        const addFavorite = async (styleId, styleName) => {
+            const { supabase } = window.SocietyArts;
+            if (!AuthState.user || !supabase) return false;
+            
+            try {
+                const { error } = await supabase
+                    .from('user_favorites')
+                    .insert({
+                        user_id: AuthState.user.id,
+                        style_id: styleId,
+                        style_name: styleName || styleId
+                    });
+                
+                if (error) {
+                    console.error('Failed to add favorite:', error);
+                    return false;
+                }
+                
+                await loadFavorites();
+                return true;
+            } catch (err) {
+                console.error('Add favorite error:', err);
+                return false;
+            }
+        };
+
+        const removeFavorite = async (styleId) => {
+            const { supabase } = window.SocietyArts;
+            if (!AuthState.user || !supabase) return false;
+            
+            try {
+                const { error } = await supabase
+                    .from('user_favorites')
+                    .delete()
+                    .eq('user_id', AuthState.user.id)
+                    .eq('style_id', styleId);
+                
+                if (error) {
+                    console.error('Failed to remove favorite:', error);
+                    return false;
+                }
+                
+                setFavorites(prev => prev.filter(f => f.style_id !== styleId));
+                return true;
+            } catch (err) {
+                console.error('Remove favorite error:', err);
+                return false;
+            }
+        };
+
+        const isStyleFavorited = (styleId) => {
+            return favorites.some(f => f.style_id === styleId);
+        };
+
+        const toggleFavorite = async (styleId, styleName) => {
+            if (isStyleFavorited(styleId)) {
+                return await removeFavorite(styleId);
+            } else {
+                return await addFavorite(styleId, styleName);
+            }
+        };
+
+        return {
+            favorites,
+            isLoading,
+            loadFavorites,
+            addFavorite,
+            removeFavorite,
+            isStyleFavorited,
+            toggleFavorite
+        };
+    }
+
+    // ========================================
+    // COLLECTIONS HOOK (Supabase-based)
+    // ========================================
+    function useCollections() {
+        const [collections, setCollections] = useState([]);
+        const [isLoading, setIsLoading] = useState(false);
+
+        const loadCollections = async () => {
+            const { supabase } = window.SocietyArts;
+            if (!AuthState.user || !supabase) return [];
+            
+            setIsLoading(true);
+            try {
+                const { data, error } = await supabase
+                    .from('user_collections')
+                    .select('*')
+                    .eq('user_id', AuthState.user.id)
+                    .order('created_at', { ascending: false });
+                
+                if (error) {
+                    console.error('Failed to load collections:', error);
+                    return [];
+                }
+                
+                setCollections(data || []);
+                return data || [];
+            } catch (err) {
+                console.error('Collections error:', err);
+                return [];
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        const createCollection = async (name, description = '') => {
+            const { supabase } = window.SocietyArts;
+            if (!AuthState.user || !supabase) return null;
+            
+            try {
+                const { data, error } = await supabase
+                    .from('user_collections')
+                    .insert({
+                        user_id: AuthState.user.id,
+                        name,
+                        description,
+                        styles: []
+                    })
+                    .select()
+                    .single();
+                
+                if (error) {
+                    console.error('Failed to create collection:', error);
+                    return null;
+                }
+                
+                await loadCollections();
+                return data;
+            } catch (err) {
+                console.error('Create collection error:', err);
+                return null;
+            }
+        };
+
+        const deleteCollection = async (collectionId) => {
+            const { supabase } = window.SocietyArts;
+            if (!AuthState.user || !supabase) return false;
+            
+            try {
+                const { error } = await supabase
+                    .from('user_collections')
+                    .delete()
+                    .eq('id', collectionId)
+                    .eq('user_id', AuthState.user.id);
+                
+                if (error) {
+                    console.error('Failed to delete collection:', error);
+                    return false;
+                }
+                
+                setCollections(prev => prev.filter(c => c.id !== collectionId));
+                return true;
+            } catch (err) {
+                console.error('Delete collection error:', err);
+                return false;
+            }
+        };
+
+        const addToCollection = async (collectionId, styleId) => {
+            const { supabase } = window.SocietyArts;
+            if (!AuthState.user || !supabase) return false;
+            
+            try {
+                // Get current collection
+                const collection = collections.find(c => c.id === collectionId);
+                if (!collection) return false;
+                
+                const currentStyles = collection.styles || [];
+                if (currentStyles.includes(styleId)) return true; // Already in collection
+                
+                const { error } = await supabase
+                    .from('user_collections')
+                    .update({ styles: [...currentStyles, styleId] })
+                    .eq('id', collectionId)
+                    .eq('user_id', AuthState.user.id);
+                
+                if (error) {
+                    console.error('Failed to add to collection:', error);
+                    return false;
+                }
+                
+                await loadCollections();
+                return true;
+            } catch (err) {
+                console.error('Add to collection error:', err);
+                return false;
+            }
+        };
+
+        const removeFromCollection = async (collectionId, styleId) => {
+            const { supabase } = window.SocietyArts;
+            if (!AuthState.user || !supabase) return false;
+            
+            try {
+                const collection = collections.find(c => c.id === collectionId);
+                if (!collection) return false;
+                
+                const newStyles = (collection.styles || []).filter(id => id !== styleId);
+                
+                const { error } = await supabase
+                    .from('user_collections')
+                    .update({ styles: newStyles })
+                    .eq('id', collectionId)
+                    .eq('user_id', AuthState.user.id);
+                
+                if (error) {
+                    console.error('Failed to remove from collection:', error);
+                    return false;
+                }
+                
+                await loadCollections();
+                return true;
+            } catch (err) {
+                console.error('Remove from collection error:', err);
+                return false;
+            }
+        };
+
+        return {
+            collections,
+            isLoading,
+            loadCollections,
+            createCollection,
+            deleteCollection,
+            addToCollection,
+            removeFromCollection
+        };
+    }
+
+    // ========================================
     // EXPORTS
     // ========================================
     window.SocietyArts = window.SocietyArts || {};
@@ -756,8 +1021,12 @@ if (typeof React !== 'undefined') {
         isAdmin,
         isSuperAdmin,
         
-        // React components
+        // React hooks
         useAuth,
+        useFavorites,
+        useCollections,
+        
+        // React components
         UserAvatar,
         UserMenu,
         AuthModal,
