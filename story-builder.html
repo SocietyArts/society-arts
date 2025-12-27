@@ -286,7 +286,7 @@
     const { useState, useRef, useEffect, useCallback } = React;
     
     // Get shared components
-    const { Header, NavSidebar, Subheader, Footer, FormatSelector, Icons } = window.SocietyArts;
+    const { Header, Sidebar, FormatSelector, Icons } = window.SocietyArts;
     const { API } = window.SocietyArts;
     const { Voice } = window.SocietyArts;
     const { StoryPanel } = window.SocietyArts;
@@ -668,11 +668,11 @@
 
       return (
         <div className="page-container">
+          <Sidebar />
           <Header 
             user={user}
             profile={profile}
           />
-          <NavSidebar />
           
           <main className="main-content story-builder-layout">
             {/* Left Column - Story Panel */}

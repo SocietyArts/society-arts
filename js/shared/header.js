@@ -1,27 +1,33 @@
 // ============================================
-// SOCIETY ARTS - UNIFIED HEADER SYSTEM
-// A++ Brand Standards v3.0
+// SOCIETY ARTS - UNIFIED HEADER & SIDEBAR
+// A++ Brand Standards v4.0
 // ============================================
-// Works with both React and vanilla JS pages.
-// Edit HEADER_CONFIG to change site-wide.
+// Persistent left sidebar (Supabase-style)
+// Expands on hover to show labels
 // ============================================
 
 // ============================================
-// SHARED CONFIGURATION
+// CONFIGURATION
 // ============================================
-const HEADER_CONFIG = {
-    logoUrl: 'https://pub-acb560f551f141db830964aed1fa005f.r2.dev/site-assets/SA_Wordmark_Brown%401x.png',
+const SIDEBAR_CONFIG = {
+    // Logo URLs
+    monogramUrl: 'https://pub-acb560f551f141db830964aed1fa005f.r2.dev/site-assets/SA_Monogram_Black%401x%201x1.png',
+    wordmarkUrl: 'https://pub-acb560f551f141db830964aed1fa005f.r2.dev/site-assets/SA_Wordmark_Brown%401x.png',
     logoAlt: 'Society Arts',
     
+    // Main navigation items
     navItems: [
+        { id: 'home', label: 'Home', href: 'index.html', icon: 'home' },
+        { id: 'style-finder', label: 'Style Finder', href: 'style-finder.html', icon: 'grid' },
         { id: 'story-builder', label: 'Story Builder', href: 'story-builder.html', icon: 'edit' },
-        { id: 'style-finder', label: 'Style Finder', href: 'style-finder.html', icon: 'palette' },
-        { type: 'divider' },
-        { id: 'your-work', label: 'Your Work', href: 'projects.html', icon: 'folder' },
         { id: 'favorites', label: 'Favorites', href: 'favorites.html', icon: 'heart' },
-        { type: 'divider' },
-        { id: 'prints-pricing', label: 'Prints & Pricing', href: 'under-construction.html?feature=Prints%20%26%20Pricing', icon: 'dollar' },
-        { id: 'help', label: 'Help', href: 'under-construction.html?feature=Help', icon: 'help' }
+        { id: 'projects', label: 'Projects', href: 'projects.html', icon: 'folder' }
+    ],
+    
+    // Bottom navigation items
+    bottomItems: [
+        { id: 'settings', label: 'Settings', href: '#', icon: 'settings', action: 'openSettings' },
+        { id: 'help', label: 'Help', href: '#', icon: 'help', action: 'openHelp' }
     ]
 };
 
@@ -29,20 +35,28 @@ const HEADER_CONFIG = {
 // SVG ICONS
 // ============================================
 const HEADER_ICONS = {
-    hamburger: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>`,
-    close: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`,
+    // Navigation icons
+    home: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>`,
+    grid: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>`,
+    edit: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>`,
+    heart: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>`,
+    folder: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>`,
+    settings: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>`,
+    help: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`,
+    
+    // Header icons
     cart: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>`,
     user: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`,
     chevronDown: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>`,
     logout: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>`,
     users: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>`,
-    edit: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>`,
-    palette: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r="2"></circle><circle cx="17.5" cy="10.5" r="2"></circle><circle cx="8.5" cy="7.5" r="2"></circle><circle cx="6.5" cy="12.5" r="2"></circle><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.555C21.965 6.012 17.461 2 12 2z"></path></svg>`,
-    folder: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>`,
-    heart: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>`,
-    dollar: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>`,
-    help: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`,
-    arrowRight: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>`
+    close: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`,
+    
+    // Help modal icons
+    book: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>`,
+    video: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>`,
+    messageCircle: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>`,
+    mail: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>`
 };
 
 // ============================================
@@ -52,36 +66,18 @@ function getCurrentPageId() {
     const path = window.location.pathname;
     const page = path.split('/').pop().replace('.html', '') || 'index';
     const pageMap = {
-        'story-builder': 'story-builder',
+        'index': 'home',
         'style-finder': 'style-finder',
-        'projects': 'your-work',
+        'story-builder': 'story-builder',
         'favorites': 'favorites',
-        'index': null
+        'projects': 'projects'
     };
-    return pageMap[page] || null;
+    return pageMap[page] || 'home';
 }
 
 // ============================================
 // VANILLA JS FUNCTIONS
 // ============================================
-function toggleNavSidebar() {
-    const sidebar = document.getElementById('navSidebar');
-    const overlay = document.getElementById('navOverlay');
-    if (sidebar && overlay) {
-        const isOpen = sidebar.classList.toggle('open');
-        overlay.classList.toggle('open');
-        document.body.style.overflow = isOpen ? 'hidden' : '';
-    }
-}
-
-function closeNavSidebar() {
-    const sidebar = document.getElementById('navSidebar');
-    const overlay = document.getElementById('navOverlay');
-    if (sidebar) sidebar.classList.remove('open');
-    if (overlay) overlay.classList.remove('open');
-    document.body.style.overflow = '';
-}
-
 function toggleUserMenu() {
     const dropdown = document.getElementById('userDropdown');
     if (dropdown) dropdown.classList.toggle('open');
@@ -92,16 +88,32 @@ function closeUserMenu() {
     if (dropdown) dropdown.classList.remove('open');
 }
 
+function openHelpModal() {
+    const modal = document.getElementById('helpModal');
+    if (modal) modal.classList.add('open');
+}
+
+function closeHelpModal() {
+    const modal = document.getElementById('helpModal');
+    if (modal) modal.classList.remove('open');
+}
+
+function openSettingsModal() {
+    // For now, redirect to under construction
+    window.location.href = 'under-construction.html?feature=Settings';
+}
+
 // Export to window for vanilla JS pages
-window.toggleNavSidebar = toggleNavSidebar;
-window.closeNavSidebar = closeNavSidebar;
 window.toggleUserMenu = toggleUserMenu;
 window.closeUserMenu = closeUserMenu;
-window.HEADER_CONFIG = HEADER_CONFIG;
+window.openHelpModal = openHelpModal;
+window.closeHelpModal = closeHelpModal;
+window.openSettingsModal = openSettingsModal;
+window.SIDEBAR_CONFIG = SIDEBAR_CONFIG;
 window.HEADER_ICONS = HEADER_ICONS;
 
 // ============================================
-// REACT COMPONENTS (for story-builder)
+// REACT COMPONENTS
 // ============================================
 if (typeof React !== 'undefined') {
     const { useState, useEffect } = React;
@@ -114,7 +126,101 @@ if (typeof React !== 'undefined') {
         });
     };
 
-    // Header Component
+    // ========================================
+    // PERSISTENT SIDEBAR (Supabase-style)
+    // ========================================
+    const Sidebar = () => {
+        const currentPageId = getCurrentPageId();
+        const [helpModalOpen, setHelpModalOpen] = useState(false);
+
+        const handleNavClick = (item, e) => {
+            if (item.action === 'openHelp') {
+                e.preventDefault();
+                setHelpModalOpen(true);
+            } else if (item.action === 'openSettings') {
+                e.preventDefault();
+                openSettingsModal();
+            }
+        };
+
+        return React.createElement(React.Fragment, null,
+            // Sidebar
+            React.createElement('aside', { className: 'app-sidebar' },
+                // Logo section
+                React.createElement('div', { className: 'sidebar-logo' },
+                    React.createElement('a', { href: 'index.html', className: 'sidebar-logo-link' },
+                        React.createElement('img', {
+                            src: SIDEBAR_CONFIG.monogramUrl,
+                            alt: SIDEBAR_CONFIG.logoAlt,
+                            className: 'sidebar-logo-icon'
+                        }),
+                        React.createElement('img', {
+                            src: SIDEBAR_CONFIG.wordmarkUrl,
+                            alt: SIDEBAR_CONFIG.logoAlt,
+                            className: 'sidebar-logo-text'
+                        })
+                    )
+                ),
+                
+                // Main navigation
+                React.createElement('nav', { className: 'sidebar-nav' },
+                    React.createElement('ul', { className: 'sidebar-nav-list' },
+                        SIDEBAR_CONFIG.navItems.map((item, index) => {
+                            const isActive = item.id === currentPageId;
+                            return React.createElement('li', { key: index, className: 'sidebar-nav-item' },
+                                React.createElement('a', {
+                                    href: item.href,
+                                    className: `sidebar-nav-link ${isActive ? 'active' : ''}`,
+                                    title: item.label
+                                },
+                                    React.createElement('span', {
+                                        className: 'sidebar-nav-icon',
+                                        dangerouslySetInnerHTML: { __html: HEADER_ICONS[item.icon] || '' }
+                                    }),
+                                    React.createElement('span', { className: 'sidebar-nav-label' }, item.label)
+                                )
+                            );
+                        })
+                    )
+                ),
+                
+                // Spacer
+                React.createElement('div', { className: 'sidebar-spacer' }),
+                
+                // Bottom navigation
+                React.createElement('nav', { className: 'sidebar-nav sidebar-nav-bottom' },
+                    React.createElement('ul', { className: 'sidebar-nav-list' },
+                        SIDEBAR_CONFIG.bottomItems.map((item, index) => 
+                            React.createElement('li', { key: index, className: 'sidebar-nav-item' },
+                                React.createElement('a', {
+                                    href: item.href,
+                                    className: 'sidebar-nav-link',
+                                    title: item.label,
+                                    onClick: (e) => handleNavClick(item, e)
+                                },
+                                    React.createElement('span', {
+                                        className: 'sidebar-nav-icon',
+                                        dangerouslySetInnerHTML: { __html: HEADER_ICONS[item.icon] || '' }
+                                    }),
+                                    React.createElement('span', { className: 'sidebar-nav-label' }, item.label)
+                                )
+                            )
+                        )
+                    )
+                )
+            ),
+            
+            // Help Modal
+            helpModalOpen && React.createElement(HelpModal, {
+                isOpen: helpModalOpen,
+                onClose: () => setHelpModalOpen(false)
+            })
+        );
+    };
+
+    // ========================================
+    // TOP HEADER (Simplified)
+    // ========================================
     const Header = ({ user, profile, onAuthClick }) => {
         const [dropdownOpen, setDropdownOpen] = useState(false);
 
@@ -134,34 +240,16 @@ if (typeof React !== 'undefined') {
         const roleLabel = profile?.role === 'super_admin' ? 'Super Admin' : (profile?.role === 'admin' ? 'Admin' : null);
 
         return React.createElement('header', { className: 'header' },
-            // Left side
-            React.createElement('div', { className: 'header-left' },
-                React.createElement('button', {
-                    className: 'hamburger-btn',
-                    onClick: toggleNavSidebar,
-                    'aria-label': 'Open menu',
-                    dangerouslySetInnerHTML: { __html: HEADER_ICONS.hamburger }
-                }),
-                React.createElement('a', { href: 'index.html', className: 'logo' },
-                    React.createElement('img', {
-                        src: HEADER_CONFIG.logoUrl,
-                        alt: HEADER_CONFIG.logoAlt,
-                        className: 'logo-image'
-                    })
-                )
-            ),
-            // Right side
+            // Spacer to account for sidebar width
+            React.createElement('div', { className: 'header-spacer' }),
+            
+            // Right side actions
             React.createElement('div', { className: 'header-right' },
-                React.createElement('button', {
-                    className: 'btn-icon cart-btn',
-                    onClick: () => window.location.href = 'under-construction.html?feature=Shopping%20Cart',
-                    'aria-label': 'Cart',
-                    dangerouslySetInnerHTML: { __html: HEADER_ICONS.cart }
-                }),
                 React.createElement('a', {
                     href: 'story-builder.html',
                     className: 'btn btn-primary new-project-btn'
                 }, 'New Project'),
+                
                 // Auth section
                 React.createElement('div', { className: 'header-auth' },
                     !user ? 
@@ -215,77 +303,57 @@ if (typeof React !== 'undefined') {
         );
     };
 
-    // Navigation Sidebar Component
-    const NavSidebar = () => {
-        const currentPageId = getCurrentPageId();
-        
-        useEffect(() => {
-            const handleEscape = (e) => {
-                if (e.key === 'Escape') closeNavSidebar();
-            };
-            document.addEventListener('keydown', handleEscape);
-            return () => document.removeEventListener('keydown', handleEscape);
-        }, []);
+    // ========================================
+    // HELP MODAL
+    // ========================================
+    const HelpModal = ({ isOpen, onClose }) => {
+        if (!isOpen) return null;
 
-        return React.createElement(React.Fragment, null,
-            React.createElement('div', {
-                className: 'nav-overlay',
-                id: 'navOverlay',
-                onClick: closeNavSidebar
-            }),
-            React.createElement('nav', { className: 'nav-sidebar', id: 'navSidebar' },
-                React.createElement('div', { className: 'nav-header' },
-                    React.createElement('img', {
-                        src: HEADER_CONFIG.logoUrl,
-                        alt: HEADER_CONFIG.logoAlt,
-                        className: 'nav-logo'
-                    }),
+        const helpItems = [
+            { icon: 'book', title: 'Documentation', desc: 'Learn how to use Society Arts', href: 'under-construction.html?feature=Documentation' },
+            { icon: 'video', title: 'Video Tutorials', desc: 'Watch step-by-step guides', href: 'under-construction.html?feature=Video%20Tutorials' },
+            { icon: 'messageCircle', title: 'Community', desc: 'Join discussions with other artists', href: 'under-construction.html?feature=Community' },
+            { icon: 'mail', title: 'Contact Support', desc: 'Get help from our team', href: 'mailto:support@societyarts.com' }
+        ];
+
+        return React.createElement('div', { className: 'help-modal-overlay', onClick: onClose },
+            React.createElement('div', { 
+                className: 'help-modal',
+                onClick: (e) => e.stopPropagation()
+            },
+                React.createElement('div', { className: 'help-modal-header' },
+                    React.createElement('h3', null, 'Help & Resources'),
                     React.createElement('button', {
-                        className: 'nav-close-btn',
-                        onClick: closeNavSidebar,
+                        className: 'help-modal-close',
+                        onClick: onClose,
                         dangerouslySetInnerHTML: { __html: HEADER_ICONS.close }
                     })
                 ),
-                React.createElement('div', { className: 'nav-content' },
-                    React.createElement('ul', { className: 'nav-list' },
-                        HEADER_CONFIG.navItems.map((item, index) => {
-                            if (item.type === 'divider') {
-                                return React.createElement('li', { key: index, className: 'nav-divider' });
-                            }
-                            const isActive = item.id === currentPageId;
-                            return React.createElement('li', { key: index, className: 'nav-item' },
-                                React.createElement('a', {
-                                    href: item.href,
-                                    className: `nav-link ${isActive ? 'active' : ''}`
-                                },
-                                    React.createElement('span', {
-                                        className: 'nav-link-icon',
-                                        dangerouslySetInnerHTML: { __html: HEADER_ICONS[item.icon] || '' }
-                                    }),
-                                    item.label
-                                )
-                            );
-                        })
+                React.createElement('div', { className: 'help-modal-content' },
+                    helpItems.map((item, index) =>
+                        React.createElement('a', {
+                            key: index,
+                            href: item.href,
+                            className: 'help-modal-item'
+                        },
+                            React.createElement('span', {
+                                className: 'help-modal-item-icon',
+                                dangerouslySetInnerHTML: { __html: HEADER_ICONS[item.icon] }
+                            }),
+                            React.createElement('div', { className: 'help-modal-item-text' },
+                                React.createElement('span', { className: 'help-modal-item-title' }, item.title),
+                                React.createElement('span', { className: 'help-modal-item-desc' }, item.desc)
+                            )
+                        )
                     )
                 )
             )
         );
     };
 
-    // Subheader Component
-    const Subheader = ({ title, subtitle }) => {
-        return React.createElement('div', { className: 'subheader' },
-            React.createElement('h1', { className: 'subheader-title' }, title),
-            subtitle && React.createElement('p', { className: 'subheader-text' }, subtitle)
-        );
-    };
-
-    // Footer Component  
-    const Footer = ({ children }) => {
-        return React.createElement('footer', { className: 'footer' }, children);
-    };
-
-    // Format Selector Component
+    // ========================================
+    // FORMAT SELECTOR (for Story Builder)
+    // ========================================
     const FormatSelector = ({ value, onChange }) => {
         const [isOpen, setIsOpen] = useState(false);
         
@@ -317,13 +385,22 @@ if (typeof React !== 'undefined') {
         );
     };
 
-    // Export React components
+    // ========================================
+    // LEGACY COMPONENTS (for compatibility)
+    // ========================================
+    const NavSidebar = () => null; // No longer needed
+    const Subheader = ({ title, subtitle }) => null; // Removed
+
+    // ========================================
+    // EXPORTS
+    // ========================================
     window.SocietyArts = window.SocietyArts || {};
     window.SocietyArts.Header = Header;
-    window.SocietyArts.NavSidebar = NavSidebar;
-    window.SocietyArts.Subheader = Subheader;
-    window.SocietyArts.Footer = Footer;
+    window.SocietyArts.Sidebar = Sidebar;
+    window.SocietyArts.NavSidebar = NavSidebar; // Legacy
+    window.SocietyArts.Subheader = Subheader; // Legacy
     window.SocietyArts.FormatSelector = FormatSelector;
+    window.SocietyArts.HelpModal = HelpModal;
     
     // Create React icon components from SVG strings
     const Icons = {};
