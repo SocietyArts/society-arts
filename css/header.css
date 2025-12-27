@@ -14,6 +14,7 @@
     --sidebar-width-expanded: 220px;
     --sidebar-transition: 0.2s ease;
     --header-height: 56px;
+    --logo-bar-height: 48px;
 }
 
 /* ========================================
@@ -38,7 +39,69 @@
     width: var(--sidebar-width-expanded);
 }
 
-/* Logo Section */
+/* Logo Bar - Always visible with full wordmark */
+.sidebar-logo-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: var(--logo-bar-height);
+    background-color: var(--color-surface, #F9F8F6);
+    border-bottom: 1px solid var(--color-tan-20, #E7E2DC);
+    z-index: 210;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    width: 180px;
+}
+
+.sidebar-logo-bar a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+}
+
+.sidebar-logo-bar img.logo-icon {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.sidebar-logo-bar img.logo-text {
+    height: 16px;
+    width: auto;
+}
+
+/* Section Title - Shows current page name */
+.sidebar-section-title {
+    position: fixed;
+    top: var(--logo-bar-height);
+    left: 0;
+    width: 180px;
+    padding: 12px 16px;
+    background-color: var(--color-surface, #F9F8F6);
+    border-bottom: 1px solid var(--color-tan-20, #E7E2DC);
+    z-index: 205;
+}
+
+.sidebar-section-title h2 {
+    font-family: var(--font-serif, 'Domine', serif);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--color-text-primary, #3E2318);
+    margin: 0;
+    white-space: nowrap;
+}
+
+.sidebar-section-title .section-count {
+    font-family: var(--font-sans, 'Familjen Grotesk', sans-serif);
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--color-text-muted, #A89F94);
+    margin-left: 8px;
+}
+
+/* Legacy Logo Section - for backwards compatibility */
 .sidebar-logo {
     height: var(--header-height);
     display: flex;

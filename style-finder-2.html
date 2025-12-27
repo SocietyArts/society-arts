@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Style Finder - Society Arts</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://pub-acb560f551f141db830964aed1fa005f.r2.dev/site-assets/SA_Monogram_Black%401x%201x1.png">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Domine:wght@400;500;600;700&family=Familjen+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        :root {
+            /* Colors */
+            --color-brown: #3E2318;
+            --color-brown-60: #8B7B75;
+            --color-tan: #C4B7A6;
+            --color-tan-10: #F3F1EE;
+            --color-tan-20: #E7E2DC;
+            --color-tan-40: #CFC5B9;
+            --color-accent: #C73314;
+            --color-accent-hover: #A82A10;
+            --color-surface: #FAFAFA;
+            --color-text-primary: #3E2318;
+            --color-text-secondary: #5D4E47;
+            --color-text-muted: #A89F94;
+            --color-border: #E7E2DC;
+            
+            /* Typography */
+            --font-serif: 'Domine', serif;
+            --font-sans: 'Familjen Grotesk', sans-serif;
+            
+            /* Layout */
+            --sidebar-width: 280px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--color-surface);
+            color: var(--color-text-primary);
+            min-height: 100vh;
+        }
+        
+        /* ========================================
+           MAIN LAYOUT
+           ======================================== */
+        .sf2-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* ========================================
+           LEFT SIDEBAR - FACETED NAVIGATION
+           ======================================== */
+        .sf2-sidebar {
+            width: var(--sidebar-width);
+            background: white;
+            border-right: 1px solid var(--color-border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 100;
+            overflow-y: auto;
+        }
+        
+        /* Title Section */
+        .sf2-title-section {
+            padding: 20px 20px 16px 20px;
+            border-bottom: 1px solid var(--color-border);
+        }
+        
+        .sf2-title {
+            font-family: var(--font-serif);
+            font-size: 20px;
+            font-weight: 500;
+            color: var(--color-text-primary);
+            margin: 0 0 4px 0;
+        }
+        
+        .sf2-subtitle {
+            font-size: 14px;
+            color: var(--color-text-muted);
+        }
+        
+        /* Quick Access Section */
+        .sf2-quick-access {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--color-border);
+        }
+        
+        .sf2-quick-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: background 0.15s;
+            border-left: 3px solid transparent;
+        }
+        
+        .sf2-quick-item:hover {
+            background: var(--color-tan-10);
+        }
+        
+        .sf2-quick-item.active {
+            background: var(--color-tan-10);
+            border-left-color: var(--color-brown);
+        }
+        
+        .sf2-quick-item-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .sf2-quick-item svg {
+            width: 18px;
+            height: 18px;
+            color: var(--color-brown-60);
+        }
+        
+        .sf2-quick-item.active svg {
+            color: var(--color-brown);
+        }
+        
+        .sf2-quick-item span.label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text-primary);
+        }
+        
+        .sf2-quick-item .count {
+            font-size: 13px;
+            color: var(--color-text-muted);
+            background: var(--color-tan-10);
+            padding: 2px 10px;
+            border-radius: 12px;
+            min-width: 28px;
+            text-align: center;
+        }
+        
+        /* Faceted Categories */
+        .sf2-facets {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 0;
+        }
+        
+        .sf2-category {
+            /* No border between categories */
+        }
+        
+        .sf2-category-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.15s;
+        }
+        
+        .sf2-category-header:hover {
+            background: var(--color-tan-10);
+        }
+        
+        .sf2-category-header-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .sf2-category-header svg.chevron {
+            width: 16px;
+            height: 16px;
+            color: var(--color-brown-60);
+            transition: transform 0.2s;
+        }
+        
+        .sf2-category.open .sf2-category-header svg.chevron {
+            transform: rotate(90deg);
+        }
+        
+        .sf2-category-header h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+        
+        .sf2-category-header .count {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--color-text-muted);
+            background: var(--color-tan-10);
+            padding: 2px 10px;
+            border-radius: 12px;
+        }
+        
+        .sf2-category-items {
+            display: none;
+            padding: 0 20px 8px 20px;
+        }
+        
+        .sf2-category.open .sf2-category-items {
+            display: block;
+        }
+        
+        .sf2-facet-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0 8px 28px;
+            cursor: pointer;
+            transition: color 0.15s;
+        }
+        
+        .sf2-facet-item:hover {
+            color: var(--color-accent);
+        }
+        
+        .sf2-facet-checkbox {
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--color-tan-40);
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.15s;
+        }
+        
+        .sf2-facet-item.selected .sf2-facet-checkbox {
+            background: var(--color-accent);
+            border-color: var(--color-accent);
+        }
+        
+        .sf2-facet-checkbox svg {
+            width: 12px;
+            height: 12px;
+            color: white;
+            opacity: 0;
+        }
+        
+        .sf2-facet-item.selected .sf2-facet-checkbox svg {
+            opacity: 1;
+        }
+        
+        .sf2-facet-label {
+            flex: 1;
+            font-size: 13px;
+            color: var(--color-text-secondary);
+        }
+        
+        .sf2-facet-item.selected .sf2-facet-label {
+            color: var(--color-text-primary);
+            font-weight: 500;
+        }
+        
+        .sf2-facet-count {
+            font-size: 13px;
+            color: var(--color-text-muted);
+        }
+        
+        /* ========================================
+           MAIN CONTENT
+           ======================================== */
+        .sf2-main {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            display: flex;
+            flex-direction: column;
+            background: white;
+        }
+        
+        /* Top Bar */
+        .sf2-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 16px 24px;
+            background: white;
+            border-bottom: 1px solid var(--color-border);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            gap: 16px;
+        }
+        
+        .sf2-search {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--color-tan-10);
+            border-radius: 24px;
+            padding: 10px 16px;
+            width: 280px;
+        }
+        
+        .sf2-search svg {
+            width: 18px;
+            height: 18px;
+            color: var(--color-brown-60);
+            flex-shrink: 0;
+        }
+        
+        .sf2-search input {
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            color: var(--color-text-primary);
+            outline: none;
+            width: 100%;
+        }
+        
+        .sf2-search input::placeholder {
+            color: var(--color-text-muted);
+        }
+        
+        .sf2-topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .sf2-filter-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            background: white;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text-primary);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        
+        .sf2-filter-btn:hover {
+            background: var(--color-tan-10);
+        }
+        
+        .sf2-filter-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        .sf2-reset-btn {
+            padding: 10px 16px;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text-muted);
+            cursor: pointer;
+            transition: color 0.15s;
+        }
+        
+        .sf2-reset-btn:hover {
+            color: var(--color-text-primary);
+        }
+        
+        .sf2-close-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background 0.15s;
+        }
+        
+        .sf2-close-btn:hover {
+            background: var(--color-tan-10);
+        }
+        
+        .sf2-close-btn svg {
+            width: 20px;
+            height: 20px;
+            color: var(--color-brown-60);
+        }
+        
+        /* Grid Container */
+        .sf2-grid-container {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            background: var(--color-surface);
+        }
+        
+        .sf2-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+        
+        /* Style Card */
+        .sf2-card {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .sf2-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(62, 35, 24, 0.15);
+        }
+        
+        .sf2-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .sf2-card-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(transparent 60%, rgba(0,0,0,0.4));
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .sf2-card:hover .sf2-card-overlay {
+            opacity: 1;
+        }
+        
+        .sf2-card-actions {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            display: flex;
+            gap: 6px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .sf2-card:hover .sf2-card-actions {
+            opacity: 1;
+        }
+        
+        .sf2-card-action {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            transition: transform 0.15s;
+        }
+        
+        .sf2-card-action:hover {
+            transform: scale(1.1);
+        }
+        
+        .sf2-card-action svg {
+            width: 16px;
+            height: 16px;
+            color: var(--color-brown-60);
+        }
+        
+        .sf2-card-action.favorite.active svg {
+            fill: var(--color-accent);
+            color: var(--color-accent);
+        }
+        
+        /* Loading State */
+        .sf2-loading {
+            grid-column: 1 / -1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px;
+            color: var(--color-text-muted);
+        }
+        
+        .sf2-loading-spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid var(--color-tan-20);
+            border-top-color: var(--color-accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Empty State */
+        .sf2-empty {
+            grid-column: 1 / -1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 40px;
+            text-align: center;
+        }
+        
+        .sf2-empty svg {
+            width: 64px;
+            height: 64px;
+            color: var(--color-tan-40);
+            margin-bottom: 16px;
+        }
+        
+        .sf2-empty h3 {
+            font-family: var(--font-serif);
+            font-size: 18px;
+            color: var(--color-text-primary);
+            margin-bottom: 8px;
+        }
+        
+        .sf2-empty p {
+            font-size: 14px;
+            color: var(--color-text-muted);
+        }
+        
+        /* Active Filters Chips */
+        .sf2-active-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 0 24px 16px 24px;
+            background: var(--color-surface);
+        }
+        
+        .sf2-active-filters:empty {
+            display: none;
+        }
+        
+        .sf2-filter-chip {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: white;
+            border: 1px solid var(--color-border);
+            border-radius: 16px;
+            font-size: 13px;
+            color: var(--color-text-primary);
+        }
+        
+        .sf2-filter-chip button {
+            width: 16px;
+            height: 16px;
+            border: none;
+            background: var(--color-tan-40);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        
+        .sf2-filter-chip button:hover {
+            background: var(--color-accent);
+        }
+        
+        .sf2-filter-chip button svg {
+            width: 10px;
+            height: 10px;
+            color: white;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .sf2-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        @media (max-width: 900px) {
+            .sf2-sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+            
+            .sf2-sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .sf2-main {
+                margin-left: 0;
+            }
+            
+            .sf2-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .sf2-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+            
+            .sf2-grid-container {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sf2-layout">
+        <!-- Left Sidebar - Faceted Navigation -->
+        <aside class="sf2-sidebar">
+            <!-- Title Section -->
+            <div class="sf2-title-section">
+                <h1 class="sf2-title">Style Finder</h1>
+                <p class="sf2-subtitle" id="subtitleText">Explore styles</p>
+            </div>
+            
+            <!-- Quick Access -->
+            <div class="sf2-quick-access">
+                <div class="sf2-quick-item" data-view="favorites" onclick="setView('favorites')">
+                    <div class="sf2-quick-item-left">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                        </svg>
+                        <span class="label">Favorites</span>
+                    </div>
+                    <span class="count" id="favoritesCount">0</span>
+                </div>
+                <div class="sf2-quick-item" data-view="collections" onclick="setView('collections')">
+                    <div class="sf2-quick-item-left">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                        <span class="label">Collections</span>
+                    </div>
+                    <span class="count" id="collectionsCount">3</span>
+                </div>
+                <div class="sf2-quick-item active" data-view="explore" onclick="setView('explore')">
+                    <div class="sf2-quick-item-left">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                        </svg>
+                        <span class="label">Explore</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Faceted Categories -->
+            <div class="sf2-facets" id="facetsContainer">
+                <!-- Categories will be populated by JavaScript -->
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="sf2-main">
+            <!-- Top Bar -->
+            <div class="sf2-topbar">
+                <div class="sf2-search">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" placeholder="Search styles..." id="searchInput">
+                </div>
+                
+                <div class="sf2-topbar-actions">
+                    <button class="sf2-filter-btn" id="overlayFilterBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="4" y1="21" x2="4" y2="14"></line>
+                            <line x1="4" y1="10" x2="4" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12" y2="3"></line>
+                            <line x1="20" y1="21" x2="20" y2="16"></line>
+                            <line x1="20" y1="12" x2="20" y2="3"></line>
+                            <line x1="1" y1="14" x2="7" y2="14"></line>
+                            <line x1="9" y1="8" x2="15" y2="8"></line>
+                            <line x1="17" y1="16" x2="23" y2="16"></line>
+                        </svg>
+                        Filter
+                    </button>
+                    <button class="sf2-reset-btn" id="resetBtn">Reset</button>
+                    <button class="sf2-close-btn" onclick="window.location.href='index.html'">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Active Filters -->
+            <div class="sf2-active-filters" id="activeFilters"></div>
+            
+            <!-- Grid Container -->
+            <div class="sf2-grid-container">
+                <div class="sf2-grid" id="stylesGrid">
+                    <!-- Loading State -->
+                    <div class="sf2-loading" id="loadingState">
+                        <div class="sf2-loading-spinner"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Supabase Client -->
+    <script src="js/shared/supabase-client.js"></script>
+    
+    <script>
+        // ============================================
+        // STYLE FINDER 2 - FACETED NAVIGATION
+        // ============================================
+        
+        // Configuration - 14 Mediums organized by 5 Categories
+        const MEDIUM_CATEGORIES = {
+            painting: {
+                name: 'Painting',
+                mediums: [
+                    { id: 'bold_paint', name: 'Bold Paint (Oil/Acrylic)', dbKey: 'bold_paint_oil_acrylic' },
+                    { id: 'fluid_paint', name: 'Fluid Paint (Watercolor)', dbKey: 'fluid_paint_watercolor' },
+                    { id: 'flat_paint', name: 'Flat Paint (Poster/Gouache)', dbKey: 'flat_paint_poster_gouache' }
+                ]
+            },
+            drawing: {
+                name: 'Drawing',
+                mediums: [
+                    { id: 'pencil_graphite', name: 'Pencil/Graphite', dbKey: 'sketch_pencil_graphite' },
+                    { id: 'ink_charcoal', name: 'Ink/Charcoal', dbKey: 'bold_line_ink_charcoal' },
+                    { id: 'pastel_colored', name: 'Pastel/Colored Pencil', dbKey: 'color_drawing_pastel_colored_pencil' }
+                ]
+            },
+            photography: {
+                name: 'Photography',
+                mediums: [
+                    { id: 'color_photo', name: 'Color', dbKey: 'color_photography' },
+                    { id: 'bw_photo', name: 'Black & White', dbKey: 'black_white_photography' }
+                ]
+            },
+            printmaking: {
+                name: 'Printmaking',
+                mediums: [
+                    { id: 'woodcut_linocut', name: 'Woodcut/Linocut', dbKey: 'bold_carved_print_woodcut_linocut' },
+                    { id: 'etching_engraving', name: 'Etching/Engraving', dbKey: 'fine_line_print_etching_engraving' },
+                    { id: 'screenprint', name: 'Screenprint', dbKey: 'poster_print_screenprint' }
+                ]
+            },
+            collage: {
+                name: 'Collage / Mixed Media',
+                mediums: [
+                    { id: 'paper_collage', name: 'Paper Collage', dbKey: 'paper_collage' },
+                    { id: 'photo_collage', name: 'Photo Collage', dbKey: 'photo_collage' },
+                    { id: 'mixed_layers', name: 'Mixed Layers', dbKey: 'mixed_layers' }
+                ]
+            }
+        };
+        
+        // 8 Overlays/Styles
+        const OVERLAYS = [
+            { id: 'abstract', name: 'Abstract' },
+            { id: 'realistic', name: 'Realistic' },
+            { id: 'cinematic', name: 'Cinematic' },
+            { id: 'experimental', name: 'Experimental' },
+            { id: 'minimalist', name: 'Minimalist' },
+            { id: 'whimsical', name: 'Whimsical' },
+            { id: 'illustration', name: 'Illustration' },
+            { id: 'historic', name: 'Historic' }
+        ];
+        
+        // State
+        let allStyles = [];
+        let filteredStyles = [];
+        let selectedMediums = new Set();
+        let selectedOverlays = new Set();
+        let searchTerm = '';
+        let currentView = 'explore';
+        let expandedCategories = new Set(['painting', 'drawing', 'photography', 'printmaking']);
+        let facetCounts = {};
+        
+        // DOM Elements
+        const facetsContainer = document.getElementById('facetsContainer');
+        const stylesGrid = document.getElementById('stylesGrid');
+        const loadingState = document.getElementById('loadingState');
+        const activeFilters = document.getElementById('activeFilters');
+        const searchInput = document.getElementById('searchInput');
+        const subtitleText = document.getElementById('subtitleText');
+        const resetBtn = document.getElementById('resetBtn');
+        
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        
+        async function initialize() {
+            console.log('Initializing Style Finder 2...');
+            
+            // Render facets immediately
+            renderFacets();
+            
+            // Load styles from Supabase
+            await loadStyles();
+            
+            // Setup event listeners
+            setupEventListeners();
+        }
+        
+        // ============================================
+        // LOAD STYLES FROM SUPABASE
+        // ============================================
+        
+        async function loadStyles() {
+            showLoading(true);
+            
+            try {
+                const { supabase } = window.SocietyArts;
+                
+                // First try to load from styles_with_attributes view
+                let { data: stylesData, error } = await supabase
+                    .from('styles')
+                    .select('id, name, image_urls, status')
+                    .eq('status', 'active')
+                    .order('name')
+                    .limit(500);
+                
+                if (error) throw error;
+                
+                // Try to get attributes
+                const { data: attributes } = await supabase
+                    .from('style_attributes')
+                    .select('style_id, medium, medium_category, overlay');
+                
+                // Merge attributes with styles
+                const attributesMap = {};
+                if (attributes) {
+                    attributes.forEach(attr => {
+                        attributesMap[attr.style_id] = attr;
+                    });
+                }
+                
+                allStyles = stylesData.map(s => ({
+                    ...s,
+                    medium: attributesMap[s.id]?.medium || null,
+                    medium_category: attributesMap[s.id]?.medium_category || null,
+                    overlay: attributesMap[s.id]?.overlay || null
+                }));
+                
+                console.log(`Loaded ${allStyles.length} styles`);
+                
+                // Calculate facet counts
+                calculateFacetCounts();
+                
+                // Update subtitle
+                updateSubtitle();
+                
+                // Initial filter and render
+                filterAndRenderStyles();
+                
+            } catch (error) {
+                console.error('Error loading styles:', error);
+                showError('Failed to load styles');
+            }
+            
+            showLoading(false);
+        }
+        
+        // ============================================
+        // FACET COUNTS
+        // ============================================
+        
+        function calculateFacetCounts() {
+            facetCounts = {};
+            
+            // Count by medium
+            Object.values(MEDIUM_CATEGORIES).forEach(category => {
+                category.mediums.forEach(medium => {
+                    const count = allStyles.filter(s => 
+                        s.medium === medium.dbKey || 
+                        s.medium === medium.id
+                    ).length;
+                    facetCounts[medium.id] = count;
+                });
+            });
+            
+            // Count by overlay
+            OVERLAYS.forEach(overlay => {
+                const count = allStyles.filter(s => 
+                    s.overlay === overlay.id
+                ).length;
+                facetCounts[overlay.id] = count;
+            });
+            
+            // Update facet UI with counts
+            updateFacetCounts();
+        }
+        
+        function updateFacetCounts() {
+            // Update category totals and individual counts
+            Object.entries(MEDIUM_CATEGORIES).forEach(([catId, category]) => {
+                let categoryTotal = 0;
+                
+                category.mediums.forEach(medium => {
+                    const count = facetCounts[medium.id] || 0;
+                    categoryTotal += count;
+                    
+                    const countEl = document.querySelector(`[data-medium="${medium.id}"] .sf2-facet-count`);
+                    if (countEl) countEl.textContent = count;
+                });
+                
+                const catCountEl = document.querySelector(`[data-category="${catId}"] .count`);
+                if (catCountEl) catCountEl.textContent = categoryTotal;
+            });
+        }
+        
+        // ============================================
+        // RENDER FACETS
+        // ============================================
+        
+        function renderFacets() {
+            let html = '';
+            
+            Object.entries(MEDIUM_CATEGORIES).forEach(([catId, category]) => {
+                const isOpen = expandedCategories.has(catId);
+                
+                html += `
+                    <div class="sf2-category ${isOpen ? 'open' : ''}" data-category="${catId}">
+                        <div class="sf2-category-header" onclick="toggleCategory('${catId}')">
+                            <div class="sf2-category-header-left">
+                                <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="9 18 15 12 9 6"></polyline>
+                                </svg>
+                                <h3>${category.name}</h3>
+                            </div>
+                            <span class="count">0</span>
+                        </div>
+                        <div class="sf2-category-items">
+                            ${category.mediums.map(medium => `
+                                <div class="sf2-facet-item ${selectedMediums.has(medium.id) ? 'selected' : ''}" 
+                                     data-medium="${medium.id}"
+                                     onclick="toggleMedium('${medium.id}')">
+                                    <div class="sf2-facet-checkbox">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                            <polyline points="20 6 9 17 4 12"></polyline>
+                                        </svg>
+                                    </div>
+                                    <span class="sf2-facet-label">${medium.name}</span>
+                                    <span class="sf2-facet-count">0</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            facetsContainer.innerHTML = html;
+        }
+        
+        // ============================================
+        // FILTER & RENDER STYLES
+        // ============================================
+        
+        function filterAndRenderStyles() {
+            // Filter styles
+            filteredStyles = allStyles.filter(style => {
+                // Search filter
+                if (searchTerm) {
+                    const search = searchTerm.toLowerCase();
+                    if (!style.name?.toLowerCase().includes(search)) {
+                        return false;
+                    }
+                }
+                
+                // Medium filter
+                if (selectedMediums.size > 0) {
+                    const styleMedium = style.medium;
+                    let matches = false;
+                    
+                    selectedMediums.forEach(mediumId => {
+                        const medium = findMediumById(mediumId);
+                        if (medium && (styleMedium === medium.dbKey || styleMedium === mediumId)) {
+                            matches = true;
+                        }
+                    });
+                    
+                    if (!matches) return false;
+                }
+                
+                // Overlay filter
+                if (selectedOverlays.size > 0) {
+                    const styleOverlay = style.overlay;
+                    if (!selectedOverlays.has(styleOverlay)) {
+                        return false;
+                    }
+                }
+                
+                return true;
+            });
+            
+            // Update subtitle
+            updateSubtitle();
+            
+            // Render active filters
+            renderActiveFilters();
+            
+            // Render grid
+            renderStylesGrid();
+        }
+        
+        function updateSubtitle() {
+            const count = filteredStyles.length;
+            const hasFilters = selectedMediums.size > 0 || selectedOverlays.size > 0 || searchTerm;
+            
+            if (hasFilters) {
+                subtitleText.textContent = `${count} styles found`;
+            } else {
+                subtitleText.textContent = `${allStyles.length} styles`;
+            }
+        }
+        
+        function renderStylesGrid() {
+            if (filteredStyles.length === 0) {
+                stylesGrid.innerHTML = `
+                    <div class="sf2-empty">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                        <h3>No styles found</h3>
+                        <p>Try adjusting your filters or search term</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            stylesGrid.innerHTML = filteredStyles.map(style => {
+                const imageUrl = style.image_urls?.[0] || '';
+                
+                return `
+                    <div class="sf2-card" data-id="${style.id}" onclick="openStyleModal('${style.id}')">
+                        <img src="${imageUrl}" alt="${style.name || ''}" 
+                             loading="lazy"
+                             onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23E7E2DC%22 width=%22100%22 height=%22100%22/></svg>'">
+                        <div class="sf2-card-overlay"></div>
+                        <div class="sf2-card-actions">
+                            <button class="sf2-card-action favorite" onclick="event.stopPropagation(); toggleFavorite('${style.id}')">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function renderActiveFilters() {
+            const chips = [];
+            
+            selectedMediums.forEach(mediumId => {
+                const medium = findMediumById(mediumId);
+                if (medium) {
+                    chips.push(`
+                        <div class="sf2-filter-chip">
+                            ${medium.name}
+                            <button onclick="toggleMedium('${mediumId}')">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
+                        </div>
+                    `);
+                }
+            });
+            
+            selectedOverlays.forEach(overlayId => {
+                const overlay = OVERLAYS.find(o => o.id === overlayId);
+                if (overlay) {
+                    chips.push(`
+                        <div class="sf2-filter-chip">
+                            ${overlay.name}
+                            <button onclick="toggleOverlay('${overlayId}')">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
+                        </div>
+                    `);
+                }
+            });
+            
+            activeFilters.innerHTML = chips.join('');
+        }
+        
+        // ============================================
+        // EVENT HANDLERS
+        // ============================================
+        
+        function setView(view) {
+            currentView = view;
+            
+            // Update active state
+            document.querySelectorAll('.sf2-quick-item').forEach(el => {
+                el.classList.toggle('active', el.dataset.view === view);
+            });
+            
+            // TODO: Implement favorites and collections views
+            if (view === 'favorites') {
+                subtitleText.textContent = 'Your favorites';
+            } else if (view === 'collections') {
+                subtitleText.textContent = '3 collections';
+            } else {
+                updateSubtitle();
+            }
+        }
+        
+        function toggleCategory(catId) {
+            const catEl = document.querySelector(`[data-category="${catId}"]`);
+            if (expandedCategories.has(catId)) {
+                expandedCategories.delete(catId);
+                catEl?.classList.remove('open');
+            } else {
+                expandedCategories.add(catId);
+                catEl?.classList.add('open');
+            }
+        }
+        
+        function toggleMedium(mediumId) {
+            const itemEl = document.querySelector(`[data-medium="${mediumId}"]`);
+            
+            if (selectedMediums.has(mediumId)) {
+                selectedMediums.delete(mediumId);
+                itemEl?.classList.remove('selected');
+            } else {
+                selectedMediums.add(mediumId);
+                itemEl?.classList.add('selected');
+            }
+            
+            filterAndRenderStyles();
+        }
+        
+        function toggleOverlay(overlayId) {
+            if (selectedOverlays.has(overlayId)) {
+                selectedOverlays.delete(overlayId);
+            } else {
+                selectedOverlays.add(overlayId);
+            }
+            
+            filterAndRenderStyles();
+        }
+        
+        function resetFilters() {
+            selectedMediums.clear();
+            selectedOverlays.clear();
+            searchTerm = '';
+            searchInput.value = '';
+            
+            document.querySelectorAll('.sf2-facet-item.selected').forEach(el => {
+                el.classList.remove('selected');
+            });
+            
+            filterAndRenderStyles();
+        }
+        
+        function findMediumById(id) {
+            for (const category of Object.values(MEDIUM_CATEGORIES)) {
+                const medium = category.mediums.find(m => m.id === id);
+                if (medium) return medium;
+            }
+            return null;
+        }
+        
+        function setupEventListeners() {
+            // Search input
+            let searchTimeout;
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    searchTerm = e.target.value.trim();
+                    filterAndRenderStyles();
+                }, 300);
+            });
+            
+            // Reset button
+            resetBtn.addEventListener('click', resetFilters);
+        }
+        
+        function showLoading(show) {
+            loadingState.style.display = show ? 'flex' : 'none';
+        }
+        
+        function showError(message) {
+            stylesGrid.innerHTML = `
+                <div class="sf2-empty">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    <h3>Error</h3>
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+        
+        // Placeholder functions
+        function openStyleModal(styleId) {
+            // Open style in Style Finder 1 for now
+            window.location.href = `style-finder.html?style=${styleId}`;
+        }
+        
+        function toggleFavorite(styleId) {
+            console.log('Toggle favorite:', styleId);
+            // TODO: Implement favorites
+        }
+        
+        // ============================================
+        // INITIALIZE
+        // ============================================
+        
+        document.addEventListener('DOMContentLoaded', initialize);
+    </script>
+</body>
+</html>
