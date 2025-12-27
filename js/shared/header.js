@@ -457,7 +457,7 @@ function Header({ currentPage, onNewProject, onOpenStyleFinder }) {
           </button>
           <a href="/" className="logo">
             <img 
-              src="https://pub-d4d49982f29749dea52e2eb37c29ad51.r2.dev/site-assets/SA_Wordmark_Brown_1x.png" 
+              src="https://pub-acb560f551f141db830964aed1fa005f.r2.dev/site-assets/SA_Wordmark_Brown%401x.png" 
               alt="Society Arts" 
               className="logo-image"
             />
