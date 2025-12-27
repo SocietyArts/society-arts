@@ -2317,6 +2317,8 @@
 
     <!-- Scripts -->
     <script src="js/shared/supabase-client.js"></script>
+    <script src="js/shared/auth.js"></script>
+    <script src="js/shared/projects.js"></script>
     <script src="js/style-finder/style-data.js"></script>
     <script>
         // ============================================
@@ -2486,7 +2488,7 @@
                                 <polyline points="20 6 9 17 4 12"></polyline>
                             </svg>
                         </button>
-                        <button class="favorite-btn ${SocietyArts.isFavorite(style.id) ? 'active' : ''}" 
+                        <button class="favorite-btn ${isStyleFavorited(style.id) ? 'active' : ''}" 
                                 onclick="event.stopPropagation(); toggleFavorite('${style.id}', this)"
                                 title="Add to favorites">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -2819,22 +2821,51 @@
         async function bulkFavorite() {
             if (!currentUser) {
                 showToast('Please sign in to favorite styles');
+                openAuthModal();
                 return;
             }
             
+            const { supabase } = window.SocietyArts;
             const styleIds = Array.from(selectedStyles);
             let added = 0;
             
             for (const styleId of styleIds) {
-                const result = SocietyArts.toggleFavorite(styleId);
-                if (result.added) added++;
-                
-                // Update button state
-                const btn = document.querySelector(`.style-card[data-style-id="${styleId}"] .favorite-btn`);
-                btn?.classList.toggle('active', result.added);
+                try {
+                    // Check if already favorited using local function
+                    if (!isStyleFavorited(styleId)) {
+                        // Get style name and add to favorites
+                        const style = await SocietyArts.getStyleById(styleId);
+                        const styleName = style?.name || null;
+                        
+                        const { error } = await supabase
+                            .from('user_favorites')
+                            .insert({
+                                user_id: currentUser.id,
+                                style_id: styleId,
+                                style_name: styleName
+                            });
+                        
+                        if (error && error.code !== '23505') {
+                            throw error;
+                        }
+                        
+                        localFavorites.unshift({
+                            style_id: styleId,
+                            style_name: styleName,
+                            created_at: new Date().toISOString()
+                        });
+                        added++;
+                        
+                        // Update button state
+                        const btn = document.querySelector(`.style-card[data-style-id="${styleId}"] .favorite-btn`);
+                        btn?.classList.add('active');
+                    }
+                } catch (error) {
+                    console.error(`Failed to add favorite ${styleId}:`, error);
+                }
             }
             
-            showToast(`Added ${added} styles to favorites`);
+            showToast(`Added ${added} style${added !== 1 ? 's' : ''} to favorites`);
             clearSelection();
         }
         
@@ -2883,12 +2914,99 @@
         }
         
         // ============================================
-        // Favorites
+        // Favorites (Database-backed)
         // ============================================
-        function toggleFavorite(styleId, btn) {
-            const result = SocietyArts.toggleFavorite(styleId);
-            btn.classList.toggle('active', result.added);
-            showToast(result.added ? 'Added to favorites' : 'Removed from favorites');
+        
+        // Local favorites cache for style-finder
+        let localFavorites = [];
+        
+        // Load user's favorites on auth
+        async function loadUserFavoritesLocal() {
+            if (!currentUser) {
+                localFavorites = [];
+                return [];
+            }
+            
+            const { supabase } = window.SocietyArts;
+            try {
+                const { data, error } = await supabase
+                    .from('user_favorites')
+                    .select('style_id, style_name, created_at')
+                    .eq('user_id', currentUser.id)
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                localFavorites = data || [];
+                console.log(`Loaded ${localFavorites.length} favorites for user`);
+                return localFavorites;
+            } catch (error) {
+                console.error('Failed to load favorites:', error);
+                return [];
+            }
+        }
+        
+        // Check if a style is favorited
+        function isStyleFavorited(styleId) {
+            return localFavorites.some(f => f.style_id === styleId);
+        }
+        
+        // Toggle favorite on a style
+        async function toggleFavorite(styleId, btn) {
+            // Check if user is logged in
+            if (!currentUser) {
+                showToast('Please sign in to save favorites');
+                openAuthModal();
+                return;
+            }
+            
+            const { supabase } = window.SocietyArts;
+            
+            try {
+                if (isStyleFavorited(styleId)) {
+                    // Remove from favorites
+                    const { error } = await supabase
+                        .from('user_favorites')
+                        .delete()
+                        .eq('user_id', currentUser.id)
+                        .eq('style_id', styleId);
+                    
+                    if (error) throw error;
+                    
+                    localFavorites = localFavorites.filter(f => f.style_id !== styleId);
+                    btn.classList.remove('active');
+                    showToast('Removed from favorites');
+                } else {
+                    // Add to favorites - get style name first
+                    const style = await SocietyArts.getStyleById(styleId);
+                    const styleName = style?.name || null;
+                    
+                    const { error } = await supabase
+                        .from('user_favorites')
+                        .insert({
+                            user_id: currentUser.id,
+                            style_id: styleId,
+                            style_name: styleName
+                        });
+                    
+                    if (error) {
+                        // Ignore duplicate key error
+                        if (error.code !== '23505') {
+                            throw error;
+                        }
+                    }
+                    
+                    localFavorites.unshift({
+                        style_id: styleId,
+                        style_name: styleName,
+                        created_at: new Date().toISOString()
+                    });
+                    btn.classList.add('active');
+                    showToast('Added to favorites');
+                }
+            } catch (error) {
+                console.error('Failed to toggle favorite:', error);
+                showToast('Failed to update favorites');
+            }
         }
         
         // ============================================
@@ -2984,8 +3102,8 @@
             
             btn.style.display = 'inline-flex';
             
-            // Check if favorited (we need to load favorites first)
-            const isFavorited = window.SocietyArts?.isStyleFavorited?.(currentModalStyleId);
+            // Check if favorited using local function
+            const isFavorited = isStyleFavorited(currentModalStyleId);
             
             if (isFavorited) {
                 btn.classList.add('active');
@@ -3001,24 +3119,59 @@
         // Toggle favorite on current modal style
         async function toggleStyleFavorite() {
             if (!currentUser) {
-                showAuthModal();
+                openAuthModal();
                 return;
             }
             
             if (!currentModalStyleId) return;
             
-            const isFavorited = window.SocietyArts?.isStyleFavorited?.(currentModalStyleId);
+            const { supabase } = window.SocietyArts;
             
             try {
-                if (isFavorited) {
-                    await window.SocietyArts.removeFavorite(currentModalStyleId);
+                if (isStyleFavorited(currentModalStyleId)) {
+                    // Remove from favorites
+                    const { error } = await supabase
+                        .from('user_favorites')
+                        .delete()
+                        .eq('user_id', currentUser.id)
+                        .eq('style_id', currentModalStyleId);
+                    
+                    if (error) throw error;
+                    
+                    localFavorites = localFavorites.filter(f => f.style_id !== currentModalStyleId);
+                    showToast('Removed from favorites');
                 } else {
-                    await window.SocietyArts.addFavorite(currentModalStyleId, currentModalStyleName);
+                    // Add to favorites
+                    const { error } = await supabase
+                        .from('user_favorites')
+                        .insert({
+                            user_id: currentUser.id,
+                            style_id: currentModalStyleId,
+                            style_name: currentModalStyleName
+                        });
+                    
+                    if (error && error.code !== '23505') {
+                        throw error;
+                    }
+                    
+                    localFavorites.unshift({
+                        style_id: currentModalStyleId,
+                        style_name: currentModalStyleName,
+                        created_at: new Date().toISOString()
+                    });
+                    showToast('Added to favorites');
                 }
+                
                 updateFavoriteButtonState();
+                
+                // Also update the card button if visible
+                const cardBtn = document.querySelector(`.style-card[data-style-id="${currentModalStyleId}"] .favorite-btn`);
+                if (cardBtn) {
+                    cardBtn.classList.toggle('active', isStyleFavorited(currentModalStyleId));
+                }
             } catch (error) {
                 console.error('Failed to toggle favorite:', error);
-                alert('Failed to update favorite. Please try again.');
+                showToast('Failed to update favorite');
             }
         }
         
@@ -3352,7 +3505,17 @@
             
             if (session) {
                 currentUser = session.user;
+                
+                // Also update shared AuthState for projects.js functions
+                if (window.SocietyArts?.AuthState) {
+                    window.SocietyArts.AuthState.user = session.user;
+                }
+                
                 await loadUserProfile();
+                
+                // Load user's favorites from database
+                await loadUserFavoritesLocal();
+                
                 updateAuthUI();
             }
             
@@ -3362,14 +3525,37 @@
                 
                 if (event === 'SIGNED_IN' && session) {
                     currentUser = session.user;
+                    
+                    // Also update shared AuthState
+                    if (window.SocietyArts?.AuthState) {
+                        window.SocietyArts.AuthState.user = session.user;
+                    }
+                    
                     await loadUserProfile();
+                    
+                    // Load user's favorites from database
+                    await loadUserFavoritesLocal();
+                    
+                    // Re-render styles to show correct favorite states
+                    renderStyles();
+                    
                     updateAuthUI();
                     closeAuthModal();
                     showToast('Signed in successfully!');
                 } else if (event === 'SIGNED_OUT') {
                     currentUser = null;
                     userProfile = null;
+                    localFavorites = [];
+                    
+                    // Clear shared AuthState
+                    if (window.SocietyArts?.AuthState) {
+                        window.SocietyArts.AuthState.user = null;
+                        window.SocietyArts.AuthState.profile = null;
+                    }
+                    
                     updateAuthUI();
+                    // Re-render to clear favorite states
+                    renderStyles();
                     showToast('Signed out');
                 }
             });
@@ -3397,6 +3583,12 @@
             }
             
             userProfile = data;
+            
+            // Also update shared AuthState for consistency
+            if (window.SocietyArts?.AuthState) {
+                window.SocietyArts.AuthState.profile = data;
+            }
+            
             console.log('Loaded user profile:', userProfile);
         }
         
@@ -4017,8 +4209,10 @@
         // ============================================
         // Start
         // ============================================
-        initialize();
-        initializeAuth();
+        // Initialize auth first to get user's favorites, then render styles
+        initializeAuth().then(() => {
+            initialize();
+        });
     </script>
 </body>
 </html>
