@@ -577,6 +577,517 @@
       }
     }
     
+    /* ========================================
+       STYLE PICKER MODAL
+       ======================================== */
+    
+    .style-picker-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(62, 35, 24, 0.6);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    
+    .style-picker-modal {
+      background: white;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 1200px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 24px 64px rgba(62, 35, 24, 0.3);
+    }
+    
+    /* Modal Header */
+    .style-picker-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--color-border-light);
+      background: #3E2318;
+      color: #FAF8F5;
+    }
+    
+    .style-picker-title {
+      font-family: 'Domine', var(--font-serif);
+      font-size: 20px;
+      font-weight: 500;
+    }
+    
+    .style-picker-close {
+      width: 36px;
+      height: 36px;
+      border: none;
+      background: rgba(255,255,255,0.15);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #FAF8F5;
+      transition: background 0.15s;
+    }
+    
+    .style-picker-close:hover {
+      background: rgba(255,255,255,0.25);
+    }
+    
+    /* Style Finder Type Tabs */
+    .style-picker-tabs {
+      display: flex;
+      gap: 4px;
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--color-border-light);
+      background: var(--color-tan-10);
+    }
+    
+    .style-picker-tab {
+      padding: 10px 20px;
+      border: none;
+      background: transparent;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.15s;
+    }
+    
+    .style-picker-tab:hover {
+      background: var(--color-tan-20);
+      color: var(--color-text-primary);
+    }
+    
+    .style-picker-tab.active {
+      background: #3E2318;
+      color: #FAF8F5;
+    }
+    
+    .style-picker-tab.coming-soon {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .style-picker-tab.coming-soon::after {
+      content: 'Soon';
+      font-size: 10px;
+      background: var(--color-tan-40);
+      color: var(--color-text-secondary);
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-left: 8px;
+    }
+    
+    /* Modal Body */
+    .style-picker-body {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+    
+    /* Sidebar Facets */
+    .style-picker-sidebar {
+      width: 260px;
+      border-right: 1px solid var(--color-border-light);
+      overflow-y: auto;
+      flex-shrink: 0;
+      background: white;
+    }
+    
+    .sp-search {
+      padding: 16px;
+      border-bottom: 1px solid var(--color-border-light);
+    }
+    
+    .sp-search-input {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--color-tan-10);
+      border-radius: 24px;
+      padding: 10px 14px;
+      width: 100%;
+    }
+    
+    .sp-search-input svg {
+      width: 16px;
+      height: 16px;
+      color: var(--color-text-muted);
+      flex-shrink: 0;
+    }
+    
+    .sp-search-input input {
+      border: none;
+      background: transparent;
+      font-size: 14px;
+      outline: none;
+      width: 100%;
+      color: var(--color-text-primary);
+    }
+    
+    .sp-search-input input::placeholder {
+      color: var(--color-text-muted);
+    }
+    
+    /* Facet Categories */
+    .sp-facets {
+      padding: 8px 0;
+    }
+    
+    .sp-category {
+      border-bottom: 1px solid var(--color-border-light);
+    }
+    
+    .sp-category:last-child {
+      border-bottom: none;
+    }
+    
+    .sp-category-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.15s;
+    }
+    
+    .sp-category-header:hover {
+      background: var(--color-tan-10);
+    }
+    
+    .sp-category-header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .sp-category-header svg {
+      width: 16px;
+      height: 16px;
+      color: var(--color-text-muted);
+      transition: transform 0.2s;
+    }
+    
+    .sp-category.open .sp-category-header svg {
+      transform: rotate(90deg);
+    }
+    
+    .sp-category-header h4 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+    
+    .sp-category-count {
+      font-size: 12px;
+      color: var(--color-text-muted);
+      background: var(--color-tan-10);
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+    
+    .sp-category-items {
+      display: none;
+      padding: 0 16px 12px 16px;
+    }
+    
+    .sp-category.open .sp-category-items {
+      display: block;
+    }
+    
+    .sp-facet-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0 8px 24px;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      transition: color 0.15s;
+    }
+    
+    .sp-facet-item:hover {
+      color: var(--color-accent);
+    }
+    
+    .sp-facet-checkbox {
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--color-tan-40);
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.15s;
+    }
+    
+    .sp-facet-item.selected .sp-facet-checkbox {
+      background: var(--color-accent);
+      border-color: var(--color-accent);
+    }
+    
+    .sp-facet-item.selected .sp-facet-checkbox svg {
+      display: block;
+    }
+    
+    .sp-facet-checkbox svg {
+      width: 10px;
+      height: 10px;
+      color: white;
+      display: none;
+    }
+    
+    /* Grid Area */
+    .style-picker-grid-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      background: var(--color-surface);
+    }
+    
+    .sp-grid-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    
+    .sp-results-count {
+      font-size: 14px;
+      color: var(--color-text-muted);
+    }
+    
+    .sp-reset-btn {
+      padding: 8px 16px;
+      border: none;
+      background: transparent;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      transition: color 0.15s;
+    }
+    
+    .sp-reset-btn:hover {
+      color: var(--color-text-primary);
+    }
+    
+    .sp-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+    }
+    
+    @media (max-width: 1100px) {
+      .sp-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+    
+    @media (max-width: 900px) {
+      .sp-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .style-picker-sidebar {
+        display: none;
+      }
+    }
+    
+    /* Style Card in Modal */
+    .sp-card {
+      position: relative;
+      aspect-ratio: 1;
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .sp-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(62, 35, 24, 0.15);
+    }
+    
+    .sp-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .sp-card-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(transparent 50%, rgba(0,0,0,0.5));
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    
+    .sp-card:hover .sp-card-overlay {
+      opacity: 1;
+    }
+    
+    .sp-card-name {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 8px 10px;
+      font-size: 12px;
+      font-weight: 500;
+      color: white;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    
+    .sp-card:hover .sp-card-name {
+      opacity: 1;
+    }
+    
+    /* Selected State */
+    .sp-card.selected {
+      box-shadow: 0 0 0 3px var(--color-accent);
+    }
+    
+    .sp-card-selected-badge {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 28px;
+      height: 28px;
+      background: var(--color-accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: scale(0.8);
+      transition: all 0.2s;
+    }
+    
+    .sp-card.selected .sp-card-selected-badge {
+      opacity: 1;
+      transform: scale(1);
+    }
+    
+    .sp-card-selected-badge svg {
+      width: 16px;
+      height: 16px;
+      color: white;
+    }
+    
+    /* Loading */
+    .sp-loading {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px;
+    }
+    
+    .sp-spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid var(--color-tan-20);
+      border-top-color: var(--color-accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    
+    /* Modal Footer */
+    .style-picker-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      border-top: 1px solid var(--color-border-light);
+      background: white;
+    }
+    
+    .sp-selection-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .sp-selection-count {
+      font-size: 14px;
+      color: var(--color-text-secondary);
+    }
+    
+    .sp-selection-count strong {
+      color: var(--color-accent);
+    }
+    
+    .sp-selected-previews {
+      display: flex;
+      gap: 4px;
+    }
+    
+    .sp-selected-preview {
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 2px solid var(--color-accent);
+    }
+    
+    .sp-selected-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .sp-footer-actions {
+      display: flex;
+      gap: 12px;
+    }
+    
+    .sp-cancel-btn {
+      padding: 10px 24px;
+      border: 1px solid var(--color-border-medium);
+      background: white;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    
+    .sp-cancel-btn:hover {
+      background: var(--color-tan-10);
+    }
+    
+    .sp-done-btn {
+      padding: 10px 24px;
+      border: none;
+      background: var(--color-accent);
+      font-size: 14px;
+      font-weight: 500;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    
+    .sp-done-btn:hover {
+      background: var(--color-accent-hover, #A82A10);
+    }
+    
+    .sp-done-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
     /* Welcome State */
     .welcome-container {
       flex: 1;
@@ -813,6 +1324,446 @@
   <!-- Story Builder App -->
   <script type="text/babel">
     const { useState, useRef, useEffect, useCallback } = React;
+
+    // ============================================
+    // STYLE PICKER MODAL COMPONENT
+    // ============================================
+    
+    // Medium categories for faceted navigation
+    const MEDIUM_CATEGORIES = {
+      painting: {
+        name: 'Painting',
+        mediums: [
+          { id: 'bold_paint', name: 'Bold Paint (Oil/Acrylic)', dbKey: 'bold_paint_oil_acrylic' },
+          { id: 'fluid_paint', name: 'Fluid Paint (Watercolor)', dbKey: 'fluid_paint_watercolor' },
+          { id: 'flat_paint', name: 'Flat Paint (Poster/Gouache)', dbKey: 'flat_paint_poster_gouache' }
+        ]
+      },
+      drawing: {
+        name: 'Drawing',
+        mediums: [
+          { id: 'pencil_graphite', name: 'Pencil/Graphite', dbKey: 'sketch_pencil_graphite' },
+          { id: 'ink_charcoal', name: 'Ink/Charcoal', dbKey: 'bold_line_ink_charcoal' },
+          { id: 'pastel_colored', name: 'Pastel/Colored Pencil', dbKey: 'color_drawing_pastel_colored_pencil' }
+        ]
+      },
+      photography: {
+        name: 'Photography',
+        mediums: [
+          { id: 'color_photo', name: 'Color', dbKey: 'color_photography' },
+          { id: 'bw_photo', name: 'Black & White', dbKey: 'black_white_photography' }
+        ]
+      },
+      printmaking: {
+        name: 'Printmaking',
+        mediums: [
+          { id: 'woodcut_linocut', name: 'Woodcut/Linocut', dbKey: 'bold_carved_print_woodcut_linocut' },
+          { id: 'etching_engraving', name: 'Etching/Engraving', dbKey: 'fine_line_print_etching_engraving' },
+          { id: 'screenprint', name: 'Screenprint', dbKey: 'poster_print_screenprint' }
+        ]
+      },
+      collage: {
+        name: 'Collage / Mixed Media',
+        mediums: [
+          { id: 'paper_collage', name: 'Paper Collage', dbKey: 'paper_collage' },
+          { id: 'photo_collage', name: 'Photo Collage', dbKey: 'photo_collage' },
+          { id: 'mixed_layers', name: 'Mixed Layers', dbKey: 'mixed_layers' }
+        ]
+      }
+    };
+
+    // Overlay styles
+    const OVERLAYS = [
+      { id: 'abstract', name: 'Abstract' },
+      { id: 'realistic', name: 'Realistic' },
+      { id: 'cinematic', name: 'Cinematic' },
+      { id: 'experimental', name: 'Experimental' },
+      { id: 'minimalist', name: 'Minimalist' },
+      { id: 'whimsical', name: 'Whimsical' },
+      { id: 'illustration', name: 'Illustration' },
+      { id: 'historic', name: 'Historic' }
+    ];
+
+    function StylePickerModal({ isOpen, onClose, selectedStyles, onStylesChange, maxStyles = 4 }) {
+      const [allStyles, setAllStyles] = useState([]);
+      const [filteredStyles, setFilteredStyles] = useState([]);
+      const [loading, setLoading] = useState(true);
+      const [searchTerm, setSearchTerm] = useState('');
+      const [selectedMediums, setSelectedMediums] = useState(new Set());
+      const [selectedOverlays, setSelectedOverlays] = useState(new Set());
+      const [expandedCategories, setExpandedCategories] = useState(new Set(['painting', 'drawing']));
+      const [activeTab, setActiveTab] = useState('browse'); // browse, ai-match, mood, color
+      const [tempSelected, setTempSelected] = useState(new Set(selectedStyles));
+      const [styleAttributes, setStyleAttributes] = useState({});
+
+      // Load styles on mount
+      useEffect(() => {
+        if (isOpen) {
+          loadStyles();
+          setTempSelected(new Set(selectedStyles));
+        }
+      }, [isOpen, selectedStyles]);
+
+      // Filter styles when search/filters change
+      useEffect(() => {
+        filterStyles();
+      }, [searchTerm, selectedMediums, selectedOverlays, allStyles]);
+
+      const loadStyles = async () => {
+        setLoading(true);
+        try {
+          const { supabase } = window.SocietyArts;
+          
+          // Load styles
+          const { data: stylesData, error } = await supabase
+            .from('styles')
+            .select('id, name, image_urls, status')
+            .eq('status', 'active')
+            .order('name')
+            .limit(500);
+          
+          if (error) throw error;
+
+          // Load attributes
+          const { data: attributes } = await supabase
+            .from('style_attributes')
+            .select('style_id, medium, medium_category, overlay');
+
+          // Build attributes map
+          const attrsMap = {};
+          if (attributes) {
+            attributes.forEach(attr => {
+              attrsMap[attr.style_id] = attr;
+            });
+          }
+          setStyleAttributes(attrsMap);
+
+          // Merge attributes with styles
+          const stylesWithAttrs = stylesData.map(s => ({
+            ...s,
+            medium: attrsMap[s.id]?.medium || null,
+            medium_category: attrsMap[s.id]?.medium_category || null,
+            overlay: attrsMap[s.id]?.overlay || null
+          }));
+
+          setAllStyles(stylesWithAttrs);
+          setFilteredStyles(stylesWithAttrs);
+        } catch (error) {
+          console.error('Error loading styles:', error);
+        }
+        setLoading(false);
+      };
+
+      const filterStyles = () => {
+        let results = [...allStyles];
+
+        // Search filter
+        if (searchTerm) {
+          const term = searchTerm.toLowerCase();
+          results = results.filter(s => 
+            s.name?.toLowerCase().includes(term) ||
+            s.id?.toLowerCase().includes(term)
+          );
+        }
+
+        // Medium filter
+        if (selectedMediums.size > 0) {
+          results = results.filter(s => {
+            // Check if style matches any selected medium
+            for (const mediumId of selectedMediums) {
+              // Find the medium config
+              for (const cat of Object.values(MEDIUM_CATEGORIES)) {
+                const medium = cat.mediums.find(m => m.id === mediumId);
+                if (medium && (s.medium === medium.dbKey || s.medium === medium.id)) {
+                  return true;
+                }
+              }
+            }
+            return false;
+          });
+        }
+
+        // Overlay filter
+        if (selectedOverlays.size > 0) {
+          results = results.filter(s => selectedOverlays.has(s.overlay));
+        }
+
+        setFilteredStyles(results);
+      };
+
+      const toggleMedium = (mediumId) => {
+        const newSet = new Set(selectedMediums);
+        if (newSet.has(mediumId)) {
+          newSet.delete(mediumId);
+        } else {
+          newSet.add(mediumId);
+        }
+        setSelectedMediums(newSet);
+      };
+
+      const toggleOverlay = (overlayId) => {
+        const newSet = new Set(selectedOverlays);
+        if (newSet.has(overlayId)) {
+          newSet.delete(overlayId);
+        } else {
+          newSet.add(overlayId);
+        }
+        setSelectedOverlays(newSet);
+      };
+
+      const toggleCategory = (catId) => {
+        const newSet = new Set(expandedCategories);
+        if (newSet.has(catId)) {
+          newSet.delete(catId);
+        } else {
+          newSet.add(catId);
+        }
+        setExpandedCategories(newSet);
+      };
+
+      const toggleStyleSelection = (styleId) => {
+        const newSet = new Set(tempSelected);
+        if (newSet.has(styleId)) {
+          newSet.delete(styleId);
+        } else if (newSet.size < maxStyles) {
+          newSet.add(styleId);
+        }
+        setTempSelected(newSet);
+      };
+
+      const resetFilters = () => {
+        setSearchTerm('');
+        setSelectedMediums(new Set());
+        setSelectedOverlays(new Set());
+      };
+
+      const handleDone = () => {
+        onStylesChange(Array.from(tempSelected));
+        onClose();
+      };
+
+      const getStyleImage = (style) => {
+        if (style.image_urls?.length > 0) {
+          return style.image_urls[0];
+        }
+        return `https://pub-d4d49982f29749dea52e2eb37c29ad51.r2.dev/${style.id}/${style.id}_1.webp`;
+      };
+
+      if (!isOpen) return null;
+
+      return (
+        <div className="style-picker-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
+          <div className="style-picker-modal">
+            {/* Header */}
+            <div className="style-picker-header">
+              <span className="style-picker-title">Choose Your Styles</span>
+              <button className="style-picker-close" onClick={onClose}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+
+            {/* Style Finder Type Tabs */}
+            <div className="style-picker-tabs">
+              <button 
+                className={`style-picker-tab ${activeTab === 'browse' ? 'active' : ''}`}
+                onClick={() => setActiveTab('browse')}
+              >
+                Browse All
+              </button>
+              <button 
+                className="style-picker-tab coming-soon"
+                disabled
+              >
+                AI Match
+              </button>
+              <button 
+                className="style-picker-tab coming-soon"
+                disabled
+              >
+                By Mood
+              </button>
+              <button 
+                className="style-picker-tab coming-soon"
+                disabled
+              >
+                By Color
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="style-picker-body">
+              {/* Sidebar with Facets */}
+              <div className="style-picker-sidebar">
+                {/* Search */}
+                <div className="sp-search">
+                  <div className="sp-search-input">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <circle cx="11" cy="11" r="8"></circle>
+                      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input 
+                      type="text" 
+                      placeholder="Search styles..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                {/* Facets */}
+                <div className="sp-facets">
+                  {/* Medium Categories */}
+                  {Object.entries(MEDIUM_CATEGORIES).map(([catId, category]) => (
+                    <div key={catId} className={`sp-category ${expandedCategories.has(catId) ? 'open' : ''}`}>
+                      <div className="sp-category-header" onClick={() => toggleCategory(catId)}>
+                        <div className="sp-category-header-left">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                          </svg>
+                          <h4>{category.name}</h4>
+                        </div>
+                        <span className="sp-category-count">
+                          {category.mediums.reduce((sum, m) => {
+                            const count = allStyles.filter(s => s.medium === m.dbKey || s.medium === m.id).length;
+                            return sum + count;
+                          }, 0)}
+                        </span>
+                      </div>
+                      <div className="sp-category-items">
+                        {category.mediums.map(medium => (
+                          <div 
+                            key={medium.id}
+                            className={`sp-facet-item ${selectedMediums.has(medium.id) ? 'selected' : ''}`}
+                            onClick={() => toggleMedium(medium.id)}
+                          >
+                            <div className="sp-facet-checkbox">
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                              </svg>
+                            </div>
+                            <span>{medium.name}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Overlays */}
+                  <div className={`sp-category ${expandedCategories.has('overlays') ? 'open' : ''}`}>
+                    <div className="sp-category-header" onClick={() => toggleCategory('overlays')}>
+                      <div className="sp-category-header-left">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                        <h4>Style</h4>
+                      </div>
+                      <span className="sp-category-count">{OVERLAYS.length}</span>
+                    </div>
+                    <div className="sp-category-items">
+                      {OVERLAYS.map(overlay => (
+                        <div 
+                          key={overlay.id}
+                          className={`sp-facet-item ${selectedOverlays.has(overlay.id) ? 'selected' : ''}`}
+                          onClick={() => toggleOverlay(overlay.id)}
+                        >
+                          <div className="sp-facet-checkbox">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                              <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                          </div>
+                          <span>{overlay.name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Grid Area */}
+              <div className="style-picker-grid-area">
+                <div className="sp-grid-header">
+                  <span className="sp-results-count">
+                    {filteredStyles.length} styles {(selectedMediums.size > 0 || selectedOverlays.size > 0 || searchTerm) && '(filtered)'}
+                  </span>
+                  {(selectedMediums.size > 0 || selectedOverlays.size > 0 || searchTerm) && (
+                    <button className="sp-reset-btn" onClick={resetFilters}>Reset filters</button>
+                  )}
+                </div>
+
+                <div className="sp-grid">
+                  {loading ? (
+                    <div className="sp-loading">
+                      <div className="sp-spinner"></div>
+                    </div>
+                  ) : (
+                    filteredStyles.map(style => (
+                      <div 
+                        key={style.id}
+                        className={`sp-card ${tempSelected.has(style.id) ? 'selected' : ''}`}
+                        onClick={() => toggleStyleSelection(style.id)}
+                      >
+                        <img 
+                          src={getStyleImage(style)} 
+                          alt={style.name}
+                          loading="lazy"
+                          onError={(e) => {
+                            e.target.src = `https://pub-d4d49982f29749dea52e2eb37c29ad51.r2.dev/${style.id}/${style.id}_1.webp`;
+                          }}
+                        />
+                        <div className="sp-card-overlay"></div>
+                        <div className="sp-card-name">{style.name}</div>
+                        <div className="sp-card-selected-badge">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                          </svg>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="style-picker-footer">
+              <div className="sp-selection-info">
+                <span className="sp-selection-count">
+                  <strong>{tempSelected.size}</strong> of {maxStyles} styles selected
+                </span>
+                {tempSelected.size > 0 && (
+                  <div className="sp-selected-previews">
+                    {Array.from(tempSelected).slice(0, 4).map(styleId => {
+                      const style = allStyles.find(s => s.id === styleId);
+                      return style ? (
+                        <div key={styleId} className="sp-selected-preview">
+                          <img src={getStyleImage(style)} alt={style.name} />
+                        </div>
+                      ) : null;
+                    })}
+                  </div>
+                )}
+              </div>
+              <div className="sp-footer-actions">
+                <button className="sp-cancel-btn" onClick={onClose}>Cancel</button>
+                <button 
+                  className="sp-done-btn" 
+                  onClick={handleDone}
+                >
+                  Done
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ============================================
+    // STORY BUILDER APP
+    // ============================================
 
     function StoryBuilderApp() {
       // Get shared components inside the function to ensure they're loaded
@@ -1436,7 +2387,7 @@
                 {selectedStyles.length < 4 && (
                   <button 
                     className="add-style-btn"
-                    onClick={() => window.location.href = '/style-finder.html'}
+                    onClick={() => setStyleFinderOpen(true)}
                   >
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                       <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -1484,6 +2435,22 @@
               projectTitle={title}
             />
           )}
+          
+          {/* Style Picker Modal */}
+          <StylePickerModal
+            isOpen={styleFinderOpen}
+            onClose={() => setStyleFinderOpen(false)}
+            selectedStyles={selectedStyles}
+            onStylesChange={(styles) => {
+              setSelectedStyles(styles);
+              setIsDirty(true);
+              // Load style details for new selections
+              if (styles.length > 0) {
+                loadStyleDetails(styles);
+              }
+            }}
+            maxStyles={4}
+          />
         </div>
       );
     }
