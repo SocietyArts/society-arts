@@ -286,7 +286,7 @@
     const { useState, useRef, useEffect, useCallback } = React;
     
     // Get shared components
-    const { Header, Subheader, Footer, FormatSelector, Icons } = window.SocietyArts;
+    const { Header, NavSidebar, Subheader, Footer, FormatSelector, Icons } = window.SocietyArts;
     const { API } = window.SocietyArts;
     const { Voice } = window.SocietyArts;
     const { StoryPanel } = window.SocietyArts;
@@ -669,10 +669,10 @@
       return (
         <div className="page-container">
           <Header 
-            currentPage="story-builder" 
-            onNewProject={title ? handleNewProject : undefined}
-            onOpenStyleFinder={() => setStyleFinderOpen(true)}
+            user={user}
+            profile={profile}
           />
+          <NavSidebar />
           
           <Subheader 
             title="Your Story, Your Style"

@@ -126,12 +126,13 @@
   
   <!-- Homepage App -->
   <script type="text/babel">
-    const { Header, Footer, Icons } = window.SocietyArts;
+    const { Header, NavSidebar, Footer, Icons } = window.SocietyArts;
 
     function HomePage() {
       return (
         <div className="page-container">
-          <Header currentPage="home" />
+          <Header />
+          <NavSidebar />
           
           <main className="home-content">
             <h1 className="hero-title">Transform Your Stories<br/>Into Beautiful Art</h1>

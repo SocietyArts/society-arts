@@ -1,778 +1,337 @@
-/* ========================================
-   SOCIETY ARTS - HEADER & NAVIGATION
-   Header, sidebar nav, help menu, footer
-   Version: 2.0
-   ======================================== */
+// ============================================
+// SOCIETY ARTS - UNIFIED HEADER SYSTEM
+// A++ Brand Standards v3.0
+// ============================================
+// Works with both React and vanilla JS pages.
+// Edit HEADER_CONFIG to change site-wide.
+// ============================================
 
-// ========================================
-// ICONS
-// ========================================
-
-const Icons = {
-  menu: () => (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <line x1="3" y1="6" x2="21" y2="6"></line>
-      <line x1="3" y1="12" x2="21" y2="12"></line>
-      <line x1="3" y1="18" x2="21" y2="18"></line>
-    </svg>
-  ),
-  close: () => (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <line x1="18" y1="6" x2="6" y2="18"></line>
-      <line x1="6" y1="6" x2="18" y2="18"></line>
-    </svg>
-  ),
-  search: () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <circle cx="11" cy="11" r="8"></circle>
-      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-    </svg>
-  ),
-  cart: () => (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <circle cx="9" cy="21" r="1"></circle>
-      <circle cx="20" cy="21" r="1"></circle>
-      <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-    </svg>
-  ),
-  chevronDown: () => (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <polyline points="6 9 12 15 18 9"></polyline>
-    </svg>
-  ),
-  chevronRight: () => (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <polyline points="9 18 15 12 9 6"></polyline>
-    </svg>
-  ),
-  arrowRight: () => (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <line x1="5" y1="12" x2="19" y2="12"></line>
-      <polyline points="12 5 19 12 12 19"></polyline>
-    </svg>
-  ),
-  // Navigation icons
-  projects: () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <rect x="3" y="3" width="7" height="7"></rect>
-      <rect x="14" y="3" width="7" height="7"></rect>
-      <rect x="14" y="14" width="7" height="7"></rect>
-      <rect x="3" y="14" width="7" height="7"></rect>
-    </svg>
-  ),
-  styleFinder: () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-    </svg>
-  ),
-  gallery: () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-      <circle cx="8.5" cy="8.5" r="1.5"></circle>
-      <polyline points="21 15 16 10 5 21"></polyline>
-    </svg>
-  ),
-  collections: () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-      <line x1="3" y1="9" x2="21" y2="9"></line>
-      <line x1="9" y1="21" x2="9" y2="9"></line>
-    </svg>
-  ),
-  favorites: () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-    </svg>
-  ),
-  pricing: () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <line x1="12" y1="1" x2="12" y2="23"></line>
-      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-    </svg>
-  ),
-  help: () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <circle cx="12" cy="12" r="10"></circle>
-      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-      <line x1="12" y1="17" x2="12.01" y2="17"></line>
-    </svg>
-  ),
-  // Help menu icons
-  howItWorks: () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <circle cx="12" cy="12" r="10"></circle>
-      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-      <line x1="12" y1="17" x2="12.01" y2="17"></line>
-    </svg>
-  ),
-  quickTips: () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <line x1="8" y1="6" x2="21" y2="6"></line>
-      <line x1="8" y1="12" x2="21" y2="12"></line>
-      <line x1="8" y1="18" x2="21" y2="18"></line>
-      <line x1="3" y1="6" x2="3.01" y2="6"></line>
-      <line x1="3" y1="12" x2="3.01" y2="12"></line>
-      <line x1="3" y1="18" x2="3.01" y2="18"></line>
-    </svg>
-  ),
-  newChat: () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-    </svg>
-  ),
-  updates: () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-    </svg>
-  ),
-  tutorials: () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <circle cx="12" cy="12" r="10"></circle>
-      <polygon points="10 8 16 12 10 16 10 8"></polygon>
-    </svg>
-  ),
-  explore: () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <circle cx="12" cy="12" r="10"></circle>
-      <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
-    </svg>
-  ),
-  troubleshoot: () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
-    </svg>
-  ),
-  feedback: () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
-    </svg>
-  ),
-  contact: () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-      <polyline points="22,6 12,13 2,6"></polyline>
-    </svg>
-  ),
-  // Format icons
-  square: () => (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-    </svg>
-  )
+// ============================================
+// SHARED CONFIGURATION
+// ============================================
+const HEADER_CONFIG = {
+    logoUrl: 'https://pub-acb560f551f141db830964aed1fa005f.r2.dev/site-assets/SA_Wordmark_Brown%401x.png',
+    logoAlt: 'Society Arts',
+    
+    navItems: [
+        { id: 'story-builder', label: 'Story Builder', href: 'story-builder.html', icon: 'edit' },
+        { id: 'style-finder', label: 'Style Finder', href: 'style-finder.html', icon: 'palette' },
+        { type: 'divider' },
+        { id: 'your-work', label: 'Your Work', href: 'projects.html', icon: 'folder' },
+        { id: 'favorites', label: 'Favorites', href: 'favorites.html', icon: 'heart' },
+        { type: 'divider' },
+        { id: 'prints-pricing', label: 'Prints & Pricing', href: 'under-construction.html?feature=Prints%20%26%20Pricing', icon: 'dollar' },
+        { id: 'help', label: 'Help', href: 'under-construction.html?feature=Help', icon: 'help' }
+    ]
 };
 
-// ========================================
-// NAVIGATION ITEMS
-// ========================================
+// ============================================
+// SVG ICONS
+// ============================================
+const HEADER_ICONS = {
+    hamburger: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>`,
+    close: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`,
+    cart: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>`,
+    user: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`,
+    chevronDown: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>`,
+    logout: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>`,
+    users: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>`,
+    edit: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>`,
+    palette: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r="2"></circle><circle cx="17.5" cy="10.5" r="2"></circle><circle cx="8.5" cy="7.5" r="2"></circle><circle cx="6.5" cy="12.5" r="2"></circle><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.555C21.965 6.012 17.461 2 12 2z"></path></svg>`,
+    folder: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>`,
+    heart: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>`,
+    dollar: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>`,
+    help: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`,
+    arrowRight: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>`
+};
 
-const NAV_ITEMS = [
-  { id: 'story-builder', label: 'Story Builder', icon: 'newChat', href: '/story-builder.html' },
-  { id: 'style-finder', label: 'Style Finder', icon: 'styleFinder', href: '/style-finder.html' },
-  { divider: true },
-  { id: 'your-work', label: 'Your Work', icon: 'projects', href: '/projects.html', showCount: 'projects' },
-  { id: 'favorites', label: 'Favorites', icon: 'favorites', href: '/favorites.html', showCount: 'favorites' },
-  { divider: true },
-  { id: 'pricing', label: 'Prints & Pricing', icon: 'pricing', href: '/under-construction.html?feature=Prints%20%26%20Pricing' },
-  { id: 'help', label: 'Help', icon: 'help', href: '/under-construction.html?feature=Help' }
-];
-
-const HELP_MENU_ITEMS = [
-  { id: 'how-it-works', label: 'How It Works', icon: 'howItWorks', action: 'howItWorks' },
-  { id: 'quick-tips', label: 'Quick Tips for Getting Started', icon: 'quickTips', href: '/under-construction.html?feature=Quick%20Tips' },
-  { id: 'new-chat', label: 'Start a New Chat', icon: 'newChat', action: 'newChat' },
-  { id: 'updates', label: 'New Features & Updates', icon: 'updates', href: '/under-construction.html?feature=New%20Features' },
-  { id: 'tutorials', label: 'Help & Tutorials', icon: 'tutorials', href: '/under-construction.html?feature=Tutorials' },
-  { id: 'explore', label: 'Explore Ways to Create', icon: 'explore', href: '/under-construction.html?feature=Explore' },
-  { id: 'troubleshoot', label: 'Troubleshooting Guide', icon: 'troubleshoot', href: '/under-construction.html?feature=Troubleshooting' },
-  { id: 'feedback', label: 'Share Feedback', icon: 'feedback', href: '/under-construction.html?feature=Feedback' },
-  { id: 'contact', label: 'Contact Us', icon: 'contact', href: '/under-construction.html?feature=Contact' }
-];
-
-const FORMAT_OPTIONS = [
-  { id: 'square', label: 'Square (1:1)', ratio: '1:1', width: 16, height: 16 },
-  { id: 'vertical', label: 'Vertical (3:4)', ratio: '3:4', width: 12, height: 16 },
-  { id: 'horizontal', label: 'Horizontal (4:3)', ratio: '4:3', width: 16, height: 12 },
-  { id: 'tall', label: 'Tall (9:16)', ratio: '9:16', width: 9, height: 16 },
-  { id: 'wide', label: 'Wide (16:9)', ratio: '16:9', width: 16, height: 9 }
-];
-
-// ========================================
-// NAVIGATION SIDEBAR COMPONENT
-// ========================================
-
-function NavSidebar({ isOpen, onClose, currentPage, onOpenStyleFinder }) {
-  const [counts, setCounts] = React.useState({ projects: 0, favorites: 0 });
-
-  // Load counts when sidebar opens
-  React.useEffect(() => {
-    if (isOpen && window.SocietyArts.AuthState?.user) {
-      // Get project count
-      if (window.SocietyArts.ProjectState) {
-        setCounts(prev => ({ 
-          ...prev, 
-          projects: window.SocietyArts.ProjectState.projects?.length || 0 
-        }));
-      }
-      // Get favorite count
-      if (window.SocietyArts.getFavoriteCount) {
-        setCounts(prev => ({ 
-          ...prev, 
-          favorites: window.SocietyArts.getFavoriteCount() || 0 
-        }));
-      }
-    }
-  }, [isOpen]);
-
-  // Close on escape key
-  React.useEffect(() => {
-    const handleEscape = (e) => {
-      if (e.key === 'Escape') onClose();
+// ============================================
+// DETECT CURRENT PAGE
+// ============================================
+function getCurrentPageId() {
+    const path = window.location.pathname;
+    const page = path.split('/').pop().replace('.html', '') || 'index';
+    const pageMap = {
+        'story-builder': 'story-builder',
+        'style-finder': 'style-finder',
+        'projects': 'your-work',
+        'favorites': 'favorites',
+        'index': null
     };
-    if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'hidden';
-    }
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = '';
-    };
-  }, [isOpen, onClose]);
-
-  const handleItemClick = (item) => {
-    if (item.href) {
-      window.location.href = item.href;
-    }
-    onClose();
-  };
-
-  const getIcon = (iconName) => {
-    const IconComponent = Icons[iconName];
-    return IconComponent ? <IconComponent /> : null;
-  };
-
-  const getCount = (countType) => {
-    if (!window.SocietyArts.AuthState?.user) return null;
-    return counts[countType] || 0;
-  };
-
-  return (
-    <>
-      <div 
-        className={`nav-overlay ${isOpen ? 'open' : ''}`}
-        onClick={onClose}
-      />
-      
-      <nav className={`nav-sidebar ${isOpen ? 'open' : ''}`}>
-        <div className="nav-header">
-          <button className="nav-close-btn" onClick={onClose} aria-label="Close menu">
-            <Icons.close />
-          </button>
-        </div>
-        
-        <div className="nav-search">
-          <div className="nav-search-input">
-            <Icons.search />
-            <input type="text" placeholder="Search" />
-          </div>
-        </div>
-        
-        <div className="nav-content">
-          <ul className="nav-list">
-            {NAV_ITEMS.map((item, index) => (
-              item.divider ? (
-                <li key={`divider-${index}`} className="nav-divider"></li>
-              ) : (
-                <li key={item.id} className="nav-item">
-                  <a 
-                    className={`nav-link ${currentPage === item.id ? 'active' : ''}`}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleItemClick(item);
-                    }}
-                    href={item.href || '#'}
-                  >
-                    <span className="nav-link-icon">{getIcon(item.icon)}</span>
-                    <span>{item.label}</span>
-                    {item.showCount && getCount(item.showCount) > 0 && (
-                      <span className="nav-link-badge">{getCount(item.showCount)}</span>
-                    )}
-                  </a>
-                </li>
-              )
-            ))}
-          </ul>
-        </div>
-      </nav>
-    </>
-  );
+    return pageMap[page] || null;
 }
 
-// ========================================
-// HELP MENU COMPONENT
-// ========================================
-
-function HelpMenu({ isOpen, onClose, onNewChat, onOpenHowItWorks }) {
-  const menuRef = React.useRef(null);
-
-  React.useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) {
-        onClose();
-      }
-    };
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+// ============================================
+// VANILLA JS FUNCTIONS
+// ============================================
+function toggleNavSidebar() {
+    const sidebar = document.getElementById('navSidebar');
+    const overlay = document.getElementById('navOverlay');
+    if (sidebar && overlay) {
+        const isOpen = sidebar.classList.toggle('open');
+        overlay.classList.toggle('open');
+        document.body.style.overflow = isOpen ? 'hidden' : '';
     }
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+}
+
+function closeNavSidebar() {
+    const sidebar = document.getElementById('navSidebar');
+    const overlay = document.getElementById('navOverlay');
+    if (sidebar) sidebar.classList.remove('open');
+    if (overlay) overlay.classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+function toggleUserMenu() {
+    const dropdown = document.getElementById('userDropdown');
+    if (dropdown) dropdown.classList.toggle('open');
+}
+
+function closeUserMenu() {
+    const dropdown = document.getElementById('userDropdown');
+    if (dropdown) dropdown.classList.remove('open');
+}
+
+// Export to window for vanilla JS pages
+window.toggleNavSidebar = toggleNavSidebar;
+window.closeNavSidebar = closeNavSidebar;
+window.toggleUserMenu = toggleUserMenu;
+window.closeUserMenu = closeUserMenu;
+window.HEADER_CONFIG = HEADER_CONFIG;
+window.HEADER_ICONS = HEADER_ICONS;
+
+// ============================================
+// REACT COMPONENTS (for story-builder)
+// ============================================
+if (typeof React !== 'undefined') {
+    const { useState, useEffect } = React;
+
+    // Icon component
+    const Icon = ({ name, size = 20 }) => {
+        return React.createElement('span', {
+            className: 'icon',
+            dangerouslySetInnerHTML: { __html: HEADER_ICONS[name] || '' }
+        });
     };
-  }, [isOpen, onClose]);
 
-  const handleItemClick = (item) => {
-    if (item.action === 'newChat' && onNewChat) {
-      onNewChat();
-    } else if (item.action === 'howItWorks' && onOpenHowItWorks) {
-      onOpenHowItWorks();
-    } else if (item.href) {
-      window.location.href = item.href;
-    }
-    onClose();
-  };
+    // Header Component
+    const Header = ({ user, profile, onAuthClick }) => {
+        const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const getIcon = (iconName) => {
-    const IconComponent = Icons[iconName];
-    return IconComponent ? <IconComponent /> : null;
-  };
+        useEffect(() => {
+            const handleClickOutside = (e) => {
+                if (!e.target.closest('.user-menu-container')) {
+                    setDropdownOpen(false);
+                }
+            };
+            document.addEventListener('click', handleClickOutside);
+            return () => document.removeEventListener('click', handleClickOutside);
+        }, []);
 
-  return (
-    <div ref={menuRef} className={`help-menu ${isOpen ? 'open' : ''}`}>
-      {HELP_MENU_ITEMS.map((item) => (
-        <button
-          key={item.id}
-          className="help-menu-item"
-          onClick={() => handleItemClick(item)}
-        >
-          <span className="help-menu-icon">{getIcon(item.icon)}</span>
-          <span>{item.label}</span>
-        </button>
-      ))}
-    </div>
-  );
-}
+        const displayName = profile?.display_name || user?.email?.split('@')[0] || 'User';
+        const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+        const isAdmin = profile?.role === 'admin';
 
-// ========================================
-// FORMAT SELECTOR COMPONENT
-// ========================================
-
-function FormatSelector({ value, onChange }) {
-  const [isOpen, setIsOpen] = React.useState(false);
-  const dropdownRef = React.useRef(null);
-
-  React.useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-        setIsOpen(false);
-      }
+        return React.createElement('header', { className: 'header' },
+            // Left side
+            React.createElement('div', { className: 'header-left' },
+                React.createElement('button', {
+                    className: 'hamburger-btn',
+                    onClick: toggleNavSidebar,
+                    'aria-label': 'Open menu',
+                    dangerouslySetInnerHTML: { __html: HEADER_ICONS.hamburger }
+                }),
+                React.createElement('a', { href: 'index.html', className: 'logo' },
+                    React.createElement('img', {
+                        src: HEADER_CONFIG.logoUrl,
+                        alt: HEADER_CONFIG.logoAlt,
+                        className: 'logo-image'
+                    })
+                )
+            ),
+            // Right side
+            React.createElement('div', { className: 'header-right' },
+                React.createElement('button', {
+                    className: 'btn-icon cart-btn',
+                    onClick: () => window.location.href = 'under-construction.html?feature=Shopping%20Cart',
+                    'aria-label': 'Cart',
+                    dangerouslySetInnerHTML: { __html: HEADER_ICONS.cart }
+                }),
+                React.createElement('a', {
+                    href: 'story-builder.html',
+                    className: 'btn btn-primary new-project-btn'
+                }, 'New Project'),
+                // Auth section
+                React.createElement('div', { className: 'header-auth' },
+                    !user ? 
+                        React.createElement('button', {
+                            className: 'btn btn-secondary',
+                            onClick: onAuthClick || (() => typeof openAuthModal === 'function' && openAuthModal())
+                        }, 'Log In') :
+                        React.createElement('div', { className: 'user-menu-container' },
+                            React.createElement('button', {
+                                className: 'user-avatar-btn',
+                                onClick: (e) => { e.stopPropagation(); setDropdownOpen(!dropdownOpen); }
+                            },
+                                React.createElement('div', { className: 'user-avatar' },
+                                    React.createElement('span', null, initials)
+                                ),
+                                React.createElement('span', { className: 'user-name' }, displayName),
+                                React.createElement('span', { dangerouslySetInnerHTML: { __html: HEADER_ICONS.chevronDown } })
+                            ),
+                            React.createElement('div', { className: `user-dropdown ${dropdownOpen ? 'open' : ''}` },
+                                React.createElement('div', { className: 'user-dropdown-header' },
+                                    React.createElement('div', { className: 'user-dropdown-name' }, displayName),
+                                    React.createElement('div', { className: 'user-dropdown-email' }, user.email),
+                                    isAdmin && React.createElement('span', { className: 'user-dropdown-role' }, 'Admin')
+                                ),
+                                React.createElement('button', {
+                                    className: 'user-dropdown-item',
+                                    onClick: () => typeof openProfileModal === 'function' && openProfileModal()
+                                },
+                                    React.createElement('span', { dangerouslySetInnerHTML: { __html: HEADER_ICONS.user } }),
+                                    'Profile'
+                                ),
+                                isAdmin && React.createElement('button', {
+                                    className: 'user-dropdown-item',
+                                    onClick: () => typeof openAdminUsersModal === 'function' && openAdminUsersModal()
+                                },
+                                    React.createElement('span', { dangerouslySetInnerHTML: { __html: HEADER_ICONS.users } }),
+                                    'Manage Users'
+                                ),
+                                React.createElement('div', { className: 'user-dropdown-divider' }),
+                                React.createElement('button', {
+                                    className: 'user-dropdown-item logout',
+                                    onClick: () => typeof handleLogout === 'function' && handleLogout()
+                                },
+                                    React.createElement('span', { dangerouslySetInnerHTML: { __html: HEADER_ICONS.logout } }),
+                                    'Sign Out'
+                                )
+                            )
+                        )
+                )
+            )
+        );
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
-  const selectedOption = FORMAT_OPTIONS.find(opt => opt.ratio === value) || FORMAT_OPTIONS[0];
+    // Navigation Sidebar Component
+    const NavSidebar = () => {
+        const currentPageId = getCurrentPageId();
+        
+        useEffect(() => {
+            const handleEscape = (e) => {
+                if (e.key === 'Escape') closeNavSidebar();
+            };
+            document.addEventListener('keydown', handleEscape);
+            return () => document.removeEventListener('keydown', handleEscape);
+        }, []);
 
-  return (
-    <div className="format-selector" ref={dropdownRef} onClick={() => setIsOpen(!isOpen)}>
-      <span className="format-selector-icon">
-        <Icons.square />
-      </span>
-      <span className="format-selector-label">Format</span>
-      <span className="format-selector-value">{value}</span>
-      <Icons.chevronDown />
-      
-      <div className={`format-dropdown ${isOpen ? 'open' : ''}`}>
-        {FORMAT_OPTIONS.map((option) => (
-          <div
-            key={option.id}
-            className={`format-option ${value === option.ratio ? 'selected' : ''}`}
-            onClick={(e) => {
-              e.stopPropagation();
-              onChange(option.ratio);
-              setIsOpen(false);
-            }}
-          >
-            <div 
-              className="format-option-icon"
-              style={{
-                width: option.width,
-                height: option.height
-              }}
-            />
-            <span className="format-option-label">{option.label}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ========================================
-// HEADER COMPONENT
-// ========================================
-
-function Header({ currentPage, onNewProject, onOpenStyleFinder }) {
-  const [menuOpen, setMenuOpen] = React.useState(false);
-  const [authModalOpen, setAuthModalOpen] = React.useState(false);
-  
-  // Use auth hook
-  const { user, profile, isLoading, signOut } = window.SocietyArts.useAuth ? 
-    window.SocietyArts.useAuth() : 
-    { user: null, profile: null, isLoading: true, signOut: () => {} };
-
-  const handleSignOut = async () => {
-    await signOut();
-  };
-  
-  const handleCartClick = () => {
-    window.location.href = '/under-construction.html?feature=Shopping%20Cart';
-  };
-  
-  const handleNewProject = () => {
-    if (onNewProject) {
-      onNewProject();
-    } else {
-      window.location.href = '/story-builder.html';
-    }
-  };
-
-  return (
-    <>
-      <header className="header">
-        <div className="header-left">
-          <button 
-            className="hamburger-btn"
-            onClick={() => setMenuOpen(true)}
-            aria-label="Open menu"
-          >
-            <Icons.menu />
-          </button>
-          <a href="/" className="logo">
-            <img 
-              src="https://pub-acb560f551f141db830964aed1fa005f.r2.dev/site-assets/SA_Wordmark_Brown%401x.png" 
-              alt="Society Arts" 
-              className="logo-image"
-            />
-          </a>
-        </div>
-        <div className="header-right">
-          <button className="btn-icon" aria-label="Cart" onClick={handleCartClick}>
-            <Icons.cart />
-          </button>
-          <button className="btn btn-primary" onClick={handleNewProject}>
-            New Project
-          </button>
-          
-          {/* Auth Section */}
-          {isLoading ? (
-            <div style={{ width: '80px' }}></div>
-          ) : user && profile ? (
-            <window.SocietyArts.UserMenu 
-              user={user}
-              profile={profile}
-              onSignOut={handleSignOut}
-            />
-          ) : (
-            <button className="btn btn-secondary" onClick={() => setAuthModalOpen(true)}>
-              Log In
-            </button>
-          )}
-        </div>
-      </header>
-      
-      <NavSidebar 
-        isOpen={menuOpen} 
-        onClose={() => setMenuOpen(false)}
-        currentPage={currentPage}
-        onOpenStyleFinder={onOpenStyleFinder}
-      />
-      
-      {/* Auth Modal */}
-      {window.SocietyArts.AuthModal && (
-        <window.SocietyArts.AuthModal 
-          isOpen={authModalOpen}
-          onClose={() => setAuthModalOpen(false)}
-        />
-      )}
-    </>
-  );
-}
-
-// ========================================
-// SUBHEADER COMPONENT
-// ========================================
-
-function Subheader({ title, description, progress }) {
-  return (
-    <div className="subheader">
-      <h2 className="subheader-title">{title}</h2>
-      {description && <p className="subheader-text">{description}</p>}
-      {typeof progress === 'number' && (
-        <div className="progress-bar">
-          <div className="progress-fill" style={{ width: `${progress}%` }}></div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ========================================
-// HOW IT WORKS MODAL
-// ========================================
-
-function HowItWorksModal({ isOpen, onClose, onOpenArtBridge }) {
-  React.useEffect(() => {
-    const handleEscape = (e) => {
-      if (e.key === 'Escape') onClose();
+        return React.createElement(React.Fragment, null,
+            React.createElement('div', {
+                className: 'nav-overlay',
+                id: 'navOverlay',
+                onClick: closeNavSidebar
+            }),
+            React.createElement('nav', { className: 'nav-sidebar', id: 'navSidebar' },
+                React.createElement('div', { className: 'nav-header' },
+                    React.createElement('img', {
+                        src: HEADER_CONFIG.logoUrl,
+                        alt: HEADER_CONFIG.logoAlt,
+                        className: 'nav-logo'
+                    }),
+                    React.createElement('button', {
+                        className: 'nav-close-btn',
+                        onClick: closeNavSidebar,
+                        dangerouslySetInnerHTML: { __html: HEADER_ICONS.close }
+                    })
+                ),
+                React.createElement('div', { className: 'nav-content' },
+                    React.createElement('ul', { className: 'nav-list' },
+                        HEADER_CONFIG.navItems.map((item, index) => {
+                            if (item.type === 'divider') {
+                                return React.createElement('li', { key: index, className: 'nav-divider' });
+                            }
+                            const isActive = item.id === currentPageId;
+                            return React.createElement('li', { key: index, className: 'nav-item' },
+                                React.createElement('a', {
+                                    href: item.href,
+                                    className: `nav-link ${isActive ? 'active' : ''}`
+                                },
+                                    React.createElement('span', {
+                                        className: 'nav-link-icon',
+                                        dangerouslySetInnerHTML: { __html: HEADER_ICONS[item.icon] || '' }
+                                    }),
+                                    item.label
+                                )
+                            );
+                        })
+                    )
+                )
+            )
+        );
     };
-    if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'hidden';
-    }
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = '';
+
+    // Subheader Component
+    const Subheader = ({ title, subtitle }) => {
+        return React.createElement('div', { className: 'subheader' },
+            React.createElement('h1', { className: 'subheader-title' }, title),
+            subtitle && React.createElement('p', { className: 'subheader-text' }, subtitle)
+        );
     };
-  }, [isOpen, onClose]);
 
-  return (
-    <div className={`help-modal-overlay ${isOpen ? 'open' : ''}`} onClick={onClose}>
-      <div className="help-modal hiw-modal" onClick={(e) => e.stopPropagation()}>
-        <button className="help-modal-close" onClick={onClose} aria-label="Close">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
-        
-        <div className="hiw-header">
-          <h2 className="hiw-title">How It Works</h2>
-          <p className="hiw-subtitle">
-            Society Arts transforms a personal story into a predictive art prompt through its proprietary 
-            Trust Layer — blending human emotion with machine precision.
-          </p>
-        </div>
-        
-        <div className="hiw-formula">
-          <div className="hiw-column">
-            <h3 className="hiw-column-title">Your Story</h3>
-            <p className="hiw-column-content">
-              A striking watercolor painting shows a determined woman carrying a large jug of water on her head in the 
-              vibrant light and heat of an African landscape. How does that feel? Children walk beside her, their 
-              figures simple yet lively, surrounded by bold, wild colors that echo the spirit and energy of Africa. 
-              The scene feels purposeful and full of hope, with sunlight shimmering off the water and dust.
-            </p>
-          </div>
-          
-          <div className="hiw-operator">
-            <span className="hiw-operator-symbol">+</span>
-          </div>
-          
-          <div className="hiw-column">
-            <h3 className="hiw-column-title">Our Predictive Prompt</h3>
-            <p className="hiw-column-content">
-              Rendered as a fine-art contemporary watercolor composition with fluid wet-on-wet technique and 
-              expressive pigment diffusion; vibrant translucent washes merge seamlessly with controlled bleeding 
-              and organic edge transitions across textured 300 gsm cold-pressed cotton paper. Layered transparent 
-              glazes establish luminous tonal depth and chromatic harmony, balancing saturated primaries with 
-              softened neutrals.
-            </p>
-          </div>
-          
-          <div className="hiw-operator">
-            <span className="hiw-operator-symbol">=</span>
-          </div>
-          
-          <div className="hiw-result">
-            <span className="hiw-result-text">Your<br/>Creation</span>
-          </div>
-        </div>
-        
-        <div className="hiw-trust">
-          <p className="hiw-trust-text">
-            Society Arts created this predictive prompt, then validated it through the{' '}
-            <span className="artbridge-link" onClick={onOpenArtBridge}>
-              ArtBridge Index (ABI)
-            </span>
-            {' '}— a rigorous quality system measuring composition, style fidelity, safety, and adaptability.
-          </p>
-          <p className="hiw-trust-text">
-            Only prompts that meet or exceed these benchmarks are accepted into the Society Arts ecosystem, ensuring every 
-            piece is emotionally aligned, technically consistent, and worthy of display.
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ========================================
-// ARTBRIDGE MODAL
-// ========================================
-
-function ArtBridgeModal({ isOpen, onClose, onBack }) {
-  React.useEffect(() => {
-    const handleEscape = (e) => {
-      if (e.key === 'Escape') onClose();
+    // Footer Component  
+    const Footer = ({ children }) => {
+        return React.createElement('footer', { className: 'footer' }, children);
     };
-    if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'hidden';
-    }
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = '';
+
+    // Format Selector Component
+    const FormatSelector = ({ value, onChange }) => {
+        const [isOpen, setIsOpen] = useState(false);
+        
+        const formats = [
+            { value: '1:1', label: '1:1', desc: 'Square' },
+            { value: '4:3', label: '4:3', desc: 'Standard' },
+            { value: '16:9', label: '16:9', desc: 'Widescreen' },
+            { value: '9:16', label: '9:16', desc: 'Portrait' },
+            { value: '3:2', label: '3:2', desc: 'Classic' }
+        ];
+
+        const currentFormat = formats.find(f => f.value === value) || formats[0];
+
+        return React.createElement('div', { className: 'format-selector', onClick: () => setIsOpen(!isOpen) },
+            React.createElement('span', { className: 'format-selector-label' }, 'Format'),
+            React.createElement('span', { className: 'format-selector-value' }, currentFormat.label),
+            React.createElement('div', { className: `format-dropdown ${isOpen ? 'open' : ''}` },
+                formats.map(format => 
+                    React.createElement('div', {
+                        key: format.value,
+                        className: `format-option ${format.value === value ? 'selected' : ''}`,
+                        onClick: (e) => { e.stopPropagation(); onChange(format.value); setIsOpen(false); }
+                    },
+                        React.createElement('div', { className: 'format-option-icon' }),
+                        React.createElement('span', { className: 'format-option-label' }, `${format.label} ${format.desc}`)
+                    )
+                )
+            )
+        );
     };
-  }, [isOpen, onClose]);
 
-  const metrics = [
-    { name: 'Aesthetic & Composition', abbr: 'ACS', desc: 'visual balance and professional quality' },
-    { name: 'Style Fidelity & Consistency', abbr: 'SFCS', desc: 'steadiness of style across subjects' },
-    { name: 'Subject Reactivity', abbr: 'SRS', desc: 'intelligent adaptation when the subject changes' },
-    { name: 'Safety / SFW', abbr: 'SSS', desc: 'ensures every output is appropriate for all audiences' },
-    { name: 'Content Disentanglement', abbr: 'CDS', desc: 'preserves style while removing source bias' },
-    { name: 'Prompt Similarity', abbr: 'PSS', desc: 'tracks how closely the generated image reflects the prompt' }
-  ];
-
-  return (
-    <div className={`help-modal-overlay ${isOpen ? 'open' : ''}`} onClick={onClose}>
-      <div className="help-modal artbridge-modal" onClick={(e) => e.stopPropagation()}>
-        <button className="artbridge-back" onClick={onBack} aria-label="Back">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <polyline points="15 18 9 12 15 6"></polyline>
-          </svg>
-          Back
-        </button>
-        
-        <button className="help-modal-close" onClick={onClose} aria-label="Close">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
-        
-        <div className="artbridge-header">
-          <h2 className="artbridge-title">ArtBridge: The Science Within</h2>
-          <p className="artbridge-subtitle">
-            What makes AI art predictable, personal, and print-worthy isn't magic — it's measurement.<br/>
-            The ArtBridge Index (ABI) translates creative intuition into data through six measurable dimensions:
-          </p>
-        </div>
-        
-        <div className="artbridge-metrics">
-          {metrics.map((metric, index) => (
-            <div key={index} className="artbridge-metric">
-              <span className="artbridge-metric-number">{index + 1}.</span>
-              <span>
-                <span className="artbridge-metric-name">{metric.name}</span>
-                {' '}
-                <span className="artbridge-metric-abbr">({metric.abbr})</span>
-                {' — '}
-                <span className="artbridge-metric-desc">{metric.desc}</span>
-              </span>
-            </div>
-          ))}
-        </div>
-        
-        <div className="artbridge-footer">
-          <p className="artbridge-footer-text">
-            Together, these six metrics form the scientific backbone of Society Arts —<br/>
-            quantifying creativity so that beauty becomes reproducible.
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ========================================
-// FOOTER COMPONENT
-// ========================================
-
-function Footer({ children, onNewChat }) {
-  const [helpOpen, setHelpOpen] = React.useState(false);
-  const [showHowItWorks, setShowHowItWorks] = React.useState(false);
-  const [showArtBridge, setShowArtBridge] = React.useState(false);
-
-  const handleOpenHowItWorks = () => {
-    setShowHowItWorks(true);
-  };
-
-  const handleCloseHowItWorks = () => {
-    setShowHowItWorks(false);
-    setShowArtBridge(false);
-  };
-
-  const handleOpenArtBridge = () => {
-    setShowArtBridge(true);
-  };
-
-  const handleBackToHowItWorks = () => {
-    setShowArtBridge(false);
-  };
-
-  return (
-    <>
-      <footer className="footer">
-        {children}
-        <div style={{ position: 'relative' }}>
-          <button 
-            className="help-btn" 
-            onClick={() => setHelpOpen(!helpOpen)}
-            aria-label="Help"
-          >
-            ?
-          </button>
-          <HelpMenu 
-            isOpen={helpOpen} 
-            onClose={() => setHelpOpen(false)} 
-            onNewChat={onNewChat}
-            onOpenHowItWorks={handleOpenHowItWorks}
-          />
-        </div>
-      </footer>
-      
-      {/* How It Works Modal */}
-      <HowItWorksModal 
-        isOpen={showHowItWorks && !showArtBridge}
-        onClose={handleCloseHowItWorks}
-        onOpenArtBridge={handleOpenArtBridge}
-      />
-      
-      {/* ArtBridge Modal */}
-      <ArtBridgeModal 
-        isOpen={showArtBridge}
-        onClose={handleCloseHowItWorks}
-        onBack={handleBackToHowItWorks}
-      />
-    </>
-  );
-}
-
-// ========================================
-// EXPORTS
-// ========================================
-
-if (typeof window !== 'undefined') {
-  window.SocietyArts = window.SocietyArts || {};
-  window.SocietyArts.Header = Header;
-  window.SocietyArts.Subheader = Subheader;
-  window.SocietyArts.Footer = Footer;
-  window.SocietyArts.NavSidebar = NavSidebar;
-  window.SocietyArts.HelpMenu = HelpMenu;
-  window.SocietyArts.FormatSelector = FormatSelector;
-  window.SocietyArts.HowItWorksModal = HowItWorksModal;
-  window.SocietyArts.ArtBridgeModal = ArtBridgeModal;
-  window.SocietyArts.Icons = Icons;
-  window.SocietyArts.NAV_ITEMS = NAV_ITEMS;
-  window.SocietyArts.HELP_MENU_ITEMS = HELP_MENU_ITEMS;
-  window.SocietyArts.FORMAT_OPTIONS = FORMAT_OPTIONS;
+    // Export React components
+    window.SocietyArts = window.SocietyArts || {};
+    window.SocietyArts.Header = Header;
+    window.SocietyArts.NavSidebar = NavSidebar;
+    window.SocietyArts.Subheader = Subheader;
+    window.SocietyArts.Footer = Footer;
+    window.SocietyArts.FormatSelector = FormatSelector;
+    
+    // Create React icon components from SVG strings
+    const Icons = {};
+    Object.keys(HEADER_ICONS).forEach(key => {
+        Icons[key] = (props) => React.createElement('span', {
+            className: `icon ${props?.className || ''}`,
+            style: props?.style,
+            dangerouslySetInnerHTML: { __html: HEADER_ICONS[key] }
+        });
+    });
+    window.SocietyArts.Icons = Icons;
 }

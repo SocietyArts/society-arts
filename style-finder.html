@@ -24,6 +24,9 @@
     <!-- Supabase Client Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
+    <!-- Shared Header Functions -->
+    <script src="js/shared/header.js"></script>
+    
     <style>
         /* ========================================
            STYLE FINDER - A++ BRAND STYLES
@@ -2256,31 +2259,7 @@
         const qualityFilter = document.getElementById('qualityFilter');
         const confirmModal = document.getElementById('confirmModal');
         
-        // ============================================
-        // Navigation Sidebar Functions
-        // ============================================
-        function toggleNavSidebar() {
-            const sidebar = document.getElementById('navSidebar');
-            const overlay = document.getElementById('navOverlay');
-            sidebar.classList.toggle('open');
-            overlay.classList.toggle('open');
-            document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
-        }
-        
-        function closeNavSidebar() {
-            const sidebar = document.getElementById('navSidebar');
-            const overlay = document.getElementById('navOverlay');
-            sidebar.classList.remove('open');
-            overlay.classList.remove('open');
-            document.body.style.overflow = '';
-        }
-        
-        // Close sidebar on escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                closeNavSidebar();
-            }
-        });
+        // Note: toggleNavSidebar, closeNavSidebar are provided by header.js
         
         // Filter elements mapped to database columns
         const filterSelects = {

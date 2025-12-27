@@ -213,7 +213,7 @@
   <!-- Favorites App -->
   <script type="text/babel">
     const { useState, useEffect } = React;
-    const { Header, Footer, Icons } = window.SocietyArts;
+    const { Header, NavSidebar, Footer, Icons } = window.SocietyArts;
 
     function FavoritesPage() {
       const { user, profile, isLoading: authLoading } = window.SocietyArts.useAuth();
@@ -287,7 +287,8 @@
 
       return (
         <div className="page-container">
-          <Header currentPage="favorites" />
+          <Header user={user} profile={profile} />
+          <NavSidebar />
           
           <main className="main-content favorites-content">
             {authLoading ? (
