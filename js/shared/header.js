@@ -130,7 +130,8 @@ if (typeof React !== 'undefined') {
 
         const displayName = profile?.display_name || user?.email?.split('@')[0] || 'User';
         const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-        const isAdmin = profile?.role === 'admin';
+        const isAdmin = profile?.role === 'admin' || profile?.role === 'super_admin';
+        const roleLabel = profile?.role === 'super_admin' ? 'Super Admin' : (profile?.role === 'admin' ? 'Admin' : null);
 
         return React.createElement('header', { className: 'header' },
             // Left side
@@ -183,7 +184,7 @@ if (typeof React !== 'undefined') {
                                 React.createElement('div', { className: 'user-dropdown-header' },
                                     React.createElement('div', { className: 'user-dropdown-name' }, displayName),
                                     React.createElement('div', { className: 'user-dropdown-email' }, user.email),
-                                    isAdmin && React.createElement('span', { className: 'user-dropdown-role' }, 'Admin')
+                                    roleLabel && React.createElement('span', { className: 'user-dropdown-role' }, roleLabel)
                                 ),
                                 React.createElement('button', {
                                     className: 'user-dropdown-item',

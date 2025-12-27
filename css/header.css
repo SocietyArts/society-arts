@@ -548,3 +548,88 @@
         padding: 4px;
     }
 }
+
+/* ========================================
+   FORMAT SELECTOR
+   ======================================== */
+.format-selector {
+    position: relative;
+    background: white;
+    border: 1px solid var(--color-tan-20, #E7E2DC);
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    min-width: 100px;
+    user-select: none;
+}
+
+.format-selector-label {
+    font-family: var(--font-primary, 'Familjen Grotesk', sans-serif);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-brown-60, #8B7B75);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.format-selector-value {
+    font-family: var(--font-primary, 'Familjen Grotesk', sans-serif);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-brown, #3E2318);
+}
+
+.format-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid var(--color-tan-20, #E7E2DC);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(62, 35, 24, 0.12);
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: all 0.15s ease;
+    overflow: hidden;
+}
+
+.format-dropdown.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.format-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.format-option:hover {
+    background-color: var(--color-tan-10, #F3F1EE);
+}
+
+.format-option.selected {
+    background-color: var(--color-tan-10, #F3F1EE);
+}
+
+.format-option-icon {
+    width: 20px;
+    height: 16px;
+    border: 2px solid var(--color-brown, #3E2318);
+    border-radius: 2px;
+}
+
+.format-option-label {
+    font-family: var(--font-primary, 'Familjen Grotesk', sans-serif);
+    font-size: 13px;
+    color: var(--color-brown, #3E2318);
+}
