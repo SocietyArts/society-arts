@@ -13,6 +13,9 @@ function isTouchDevice() {
 
 /**
  * Voice Interface Hook
+ * Uses browser-native APIs for mute controls (cross-platform compatible)
+ * - Mic mute: MediaStreamTrack.enabled (W3C standard)
+ * - Speaker mute: Web Audio API GainNode
  */
 function useVoiceInterface({ onUserMessage, onAssistantMessage }) {
   const [isConnected, setIsConnected] = React.useState(false);
@@ -24,39 +27,35 @@ function useVoiceInterface({ onUserMessage, onAssistantMessage }) {
   
   const socketRef = React.useRef(null);
   const audioContextRef = React.useRef(null);
+  const gainNodeRef = React.useRef(null); // For speaker volume control
   const mediaRecorderRef = React.useRef(null);
   const audioQueueRef = React.useRef([]);
   const isPlayingRef = React.useRef(false);
   const streamRef = React.useRef(null);
   const currentAssistantMessageRef = React.useRef('');
-  
-  // Refs to track current mute state (accessible in callbacks)
-  const isMutedRef = React.useRef(false);
-  const speakerMutedRef = React.useRef(false);
 
   const { API } = window.SocietyArts;
   
-  // Keep refs in sync with state
-  React.useEffect(() => {
-    isMutedRef.current = isMuted;
-  }, [isMuted]);
-  
-  React.useEffect(() => {
-    speakerMutedRef.current = speakerMuted;
-  }, [speakerMuted]);
+  // Initialize AudioContext and GainNode for speaker control
+  const initAudioContext = () => {
+    if (!audioContextRef.current) {
+      audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (!gainNodeRef.current && audioContextRef.current) {
+      gainNodeRef.current = audioContextRef.current.createGain();
+      gainNodeRef.current.connect(audioContextRef.current.destination);
+      gainNodeRef.current.gain.value = 1; // Start unmuted
+    }
+    return audioContextRef.current;
+  };
 
   const playAudioQueue = async () => {
-    if (isPlayingRef.current || audioQueueRef.current.length === 0 || speakerMutedRef.current) return;
+    if (isPlayingRef.current || audioQueueRef.current.length === 0) return;
     
     isPlayingRef.current = true;
     setIsSpeaking(true);
 
     while (audioQueueRef.current.length > 0) {
-      // Check ref (not state) for current value
-      if (speakerMutedRef.current) {
-        audioQueueRef.current = [];
-        break;
-      }
       const audioData = audioQueueRef.current.shift();
       try {
         await playAudio(audioData);
@@ -72,8 +71,11 @@ function useVoiceInterface({ onUserMessage, onAssistantMessage }) {
   const playAudio = (base64Audio) => {
     return new Promise((resolve, reject) => {
       try {
-        if (!audioContextRef.current) {
-          audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
+        const ctx = initAudioContext();
+        
+        // Resume if suspended (required by some browsers after user interaction)
+        if (ctx.state === 'suspended') {
+          ctx.resume();
         }
 
         const binaryString = atob(base64Audio);
@@ -82,15 +84,21 @@ function useVoiceInterface({ onUserMessage, onAssistantMessage }) {
           bytes[i] = binaryString.charCodeAt(i);
         }
 
-        audioContextRef.current.decodeAudioData(bytes.buffer, (buffer) => {
-          const source = audioContextRef.current.createBufferSource();
+        // Use slice to avoid detached ArrayBuffer issues
+        ctx.decodeAudioData(bytes.buffer.slice(0), (buffer) => {
+          const source = ctx.createBufferSource();
           source.buffer = buffer;
-          source.connect(audioContextRef.current.destination);
+          // Route through GainNode for volume control (speaker mute)
+          source.connect(gainNodeRef.current);
           source.onended = resolve;
           source.start(0);
-        }, reject);
+        }, (err) => {
+          console.error('Decode error:', err);
+          resolve(); // Continue even on decode error
+        });
       } catch (err) {
-        reject(err);
+        console.error('Play error:', err);
+        resolve(); // Continue even on error
       }
     });
   };
@@ -153,10 +161,7 @@ function useVoiceInterface({ onUserMessage, onAssistantMessage }) {
               if (message.data) {
                 console.log('Received audio chunk');
                 audioQueueRef.current.push(message.data);
-                // Use ref for current value
-                if (!speakerMutedRef.current) {
-                  playAudioQueue();
-                }
+                playAudioQueue();
               }
               break;
               
@@ -211,6 +216,8 @@ function useVoiceInterface({ onUserMessage, onAssistantMessage }) {
       console.log('Microphone access granted');
       streamRef.current = stream;
 
+      // Initialize audio context for playback
+      initAudioContext();
       if (audioContextRef.current?.state === 'suspended') {
         await audioContextRef.current.resume();
       }
@@ -219,9 +226,9 @@ function useVoiceInterface({ onUserMessage, onAssistantMessage }) {
         mimeType: 'audio/webm;codecs=opus',
       });
 
+      // Audio is always sent - mic mute is handled at track level
       mediaRecorderRef.current.ondataavailable = async (event) => {
-        // Use ref for current mute state (not state which would be stale in closure)
-        if (event.data.size > 0 && socketRef.current?.readyState === WebSocket.OPEN && !isMutedRef.current) {
+        if (event.data.size > 0 && socketRef.current?.readyState === WebSocket.OPEN) {
           const reader = new FileReader();
           reader.onloadend = () => {
             const base64 = reader.result.split(',')[1];
@@ -236,6 +243,7 @@ function useVoiceInterface({ onUserMessage, onAssistantMessage }) {
 
       mediaRecorderRef.current.start(100);
       setIsListening(true);
+      setIsMuted(false); // Reset mute state
       console.log('Now listening!');
     } catch (err) {
       console.error('Failed to start listening:', err);
@@ -254,28 +262,58 @@ function useVoiceInterface({ onUserMessage, onAssistantMessage }) {
     setIsListening(false);
   };
 
+  /**
+   * Toggle Microphone Mute
+   * Uses MediaStreamTrack.enabled - the W3C standard for muting audio tracks
+   * Works on all platforms: Android, iOS, Mac, Windows
+   */
   const toggleMute = () => {
-    setIsMuted(prev => {
-      const newValue = !prev;
-      isMutedRef.current = newValue; // Update ref immediately
-      console.log('Mic muted:', newValue);
-      return newValue;
-    });
+    if (!streamRef.current) {
+      console.warn('No audio stream available to mute');
+      return;
+    }
+    
+    const audioTracks = streamRef.current.getAudioTracks();
+    if (audioTracks.length === 0) {
+      console.warn('No audio tracks found');
+      return;
+    }
+    
+    const track = audioTracks[0];
+    // Toggle the track's enabled property (browser-native mute)
+    track.enabled = !track.enabled;
+    const newMutedState = !track.enabled;
+    setIsMuted(newMutedState);
+    console.log('Mic muted:', newMutedState, '| Track enabled:', track.enabled);
   };
 
+  /**
+   * Toggle Speaker Mute
+   * Uses Web Audio API GainNode - the standard for controlling audio output
+   * Works on all platforms: Android, iOS, Mac, Windows
+   */
   const toggleSpeaker = () => {
-    setSpeakerMuted(prev => {
-      const newValue = !prev;
-      speakerMutedRef.current = newValue; // Update ref immediately
-      console.log('Speaker muted:', newValue);
-      if (newValue) {
-        // Muting - clear queue and stop speaking
-        audioQueueRef.current = [];
-        isPlayingRef.current = false;
-        setIsSpeaking(false);
-      }
-      return newValue;
-    });
+    initAudioContext(); // Ensure gain node exists
+    
+    if (!gainNodeRef.current) {
+      console.warn('No gain node available for speaker control');
+      return;
+    }
+    
+    const currentGain = gainNodeRef.current.gain.value;
+    const newGain = currentGain > 0 ? 0 : 1;
+    
+    // Use setValueAtTime for more reliable cross-browser support
+    gainNodeRef.current.gain.setValueAtTime(newGain, audioContextRef.current.currentTime);
+    
+    const newMutedState = newGain === 0;
+    setSpeakerMuted(newMutedState);
+    console.log('Speaker muted:', newMutedState, '| Gain:', newGain);
+    
+    // If muting, clear pending audio
+    if (newMutedState) {
+      audioQueueRef.current = [];
+    }
   };
 
   const disconnect = () => {
@@ -287,11 +325,22 @@ function useVoiceInterface({ onUserMessage, onAssistantMessage }) {
     audioQueueRef.current = [];
     setIsConnected(false);
     setIsSpeaking(false);
+    setIsMuted(false);
+    setSpeakerMuted(false);
+    
+    // Reset gain for next session
+    if (gainNodeRef.current && audioContextRef.current) {
+      gainNodeRef.current.gain.setValueAtTime(1, audioContextRef.current.currentTime);
+    }
   };
 
+  // Cleanup on unmount
   React.useEffect(() => {
     return () => {
       disconnect();
+      if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+        audioContextRef.current.close().catch(() => {});
+      }
     };
   }, []);
 
