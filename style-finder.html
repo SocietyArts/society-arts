@@ -839,36 +839,130 @@
             padding: 1.5rem;
         }
         
-        .style-modal-id {
-            font-size: 0.875rem;
-            color: var(--color-text-secondary, #999);
+        .style-modal-title-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
             margin-bottom: 0.25rem;
         }
         
         .style-modal-name {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin: 0 0 0.5rem;
+            font-family: 'Domine', serif;
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin: 0;
+            color: var(--color-brown, #3E2318);
+            flex: 1;
+        }
+        
+        .style-modal-name-input {
+            font-family: 'Domine', serif;
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--color-brown, #3E2318);
+            border: 2px solid var(--color-tan-40, #CFC5B9);
+            border-radius: 8px;
+            padding: 0.25rem 0.5rem;
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+        
+        .style-modal-name-input:focus {
+            outline: none;
+            border-color: var(--color-accent, #C73314);
+        }
+        
+        .style-modal-edit-btn {
+            background: none;
+            border: none;
+            padding: 6px;
+            cursor: pointer;
+            color: var(--color-brown-60, #8B7B75);
+            border-radius: 4px;
+            transition: all 0.15s ease;
+            flex-shrink: 0;
+        }
+        
+        .style-modal-edit-btn:hover {
+            background: var(--color-tan-20, #E7E2DC);
+            color: var(--color-brown, #3E2318);
         }
         
         .style-modal-tagline {
+            font-family: 'Familjen Grotesk', sans-serif;
             font-size: 1rem;
-            color: var(--color-accent, #C75B3F);
+            color: var(--color-accent, #C73314);
             margin-bottom: 1rem;
             font-style: italic;
         }
         
+        .style-modal-description-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
         .style-modal-description {
-            color: var(--color-text-secondary, #666);
+            font-family: 'Familjen Grotesk', sans-serif;
+            color: var(--color-brown-60, #8B7B75);
             line-height: 1.6;
+            margin: 0;
+            flex: 1;
+        }
+        
+        .style-modal-desc-input {
+            font-family: 'Familjen Grotesk', sans-serif;
+            font-size: 0.95rem;
+            color: var(--color-brown, #3E2318);
+            border: 2px solid var(--color-tan-40, #CFC5B9);
+            border-radius: 8px;
+            padding: 0.5rem;
+            width: 100%;
+            margin-bottom: 1rem;
+            resize: vertical;
+            line-height: 1.6;
+        }
+        
+        .style-modal-desc-input:focus {
+            outline: none;
+            border-color: var(--color-accent, #C73314);
+        }
+        
+        .style-modal-id {
+            font-family: 'Familjen Grotesk', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--color-brown-60, #8B7B75);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 1rem;
+        }
+        
+        .style-modal-tags-section {
             margin-bottom: 1.5rem;
+        }
+        
+        .style-modal-tags-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .style-modal-section-label {
+            font-family: 'Familjen Grotesk', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--color-brown-60, #8B7B75);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
         .style-modal-tags {
             display: flex;
             flex-wrap: wrap;
             gap: 0.5rem;
-            margin-bottom: 1.5rem;
         }
         
         .style-tag {
@@ -956,17 +1050,29 @@
         .style-modal-admin-actions {
             display: flex;
             gap: 0.75rem;
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid var(--color-border, #e5e5e5);
+            margin-top: 0.75rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
         }
         
         .style-modal-action-btn.admin {
+            font-size: 0.8rem;
+            padding: 0.5rem 1rem;
+            color: var(--color-brown-60, #8B7B75);
+            border-color: var(--color-tan-40, #CFC5B9);
+        }
+        
+        .style-modal-action-btn.admin:hover {
+            background: var(--color-tan-10, #F3F1EE);
+            color: var(--color-brown, #3E2318);
+        }
+        
+        .style-modal-action-btn.admin.danger {
             color: #dc2626;
             border-color: #fca5a5;
         }
         
-        .style-modal-action-btn.admin:hover {
+        .style-modal-action-btn.admin.danger:hover {
             background: #fee2e2;
         }
         
@@ -1701,11 +1807,37 @@
                 <!-- Images inserted here -->
             </div>
             <div class="style-modal-info">
-                <div class="style-modal-id" id="styleModalId"></div>
-                <h2 class="style-modal-name" id="styleModalName"></h2>
+                <!-- Title (editable for admins) -->
+                <div class="style-modal-title-row">
+                    <h2 class="style-modal-name" id="styleModalName"></h2>
+                    <button class="style-modal-edit-btn" id="styleModalEditTitle" onclick="toggleEditTitle()" style="display: none;" title="Edit title">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                    </button>
+                </div>
+                <input type="text" class="style-modal-name-input" id="styleModalNameInput" style="display: none;" onkeydown="handleTitleKeydown(event)" onblur="saveTitle()">
+                
+                <!-- Tagline -->
                 <div class="style-modal-tagline" id="styleModalTagline"></div>
                 
-                <!-- Action Buttons -->
+                <!-- Description (editable for admins) -->
+                <div class="style-modal-description-row">
+                    <p class="style-modal-description" id="styleModalDescription"></p>
+                    <button class="style-modal-edit-btn" id="styleModalEditDesc" onclick="toggleEditDescription()" style="display: none;" title="Edit description">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                    </button>
+                </div>
+                <textarea class="style-modal-desc-input" id="styleModalDescInput" style="display: none;" onblur="saveDescription()" rows="4"></textarea>
+                
+                <!-- Style Number -->
+                <div class="style-modal-id" id="styleModalId"></div>
+                
+                <!-- Action Buttons (Favorite, Add to Project) -->
                 <div class="style-modal-actions" id="styleModalActions">
                     <button class="style-modal-action-btn favorite" id="styleModalFavoriteBtn" onclick="toggleStyleFavorite()">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1722,21 +1854,8 @@
                     </button>
                 </div>
                 
-                <p class="style-modal-description" id="styleModalDescription"></p>
-                <div class="style-modal-tags" id="styleModalTags"></div>
-                <div class="style-modal-attributes" id="styleModalAttributes">
-                    <!-- Attributes inserted here -->
-                </div>
-                
                 <!-- Admin Actions (shown only for super admins) -->
                 <div class="style-modal-admin-actions" id="styleModalAdminActions" style="display: none;">
-                    <button class="style-modal-action-btn" id="adminEditStyleBtn" onclick="openEditStyleModal(currentModalStyleId)">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                        </svg>
-                        Edit Style
-                    </button>
                     <button class="style-modal-action-btn admin" onclick="flagStyleForReview()">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
@@ -1744,13 +1863,32 @@
                         </svg>
                         Flag for Review
                     </button>
-                    <button class="style-modal-action-btn admin" onclick="unlistStyle()">
+                    <button class="style-modal-action-btn admin danger" onclick="unlistStyle()">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <circle cx="12" cy="12" r="10"></circle>
                             <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
                         </svg>
                         Unlist Style
                     </button>
+                </div>
+                
+                <!-- Tags Section (editable for admins) -->
+                <div class="style-modal-tags-section">
+                    <div class="style-modal-tags-header">
+                        <span class="style-modal-section-label">Tags</span>
+                        <button class="style-modal-edit-btn" id="styleModalEditTags" onclick="openTagsEditor()" style="display: none;" title="Edit tags">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="style-modal-tags" id="styleModalTags"></div>
+                </div>
+                
+                <!-- Attributes Grid -->
+                <div class="style-modal-attributes" id="styleModalAttributes">
+                    <!-- Attributes inserted here -->
                 </div>
             </div>
         </div>
@@ -3021,6 +3159,11 @@
             
             lightboxImages = style.images;
             
+            // Store current style data for editing
+            currentModalStyleId = styleId;
+            currentModalStyleName = style.name;
+            currentModalStyle = style;
+            
             const galleryHtml = style.images.map((url, i) => 
                 `<img src="${url}" alt="${style.name} - Image ${i + 1}" 
                       onclick="openLightbox(${i})"
@@ -3028,10 +3171,19 @@
             ).join('');
             document.getElementById('styleModalGallery').innerHTML = galleryHtml;
             
-            document.getElementById('styleModalId').textContent = style.id;
+            // Set title
             document.getElementById('styleModalName').textContent = style.name || 'Untitled Style';
+            document.getElementById('styleModalNameInput').value = style.name || '';
+            
+            // Set tagline
             document.getElementById('styleModalTagline').textContent = style.tagline || '';
+            
+            // Set description
             document.getElementById('styleModalDescription').textContent = style.description || 'No description available.';
+            document.getElementById('styleModalDescInput').value = style.description || '';
+            
+            // Set style ID
+            document.getElementById('styleModalId').textContent = `Style #${style.id}`;
             
             // Show tags from junction tables
             const allTags = [
@@ -3046,7 +3198,7 @@
             
             document.getElementById('styleModalTags').innerHTML = allTags.length > 0 
                 ? allTags.map(tag => `<span class="style-tag">${tag}</span>`).join('')
-                : '';
+                : '<span class="style-tag" style="opacity: 0.5;">No tags</span>';
             
             const attributes = [
                 ['Art Types', style.artTypes?.join(', ')],
@@ -3069,18 +3221,21 @@
                 </div>
             `).join('');
             
-            // Track current style for actions
-            currentModalStyleId = styleId;
-            currentModalStyleName = style.name;
-            
             // Update favorite button state
             updateFavoriteButtonState();
             
-            // Show/hide admin actions based on role
-            const adminActions = document.getElementById('styleModalAdminActions');
-            if (adminActions) {
-                adminActions.style.display = isSuperAdmin() ? 'flex' : 'none';
-            }
+            // Show/hide admin actions and edit buttons based on role
+            const isAdmin = isSuperAdmin();
+            document.getElementById('styleModalAdminActions').style.display = isAdmin ? 'flex' : 'none';
+            document.getElementById('styleModalEditTitle').style.display = isAdmin ? 'block' : 'none';
+            document.getElementById('styleModalEditDesc').style.display = isAdmin ? 'block' : 'none';
+            document.getElementById('styleModalEditTags').style.display = isAdmin ? 'block' : 'none';
+            
+            // Reset edit modes
+            document.getElementById('styleModalName').style.display = 'block';
+            document.getElementById('styleModalNameInput').style.display = 'none';
+            document.getElementById('styleModalDescription').parentElement.style.display = 'flex';
+            document.getElementById('styleModalDescInput').style.display = 'none';
             
             styleModal.classList.add('active');
         }
@@ -3088,6 +3243,7 @@
         // Variable to track current style in modal
         let currentModalStyleId = null;
         let currentModalStyleName = null;
+        let currentModalStyle = null;
         
         // Update favorite button appearance
         function updateFavoriteButtonState() {
@@ -3197,6 +3353,8 @@
             const reason = prompt('Enter reason for flagging this style:');
             if (!reason) return;
             
+            const { supabase } = window.SocietyArts;
+            
             try {
                 // Update style status
                 const { error } = await supabase
@@ -3209,11 +3367,11 @@
                 
                 if (error) throw error;
                 
-                alert(`Style ${currentModalStyleId} has been flagged for review.`);
+                showToast('Style flagged for review');
                 styleModal.classList.remove('active');
             } catch (error) {
                 console.error('Failed to flag style:', error);
-                alert('Failed to flag style. Please try again.');
+                showToast('Failed to flag style');
             }
         }
         
@@ -3225,24 +3383,148 @@
                 return;
             }
             
+            const { supabase } = window.SocietyArts;
+            
             try {
                 const { error } = await supabase
                     .from('styles')
-                    .update({ is_listed: false })
+                    .update({ status: 'unlisted' })
                     .eq('id', currentModalStyleId);
                 
                 if (error) throw error;
                 
-                alert(`Style ${currentModalStyleId} has been unlisted.`);
+                showToast('Style unlisted');
                 styleModal.classList.remove('active');
                 
                 // Remove from grid
                 const card = document.querySelector(`[data-style-id="${currentModalStyleId}"]`);
                 if (card) card.remove();
+                
+                // Update results count
+                updateResultsCount();
             } catch (error) {
                 console.error('Failed to unlist style:', error);
-                alert('Failed to unlist style. Please try again.');
+                showToast('Failed to unlist style');
             }
+        }
+        
+        // ============================================
+        // Inline Edit Functions (Admin)
+        // ============================================
+        function toggleEditTitle() {
+            const nameEl = document.getElementById('styleModalName');
+            const inputEl = document.getElementById('styleModalNameInput');
+            
+            if (inputEl.style.display === 'none') {
+                nameEl.style.display = 'none';
+                inputEl.style.display = 'block';
+                inputEl.focus();
+                inputEl.select();
+            } else {
+                saveTitle();
+            }
+        }
+        
+        function handleTitleKeydown(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                saveTitle();
+            } else if (event.key === 'Escape') {
+                // Cancel edit
+                document.getElementById('styleModalName').style.display = 'block';
+                document.getElementById('styleModalNameInput').style.display = 'none';
+            }
+        }
+        
+        async function saveTitle() {
+            const nameEl = document.getElementById('styleModalName');
+            const inputEl = document.getElementById('styleModalNameInput');
+            const newName = inputEl.value.trim();
+            
+            if (!newName || newName === currentModalStyleName) {
+                nameEl.style.display = 'block';
+                inputEl.style.display = 'none';
+                return;
+            }
+            
+            const { supabase } = window.SocietyArts;
+            
+            try {
+                const { error } = await supabase
+                    .from('styles')
+                    .update({ name: newName })
+                    .eq('id', currentModalStyleId);
+                
+                if (error) throw error;
+                
+                nameEl.textContent = newName;
+                currentModalStyleName = newName;
+                showToast('Title updated');
+                
+                // Update card in grid
+                const card = document.querySelector(`[data-style-id="${currentModalStyleId}"] .style-card-name`);
+                if (card) card.textContent = newName;
+            } catch (error) {
+                console.error('Failed to update title:', error);
+                showToast('Failed to update title');
+            }
+            
+            nameEl.style.display = 'block';
+            inputEl.style.display = 'none';
+        }
+        
+        function toggleEditDescription() {
+            const descRow = document.getElementById('styleModalDescription').parentElement;
+            const inputEl = document.getElementById('styleModalDescInput');
+            
+            if (inputEl.style.display === 'none') {
+                descRow.style.display = 'none';
+                inputEl.style.display = 'block';
+                inputEl.focus();
+            } else {
+                saveDescription();
+            }
+        }
+        
+        async function saveDescription() {
+            const descEl = document.getElementById('styleModalDescription');
+            const descRow = descEl.parentElement;
+            const inputEl = document.getElementById('styleModalDescInput');
+            const newDesc = inputEl.value.trim();
+            
+            const originalDesc = currentModalStyle?.description || '';
+            
+            if (newDesc === originalDesc) {
+                descRow.style.display = 'flex';
+                inputEl.style.display = 'none';
+                return;
+            }
+            
+            const { supabase } = window.SocietyArts;
+            
+            try {
+                const { error } = await supabase
+                    .from('styles')
+                    .update({ description: newDesc || null })
+                    .eq('id', currentModalStyleId);
+                
+                if (error) throw error;
+                
+                descEl.textContent = newDesc || 'No description available.';
+                currentModalStyle.description = newDesc;
+                showToast('Description updated');
+            } catch (error) {
+                console.error('Failed to update description:', error);
+                showToast('Failed to update description');
+            }
+            
+            descRow.style.display = 'flex';
+            inputEl.style.display = 'none';
+        }
+        
+        function openTagsEditor() {
+            // Open the full edit modal for tag management
+            openEditStyleModal(currentModalStyleId);
         }
         
         styleModalClose.addEventListener('click', () => styleModal.classList.remove('active'));
