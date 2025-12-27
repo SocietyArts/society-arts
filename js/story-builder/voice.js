@@ -29,17 +29,31 @@ function useVoiceInterface({ onUserMessage, onAssistantMessage }) {
   const isPlayingRef = React.useRef(false);
   const streamRef = React.useRef(null);
   const currentAssistantMessageRef = React.useRef('');
+  
+  // Refs to track current mute state (accessible in callbacks)
+  const isMutedRef = React.useRef(false);
+  const speakerMutedRef = React.useRef(false);
 
   const { API } = window.SocietyArts;
+  
+  // Keep refs in sync with state
+  React.useEffect(() => {
+    isMutedRef.current = isMuted;
+  }, [isMuted]);
+  
+  React.useEffect(() => {
+    speakerMutedRef.current = speakerMuted;
+  }, [speakerMuted]);
 
   const playAudioQueue = async () => {
-    if (isPlayingRef.current || audioQueueRef.current.length === 0 || speakerMuted) return;
+    if (isPlayingRef.current || audioQueueRef.current.length === 0 || speakerMutedRef.current) return;
     
     isPlayingRef.current = true;
     setIsSpeaking(true);
 
     while (audioQueueRef.current.length > 0) {
-      if (speakerMuted) {
+      // Check ref (not state) for current value
+      if (speakerMutedRef.current) {
         audioQueueRef.current = [];
         break;
       }
@@ -139,7 +153,8 @@ function useVoiceInterface({ onUserMessage, onAssistantMessage }) {
               if (message.data) {
                 console.log('Received audio chunk');
                 audioQueueRef.current.push(message.data);
-                if (!speakerMuted) {
+                // Use ref for current value
+                if (!speakerMutedRef.current) {
                   playAudioQueue();
                 }
               }
@@ -205,7 +220,8 @@ function useVoiceInterface({ onUserMessage, onAssistantMessage }) {
       });
 
       mediaRecorderRef.current.ondataavailable = async (event) => {
-        if (event.data.size > 0 && socketRef.current?.readyState === WebSocket.OPEN && !isMuted) {
+        // Use ref for current mute state (not state which would be stale in closure)
+        if (event.data.size > 0 && socketRef.current?.readyState === WebSocket.OPEN && !isMutedRef.current) {
           const reader = new FileReader();
           reader.onloadend = () => {
             const base64 = reader.result.split(',')[1];
@@ -239,17 +255,26 @@ function useVoiceInterface({ onUserMessage, onAssistantMessage }) {
   };
 
   const toggleMute = () => {
-    setIsMuted(prev => !prev);
+    setIsMuted(prev => {
+      const newValue = !prev;
+      isMutedRef.current = newValue; // Update ref immediately
+      console.log('Mic muted:', newValue);
+      return newValue;
+    });
   };
 
   const toggleSpeaker = () => {
     setSpeakerMuted(prev => {
-      if (!prev) {
-        // Muting - clear queue
+      const newValue = !prev;
+      speakerMutedRef.current = newValue; // Update ref immediately
+      console.log('Speaker muted:', newValue);
+      if (newValue) {
+        // Muting - clear queue and stop speaking
         audioQueueRef.current = [];
+        isPlayingRef.current = false;
         setIsSpeaking(false);
       }
-      return !prev;
+      return newValue;
     });
   };
 
