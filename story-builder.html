@@ -54,24 +54,25 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 14px var(--space-lg);
+      padding: 14px var(--space-xl);
       background: var(--color-surface-alt);
-      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
       border-bottom: 1px solid var(--color-border-light);
       position: relative;
+      margin: 0;
     }
     
     .panel-header-active {
-      background: var(--color-brown-dark, #3E2318);
-      color: var(--color-cream, #FAF8F5);
+      background: #3E2318;
+      color: #FAF8F5;
+      border-bottom: none;
     }
     
     .panel-header-active .panel-header-title {
-      color: var(--color-cream, #FAF8F5);
+      color: #FAF8F5;
     }
     
     .panel-header-active .panel-info-btn {
-      color: var(--color-cream, #FAF8F5);
+      color: #FAF8F5;
       opacity: 0.8;
     }
     
@@ -80,8 +81,8 @@
     }
     
     .panel-header-title {
-      font-family: var(--font-serif);
-      font-size: var(--text-base);
+      font-family: 'Domine', var(--font-serif);
+      font-size: 20px;
       font-weight: var(--weight-medium);
       text-align: center;
     }
@@ -223,25 +224,30 @@
       gap: var(--space-md);
       overflow-y: auto;
       min-width: 0;
-      padding-right: var(--space-xs);
+      padding: 0;
       max-height: 100%;
     }
     
-    /* Story Card adjustments */
-    .story-card {
+    /* Story Card adjustments - MUST override .card padding */
+    .card.story-card {
       border-radius: var(--radius-lg);
       overflow: hidden;
+      background: var(--color-tan-10);
+      padding: 0 !important; /* Override .card padding so header fills full width */
+      border: none;
     }
     
     .story-card .card-content {
       padding: var(--space-md) var(--space-lg) var(--space-lg);
+      background: var(--color-tan-10);
     }
     
-    /* Variation selector adjustments */
+    /* Variation selector adjustments - MUST override any inherited padding */
     .variation-selector {
-      background: var(--color-surface-alt);
+      background: var(--color-tan-10);
       border-radius: var(--radius-lg);
       overflow: hidden;
+      padding: 0 !important;
     }
     
     .variation-selector .panel-header {
@@ -268,19 +274,19 @@
     
     .chat-title-bar {
       padding: 14px var(--space-xl);
-      border-bottom: 1px solid var(--color-border-dark);
+      border-bottom: none;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: var(--space-sm);
-      font-family: var(--font-serif);
-      font-size: var(--text-lg);
+      font-family: 'Domine', var(--font-serif);
+      font-size: 20px;
       font-weight: var(--weight-medium);
-      color: var(--color-text-primary);
       flex-shrink: 0;
       position: relative;
-      background: var(--color-brown-dark, #3E2318);
-      color: var(--color-cream, #FAF8F5);
+      background: #3E2318;
+      color: #FAF8F5;
+      margin: 0;
     }
     
     .chat-title-bar .chat-info-btn {
@@ -291,7 +297,7 @@
       background: none;
       border: none;
       cursor: pointer;
-      color: var(--color-cream, #FAF8F5);
+      color: #FAF8F5;
       opacity: 0.8;
       padding: 4px;
       border-radius: var(--radius-sm);
@@ -308,18 +314,19 @@
     /* Empty chat title bar (no title yet) */
     .chat-title-bar-empty {
       padding: 14px var(--space-xl);
-      border-bottom: 1px solid var(--color-border-dark);
+      border-bottom: 1px solid var(--color-border-light);
       display: flex;
       align-items: center;
       justify-content: center;
       gap: var(--space-sm);
-      font-family: var(--font-serif);
-      font-size: var(--text-base);
+      font-family: 'Domine', var(--font-serif);
+      font-size: 20px;
       font-weight: var(--weight-medium);
       color: var(--color-text-muted);
       flex-shrink: 0;
       position: relative;
       background: var(--color-surface-alt);
+      margin: 0;
     }
     
     .chat-title-bar-empty .chat-info-btn {
@@ -377,8 +384,8 @@
       flex-direction: column;
       overflow-y: auto;
       min-width: 0;
-      padding-left: var(--space-xs);
-      background: var(--color-surface-alt);
+      padding: 0; /* No padding so header fills edge-to-edge */
+      background: var(--color-tan-10);
       border-radius: var(--radius-lg);
     }
     
@@ -386,19 +393,22 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 14px var(--space-lg);
+      padding: 14px var(--space-xl);
       border-bottom: 1px solid var(--color-border-light);
       position: relative;
+      background: var(--color-surface-alt);
+      margin: 0;
     }
     
     .styles-panel-header.has-styles {
-      background: var(--color-brown-dark, #3E2318);
-      color: var(--color-cream, #FAF8F5);
+      background: #3E2318;
+      color: #FAF8F5;
+      border-bottom: none;
     }
     
     .styles-panel-title {
-      font-family: var(--font-serif);
-      font-size: var(--text-base);
+      font-family: 'Domine', var(--font-serif);
+      font-size: 20px;
       font-weight: var(--weight-medium);
     }
     
@@ -420,7 +430,7 @@
     }
     
     .styles-panel-header.has-styles .styles-info-btn {
-      color: var(--color-cream, #FAF8F5);
+      color: #FAF8F5;
       opacity: 0.8;
     }
     
@@ -601,6 +611,185 @@
       flex-shrink: 0;
       display: flex;
       justify-content: center;
+    }
+    
+    /* ========================================
+       ChatGPT-STYLE INPUT SYSTEM
+       ======================================== */
+    
+    .chat-input-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border-medium);
+      border-radius: 24px;
+      padding: 8px 12px;
+      transition: all 0.2s;
+    }
+    
+    .chat-input-wrapper:focus-within {
+      border-color: var(--color-border-dark);
+      box-shadow: 0 0 0 2px rgba(62, 35, 24, 0.08);
+    }
+    
+    /* Text Input Field */
+    .chat-text-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: var(--text-base);
+      padding: 8px 4px;
+      background: transparent;
+      min-width: 0;
+    }
+    
+    .chat-text-input::placeholder {
+      color: var(--color-text-muted);
+    }
+    
+    /* Icon Buttons (Plus, Dictate, Speaker, Mic) */
+    .input-icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-muted);
+      transition: all 0.15s;
+      flex-shrink: 0;
+      position: relative;
+    }
+    
+    .input-icon-btn:hover {
+      background: var(--color-tan-10);
+      color: var(--color-text-primary);
+    }
+    
+    .input-icon-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    
+    /* Plus Button */
+    .input-icon-btn.plus-btn {
+      color: var(--color-text-secondary);
+    }
+    
+    /* Dictate Button */
+    .input-icon-btn.dictate-btn.active {
+      color: var(--color-accent);
+      background: var(--color-accent-light);
+    }
+    
+    .dictate-pulse {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 2px solid var(--color-accent);
+      animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(1.4); opacity: 0; }
+    }
+    
+    /* Speaker/Mic Muted State */
+    .input-icon-btn.muted {
+      color: #dc2626;
+    }
+    
+    /* Voice Mode Button (Waveform) */
+    .voice-mode-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: var(--color-text-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      transition: all 0.15s;
+      flex-shrink: 0;
+    }
+    
+    .voice-mode-btn:hover {
+      background: var(--color-brown);
+      transform: scale(1.05);
+    }
+    
+    /* Voice End Button (Red with dots) */
+    .voice-end-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: none;
+      background: #dc2626;
+      color: white;
+      font-size: 14px;
+      font-weight: var(--weight-medium);
+      cursor: pointer;
+      transition: all 0.15s;
+      flex-shrink: 0;
+    }
+    
+    .voice-end-btn:hover {
+      background: #b91c1c;
+    }
+    
+    .voice-end-dots {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+    
+    .voice-end-dots span {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: white;
+      animation: dot-pulse 1s ease-in-out infinite;
+    }
+    
+    .voice-end-dots span:nth-child(1) { animation-delay: 0s; }
+    .voice-end-dots span:nth-child(2) { animation-delay: 0.15s; }
+    .voice-end-dots span:nth-child(3) { animation-delay: 0.3s; }
+    
+    @keyframes dot-pulse {
+      0%, 100% { opacity: 0.4; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+    
+    .voice-end-text {
+      font-weight: var(--weight-semibold);
+    }
+    
+    /* Future Feature Modal */
+    .future-modal {
+      max-width: 360px;
+      text-align: center;
+    }
+    
+    .future-modal h3 {
+      font-family: var(--font-serif);
+      font-size: var(--text-xl);
+      margin-bottom: var(--space-md);
+    }
+    
+    .future-modal p {
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-lg);
+      line-height: 1.6;
     }
   </style>
 </head>
@@ -899,6 +1088,12 @@
 
       const sendMessage = async () => {
         if (!inputValue.trim() || isLoading) return;
+        
+        // Require login to start a story
+        if (!user) {
+          window.SocietyArts?.openAuthModal?.();
+          return;
+        }
 
         if (!hasStarted) setHasStarted(true);
 
@@ -1151,6 +1346,11 @@
                   isLoading={isLoading}
                   voice={voice}
                   placeholder={hasStarted ? "Continue your story..." : "Start your story..."}
+                  onRequireAuth={() => {
+                    if (!user) {
+                      window.SocietyArts?.openAuthModal?.();
+                    }
+                  }}
                 />
               </div>
             </div>

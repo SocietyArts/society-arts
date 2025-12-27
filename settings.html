@@ -577,10 +577,24 @@
                         value={settings.voicePersona || 'default'}
                         onChange={(e) => updateSetting('voicePersona', e.target.value)}
                       >
+                        <option value="aria">Aria (Female)</option>
+                        <option value="nova">Nova (Female)</option>
+                        <option value="marcus">Marcus (Male)</option>
+                        <option value="julian">Julian (Male)</option>
+                      </select>
+                    </div>
+                    <div className="settings-item">
+                      <span className="settings-item-label">Guide personality</span>
+                      <select 
+                        className="settings-select"
+                        value={settings.guidePersonality || 'default'}
+                        onChange={(e) => updateSetting('guidePersonality', e.target.value)}
+                      >
                         <option value="default">Default</option>
-                        <option value="female">Female Voice</option>
-                        <option value="male">Male Voice</option>
-                        <option value="neutral">Neutral Voice</option>
+                        <option value="friendly">Friendly</option>
+                        <option value="candid">Candid</option>
+                        <option value="professional">Professional</option>
+                        <option value="quirky">Quirky</option>
                       </select>
                     </div>
                     <div className="settings-item">

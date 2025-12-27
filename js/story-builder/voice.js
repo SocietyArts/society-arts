@@ -1,7 +1,7 @@
 /* ========================================
    SOCIETY ARTS - VOICE INTEGRATION
    Unified text/voice input system
-   Version: 3.0
+   Version: 4.0 (v21)
    ======================================== */
 
 /**
@@ -13,15 +13,21 @@ function isTouchDevice() {
 
 /**
  * Voice Interface Hook
+ * Uses browser-native APIs for mute controls (cross-platform compatible)
+ * - Mic mute: MediaStreamTrack.enabled (W3C standard)
+ * - Speaker mute: Web Audio API GainNode
  */
 function useVoiceInterface({ onUserMessage, onAssistantMessage }) {
   const [isConnected, setIsConnected] = React.useState(false);
   const [isListening, setIsListening] = React.useState(false);
   const [isSpeaking, setIsSpeaking] = React.useState(false);
+  const [isMuted, setIsMuted] = React.useState(false);
+  const [speakerMuted, setSpeakerMuted] = React.useState(false);
   const [error, setError] = React.useState(null);
   
   const socketRef = React.useRef(null);
   const audioContextRef = React.useRef(null);
+  const gainNodeRef = React.useRef(null); // For speaker volume control
   const mediaRecorderRef = React.useRef(null);
   const audioQueueRef = React.useRef([]);
   const isPlayingRef = React.useRef(false);
@@ -29,6 +35,19 @@ function useVoiceInterface({ onUserMessage, onAssistantMessage }) {
   const currentAssistantMessageRef = React.useRef('');
 
   const { API } = window.SocietyArts;
+  
+  // Initialize AudioContext and GainNode for speaker control
+  const initAudioContext = () => {
+    if (!audioContextRef.current) {
+      audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (!gainNodeRef.current && audioContextRef.current) {
+      gainNodeRef.current = audioContextRef.current.createGain();
+      gainNodeRef.current.connect(audioContextRef.current.destination);
+      gainNodeRef.current.gain.value = 1; // Start unmuted
+    }
+    return audioContextRef.current;
+  };
 
   const playAudioQueue = async () => {
     if (isPlayingRef.current || audioQueueRef.current.length === 0) return;
@@ -52,8 +71,11 @@ function useVoiceInterface({ onUserMessage, onAssistantMessage }) {
   const playAudio = (base64Audio) => {
     return new Promise((resolve, reject) => {
       try {
-        if (!audioContextRef.current) {
-          audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
+        const ctx = initAudioContext();
+        
+        // Resume if suspended (required by some browsers after user interaction)
+        if (ctx.state === 'suspended') {
+          ctx.resume();
         }
 
         const binaryString = atob(base64Audio);
@@ -62,15 +84,21 @@ function useVoiceInterface({ onUserMessage, onAssistantMessage }) {
           bytes[i] = binaryString.charCodeAt(i);
         }
 
-        audioContextRef.current.decodeAudioData(bytes.buffer, (buffer) => {
-          const source = audioContextRef.current.createBufferSource();
+        // Use slice to avoid detached ArrayBuffer issues
+        ctx.decodeAudioData(bytes.buffer.slice(0), (buffer) => {
+          const source = ctx.createBufferSource();
           source.buffer = buffer;
-          source.connect(audioContextRef.current.destination);
+          // Route through GainNode for volume control (speaker mute)
+          source.connect(gainNodeRef.current);
           source.onended = resolve;
           source.start(0);
-        }, reject);
+        }, (err) => {
+          console.error('Decode error:', err);
+          resolve(); // Continue even on decode error
+        });
       } catch (err) {
-        reject(err);
+        console.error('Play error:', err);
+        resolve(); // Continue even on error
       }
     });
   };
@@ -188,6 +216,8 @@ function useVoiceInterface({ onUserMessage, onAssistantMessage }) {
       console.log('Microphone access granted');
       streamRef.current = stream;
 
+      // Initialize audio context for playback
+      initAudioContext();
       if (audioContextRef.current?.state === 'suspended') {
         await audioContextRef.current.resume();
       }
@@ -196,6 +226,7 @@ function useVoiceInterface({ onUserMessage, onAssistantMessage }) {
         mimeType: 'audio/webm;codecs=opus',
       });
 
+      // Audio is always sent - mic mute is handled at track level
       mediaRecorderRef.current.ondataavailable = async (event) => {
         if (event.data.size > 0 && socketRef.current?.readyState === WebSocket.OPEN) {
           const reader = new FileReader();
@@ -212,6 +243,7 @@ function useVoiceInterface({ onUserMessage, onAssistantMessage }) {
 
       mediaRecorderRef.current.start(100);
       setIsListening(true);
+      setIsMuted(false); // Reset mute state
       console.log('Now listening!');
     } catch (err) {
       console.error('Failed to start listening:', err);
@@ -230,6 +262,60 @@ function useVoiceInterface({ onUserMessage, onAssistantMessage }) {
     setIsListening(false);
   };
 
+  /**
+   * Toggle Microphone Mute
+   * Uses MediaStreamTrack.enabled - the W3C standard for muting audio tracks
+   * Works on all platforms: Android, iOS, Mac, Windows
+   */
+  const toggleMute = () => {
+    if (!streamRef.current) {
+      console.warn('No audio stream available to mute');
+      return;
+    }
+    
+    const audioTracks = streamRef.current.getAudioTracks();
+    if (audioTracks.length === 0) {
+      console.warn('No audio tracks found');
+      return;
+    }
+    
+    const track = audioTracks[0];
+    // Toggle the track's enabled property (browser-native mute)
+    track.enabled = !track.enabled;
+    const newMutedState = !track.enabled;
+    setIsMuted(newMutedState);
+    console.log('Mic muted:', newMutedState, '| Track enabled:', track.enabled);
+  };
+
+  /**
+   * Toggle Speaker Mute
+   * Uses Web Audio API GainNode - the standard for controlling audio output
+   * Works on all platforms: Android, iOS, Mac, Windows
+   */
+  const toggleSpeaker = () => {
+    initAudioContext(); // Ensure gain node exists
+    
+    if (!gainNodeRef.current) {
+      console.warn('No gain node available for speaker control');
+      return;
+    }
+    
+    const currentGain = gainNodeRef.current.gain.value;
+    const newGain = currentGain > 0 ? 0 : 1;
+    
+    // Use setValueAtTime for more reliable cross-browser support
+    gainNodeRef.current.gain.setValueAtTime(newGain, audioContextRef.current.currentTime);
+    
+    const newMutedState = newGain === 0;
+    setSpeakerMuted(newMutedState);
+    console.log('Speaker muted:', newMutedState, '| Gain:', newGain);
+    
+    // If muting, clear pending audio
+    if (newMutedState) {
+      audioQueueRef.current = [];
+    }
+  };
+
   const disconnect = () => {
     stopListening();
     if (socketRef.current) {
@@ -239,11 +325,22 @@ function useVoiceInterface({ onUserMessage, onAssistantMessage }) {
     audioQueueRef.current = [];
     setIsConnected(false);
     setIsSpeaking(false);
+    setIsMuted(false);
+    setSpeakerMuted(false);
+    
+    // Reset gain for next session
+    if (gainNodeRef.current && audioContextRef.current) {
+      gainNodeRef.current.gain.setValueAtTime(1, audioContextRef.current.currentTime);
+    }
   };
 
+  // Cleanup on unmount
   React.useEffect(() => {
     return () => {
       disconnect();
+      if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+        audioContextRef.current.close().catch(() => {});
+      }
     };
   }, []);
 
@@ -251,17 +348,53 @@ function useVoiceInterface({ onUserMessage, onAssistantMessage }) {
     isConnected,
     isListening,
     isSpeaking,
+    isMuted,
+    speakerMuted,
     error,
     connect,
     disconnect,
     startListening,
     stopListening,
+    toggleMute,
+    toggleSpeaker,
   };
 }
 
 /**
+ * Waveform Icon Component (for voice mode button)
+ */
+function WaveformIcon({ size = 20 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
+      <rect x="4" y="10" width="2" height="4" rx="1" />
+      <rect x="8" y="7" width="2" height="10" rx="1" />
+      <rect x="12" y="4" width="2" height="16" rx="1" />
+      <rect x="16" y="7" width="2" height="10" rx="1" />
+      <rect x="20" y="10" width="2" height="4" rx="1" />
+    </svg>
+  );
+}
+
+/**
+ * Future Feature Modal
+ */
+function FutureFeatureModal({ isOpen, onClose }) {
+  if (!isOpen) return null;
+  
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content future-modal" onClick={e => e.stopPropagation()}>
+        <h3>Coming Soon</h3>
+        <p>In a future edition, you'll be able to upload your own artwork and images to incorporate into your story.</p>
+        <button className="btn btn-primary" onClick={onClose}>Got it</button>
+      </div>
+    </div>
+  );
+}
+
+/**
  * Unified Input Component
- * Text mode with voice toggle, push-to-talk when voice enabled
+ * ChatGPT-style input with text/voice modes
  */
 function UnifiedInput({ 
   voiceMode,
@@ -270,67 +403,96 @@ function UnifiedInput({
   onInputChange,
   onSendMessage,
   isLoading,
-  voice, // { isConnected, isListening, isSpeaking, error, startListening, stopListening }
-  placeholder = "Start your story..."
+  voice,
+  placeholder = "Start your story...",
+  onRequireAuth
 }) {
   const inputRef = React.useRef(null);
-  const [isHolding, setIsHolding] = React.useState(false);
+  const [showFutureModal, setShowFutureModal] = React.useState(false);
+  const [isDictating, setIsDictating] = React.useState(false);
+  const recognitionRef = React.useRef(null);
 
-  // Handle key down in text mode
+  // Initialize speech recognition for dictation
+  React.useEffect(() => {
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = true;
+      recognitionRef.current.interimResults = true;
+      
+      let finalTranscript = '';
+      recognitionRef.current.onresult = (event) => {
+        let interimTranscript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          if (event.results[i].isFinal) {
+            finalTranscript += event.results[i][0].transcript;
+          } else {
+            interimTranscript += event.results[i][0].transcript;
+          }
+        }
+        onInputChange(finalTranscript + interimTranscript);
+      };
+      
+      recognitionRef.current.onend = () => {
+        setIsDictating(false);
+      };
+    }
+    
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+    };
+  }, []);
+
+  // Handle key down
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey && inputValue.trim()) {
       e.preventDefault();
-      onSendMessage();
+      handleSend();
     }
   };
 
-  // Handle voice mode toggle
-  const handleVoiceToggle = () => {
+  // Handle send with auth check
+  const handleSend = () => {
+    if (onRequireAuth && !window.SocietyArts?.AuthState?.user) {
+      onRequireAuth();
+      return;
+    }
+    onSendMessage();
+  };
+
+  // Handle voice mode toggle with auth check
+  const handleVoiceModeToggle = () => {
+    if (onRequireAuth && !window.SocietyArts?.AuthState?.user) {
+      onRequireAuth();
+      return;
+    }
     onToggleMode(!voiceMode);
   };
 
-  // Push-to-talk handlers
-  const handlePushStart = (e) => {
-    e.preventDefault();
-    if (!voice?.isConnected || voice?.isSpeaking) return;
+  // Toggle dictation in text mode
+  const toggleDictation = () => {
+    if (!recognitionRef.current) return;
     
-    setIsHolding(true);
-    if (!voice.isListening) {
-      voice.startListening();
+    if (isDictating) {
+      recognitionRef.current.stop();
+      setIsDictating(false);
+    } else {
+      recognitionRef.current.start();
+      setIsDictating(true);
     }
-  };
-
-  const handlePushEnd = (e) => {
-    e.preventDefault();
-    if (!voice?.isConnected) return;
-    
-    setIsHolding(false);
-    if (voice.isListening) {
-      voice.stopListening();
-    }
-  };
-
-  // Get status text for voice mode
-  const getVoiceStatus = () => {
-    if (!voice) return 'Connecting...';
-    if (voice.error) return voice.error;
-    if (!voice.isConnected) return 'Connecting...';
-    if (voice.isSpeaking) return 'Speaking...';
-    if (voice.isListening) return 'Listening...';
-    return 'Hold to talk';
   };
 
   // Icons
-  const MicIcon = () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-      <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-      <line x1="12" y1="19" x2="12" y2="23"></line>
-      <line x1="8" y1="23" x2="16" y2="23"></line>
+  const PlusIcon = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <line x1="12" y1="5" x2="12" y2="19"></line>
+      <line x1="5" y1="12" x2="19" y2="12"></line>
     </svg>
   );
 
-  const MicIconSmall = () => (
+  const MicIcon = () => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
       <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
       <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
@@ -339,79 +501,113 @@ function UnifiedInput({
     </svg>
   );
 
-  const PencilIcon = () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A89F94" strokeWidth="1.5">
-      <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+  const MicMutedIcon = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+      <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+      <line x1="12" y1="19" x2="12" y2="23"></line>
+      <line x1="8" y1="23" x2="16" y2="23"></line>
+      <line x1="1" y1="1" x2="23" y2="23" strokeWidth="2"></line>
     </svg>
   );
 
   const SpeakerIcon = () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
       <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-      <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+      <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+      <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
     </svg>
   );
 
-  // Voice Toggle Switch Component
-  const VoiceToggle = ({ enabled, onChange, disabled }) => (
-    <div className="voice-toggle-container">
-      <span className="voice-toggle-label">Voice</span>
-      <button 
-        className={`voice-toggle-switch ${enabled ? 'active' : ''}`}
-        onClick={onChange}
-        disabled={disabled}
-        aria-label={enabled ? 'Disable voice mode' : 'Enable voice mode'}
-      >
-        <span className="voice-toggle-knob"></span>
-      </button>
-    </div>
+  const SpeakerMutedIcon = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+      <line x1="23" y1="9" x2="17" y2="15"></line>
+      <line x1="17" y1="9" x2="23" y2="15"></line>
+    </svg>
   );
 
-  // Combined layout with text input + optional push-to-talk + voice toggle
+  // Common wrapper
   return (
-    <div className="unified-input-wrapper">
-      {/* Push-to-talk button - only visible when voice mode is on */}
-      {voiceMode && (
-        <div className="push-to-talk-section">
-          <button
-            className={`push-to-talk-btn ${voice?.isListening ? 'active' : ''} ${voice?.isSpeaking ? 'speaking' : ''}`}
-            onMouseDown={handlePushStart}
-            onMouseUp={handlePushEnd}
-            onMouseLeave={handlePushEnd}
-            onTouchStart={handlePushStart}
-            onTouchEnd={handlePushEnd}
-            onTouchCancel={handlePushEnd}
-            disabled={!voice?.isConnected || voice?.isSpeaking}
-          >
-            {voice?.isSpeaking ? <SpeakerIcon /> : <MicIcon />}
-            {voice?.isListening && <div className="push-to-talk-pulse"></div>}
-          </button>
-          <span className="push-to-talk-status">{getVoiceStatus()}</span>
-        </div>
-      )}
-
-      {/* Text input - always visible but dimmed when voice active */}
-      <div className={`unified-input-text ${voiceMode ? 'voice-active' : ''}`}>
-        <div className="unified-input-inner">
-          <PencilIcon />
-          <input
-            ref={inputRef}
-            type="text"
-            className="unified-input-field"
-            placeholder={voiceMode ? "Voice mode active..." : placeholder}
-            value={inputValue}
-            onChange={(e) => onInputChange(e.target.value)}
-            onKeyDown={handleKeyDown}
-            disabled={isLoading || voiceMode}
-          />
-        </div>
-      </div>
-
-      {/* Voice toggle - always on right */}
-      <VoiceToggle 
-        enabled={voiceMode}
-        onChange={handleVoiceToggle}
+    <div className="chat-input-wrapper">
+      {/* Plus button */}
+      <button 
+        className="input-icon-btn plus-btn"
+        onClick={() => setShowFutureModal(true)}
+        title="Add media"
+      >
+        <PlusIcon />
+      </button>
+      
+      {/* Text input - always visible */}
+      <input
+        ref={inputRef}
+        type="text"
+        className="chat-text-input"
+        placeholder={voiceMode ? "Type" : placeholder}
+        value={inputValue}
+        onChange={(e) => onInputChange(e.target.value)}
+        onKeyDown={handleKeyDown}
         disabled={isLoading}
+      />
+      
+      {/* Right side controls depend on mode */}
+      {voiceMode ? (
+        // Voice mode: Speaker mute, Mic mute, End button
+        <>
+          <button 
+            className={`input-icon-btn speaker-btn ${voice?.speakerMuted ? 'muted' : ''}`}
+            onClick={() => voice?.toggleSpeaker()}
+            title={voice?.speakerMuted ? 'Unmute speaker' : 'Mute speaker'}
+          >
+            {voice?.speakerMuted ? <SpeakerMutedIcon /> : <SpeakerIcon />}
+          </button>
+          
+          <button 
+            className={`input-icon-btn mic-btn ${voice?.isMuted ? 'muted' : ''}`}
+            onClick={() => voice?.toggleMute()}
+            title={voice?.isMuted ? 'Unmute microphone' : 'Mute microphone'}
+          >
+            {voice?.isMuted ? <MicMutedIcon /> : <MicIcon />}
+          </button>
+          
+          <button 
+            className="voice-end-btn"
+            onClick={handleVoiceModeToggle}
+            title="End voice mode"
+          >
+            <span className="voice-end-dots">
+              <span></span><span></span><span></span>
+            </span>
+            <span className="voice-end-text">End</span>
+          </button>
+        </>
+      ) : (
+        // Text mode: Dictate mic, Voice mode button
+        <>
+          <button 
+            className={`input-icon-btn dictate-btn ${isDictating ? 'active' : ''}`}
+            onClick={toggleDictation}
+            title="Dictate"
+            disabled={!recognitionRef.current}
+          >
+            <MicIcon />
+            {isDictating && <span className="dictate-pulse"></span>}
+          </button>
+          
+          <button 
+            className="voice-mode-btn"
+            onClick={handleVoiceModeToggle}
+            title="Use voice mode"
+          >
+            <WaveformIcon size={18} />
+          </button>
+        </>
+      )}
+      
+      <FutureFeatureModal 
+        isOpen={showFutureModal} 
+        onClose={() => setShowFutureModal(false)} 
       />
     </div>
   );
@@ -423,6 +619,8 @@ if (typeof window !== 'undefined') {
   window.SocietyArts.Voice = {
     useVoiceInterface,
     UnifiedInput,
+    WaveformIcon,
+    FutureFeatureModal,
     isTouchDevice
   };
 }
