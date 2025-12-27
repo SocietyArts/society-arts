@@ -1,10 +1,10 @@
 /* ========================================
    SOCIETY ARTS - HEADER & NAVIGATION
-   Brand Design System v3.0
+   A++ Brand Standards v3.0
    ======================================== */
 
 /* ========================================
-   HEADER
+   UNIFIED HEADER
    ======================================== */
 
 .header {
@@ -12,11 +12,12 @@
   justify-content: space-between;
   align-items: center;
   padding: 0 var(--space-xl);
-  background-color: var(--color-tan-5);
+  background-color: var(--color-surface);
   border-bottom: 1px solid var(--color-tan-20);
-  flex-shrink: 0;
-  z-index: var(--z-sticky);
   height: var(--header-height);
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
 }
 
 .header-left {
@@ -41,17 +42,8 @@
 }
 
 .logo-image {
-  height: 24px;
+  height: 22px;
   width: auto;
-}
-
-.logo-text {
-  font-family: var(--font-primary);
-  font-size: var(--text-lg);
-  font-weight: var(--weight-semibold);
-  letter-spacing: var(--tracking-wide);
-  margin: 0;
-  color: var(--color-text-primary);
 }
 
 .logo:hover {
@@ -59,7 +51,7 @@
 }
 
 /* ========================================
-   BUTTONS - Brand Styled
+   BUTTONS - A++ BRAND SPEC
    ======================================== */
 
 .btn {
@@ -80,45 +72,56 @@
   white-space: nowrap;
 }
 
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Primary Button - Brown background */
 .btn-primary {
   background-color: var(--color-brown);
   color: var(--color-white);
 }
 
-.btn-primary:hover {
+.btn-primary:hover:not(:disabled) {
   background-color: var(--color-button-primary-hover);
   color: var(--color-white);
 }
 
+/* Secondary Button - Outline */
 .btn-secondary {
   background-color: transparent;
   color: var(--color-brown);
   border: 1.5px solid var(--color-brown);
 }
 
-.btn-secondary:hover {
+.btn-secondary:hover:not(:disabled) {
   background-color: var(--color-tan-10);
 }
 
+/* Accent Button - Orange CTA */
 .btn-accent {
   background-color: var(--color-orange-dark);
   color: var(--color-white);
 }
 
-.btn-accent:hover {
+.btn-accent:hover:not(:disabled) {
   background-color: var(--color-orange);
   color: var(--color-white);
 }
 
+/* Ghost Button */
 .btn-ghost {
   background-color: transparent;
   color: var(--color-brown);
+  padding: var(--space-sm) var(--space-md);
 }
 
-.btn-ghost:hover {
+.btn-ghost:hover:not(:disabled) {
   background-color: var(--color-tan-10);
 }
 
+/* Icon Button */
 .btn-icon {
   background: none;
   border: none;
@@ -131,11 +134,22 @@
   width: 40px;
   height: 40px;
   border-radius: var(--radius-md);
-  transition: background-color var(--transition-fast);
+  transition: all var(--transition-fast);
 }
 
 .btn-icon:hover {
   background-color: var(--color-tan-10);
+}
+
+/* Small/Large variants */
+.btn-sm {
+  padding: 8px 16px;
+  font-size: 13px;
+}
+
+.btn-lg {
+  padding: 14px 28px;
+  font-size: var(--text-base);
 }
 
 /* ========================================
@@ -190,7 +204,7 @@
   width: var(--nav-sidebar-width);
   max-width: 85vw;
   height: 100%;
-  background-color: var(--color-tan-5);
+  background-color: var(--color-surface);
   z-index: var(--z-sidebar);
   transform: translateX(-100%);
   transition: transform var(--transition-slow);
@@ -212,7 +226,7 @@
 }
 
 .nav-logo {
-  height: 20px;
+  height: 18px;
   width: auto;
 }
 
@@ -271,6 +285,7 @@
 
 .nav-search-input svg {
   color: var(--color-text-muted);
+  flex-shrink: 0;
 }
 
 .nav-content {
@@ -343,110 +358,55 @@
   margin: var(--space-lg) var(--space-xl);
 }
 
-/* Nav Section Labels */
-.nav-section-label {
-  padding: var(--space-lg) var(--space-xl) var(--space-sm);
-  font-family: var(--font-primary);
-  font-size: 12px;
-  font-weight: var(--weight-semibold);
-  color: var(--color-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
 /* ========================================
-   PROGRESS BAR (Step Indicator)
+   SUBHEADER
    ======================================== */
 
-.progress-bar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-md) var(--space-xl);
-  background-color: var(--color-tan-10);
+.subheader {
+  padding: var(--space-lg) var(--space-xl);
+  background-color: var(--color-surface);
   border-bottom: 1px solid var(--color-tan-20);
-  height: var(--progress-bar-height);
-  gap: var(--space-lg);
 }
 
-.progress-step {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  cursor: pointer;
-  padding: var(--space-sm) var(--space-md);
-  border-radius: var(--radius-full);
-  transition: all var(--transition-fast);
-}
-
-.progress-step:hover {
-  background-color: var(--color-tan-20);
-}
-
-.progress-step-number {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-primary);
-  font-size: 12px;
-  font-weight: var(--weight-semibold);
-  background-color: var(--color-tan-40);
-  color: var(--color-white);
-  transition: all var(--transition-fast);
-}
-
-.progress-step.active .progress-step-number {
-  background-color: var(--color-accent);
-}
-
-.progress-step.completed .progress-step-number {
-  background-color: var(--color-brown);
-}
-
-.progress-step-label {
-  font-family: var(--font-primary);
-  font-size: var(--text-sm);
+.subheader-title {
+  font-family: var(--font-serif);
+  font-size: var(--text-xl);
   font-weight: var(--weight-regular);
-  color: var(--color-text-muted);
-  transition: all var(--transition-fast);
-}
-
-.progress-step.active .progress-step-label {
-  color: var(--color-accent);
-  font-weight: var(--weight-medium);
-}
-
-.progress-step.completed .progress-step-label {
+  margin: 0 0 var(--space-xs) 0;
   color: var(--color-text-primary);
 }
 
-.progress-connector {
-  width: 40px;
-  height: 2px;
-  background-color: var(--color-tan-40);
-  transition: all var(--transition-fast);
-}
-
-.progress-connector.completed {
-  background-color: var(--color-brown);
-}
-
-/* Checkmark for completed steps */
-.progress-step.completed .progress-step-number::after {
-  content: '✓';
-  font-size: 14px;
-}
-
-/* Hide number when completed */
-.progress-step.completed .progress-step-number span {
-  display: none;
+.subheader-text {
+  font-family: var(--font-primary);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin: 0;
+  line-height: var(--leading-snug);
 }
 
 /* ========================================
-   HELP MENU (? Button)
+   FOOTER
+   ======================================== */
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-xl);
+  background-color: var(--color-surface);
+  border-top: 1px solid var(--color-tan-20);
+  height: var(--footer-height);
+}
+
+.footer-text {
+  font-family: var(--font-primary);
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+/* ========================================
+   HELP BUTTON & MENU
    ======================================== */
 
 .help-btn {
@@ -464,7 +424,6 @@
   justify-content: center;
   font-family: var(--font-primary);
   transition: all var(--transition-fast);
-  position: relative;
 }
 
 .help-btn:hover {
@@ -522,63 +481,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-text-muted);
-}
-
-.help-menu-divider {
-  height: 1px;
-  background-color: var(--color-tan-20);
-  margin: var(--space-sm) var(--space-lg);
-}
-
-/* ========================================
-   SUBHEADER
-   ======================================== */
-
-.subheader {
-  padding: var(--space-lg) var(--space-xl);
-  background-color: var(--color-tan-5);
-  flex-shrink: 0;
-  z-index: 50;
-  position: relative;
-}
-
-.subheader-title {
-  font-family: var(--font-serif);
-  font-size: var(--text-xl);
-  font-weight: var(--weight-regular);
-  margin: 0 0 var(--space-xs) 0;
-  color: var(--color-text-primary);
-}
-
-.subheader-text {
-  font-family: var(--font-primary);
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-  margin: 0;
-  line-height: var(--leading-snug);
-}
-
-/* ========================================
-   FOOTER
-   ======================================== */
-
-.footer {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: var(--space-md);
-  padding: var(--space-md) var(--space-xl);
-  background-color: var(--color-tan-5);
-  border-top: 1px solid var(--color-tan-20);
-  flex-shrink: 0;
-  z-index: var(--z-sticky);
-  height: var(--footer-height);
-}
-
-.footer-text {
-  font-family: var(--font-primary);
-  font-size: 13px;
   color: var(--color-text-muted);
 }
 
@@ -656,7 +558,7 @@
 }
 
 .format-option.selected {
-  background-color: var(--color-accent-light);
+  background-color: rgba(199, 51, 20, 0.1);
 }
 
 .format-option-icon {
@@ -664,9 +566,6 @@
   height: 24px;
   border: 1.5px solid var(--color-text-muted);
   border-radius: 2px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .format-option.selected .format-option-icon {
@@ -694,7 +593,7 @@
   }
   
   .logo-image {
-    height: 20px;
+    height: 18px;
   }
   
   .btn {
@@ -702,15 +601,7 @@
     font-size: 13px;
   }
   
-  .progress-bar {
-    padding: var(--space-sm) var(--space-lg);
-  }
-  
-  .progress-step-label {
+  .header-right .btn-primary {
     display: none;
-  }
-  
-  .progress-connector {
-    width: 24px;
   }
 }

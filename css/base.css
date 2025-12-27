@@ -1,7 +1,6 @@
 /* ========================================
    SOCIETY ARTS - BASE STYLES
-   Reset and shared styles
-   Version: 3.0 - Brand Update
+   A++ Brand Standards v3.0
    ======================================== */
 
 /* ======== RESET ======== */
@@ -14,15 +13,15 @@
 html, body, #root {
   height: 100%;
   width: 100%;
-  overflow: hidden;
 }
 
 body {
   font-family: var(--font-primary);
-  background: var(--color-background);
-  font-size: var(--text-base);
-  line-height: var(--leading-normal);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-snug);
   color: var(--color-text-primary);
+  background: var(--color-background);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -51,6 +50,7 @@ button {
 
 input, select, textarea {
   font-family: var(--font-primary);
+  font-size: var(--text-sm);
 }
 
 /* ======== SCROLLBAR ======== */
@@ -72,38 +72,23 @@ input, select, textarea {
   background: var(--color-tan-60);
 }
 
+/* ======== PAGE LAYOUT ======== */
+.page-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-background);
+}
+
+.main-content {
+  flex: 1;
+  min-height: 0;
+}
+
 /* ======== ANIMATIONS ======== */
-@keyframes pulse {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 1; }
-}
-
-@keyframes listening-pulse {
-  0%, 100% { 
-    transform: scale(1); 
-    box-shadow: 0 0 0 0 rgba(199, 51, 20, 0.4); 
-  }
-  50% { 
-    transform: scale(1.05); 
-    box-shadow: 0 0 0 12px rgba(199, 51, 20, 0); 
-  }
-}
-
-@keyframes speaking-wave {
-  0%, 100% { transform: scale(1); }
-  25% { transform: scale(1.1); }
-  50% { transform: scale(1); }
-  75% { transform: scale(1.08); }
-}
-
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
-}
-
-@keyframes fadeOut {
-  from { opacity: 1; }
-  to { opacity: 0; }
 }
 
 @keyframes slideInLeft {
@@ -114,17 +99,6 @@ input, select, textarea {
   to { 
     opacity: 1;
     transform: translateX(0);
-  }
-}
-
-@keyframes slideOutLeft {
-  from { 
-    opacity: 1;
-    transform: translateX(0);
-  }
-  to { 
-    opacity: 0;
-    transform: translateX(-100%);
   }
 }
 
@@ -155,6 +129,22 @@ input, select, textarea {
   to { transform: rotate(360deg); }
 }
 
+@keyframes pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+@keyframes listening-pulse {
+  0%, 100% { 
+    transform: scale(1); 
+    box-shadow: 0 0 0 0 rgba(199, 51, 20, 0.4); 
+  }
+  50% { 
+    transform: scale(1.05); 
+    box-shadow: 0 0 0 12px rgba(199, 51, 20, 0); 
+  }
+}
+
 /* ======== UTILITY CLASSES ======== */
 .visually-hidden {
   position: absolute;
@@ -168,125 +158,26 @@ input, select, textarea {
   border: 0;
 }
 
-/* Text alignment */
 .text-center { text-align: center; }
 .text-left { text-align: left; }
 .text-right { text-align: right; }
 
-/* Flexbox */
 .flex { display: flex; }
 .flex-col { flex-direction: column; }
 .flex-wrap { flex-wrap: wrap; }
 .items-center { align-items: center; }
 .items-start { align-items: flex-start; }
-.items-end { align-items: flex-end; }
 .justify-center { justify-content: center; }
 .justify-between { justify-content: space-between; }
-.justify-end { justify-content: flex-end; }
 .flex-1 { flex: 1; }
-.flex-shrink-0 { flex-shrink: 0; }
 
-/* Gaps */
 .gap-xs { gap: var(--space-xs); }
 .gap-sm { gap: var(--space-sm); }
 .gap-md { gap: var(--space-md); }
 .gap-lg { gap: var(--space-lg); }
 .gap-xl { gap: var(--space-xl); }
 
-/* ======== PAGE LAYOUT ======== */
-.page-container {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  background: var(--color-background);
-}
-
-.main-content {
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
-}
-
-/* ======== TYPOGRAPHY ======== */
-
-/* Page Heading - Domine (serif) - Used sparingly */
-.heading-page {
-  font-family: var(--font-serif);
-  font-size: var(--text-2xl);
-  font-weight: var(--weight-regular);
-  line-height: var(--leading-snug);
-  color: var(--color-text-primary);
-}
-
-/* Section Heading */
-.heading-section {
-  font-family: var(--font-serif);
-  font-size: var(--text-xl);
-  font-weight: var(--weight-regular);
-  line-height: var(--leading-snug);
-  color: var(--color-text-primary);
-}
-
-/* Card/Item Title - Familjen Grotesk SemiBold 17pt */
-.heading-card {
-  font-family: var(--font-primary);
-  font-size: var(--text-md);
-  font-weight: var(--weight-semibold);
-  line-height: var(--leading-snug);
-  color: var(--color-text-primary);
-}
-
-/* Body Text */
-.text-body {
-  font-family: var(--font-primary);
-  font-size: var(--text-sm);
-  font-weight: var(--weight-regular);
-  line-height: var(--leading-snug);
-  color: var(--color-text-primary);
-}
-
-/* Muted/Description Text */
-.text-muted {
-  color: var(--color-text-muted);
-}
-
-.text-secondary {
-  color: var(--color-text-secondary);
-}
-
-.text-accent {
-  color: var(--color-accent);
-}
-
-/* Legacy class names for compatibility */
-.heading-serif {
-  font-family: var(--font-serif);
-  font-weight: var(--weight-regular);
-  line-height: var(--leading-snug);
-}
-
-.heading-xl {
-  font-family: var(--font-serif);
-  font-size: var(--text-2xl);
-  font-weight: var(--weight-regular);
-  line-height: var(--leading-snug);
-}
-
-.heading-lg {
-  font-family: var(--font-serif);
-  font-size: var(--text-lg);
-  font-weight: var(--weight-regular);
-  line-height: var(--leading-snug);
-}
-
-.heading-md {
-  font-family: var(--font-primary);
-  font-size: var(--text-md);
-  font-weight: var(--weight-semibold);
-}
-
-/* ======== LOADING STATE ======== */
+/* ======== LOADING ======== */
 .loading-spinner {
   width: 24px;
   height: 24px;

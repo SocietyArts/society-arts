@@ -6,7 +6,7 @@
     <title>Style Finder | Society Arts</title>
     
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="https://pub-d4d49982f29749dea52e2eb37c29ad51.r2.dev/site-assets/SA_Monogram_Black_1x1.png">
+    <link rel="icon" type="image/png" href="https://pub-acb560f551f141db830964aed1fa005f.r2.dev/site-assets/SA_Monogram_Black%401x%201x1.png">
     
     <!-- Fonts - Familjen Grotesk + Domine -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -25,198 +25,229 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
-        /* Site Header */
+        /* ========================================
+           STYLE FINDER - A++ BRAND STYLES
+           ======================================== */
+        
+        /* Unified Header Override */
         .site-header {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             height: 64px;
-            background: var(--color-tan-5, #F9F8F6);
+            background: var(--color-surface, #F9F8F6);
             border-bottom: 1px solid var(--color-tan-20, #E7E2DC);
             z-index: 150;
-        }
-        
-        .header-content {
             display: flex;
             align-items: center;
-            height: 100%;
-            padding: 0 1.5rem;
-            max-width: 100%;
-            gap: 2rem;
+            justify-content: space-between;
+            padding: 0 20px;
         }
         
-        .header-content .logo {
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .hamburger-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--color-brown, #3E2318);
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            transition: background-color 0.15s ease;
+        }
+        
+        .hamburger-btn:hover {
+            background-color: var(--color-tan-10, #F3F1EE);
+        }
+        
+        .logo {
             display: flex;
             align-items: center;
             text-decoration: none;
         }
         
-        .header-content .logo-image {
-            height: 24px;
+        .logo-image {
+            height: 22px;
             width: auto;
         }
         
-        .header-nav {
+        .logo:hover {
+            opacity: 0.85;
+        }
+        
+        /* Cart Button */
+        .cart-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--color-brown, #3E2318);
+            padding: 8px;
             display: flex;
-            gap: 1.5rem;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            transition: background-color 0.15s ease;
         }
         
-        .header-nav a {
-            color: var(--color-text-secondary, #666);
+        .cart-btn:hover {
+            background-color: var(--color-tan-10, #F3F1EE);
+        }
+        
+        /* New Project Button */
+        .new-project-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 20px;
+            font-family: 'Familjen Grotesk', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1;
+            border-radius: 9999px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            background-color: var(--color-brown, #3E2318);
+            color: white;
             text-decoration: none;
-            font-size: 0.9375rem;
-            font-weight: 500;
-            transition: color 0.2s;
         }
         
-        .header-nav a:hover {
-            color: var(--color-text-primary, #333);
+        .new-project-btn:hover {
+            background-color: rgba(62, 35, 24, 0.85);
+            color: white;
         }
         
-        .header-nav a.active {
-            color: var(--color-accent, #C75B3F);
-        }
-        
-        /* Style Finder Page Specific Styles */
+        /* Style Finder Page Layout */
         .style-finder-page {
             display: flex;
-            height: 100vh;
-            padding-top: 60px;
+            min-height: 100vh;
+            padding-top: 64px;
+            background: var(--color-beige, #EAE4DA);
         }
         
-        /* Sidebar */
+        /* Filter Sidebar */
         .filter-sidebar {
-            width: 280px;
-            background: var(--color-surface, #fff);
-            border-right: 1px solid var(--color-border, #e5e5e5);
+            width: 240px;
+            background: var(--color-surface, #F9F8F6);
+            border-right: 1px solid var(--color-tan-20, #E7E2DC);
             overflow-y: auto;
-            padding: 1rem;
+            padding: 20px 16px;
             flex-shrink: 0;
-            height: calc(100vh - 60px);
+            height: calc(100vh - 64px);
             position: sticky;
-            top: 60px;
+            top: 64px;
         }
         
-        /* Reset/Apply Buttons at bottom of sidebar */
-        .filter-actions {
-            position: sticky;
-            bottom: 0;
-            background: white;
-            padding: 1rem 0;
-            border-top: 1px solid var(--color-border, #e5e5e5);
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 1rem;
-        }
-        
-        .filter-actions .reset-btn {
-            flex: 1;
-            padding: 0.625rem 1rem;
-            background: var(--color-surface, #f5f5f5);
-            border: 1px solid var(--color-border, #ddd);
-            border-radius: 24px;
-            cursor: pointer;
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: var(--color-text-secondary, #666);
-            transition: all 0.2s;
-        }
-        
-        .filter-actions .reset-btn:hover {
-            background: var(--color-border, #e5e5e5);
-        }
-        
-        .filter-actions .apply-btn {
-            flex: 1;
-            padding: 0.625rem 1rem;
-            background: var(--color-accent, #C75B3F);
-            border: none;
-            border-radius: 24px;
-            cursor: pointer;
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: white;
-            transition: all 0.2s;
-        }
-        
-        .filter-actions .apply-btn:hover {
-            background: #B34A2E;
-        }
-        
+        /* Filter Section Labels - A++ Typography */
         .filter-section {
-            margin-bottom: 1.5rem;
+            margin-bottom: 24px;
         }
         
         .filter-section h3 {
-            font-size: 0.875rem;
+            font-family: 'Familjen Grotesk', sans-serif;
+            font-size: 12px;
             font-weight: 600;
-            color: var(--color-text-secondary, #666);
+            color: var(--color-brown-60, #8B7B75);
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 0.75rem;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
         }
         
         .filter-select {
             width: 100%;
-            padding: 0.5rem;
-            border: 1px solid var(--color-border, #ddd);
-            border-radius: 6px;
-            font-size: 0.875rem;
+            padding: 10px 12px;
+            border: 1px solid var(--color-tan-20, #E7E2DC);
+            border-radius: 8px;
+            font-family: 'Familjen Grotesk', sans-serif;
+            font-size: 14px;
+            color: var(--color-brown, #3E2318);
             background: white;
+            cursor: pointer;
+            transition: border-color 0.15s ease;
         }
         
         .filter-select:focus {
             outline: none;
-            border-color: var(--color-accent, #C75B3F);
+            border-color: var(--color-tan-40, #CFC5B9);
         }
         
-        .filter-select option {
-            padding: 0.25rem;
+        .filter-select:hover {
+            border-color: var(--color-tan-40, #CFC5B9);
         }
         
-        .filter-select option:disabled {
-            color: #999;
-            font-style: italic;
+        /* Reset/Apply Buttons - A++ Brand */
+        .filter-actions {
+            position: sticky;
+            bottom: 0;
+            background: var(--color-surface, #F9F8F6);
+            padding: 16px 0;
+            border-top: 1px solid var(--color-tan-20, #E7E2DC);
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
         }
         
-        .clear-filters-btn {
-            width: 100%;
-            padding: 0.5rem 1rem;
-            background: var(--color-surface, #f5f5f5);
-            border: 1px solid var(--color-border, #ddd);
-            border-radius: 6px;
+        .filter-actions .reset-btn {
+            flex: 1;
+            padding: 10px 16px;
+            background: transparent;
+            border: 1.5px solid var(--color-brown, #3E2318);
+            border-radius: 9999px;
             cursor: pointer;
-            font-size: 0.875rem;
-            color: var(--color-text-secondary, #666);
-            transition: all 0.2s;
+            font-family: 'Familjen Grotesk', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--color-brown, #3E2318);
+            transition: all 0.15s ease;
         }
         
-        .clear-filters-btn:hover {
-            background: var(--color-border, #e5e5e5);
+        .filter-actions .reset-btn:hover {
+            background: var(--color-tan-10, #F3F1EE);
         }
         
-        .active-filters {
-            background: rgba(199, 91, 63, 0.1);
-            border: 1px solid var(--color-accent, #C75B3F);
-            border-radius: 6px;
-            padding: 0.5rem;
-            margin-bottom: 1rem;
-            font-size: 0.75rem;
-            color: var(--color-accent, #C75B3F);
+        /* Apply Button - PRIMARY BROWN (not orange!) */
+        .filter-actions .apply-btn {
+            flex: 1;
+            padding: 10px 16px;
+            background: var(--color-brown, #3E2318);
+            border: none;
+            border-radius: 9999px;
+            cursor: pointer;
+            font-family: 'Familjen Grotesk', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            transition: all 0.15s ease;
         }
         
-        .filter-loading {
-            font-size: 0.75rem;
-            color: #999;
-            font-style: italic;
+        .filter-actions .apply-btn:hover {
+            background: rgba(62, 35, 24, 0.85);
         }
         
-        /* Main Content */
+        /* Main Content - A++ Brand */
         .styles-main {
             flex: 1;
             overflow-y: auto;
-            background: var(--color-background, #F5F0EB);
+            background: var(--color-beige, #EAE4DA);
             display: flex;
             flex-direction: column;
         }
@@ -226,16 +257,16 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            background: var(--color-background, #F5F0EB);
-            padding: 1rem 1.5rem;
-            border-bottom: 1px solid var(--color-border, #e5e5e5);
+            background: var(--color-beige, #EAE4DA);
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--color-tan-20, #E7E2DC);
         }
         
         /* Search Bar */
         .search-bar {
             display: flex;
             flex-wrap: wrap;
-            gap: 1rem;
+            gap: 16px;
             align-items: center;
         }
         
@@ -247,18 +278,25 @@
         
         .search-input {
             width: 100%;
-            padding: 0.75rem 1rem;
-            padding-right: 2.5rem;
-            border: 1px solid var(--color-border, #ddd);
-            border-radius: 24px;
-            font-size: 1rem;
+            padding: 12px 16px;
+            padding-right: 40px;
+            border: 1px solid var(--color-tan-20, #E7E2DC);
+            border-radius: 9999px;
+            font-family: 'Familjen Grotesk', sans-serif;
+            font-size: 14px;
+            color: var(--color-brown, #3E2318);
             background: white;
+            transition: all 0.15s ease;
+        }
+        
+        .search-input::placeholder {
+            color: var(--color-brown-40, #B2A7A3);
         }
         
         .search-input:focus {
             outline: none;
-            border-color: var(--color-accent, #C75B3F);
-            box-shadow: 0 0 0 3px rgba(199, 91, 63, 0.1);
+            border-color: var(--color-tan-40, #CFC5B9);
+            box-shadow: 0 0 0 3px rgba(62, 35, 24, 0.08);
         }
         
         .search-clear-btn {
@@ -269,7 +307,7 @@
             background: none;
             border: none;
             cursor: pointer;
-            color: var(--color-text-secondary, #999);
+            color: var(--color-brown-60, #8B7B75);
             padding: 4px;
             display: none;
             border-radius: 50%;
@@ -277,20 +315,20 @@
         }
         
         .search-clear-btn:hover {
-            background: var(--color-border, #e5e5e5);
-            color: var(--color-text, #333);
+            background: var(--color-tan-20, #E7E2DC);
+            color: var(--color-brown, #3E2318);
         }
         
         .search-clear-btn.visible {
             display: block;
         }
         
-        /* Active Filter Pills */
+        /* Active Filter Pills - A++ Brand */
         .filter-pills {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-top: 0.75rem;
+            gap: 8px;
+            margin-top: 12px;
         }
         
         .filter-pills:empty {
@@ -300,12 +338,13 @@
         .filter-pill {
             display: inline-flex;
             align-items: center;
-            gap: 0.375rem;
-            padding: 0.375rem 0.75rem;
-            background: var(--color-text, #333);
+            gap: 6px;
+            padding: 6px 12px;
+            background: var(--color-brown, #3E2318);
             color: white;
-            border-radius: 20px;
-            font-size: 0.8125rem;
+            border-radius: 9999px;
+            font-family: 'Familjen Grotesk', sans-serif;
+            font-size: 13px;
             font-weight: 500;
         }
         
@@ -316,7 +355,7 @@
             cursor: pointer;
             padding: 0;
             line-height: 1;
-            font-size: 1rem;
+            font-size: 14px;
         }
         
         .filter-pill-remove:hover {
@@ -324,18 +363,20 @@
         }
         
         .reset-all-btn {
-            padding: 0.375rem 0.75rem;
+            padding: 6px 12px;
             background: transparent;
-            border: 1px solid var(--color-border, #ddd);
-            border-radius: 20px;
-            font-size: 0.8125rem;
-            color: var(--color-text-secondary, #666);
+            border: 1.5px solid var(--color-brown, #3E2318);
+            border-radius: 9999px;
+            font-family: 'Familjen Grotesk', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--color-brown, #3E2318);
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.15s ease;
         }
         
         .reset-all-btn:hover {
-            background: var(--color-border, #e5e5e5);
+            background: var(--color-tan-10, #F3F1EE);
         }
         
         /* Search Hint & Results */
@@ -343,107 +384,117 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 0.5rem;
+            margin-top: 8px;
         }
         
         .search-hint {
-            font-size: 0.75rem;
-            color: var(--color-text-secondary, #999);
+            font-family: 'Familjen Grotesk', sans-serif;
+            font-size: 12px;
+            color: var(--color-brown-60, #8B7B75);
         }
         
         .results-count {
-            color: var(--color-text-secondary, #666);
-            font-size: 0.875rem;
+            font-family: 'Familjen Grotesk', sans-serif;
+            color: var(--color-brown-60, #8B7B75);
+            font-size: 14px;
             white-space: nowrap;
         }
         
         /* Scrollable content area */
         .styles-content {
             flex: 1;
-            padding: 1.5rem;
+            padding: 24px;
         }
         
-        /* Sort Dropdown */
+        /* Sort Dropdown - A++ Brand */
         .sort-container {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 8px;
             white-space: nowrap;
         }
         
         .sort-container label {
-            font-size: 0.875rem;
-            color: var(--color-text-secondary, #666);
+            font-family: 'Familjen Grotesk', sans-serif;
+            font-size: 14px;
+            color: var(--color-brown-60, #8B7B75);
         }
         
         .sort-select {
-            padding: 0.5rem 0.75rem;
-            border: 1px solid var(--color-border, #ddd);
-            border-radius: 6px;
-            font-size: 0.875rem;
+            padding: 8px 12px;
+            border: 1px solid var(--color-tan-20, #E7E2DC);
+            border-radius: 8px;
+            font-family: 'Familjen Grotesk', sans-serif;
+            font-size: 14px;
+            color: var(--color-brown, #3E2318);
             background: white;
             cursor: pointer;
             min-width: 150px;
+            transition: border-color 0.15s ease;
         }
         
         .sort-select:focus {
             outline: none;
-            border-color: var(--color-accent, #C75B3F);
+            border-color: var(--color-tan-40, #CFC5B9);
         }
         
-        /* Quality Filter */
+        /* Quality Filter - A++ Brand */
         .quality-filter-container {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 8px;
             white-space: nowrap;
         }
         
         .quality-filter-container label {
-            font-size: 0.875rem;
-            color: var(--color-text-secondary, #666);
+            font-family: 'Familjen Grotesk', sans-serif;
+            font-size: 14px;
+            color: var(--color-brown-60, #8B7B75);
         }
         
         .quality-filter-select {
-            padding: 0.5rem 0.75rem;
-            border: 1px solid var(--color-border, #ddd);
-            border-radius: 6px;
-            font-size: 0.875rem;
+            padding: 8px 12px;
+            border: 1px solid var(--color-tan-20, #E7E2DC);
+            border-radius: 8px;
+            font-family: 'Familjen Grotesk', sans-serif;
+            font-size: 14px;
+            color: var(--color-brown, #3E2318);
             background: white;
             cursor: pointer;
             min-width: 130px;
+            transition: border-color 0.15s ease;
         }
         
         .quality-filter-select:focus {
             outline: none;
-            border-color: var(--color-accent, #C75B3F);
+            border-color: var(--color-tan-40, #CFC5B9);
         }
         
-        /* Style Grid */
+        /* Style Grid - A++ Brand */
         .styles-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 1.5rem;
+            gap: 20px;
         }
         
         .style-card {
-            background: white;
+            background: var(--color-tan-5, #F9F8F6);
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 8px rgba(62, 35, 24, 0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
             cursor: pointer;
             position: relative;
         }
         
         .style-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            box-shadow: 0 8px 24px rgba(62, 35, 24, 0.12);
         }
         
         .style-card-image {
             aspect-ratio: 1;
-            background: var(--color-surface, #f5f5f5);
+            background: var(--color-tan-10, #F3F1EE);
             position: relative;
             overflow: hidden;
         }
@@ -460,8 +511,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--color-text-secondary, #999);
-            font-size: 0.75rem;
+            color: var(--color-brown-60, #8B7B75);
+            font-family: 'Familjen Grotesk', sans-serif;
+            font-size: 12px;
         }
         
         .favorite-btn {
@@ -477,58 +529,66 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: transform 0.2s;
+            transition: transform 0.2s ease;
             z-index: 2;
+            color: var(--color-brown-60, #8B7B75);
         }
         
         .favorite-btn:hover {
             transform: scale(1.1);
+            color: var(--color-orange-dark, #C73314);
+        }
+        
+        .favorite-btn.active {
+            color: var(--color-orange-dark, #C73314);
         }
         
         .favorite-btn.active svg {
-            fill: #e74c3c;
+            fill: var(--color-orange-dark, #C73314);
         }
         
-        /* Quality Score Badge */
+        /* Quality Score Badge - A++ Brand */
         .quality-badge {
             position: absolute;
             top: 8px;
             left: 8px;
-            background: rgba(0, 0, 0, 0.75);
+            background: var(--color-brown, #3E2318);
             color: #ffd700;
-            font-size: 0.75rem;
+            font-family: 'Familjen Grotesk', sans-serif;
+            font-size: 12px;
             font-weight: 600;
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
+            padding: 4px 8px;
+            border-radius: 6px;
             z-index: 2;
         }
         
         .style-card-info {
-            padding: 0.75rem 1rem;
+            padding: 12px 16px;
         }
         
         .style-card-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 0.25rem;
+            margin-bottom: 4px;
         }
         
         .style-card-id {
-            font-size: 0.75rem;
-            color: var(--color-text-secondary, #999);
+            font-family: 'Familjen Grotesk', sans-serif;
+            font-size: 12px;
+            color: var(--color-brown-60, #8B7B75);
         }
         
-        /* Horizontal three-dot menu (Pinterest style) */
+        /* Horizontal three-dot menu */
         .menu-btn-horizontal {
             background: none;
             border: none;
             cursor: pointer;
-            padding: 0.25rem;
+            padding: 4px;
             display: flex;
             gap: 3px;
             opacity: 0;
-            transition: opacity 0.2s;
+            transition: opacity 0.2s ease;
         }
         
         .style-card:hover .menu-btn-horizontal {
@@ -538,26 +598,29 @@
         .menu-btn-horizontal .dot {
             width: 4px;
             height: 4px;
-            background: var(--color-text-secondary, #999);
+            background: var(--color-brown-60, #8B7B75);
             border-radius: 50%;
         }
         
         .menu-btn-horizontal:hover .dot {
-            background: var(--color-text, #333);
+            background: var(--color-brown, #3E2318);
         }
         
+        /* Card Title - A++ Typography: Familjen Grotesk SemiBold 17px */
         .style-card-name {
-            font-size: 1rem;
+            font-family: 'Familjen Grotesk', sans-serif;
+            font-size: 17px;
             font-weight: 600;
-            color: var(--color-text, #333);
+            color: var(--color-brown, #3E2318);
             margin: 0;
             line-height: 1.3;
         }
         
         .style-card-tagline {
-            font-size: 0.8rem;
-            color: var(--color-text-secondary, #666);
-            margin-top: 0.25rem;
+            font-family: 'Familjen Grotesk', sans-serif;
+            font-size: 13px;
+            color: var(--color-brown-60, #8B7B75);
+            margin-top: 4px;
         }
         
         /* Pagination */
@@ -1221,26 +1284,35 @@
     </style>
 </head>
 <body>
-    <!-- Header -->
+    <!-- Unified Header - A++ Brand -->
     <header class="site-header">
-        <div class="header-content">
+        <div class="header-left">
+            <button class="hamburger-btn" onclick="toggleNavSidebar()" aria-label="Open menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
             <a href="index.html" class="logo">
                 <img src="https://pub-acb560f551f141db830964aed1fa005f.r2.dev/site-assets/SA_Wordmark_Brown%401x.png" alt="Society Arts" class="logo-image">
             </a>
-            <nav class="header-nav">
-                <a href="story-builder.html">Story Builder</a>
-                <a href="style-finder.html" class="active">Style Finder</a>
-            </nav>
+        </div>
+        <div class="header-right">
+            <button class="cart-btn" onclick="window.location.href='under-construction.html?feature=Shopping%20Cart'" aria-label="Cart">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="9" cy="21" r="1"></circle>
+                    <circle cx="20" cy="21" r="1"></circle>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                </svg>
+            </button>
+            <a href="story-builder.html" class="new-project-btn">New Project</a>
             
             <!-- Auth Section -->
             <div class="header-auth" id="headerAuth">
                 <!-- Sign In Button (shown when logged out) -->
-                <button class="sign-in-btn" id="signInBtn" onclick="openAuthModal()">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="12" cy="7" r="4"></circle>
-                    </svg>
-                    Sign In
+                <button class="btn btn-secondary" id="signInBtn" onclick="openAuthModal()">
+                    Log In
                 </button>
                 
                 <!-- User Menu (shown when logged in) -->
@@ -1291,6 +1363,96 @@
             </div>
         </div>
     </header>
+    
+    <!-- Navigation Sidebar Overlay -->
+    <div class="nav-overlay" id="navOverlay" onclick="closeNavSidebar()"></div>
+    
+    <!-- Navigation Sidebar -->
+    <nav class="nav-sidebar" id="navSidebar">
+        <div class="nav-header">
+            <img src="https://pub-acb560f551f141db830964aed1fa005f.r2.dev/site-assets/SA_Wordmark_Brown%401x.png" alt="Society Arts" class="nav-logo">
+            <button class="nav-close-btn" onclick="closeNavSidebar()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <div class="nav-content">
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="story-builder.html" class="nav-link">
+                        <span class="nav-link-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 20h9"></path>
+                                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                            </svg>
+                        </span>
+                        Story Builder
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="style-finder.html" class="nav-link active">
+                        <span class="nav-link-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="13.5" cy="6.5" r="2"></circle>
+                                <circle cx="17.5" cy="10.5" r="2"></circle>
+                                <circle cx="8.5" cy="7.5" r="2"></circle>
+                                <circle cx="6.5" cy="12.5" r="2"></circle>
+                                <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.555C21.965 6.012 17.461 2 12 2z"></path>
+                            </svg>
+                        </span>
+                        Style Finder
+                    </a>
+                </li>
+                <li class="nav-divider"></li>
+                <li class="nav-item">
+                    <a href="projects.html" class="nav-link">
+                        <span class="nav-link-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                        </span>
+                        Your Work
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="favorites.html" class="nav-link">
+                        <span class="nav-link-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                            </svg>
+                        </span>
+                        Favorites
+                    </a>
+                </li>
+                <li class="nav-divider"></li>
+                <li class="nav-item">
+                    <a href="under-construction.html?feature=Prints%20%26%20Pricing" class="nav-link">
+                        <span class="nav-link-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="1" x2="12" y2="23"></line>
+                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                            </svg>
+                        </span>
+                        Prints & Pricing
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="under-construction.html?feature=Help" class="nav-link">
+                        <span class="nav-link-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                            </svg>
+                        </span>
+                        Help
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
     
     <!-- Loading Overlay -->
     <div class="loading-overlay" id="loadingOverlay">
@@ -2093,6 +2255,32 @@
         const sortSelect = document.getElementById('sortSelect');
         const qualityFilter = document.getElementById('qualityFilter');
         const confirmModal = document.getElementById('confirmModal');
+        
+        // ============================================
+        // Navigation Sidebar Functions
+        // ============================================
+        function toggleNavSidebar() {
+            const sidebar = document.getElementById('navSidebar');
+            const overlay = document.getElementById('navOverlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('open');
+            document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+        }
+        
+        function closeNavSidebar() {
+            const sidebar = document.getElementById('navSidebar');
+            const overlay = document.getElementById('navOverlay');
+            sidebar.classList.remove('open');
+            overlay.classList.remove('open');
+            document.body.style.overflow = '';
+        }
+        
+        // Close sidebar on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeNavSidebar();
+            }
+        });
         
         // Filter elements mapped to database columns
         const filterSelects = {
