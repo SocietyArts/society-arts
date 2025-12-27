@@ -1,25 +1,46 @@
 /* ========================================
    SOCIETY ARTS - STORY PANEL
    Left sidebar for story display
-   Version: 4.0
+   Version: 5.0 (v20)
    ======================================== */
+
+/**
+ * Panel Header Component (reusable for all 3 panels)
+ */
+function PanelHeader({ title, hasContent, infoContent, onInfoClick, showInfo }) {
+  const headerClass = hasContent ? 'panel-header panel-header-active' : 'panel-header';
+  
+  return (
+    <div className={headerClass}>
+      <span className="panel-header-title">{title}</span>
+      {infoContent && (
+        <button 
+          className={`panel-info-btn ${showInfo ? 'active' : ''}`}
+          onClick={onInfoClick}
+          title="More info"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+        </button>
+      )}
+    </div>
+  );
+}
 
 /**
  * Info Tooltip Component
  */
-function StoryInfoTooltip({ show, onClose }) {
+function InfoTooltip({ show, onClose, children }) {
   if (!show) return null;
   
   return (
-    <div className="story-info-tooltip">
-      <div className="story-info-content">
-        <h4>Your Story</h4>
-        <p>This box captures your story as you share it through voice or text conversation.</p>
-        <ul>
-          <li><strong>Auto-populates</strong> as you tell your story</li>
-          <li><strong>Editable</strong> — type directly or refine any words</li>
-        </ul>
-        <button className="story-info-close" onClick={onClose}>Got it</button>
+    <div className="panel-info-tooltip">
+      <div className="panel-info-content">
+        {children}
+        <button className="panel-info-close" onClick={onClose}>Got it</button>
       </div>
     </div>
   );
@@ -34,6 +55,7 @@ function StoryCard({ story, isVoiceMode, transformedStory, transformLabel, onCle
   
   const displayStory = transformedStory || story || '';
   const isTransformed = !!transformedStory;
+  const hasContent = displayStory.length > 0;
 
   // Auto-resize textarea
   React.useEffect(() => {
@@ -50,37 +72,32 @@ function StoryCard({ story, isVoiceMode, transformedStory, transformLabel, onCle
     }
   };
 
-  // Icons
-  const InfoIcon = () => (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <circle cx="12" cy="12" r="10"></circle>
-      <line x1="12" y1="16" x2="12" y2="12"></line>
-      <line x1="12" y1="8" x2="12.01" y2="8"></line>
-    </svg>
-  );
-
   return (
     <div className="card story-card">
-      <div className="card-header">
-        <span className="card-title">Your Story</span>
-        <div className="story-card-actions">
+      <PanelHeader 
+        title="Your Story"
+        hasContent={hasContent}
+        infoContent={true}
+        onInfoClick={() => setShowInfo(!showInfo)}
+        showInfo={showInfo}
+      />
+      
+      <InfoTooltip show={showInfo} onClose={() => setShowInfo(false)}>
+        <h4>Your Story</h4>
+        <p>This panel captures your story as you share it through voice or text conversation.</p>
+        <ul>
+          <li><strong>Auto-populates</strong> as you tell your story</li>
+          <li><strong>Editable</strong> — type directly or refine any words</li>
+        </ul>
+      </InfoTooltip>
+      
+      <div className="card-content">
+        <div className="story-badges">
           {isVoiceMode && <span className="badge badge-muted">🎤 Voice</span>}
           {isTransformed && (
             <span className="badge badge-accent">{transformLabel}</span>
           )}
-          <button 
-            className={`story-action-btn ${showInfo ? 'active' : ''}`}
-            onClick={() => setShowInfo(!showInfo)}
-            title="About this panel"
-          >
-            <InfoIcon />
-          </button>
         </div>
-      </div>
-      
-      <StoryInfoTooltip show={showInfo} onClose={() => setShowInfo(false)} />
-      
-      <div className="card-content">
         <textarea
           ref={textareaRef}
           className="story-textarea"
@@ -104,12 +121,49 @@ function StoryCard({ story, isVoiceMode, transformedStory, transformLabel, onCle
 }
 
 /**
+ * Variation Tooltip Component
+ */
+function VariationTooltip({ variation, show }) {
+  if (!show) return null;
+  
+  const tooltips = {
+    optimize: {
+      title: 'Optimize',
+      description: 'Takes all the words in your story and optimizes them for the creative engine, ensuring the best possible visual interpretation of your ideas.'
+    },
+    enrich: {
+      title: 'Enrich',
+      description: 'Embellishes your story with additional detail and descriptive content, adding depth and richness to help create more vivid and immersive visuals.'
+    },
+    simplify: {
+      title: 'Simplify',
+      description: 'Distills your story down to its essential concept, removing complexity to create a clear, focused visual that captures the core idea.'
+    },
+    noPeople: {
+      title: 'No People',
+      description: 'Reimagines your story without human figures. Often visuals communicate more powerfully through symbolism, objects, or abstract representation rather than depicting people directly.'
+    }
+  };
+  
+  const tooltip = tooltips[variation] || { title: variation, description: '' };
+  
+  return (
+    <div className="variation-tooltip">
+      <div className="variation-tooltip-title">{tooltip.title}</div>
+      <div className="variation-tooltip-desc">{tooltip.description}</div>
+    </div>
+  );
+}
+
+/**
  * Variation Selector Component (integrated from variations.js)
  */
 function VariationSelector({ currentStory, onVariationApplied, disabled }) {
   const [variations, setVariations] = React.useState({});
   const [loading, setLoading] = React.useState(true);
   const [generating, setGenerating] = React.useState(null);
+  const [showInfo, setShowInfo] = React.useState(false);
+  const [hoveredVariation, setHoveredVariation] = React.useState(null);
 
   // Load config on mount
   React.useEffect(() => {
@@ -179,6 +233,17 @@ function VariationSelector({ currentStory, onVariationApplied, disabled }) {
     return icons[iconName] || icons.sparkles;
   };
 
+  // Map variation IDs to tooltip keys
+  const getTooltipKey = (id) => {
+    const mapping = {
+      'optimize': 'optimize',
+      'enrich': 'enrich',
+      'simplify': 'simplify',
+      'no-people': 'noPeople'
+    };
+    return mapping[id] || id;
+  };
+
   if (loading) {
     return (
       <div className="variation-selector loading">
@@ -195,31 +260,52 @@ function VariationSelector({ currentStory, onVariationApplied, disabled }) {
 
   return (
     <div className="variation-selector">
-      <div className="variation-label">Transform Your Story</div>
+      <PanelHeader 
+        title="Transform Your Story"
+        hasContent={false}
+        infoContent={true}
+        onInfoClick={() => setShowInfo(!showInfo)}
+        showInfo={showInfo}
+      />
+      
+      <InfoTooltip show={showInfo} onClose={() => setShowInfo(false)}>
+        <h4>Transform Your Story</h4>
+        <p>These tools help you refine your story for the best visual results. Hover over each option to learn more about what it does.</p>
+      </InfoTooltip>
+      
       <div className="variation-buttons">
         {variationList.map((variation) => (
-          <button
+          <div 
             key={variation.id}
-            className={`variation-btn ${generating === variation.id ? 'generating' : ''}`}
-            onClick={() => handleVariationClick(variation.id)}
-            disabled={disabled || !currentStory || generating}
-            title={variation.description}
+            className="variation-btn-wrapper"
+            onMouseEnter={() => setHoveredVariation(variation.id)}
+            onMouseLeave={() => setHoveredVariation(null)}
           >
-            <span className="variation-btn-icon">
-              {generating === variation.id ? (
-                <svg className="spinner" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="10" strokeDasharray="32" strokeDashoffset="12"/>
-                </svg>
-              ) : (
-                getIcon(variation.icon)
-              )}
-            </span>
-            <span className="variation-btn-label">{variation.label}</span>
-          </button>
+            <button
+              className={`variation-btn ${generating === variation.id ? 'generating' : ''}`}
+              onClick={() => handleVariationClick(variation.id)}
+              disabled={disabled || !currentStory || generating}
+            >
+              <span className="variation-btn-icon">
+                {generating === variation.id ? (
+                  <svg className="spinner" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10" strokeDasharray="32" strokeDashoffset="12"/>
+                  </svg>
+                ) : (
+                  getIcon(variation.icon)
+                )}
+              </span>
+              <span className="variation-btn-label">{variation.label}</span>
+            </button>
+            <VariationTooltip 
+              variation={getTooltipKey(variation.id)} 
+              show={hoveredVariation === variation.id}
+            />
+          </div>
         ))}
       </div>
       {!currentStory && (
-        <div className="variation-hint">Share your story first to unlock variations</div>
+        <div className="variation-hint">Share your story first to unlock transformations</div>
       )}
     </div>
   );
@@ -263,6 +349,8 @@ function StoryPanel({
 if (typeof window !== 'undefined') {
   window.SocietyArts = window.SocietyArts || {};
   window.SocietyArts.StoryPanel = {
+    PanelHeader,
+    InfoTooltip,
     StoryCard,
     VariationSelector,
     StoryPanel

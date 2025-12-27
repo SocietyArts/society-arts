@@ -49,6 +49,173 @@
       overflow: hidden;
     }
     
+    /* Panel Headers - Unified style for all 3 columns */
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px var(--space-lg);
+      background: var(--color-surface-alt);
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      border-bottom: 1px solid var(--color-border-light);
+      position: relative;
+    }
+    
+    .panel-header-active {
+      background: var(--color-brown-dark, #3E2318);
+      color: var(--color-cream, #FAF8F5);
+    }
+    
+    .panel-header-active .panel-header-title {
+      color: var(--color-cream, #FAF8F5);
+    }
+    
+    .panel-header-active .panel-info-btn {
+      color: var(--color-cream, #FAF8F5);
+      opacity: 0.8;
+    }
+    
+    .panel-header-active .panel-info-btn:hover {
+      opacity: 1;
+    }
+    
+    .panel-header-title {
+      font-family: var(--font-serif);
+      font-size: var(--text-base);
+      font-weight: var(--weight-medium);
+      text-align: center;
+    }
+    
+    .panel-info-btn {
+      position: absolute;
+      right: var(--space-md);
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--color-text-muted);
+      padding: 4px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+    
+    .panel-info-btn:hover,
+    .panel-info-btn.active {
+      color: var(--color-text-primary);
+      background: var(--color-surface-hover);
+    }
+    
+    /* Panel Info Tooltip */
+    .panel-info-tooltip {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      z-index: 100;
+      width: 280px;
+    }
+    
+    .panel-info-content {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      box-shadow: 0 8px 32px rgba(62, 35, 24, 0.15);
+      border: 1px solid var(--color-border-light);
+    }
+    
+    .panel-info-content h4 {
+      font-family: var(--font-serif);
+      font-size: var(--text-base);
+      margin: 0 0 var(--space-sm) 0;
+    }
+    
+    .panel-info-content p {
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      margin: 0 0 var(--space-md) 0;
+      line-height: 1.5;
+    }
+    
+    .panel-info-content ul {
+      margin: 0 0 var(--space-md) 0;
+      padding-left: var(--space-lg);
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+    }
+    
+    .panel-info-content li {
+      margin-bottom: var(--space-xs);
+    }
+    
+    .panel-info-close {
+      background: var(--color-tan-10);
+      border: none;
+      padding: 8px 16px;
+      border-radius: var(--radius-md);
+      font-size: var(--text-sm);
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.15s;
+    }
+    
+    .panel-info-close:hover {
+      background: var(--color-tan-20);
+    }
+    
+    /* Story badges moved inside card content */
+    .story-badges {
+      display: flex;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-sm);
+      min-height: 24px;
+    }
+    
+    /* Variation Tooltips */
+    .variation-btn-wrapper {
+      position: relative;
+    }
+    
+    .variation-tooltip {
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      width: 240px;
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: var(--space-md);
+      box-shadow: 0 8px 32px rgba(62, 35, 24, 0.2);
+      border: 1px solid var(--color-border-light);
+      z-index: 100;
+      pointer-events: none;
+    }
+    
+    .variation-tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 8px solid transparent;
+      border-top-color: white;
+    }
+    
+    .variation-tooltip-title {
+      font-weight: var(--weight-semibold);
+      font-size: var(--text-sm);
+      margin-bottom: var(--space-xs);
+      color: var(--color-text-primary);
+    }
+    
+    .variation-tooltip-desc {
+      font-size: var(--text-xs);
+      color: var(--color-text-secondary);
+      line-height: 1.5;
+    }
+    
     /* Left and Right panels - no scroll, fixed content */
     .story-panel {
       display: flex;
@@ -58,6 +225,34 @@
       min-width: 0;
       padding-right: var(--space-xs);
       max-height: 100%;
+    }
+    
+    /* Story Card adjustments */
+    .story-card {
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    
+    .story-card .card-content {
+      padding: var(--space-md) var(--space-lg) var(--space-lg);
+    }
+    
+    /* Variation selector adjustments */
+    .variation-selector {
+      background: var(--color-surface-alt);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    
+    .variation-selector .panel-header {
+      margin-bottom: 0;
+    }
+    
+    .variation-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-sm);
+      padding: var(--space-md);
     }
     
     /* Chat Container - this is what scrolls */
@@ -83,6 +278,70 @@
       font-weight: var(--weight-medium);
       color: var(--color-text-primary);
       flex-shrink: 0;
+      position: relative;
+      background: var(--color-brown-dark, #3E2318);
+      color: var(--color-cream, #FAF8F5);
+    }
+    
+    .chat-title-bar .chat-info-btn {
+      position: absolute;
+      right: var(--space-md);
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--color-cream, #FAF8F5);
+      opacity: 0.8;
+      padding: 4px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+    
+    .chat-title-bar .chat-info-btn:hover {
+      opacity: 1;
+    }
+    
+    /* Empty chat title bar (no title yet) */
+    .chat-title-bar-empty {
+      padding: 14px var(--space-xl);
+      border-bottom: 1px solid var(--color-border-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-sm);
+      font-family: var(--font-serif);
+      font-size: var(--text-base);
+      font-weight: var(--weight-medium);
+      color: var(--color-text-muted);
+      flex-shrink: 0;
+      position: relative;
+      background: var(--color-surface-alt);
+    }
+    
+    .chat-title-bar-empty .chat-info-btn {
+      position: absolute;
+      right: var(--space-md);
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--color-text-muted);
+      padding: 4px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+    
+    .chat-title-bar-empty .chat-info-btn:hover {
+      color: var(--color-text-primary);
+      background: var(--color-surface-hover);
     }
     
     .voice-mode-indicator {
@@ -112,86 +371,81 @@
       gap: var(--space-lg);
     }
     
-    /* Styles panel - scrollable within its bounds */
-    .styles-panel {
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-md);
-      overflow-y: auto;
-      max-height: 100%;
-    }
-    
-    /* Footer - fixed at bottom */
-    .app-footer {
-      flex-shrink: 0;
-    }
-    
-    /* Responsive adjustments */
-    @media (max-width: 1200px) {
-      .story-builder-layout {
-        grid-template-columns: minmax(240px, 1fr) minmax(350px, 2fr) minmax(240px, 1fr);
-        gap: var(--space-lg);
-        padding: var(--space-lg);
-      }
-    }
-    
-    @media (max-width: 900px) {
-      .story-builder-layout {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto 1fr auto;
-      }
-    }
-    
-    /* Welcome State */
-    .welcome-container {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: var(--space-4xl) 30px;
-    }
-    
-    .welcome-title {
-      font-family: var(--font-serif);
-      font-size: var(--text-2xl);
-      font-weight: var(--weight-normal);
-      color: var(--color-text-primary);
-      margin-bottom: var(--space-lg);
-      letter-spacing: var(--tracking-wider);
-    }
-    
-    .welcome-text {
-      font-size: var(--text-base);
-      line-height: var(--leading-relaxed);
-      color: var(--color-text-muted);
-      max-width: 380px;
-      margin: 0;
-    }
-    
-    .chat-input-area {
-      padding: var(--space-lg) var(--space-xl);
-      border-top: 1px solid var(--color-border-dark);
-      flex-shrink: 0;
-      display: flex;
-      justify-content: center;
-    }
-    
-    /* Styles Column - Vertical Layout */
+    /* Styles Column - with panel header */
     .styles-column {
       display: flex;
       flex-direction: column;
-      gap: var(--space-md);
       overflow-y: auto;
       min-width: 0;
       padding-left: var(--space-xs);
+      background: var(--color-surface-alt);
+      border-radius: var(--radius-lg);
+    }
+    
+    .styles-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px var(--space-lg);
+      border-bottom: 1px solid var(--color-border-light);
+      position: relative;
+    }
+    
+    .styles-panel-header.has-styles {
+      background: var(--color-brown-dark, #3E2318);
+      color: var(--color-cream, #FAF8F5);
+    }
+    
+    .styles-panel-title {
+      font-family: var(--font-serif);
+      font-size: var(--text-base);
+      font-weight: var(--weight-medium);
+    }
+    
+    .styles-info-btn {
+      position: absolute;
+      right: var(--space-md);
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--color-text-muted);
+      padding: 4px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+    
+    .styles-panel-header.has-styles .styles-info-btn {
+      color: var(--color-cream, #FAF8F5);
+      opacity: 0.8;
+    }
+    
+    .styles-info-btn:hover {
+      opacity: 1;
+    }
+    
+    .styles-info-tooltip {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      z-index: 100;
+      width: 260px;
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      box-shadow: 0 8px 32px rgba(62, 35, 24, 0.15);
+      border: 1px solid var(--color-border-light);
     }
     
     .styles-list {
       display: flex;
       flex-direction: column;
       gap: var(--space-md);
+      padding: var(--space-md);
     }
     
     .style-list-item {
@@ -289,7 +543,64 @@
       text-align: center;
       font-size: var(--text-sm);
       color: var(--color-text-muted);
-      margin-top: var(--space-sm);
+      padding: var(--space-sm) 0 var(--space-md);
+    }
+    
+    /* Footer - fixed at bottom */
+    .app-footer {
+      flex-shrink: 0;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 1200px) {
+      .story-builder-layout {
+        grid-template-columns: minmax(240px, 1fr) minmax(350px, 2fr) minmax(240px, 1fr);
+        gap: var(--space-lg);
+        padding: var(--space-lg);
+      }
+    }
+    
+    @media (max-width: 900px) {
+      .story-builder-layout {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr auto;
+      }
+    }
+    
+    /* Welcome State */
+    .welcome-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: var(--space-4xl) 30px;
+    }
+    
+    .welcome-title {
+      font-family: var(--font-serif);
+      font-size: var(--text-2xl);
+      font-weight: var(--weight-normal);
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-lg);
+      letter-spacing: var(--tracking-wider);
+    }
+    
+    .welcome-text {
+      font-size: var(--text-base);
+      line-height: var(--leading-relaxed);
+      color: var(--color-text-muted);
+      max-width: 380px;
+      margin: 0;
+    }
+    
+    .chat-input-area {
+      padding: var(--space-lg) var(--space-xl);
+      border-top: 1px solid var(--color-border-dark);
+      flex-shrink: 0;
+      display: flex;
+      justify-content: center;
     }
   </style>
 </head>
@@ -348,6 +659,8 @@
       const [hasStarted, setHasStarted] = useState(false);
       const [voiceMode, setVoiceMode] = useState(false);
       const [styleFinderOpen, setStyleFinderOpen] = useState(false);
+      const [showChatInfo, setShowChatInfo] = useState(false);
+      const [showStylesInfo, setShowStylesInfo] = useState(false);
       
       const messagesEndRef = useRef(null);
       const extractionTimeoutRef = useRef(null);
@@ -727,10 +1040,72 @@
             
             {/* Center Column - Chat */}
             <div className="chat-container">
-              {title && (
+              {title ? (
                 <div className="chat-title-bar">
                   <span>{title}</span>
-                  <Icons.chevronDown />
+                  <button 
+                    className="chat-info-btn"
+                    onClick={() => setShowChatInfo(!showChatInfo)}
+                    title="About this panel"
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="12" y1="16" x2="12" y2="12"></line>
+                      <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                  </button>
+                </div>
+              ) : (
+                <div className="chat-title-bar-empty">
+                  <span>Your Story Title</span>
+                  <button 
+                    className="chat-info-btn"
+                    onClick={() => setShowChatInfo(!showChatInfo)}
+                    title="About this panel"
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="12" y1="16" x2="12" y2="12"></line>
+                      <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                  </button>
+                </div>
+              )}
+              
+              {showChatInfo && (
+                <div style={{
+                  position: 'absolute',
+                  top: '56px',
+                  right: 'var(--space-md)',
+                  zIndex: 100,
+                  width: '280px',
+                  background: 'white',
+                  borderRadius: 'var(--radius-lg)',
+                  padding: 'var(--space-lg)',
+                  boxShadow: '0 8px 32px rgba(62, 35, 24, 0.15)',
+                  border: '1px solid var(--color-border-light)'
+                }}>
+                  <h4 style={{ fontFamily: 'var(--font-serif)', fontSize: 'var(--text-base)', margin: '0 0 var(--space-sm) 0' }}>Your Story Title</h4>
+                  <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)', margin: '0 0 var(--space-md) 0', lineHeight: 1.5 }}>
+                    As you share your story through conversation, I'll automatically generate a title that captures the essence of your narrative.
+                  </p>
+                  <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)', margin: '0 0 var(--space-md) 0', lineHeight: 1.5 }}>
+                    The title bar will turn dark when your story has developed enough for me to name it.
+                  </p>
+                  <button 
+                    onClick={() => setShowChatInfo(false)}
+                    style={{
+                      background: 'var(--color-tan-10)',
+                      border: 'none',
+                      padding: '8px 16px',
+                      borderRadius: 'var(--radius-md)',
+                      fontSize: 'var(--text-sm)',
+                      cursor: 'pointer',
+                      width: '100%'
+                    }}
+                  >
+                    Got it
+                  </button>
                 </div>
               )}
               
@@ -782,10 +1157,46 @@
             
             {/* Right Column - Styles */}
             <div className="styles-column">
-              <FormatSelector 
-                value={aspectRatio}
-                onChange={setAspectRatio}
-              />
+              <div className={`styles-panel-header ${selectedStyles.length > 0 ? 'has-styles' : ''}`}>
+                <span className="styles-panel-title">Your Styles</span>
+                <button 
+                  className="styles-info-btn"
+                  onClick={() => setShowStylesInfo(!showStylesInfo)}
+                  title="About this panel"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                  </svg>
+                </button>
+                
+                {showStylesInfo && (
+                  <div className="styles-info-tooltip">
+                    <h4 style={{ fontFamily: 'var(--font-serif)', fontSize: 'var(--text-base)', margin: '0 0 var(--space-sm) 0' }}>Your Styles</h4>
+                    <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)', margin: '0 0 var(--space-md) 0', lineHeight: 1.5 }}>
+                      Select up to 4 artistic styles that will influence how your story becomes a visual artwork.
+                    </p>
+                    <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)', margin: '0 0 var(--space-md) 0', lineHeight: 1.5 }}>
+                      Click "Add Style" to browse our collection and find the perfect aesthetic for your vision.
+                    </p>
+                    <button 
+                      onClick={() => setShowStylesInfo(false)}
+                      style={{
+                        background: 'var(--color-tan-10)',
+                        border: 'none',
+                        padding: '8px 16px',
+                        borderRadius: 'var(--radius-md)',
+                        fontSize: 'var(--text-sm)',
+                        cursor: 'pointer',
+                        width: '100%'
+                      }}
+                    >
+                      Got it
+                    </button>
+                  </div>
+                )}
+              </div>
               
               <div className="styles-list">
                 {selectedStyles.map((styleId) => (
