@@ -12,8 +12,23 @@ const AuthState = {
     user: null,
     profile: null,
     isLoading: true,
-    listeners: []
+    listeners: [],
+    authModalCallback: null  // Callback to open auth modal
 };
+
+// Global function to open auth modal from anywhere
+function openAuthModal() {
+    if (AuthState.authModalCallback) {
+        AuthState.authModalCallback();
+    } else {
+        console.warn('Auth modal not registered. Make sure AuthModal is mounted.');
+    }
+}
+
+// Register the auth modal opener
+function registerAuthModal(callback) {
+    AuthState.authModalCallback = callback;
+}
 
 // ========================================
 // AUTH HELPERS
@@ -827,6 +842,12 @@ if (typeof React !== 'undefined') {
         };
 
         const toggleFavorite = async (styleId, styleName) => {
+            // Require login to favorite
+            if (!AuthState.user) {
+                openAuthModal();
+                return false;
+            }
+            
             if (isStyleFavorited(styleId)) {
                 return await removeFavorite(styleId);
             } else {
@@ -880,8 +901,14 @@ if (typeof React !== 'undefined') {
         };
 
         const createCollection = async (name, description = '') => {
+            // Require login to create collection
+            if (!AuthState.user) {
+                openAuthModal();
+                return null;
+            }
+            
             const { supabase } = window.SocietyArts;
-            if (!AuthState.user || !supabase) return null;
+            if (!supabase) return null;
             
             try {
                 const { data, error } = await supabase
@@ -1020,6 +1047,8 @@ if (typeof React !== 'undefined') {
         resetPassword,
         isAdmin,
         isSuperAdmin,
+        openAuthModal,
+        registerAuthModal,
         
         // React hooks
         useAuth,

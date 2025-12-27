@@ -602,6 +602,231 @@
       display: flex;
       justify-content: center;
     }
+    
+    /* ========================================
+       NEW INPUT SYSTEM - Text & Voice Modes
+       ======================================== */
+    
+    /* Text Mode Input */
+    .text-mode-input {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      width: 100%;
+      max-width: 600px;
+      background: white;
+      border: 1px solid var(--color-border-medium);
+      border-radius: 28px;
+      padding: 8px 12px;
+      transition: all 0.2s;
+    }
+    
+    .text-mode-input:focus-within {
+      border-color: var(--color-accent);
+      box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
+    }
+    
+    .text-input-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+    }
+    
+    .text-input-field {
+      width: 100%;
+      border: none;
+      outline: none;
+      font-size: var(--text-base);
+      padding: 8px;
+      background: transparent;
+    }
+    
+    .text-input-field::placeholder {
+      color: var(--color-text-muted);
+    }
+    
+    .input-action-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-muted);
+      transition: all 0.15s;
+      flex-shrink: 0;
+    }
+    
+    .input-action-btn:hover {
+      background: var(--color-tan-10);
+      color: var(--color-text-primary);
+    }
+    
+    .input-action-btn.plus-btn {
+      color: var(--color-text-muted);
+    }
+    
+    .input-action-btn.dictate-btn {
+      position: relative;
+    }
+    
+    .input-action-btn.dictate-btn.active {
+      color: var(--color-accent);
+      background: var(--color-accent-light);
+    }
+    
+    .dictate-pulse {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 2px solid var(--color-accent);
+      animation: pulse 1.5s infinite;
+    }
+    
+    .input-action-btn.send-btn {
+      background: var(--color-brown);
+      color: white;
+    }
+    
+    .input-action-btn.send-btn:hover {
+      background: var(--color-brown-dark);
+    }
+    
+    .input-action-btn.voice-mode-btn {
+      background: var(--color-tan-20);
+      color: var(--color-brown);
+    }
+    
+    .input-action-btn.voice-mode-btn:hover {
+      background: var(--color-tan-40);
+    }
+    
+    /* Voice Mode Input */
+    .voice-mode-input {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      width: 100%;
+      max-width: 500px;
+      background: linear-gradient(135deg, var(--color-brown) 0%, var(--color-brown-dark) 100%);
+      border-radius: 28px;
+      padding: 12px 20px;
+    }
+    
+    .voice-control-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255,255,255,0.15);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      transition: all 0.15s;
+      flex-shrink: 0;
+    }
+    
+    .voice-control-btn:hover {
+      background: rgba(255,255,255,0.25);
+    }
+    
+    .voice-control-btn.muted {
+      background: rgba(220, 38, 38, 0.3);
+    }
+    
+    .voice-control-btn.text-mode-btn {
+      background: rgba(255,255,255,0.9);
+      color: var(--color-brown);
+    }
+    
+    .voice-control-btn.text-mode-btn:hover {
+      background: white;
+    }
+    
+    .voice-waveform-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+    
+    .voice-status {
+      font-size: var(--text-sm);
+      color: rgba(255,255,255,0.8);
+      text-align: center;
+    }
+    
+    /* Waveform Animation */
+    .waveform {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      height: 32px;
+    }
+    
+    .waveform-bar {
+      width: 4px;
+      height: 8px;
+      background: rgba(255,255,255,0.4);
+      border-radius: 2px;
+      transition: height 0.1s;
+    }
+    
+    .waveform.active .waveform-bar {
+      animation: waveform-idle 1s ease-in-out infinite;
+    }
+    
+    .waveform.speaking .waveform-bar {
+      animation: waveform-speaking 0.4s ease-in-out infinite;
+    }
+    
+    @keyframes waveform-idle {
+      0%, 100% { height: 8px; background: rgba(255,255,255,0.4); }
+      50% { height: 16px; background: rgba(255,255,255,0.6); }
+    }
+    
+    @keyframes waveform-speaking {
+      0%, 100% { height: 8px; }
+      25% { height: 24px; }
+      50% { height: 16px; }
+      75% { height: 28px; }
+    }
+    
+    .waveform-bar:nth-child(1) { animation-delay: 0s; }
+    .waveform-bar:nth-child(2) { animation-delay: 0.1s; }
+    .waveform-bar:nth-child(3) { animation-delay: 0.2s; }
+    .waveform-bar:nth-child(4) { animation-delay: 0.1s; }
+    .waveform-bar:nth-child(5) { animation-delay: 0s; }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(1.5); opacity: 0; }
+    }
+    
+    /* Future Feature Modal */
+    .future-modal {
+      max-width: 360px;
+      text-align: center;
+    }
+    
+    .future-modal h3 {
+      font-family: var(--font-serif);
+      font-size: var(--text-xl);
+      margin-bottom: var(--space-md);
+    }
+    
+    .future-modal p {
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-lg);
+      line-height: 1.6;
+    }
   </style>
 </head>
 <body>
@@ -899,6 +1124,12 @@
 
       const sendMessage = async () => {
         if (!inputValue.trim() || isLoading) return;
+        
+        // Require login to start a story
+        if (!user) {
+          window.SocietyArts?.openAuthModal?.();
+          return;
+        }
 
         if (!hasStarted) setHasStarted(true);
 
@@ -1151,6 +1382,11 @@
                   isLoading={isLoading}
                   voice={voice}
                   placeholder={hasStarted ? "Continue your story..." : "Start your story..."}
+                  onRequireAuth={() => {
+                    if (!user) {
+                      window.SocietyArts?.openAuthModal?.();
+                    }
+                  }}
                 />
               </div>
             </div>
