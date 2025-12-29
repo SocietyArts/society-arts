@@ -259,29 +259,30 @@ function injectComponents() {
     const user = window.AuthState?.user;
     const profile = window.AuthState?.profile;
     
-    // Inject sidebar if not present
-    if (!document.getElementById('sa-sidebar')) {
-        const existingSidebar = document.querySelector('aside.sidebar');
-        if (existingSidebar) {
+    // Inject sidebar - check if empty placeholder or missing
+    const existingSidebar = document.getElementById('sa-sidebar') || document.querySelector('aside.sidebar');
+    if (existingSidebar) {
+        // Replace if empty or is a placeholder
+        if (!existingSidebar.innerHTML.trim() || existingSidebar.innerHTML.trim() === '') {
             existingSidebar.outerHTML = generateSidebarHTML();
-        } else {
-            document.body.insertAdjacentHTML('afterbegin', generateSidebarHTML());
         }
+    } else {
+        document.body.insertAdjacentHTML('afterbegin', generateSidebarHTML());
     }
     
-    // Inject header if not present
-    if (!document.getElementById('sa-header')) {
-        const existingHeader = document.querySelector('header.header');
-        
-        if (existingHeader) {
+    // Inject header - check if empty placeholder or missing
+    const existingHeader = document.getElementById('sa-header') || document.querySelector('header.header');
+    if (existingHeader) {
+        // Replace if empty or is a placeholder
+        if (!existingHeader.innerHTML.trim() || existingHeader.innerHTML.trim() === '') {
             existingHeader.outerHTML = generateHeaderHTML(user, profile);
+        }
+    } else {
+        const sidebar = document.getElementById('sa-sidebar');
+        if (sidebar) {
+            sidebar.insertAdjacentHTML('afterend', generateHeaderHTML(user, profile));
         } else {
-            const sidebar = document.getElementById('sa-sidebar');
-            if (sidebar) {
-                sidebar.insertAdjacentHTML('afterend', generateHeaderHTML(user, profile));
-            } else {
-                document.body.insertAdjacentHTML('afterbegin', generateHeaderHTML(user, profile));
-            }
+            document.body.insertAdjacentHTML('afterbegin', generateHeaderHTML(user, profile));
         }
     }
     
@@ -614,13 +615,25 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // For vanilla pages, inject components after auth is ready
     if (!hasBabelScript) {
-        if (window.initializeAuth) {
-            window.initializeAuth().then(() => {
+        // Wait for auth.js to be loaded (it sets window.initializeAuth)
+        let attempts = 0;
+        const maxAttempts = 50;
+        
+        const waitForAuth = () => {
+            attempts++;
+            if (window.initializeAuth) {
+                window.initializeAuth().then(() => {
+                    injectComponents();
+                });
+            } else if (attempts < maxAttempts) {
+                setTimeout(waitForAuth, 100);
+            } else {
+                // Auth not available after timeout, inject anyway
+                console.warn('Auth not available, injecting components without auth');
                 injectComponents();
-            });
-        } else {
-            // Auth not available, inject anyway
-            injectComponents();
-        }
+            }
+        };
+        
+        waitForAuth();
     }
 });

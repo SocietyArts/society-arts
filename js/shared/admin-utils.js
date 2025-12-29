@@ -280,18 +280,18 @@ function R2StyleUploader({ onClose, userEmail }) {
   const activeFolderRef = useRef(null);
   
   /**
-   * Format time in mm:ss or hh:mm:ss
+   * Format time in H:MM (hours:minutes)
    */
   function formatTime(seconds) {
     if (!seconds || seconds === Infinity || isNaN(seconds)) return '--:--';
     seconds = Math.round(seconds);
     const hours = Math.floor(seconds / 3600);
     const mins = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
-    if (hours > 0) {
-      return `${hours}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-    }
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    // Round up if there are remaining seconds
+    const adjustedMins = (seconds % 60) > 0 ? mins + 1 : mins;
+    const finalMins = adjustedMins >= 60 ? 0 : adjustedMins;
+    const finalHours = adjustedMins >= 60 ? hours + 1 : hours;
+    return `${finalHours}:${finalMins.toString().padStart(2, '0')}`;
   }
   
   // Auto-scroll to active folder
@@ -694,7 +694,7 @@ function R2StyleUploader({ onClose, userEmail }) {
           ),
           React.createElement('span', { className: 'r2-time-remaining' },
             estimatedTimeRemaining !== null && estimatedTimeRemaining > 0
-              ? `⏱️ ${formatTime(estimatedTimeRemaining)} remaining`
+              ? `⏱️ ${formatTime(estimatedTimeRemaining)} to complete`
               : ''
           )
         ),

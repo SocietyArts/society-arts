@@ -24,9 +24,6 @@
     <!-- Supabase Client Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
-    <!-- Shared Header Functions -->
-    <script src="js/shared/header.js"></script>
-    
     <style>
         /* ========================================
            STYLE FINDER - A++ BRAND STYLES
@@ -40,177 +37,11 @@
             --header-height: 56px;
         }
         
-        /* Persistent Sidebar */
-        .app-sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            width: var(--sidebar-width-collapsed);
-            background-color: var(--color-surface, #F9F8F6);
-            border-right: 1px solid var(--color-tan-20, #E7E2DC);
-            z-index: 200;
-            display: flex;
-            flex-direction: column;
-            transition: width var(--sidebar-transition);
-            overflow: hidden;
-        }
+        /* Sidebar and header styles are provided by /css/header.css */
+        /* No local overrides needed - using unified header/sidebar system */
         
-        .app-sidebar:hover {
-            width: var(--sidebar-width-expanded);
-        }
-        
-        .sidebar-logo {
-            height: var(--header-height);
-            display: flex;
-            align-items: center;
-            padding: 0 12px;
-            border-bottom: 1px solid var(--color-tan-20, #E7E2DC);
-            flex-shrink: 0;
-        }
-        
-        .sidebar-logo-link {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-            overflow: hidden;
-        }
-        
-        .sidebar-logo-icon {
-            width: 26px;
-            height: 26px;
-            flex-shrink: 0;
-            object-fit: contain;
-        }
-        
-        .sidebar-logo-text {
-            height: 18px;
-            width: auto;
-            opacity: 0;
-            transition: opacity var(--sidebar-transition);
-            flex-shrink: 0;
-        }
-        
-        .app-sidebar:hover .sidebar-logo-text {
-            opacity: 1;
-        }
-        
-        .sidebar-nav {
-            padding: 12px 8px;
-        }
-        
-        .sidebar-nav-list {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-        
-        .sidebar-nav-item {
-            margin: 0;
-            position: relative;
-        }
-        
-        .sidebar-nav-link {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 10px;
-            border-radius: 6px;
-            color: var(--color-brown-60, #8B7B75);
-            text-decoration: none;
-            transition: all 0.15s ease;
-            white-space: nowrap;
-            overflow: hidden;
-        }
-        
-        .sidebar-nav-link:hover {
-            background-color: var(--color-tan-20, #E7E2DC);
-            color: var(--color-brown, #3E2318);
-        }
-        
-        .sidebar-nav-link.active {
-            background-color: var(--color-tan-20, #E7E2DC);
-            color: var(--color-brown, #3E2318);
-        }
-        
-        .sidebar-nav-link.active::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 3px;
-            height: 20px;
-            background-color: var(--color-accent, #C73314);
-            border-radius: 0 2px 2px 0;
-        }
-        
-        .sidebar-nav-icon {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 20px;
-            height: 20px;
-            flex-shrink: 0;
-        }
-        
-        .sidebar-nav-icon svg {
-            width: 20px;
-            height: 20px;
-        }
-        
-        .sidebar-nav-label {
-            font-family: 'Familjen Grotesk', sans-serif;
-            font-size: 14px;
-            font-weight: 500;
-            opacity: 0;
-            transition: opacity var(--sidebar-transition);
-        }
-        
-        .app-sidebar:hover .sidebar-nav-label {
-            opacity: 1;
-        }
-        
-        .sidebar-spacer {
-            flex: 1;
-        }
-        
-        .sidebar-nav-bottom {
-            border-top: 1px solid var(--color-tan-20, #E7E2DC);
-            padding-top: 12px;
-            margin-top: 0;
-        }
-        
-        /* Simplified Header */
-        .header {
-            position: fixed;
-            top: 0;
-            left: var(--sidebar-width-collapsed);
-            right: 0;
-            height: var(--header-height);
-            background-color: var(--color-surface, #F9F8F6);
-            border-bottom: 1px solid var(--color-tan-20, #E7E2DC);
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            padding: 0 20px;
-            z-index: 150;
-            transition: left var(--sidebar-transition);
-        }
-        
-        .header-spacer {
-            flex: 1;
-        }
-        
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+        /* Header styles are provided by /css/header.css */
+        /* Just override specific styles for Style Finder page layout */
         
         /* Style Finder Page Layout */
         .style-finder-page {
@@ -2412,6 +2243,7 @@
     <!-- Scripts -->
     <script src="js/shared/supabase-client.js"></script>
     <script src="js/shared/auth.js"></script>
+    <script src="js/shared/header.js"></script>
     <script src="js/shared/projects.js"></script>
     <script src="js/style-finder/style-data.js"></script>
     <script>
