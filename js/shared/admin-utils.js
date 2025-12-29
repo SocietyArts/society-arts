@@ -4,6 +4,9 @@
    Version: 2.1
    ======================================== */
 
+console.log('🔄 admin-utils.js: Script loading...');
+console.log('🔄 admin-utils.js: React available:', typeof React !== 'undefined');
+
 // ========================================
 // R2 UPLOAD UTILITIES
 // ========================================
@@ -246,8 +249,9 @@ const R2Upload = {
 // ========================================
 
 // R2 Style Uploader Component - Uses React hooks directly
+// Note: This component is only rendered when React is available (via React.createElement)
 function R2StyleUploader({ onClose, userEmail }) {
-  // Extract hooks from React at the top level (before any conditionals)
+  // Extract hooks from React at the top level
   const useState = React.useState;
   const useRef = React.useRef;
   const useCallback = React.useCallback;
@@ -839,11 +843,16 @@ function R2StyleUploader({ onClose, userEmail }) {
 // ========================================
 // EXPORTS
 // ========================================
-window.SocietyArts = window.SocietyArts || {};
-window.SocietyArts.AdminUtils = {
-  R2Upload,
-  R2StyleUploader
-};
+try {
+  window.SocietyArts = window.SocietyArts || {};
+  window.SocietyArts.AdminUtils = {
+    R2Upload,
+    R2StyleUploader
+  };
+  console.log('✅ admin-utils.js: Exports registered successfully');
+} catch (e) {
+  console.error('❌ admin-utils.js: Failed to register exports:', e);
+}
 
 // Export R2Upload for vanilla JS (always available)
 if (typeof window !== 'undefined') {
