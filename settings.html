@@ -1267,7 +1267,7 @@
                       <button 
                         className="admin-tool-btn"
                         onClick={() => {
-                          console.log('Opening R2 Uploader. Component available:', !!window.SocietyArts?.AdminUtils?.R2StyleUploader);
+                          console.log('Opening R2 Uploader');
                           setShowR2Uploader(true);
                         }}
                       >
@@ -1302,29 +1302,17 @@
           {showR2Uploader && isSuperAdmin && (
             <div className="r2-uploader-overlay" onClick={() => setShowR2Uploader(false)}>
               <div onClick={e => e.stopPropagation()}>
-                {(() => {
-                  try {
-                    if (window.SocietyArts?.AdminUtils?.R2StyleUploader) {
-                      return React.createElement(window.SocietyArts.AdminUtils.R2StyleUploader, {
-                        onClose: () => setShowR2Uploader(false),
-                        userEmail: user?.email
-                      });
-                    } else {
-                      console.error('R2StyleUploader not found');
-                      return <div className="r2-uploader" style={{background: 'white', padding: '40px', borderRadius: '12px', textAlign: 'center'}}>
-                        <p style={{marginBottom: '20px'}}>R2StyleUploader component not loaded</p>
-                        <button className="btn btn-secondary" onClick={() => setShowR2Uploader(false)}>Close</button>
-                      </div>;
-                    }
-                  } catch (err) {
-                    console.error('Error rendering R2StyleUploader:', err);
-                    return <div className="r2-uploader" style={{background: 'white', padding: '40px', borderRadius: '12px', textAlign: 'center'}}>
-                      <p style={{marginBottom: '10px', color: 'red'}}>Error loading uploader</p>
-                      <p style={{marginBottom: '20px', fontSize: '12px'}}>{err.message}</p>
-                      <button className="btn btn-secondary" onClick={() => setShowR2Uploader(false)}>Close</button>
-                    </div>;
-                  }
-                })()}
+                {window.SocietyArts?.AdminUtils?.R2StyleUploader ? 
+                  React.createElement(window.SocietyArts.AdminUtils.R2StyleUploader, {
+                    onClose: () => setShowR2Uploader(false),
+                    userEmail: user?.email
+                  }) :
+                  <div className="r2-uploader" style={{background: 'white', padding: '40px', borderRadius: '12px', textAlign: 'center'}}>
+                    <p style={{marginBottom: '20px'}}>R2StyleUploader component not loaded</p>
+                    <p style={{marginBottom: '20px', fontSize: '12px', color: '#666'}}>Please refresh the page and try again.</p>
+                    <button className="btn btn-secondary" onClick={() => setShowR2Uploader(false)}>Close</button>
+                  </div>
+                }
               </div>
             </div>
           )}
@@ -1339,7 +1327,12 @@
       let attempts = 0;
       const check = () => {
         attempts++;
-        if (window.SocietyArts?.Sidebar && window.SocietyArts?.Header && window.SocietyArts?.useAuth && window.SocietyArts?.AdminUtils?.R2StyleUploader) {
+        
+        const hasComponents = window.SocietyArts?.Sidebar && window.SocietyArts?.Header && window.SocietyArts?.useAuth;
+        const hasAdminUtils = window.SocietyArts?.AdminUtils?.R2StyleUploader;
+        
+        if (hasComponents && hasAdminUtils) {
+          console.log('All components loaded, rendering...');
           // Initialize auth before rendering
           if (window.initializeAuth && !window.AuthState?.initialized) {
             window.initializeAuth().then(callback);
@@ -1349,7 +1342,15 @@
         } else if (attempts < maxAttempts) {
           setTimeout(check, 100);
         } else {
-          console.error('Components failed to load. AdminUtils:', !!window.SocietyArts?.AdminUtils);
+          console.error('Components failed to load after', maxAttempts, 'attempts');
+          console.log('Components status:', {
+            Sidebar: !!window.SocietyArts?.Sidebar,
+            Header: !!window.SocietyArts?.Header,
+            useAuth: !!window.SocietyArts?.useAuth,
+            AdminUtils: !!window.SocietyArts?.AdminUtils,
+            R2StyleUploader: !!window.SocietyArts?.AdminUtils?.R2StyleUploader
+          });
+          // Render anyway, will show error state
           callback();
         }
       };

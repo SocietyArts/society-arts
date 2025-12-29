@@ -1,10 +1,8 @@
 /* ========================================
    SOCIETY ARTS - ADMIN UTILITIES
    SuperAdmin tools for style management
-   Version: 2.0
+   Version: 2.1
    ======================================== */
-
-console.log('admin-utils.js loading, React available:', typeof React !== 'undefined');
 
 // ========================================
 // R2 UPLOAD UTILITIES
@@ -239,7 +237,6 @@ const R2Upload = {
         files: uploadedFiles,
         errors: errors.length > 0 ? errors : [{ file: 'overall', error: error.message }]
       };
-      };
     }
   }
 };
@@ -248,9 +245,36 @@ const R2Upload = {
 // REACT COMPONENTS
 // ========================================
 
-if (typeof React !== 'undefined') {
-  const { useState, useRef, useCallback, useEffect } = React;
-
+// R2 Style Uploader Component - Uses React hooks directly
+function R2StyleUploader({ onClose, userEmail }) {
+  // Extract hooks from React at the top level (before any conditionals)
+  const useState = React.useState;
+  const useRef = React.useRef;
+  const useCallback = React.useCallback;
+  const useEffect = React.useEffect;
+  
+  const [folders, setFolders] = useState([]);
+  const [validationResults, setValidationResults] = useState({});
+  const [uploadStatus, setUploadStatus] = useState({});
+  const [overwriteExisting, setOverwriteExisting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const [uploadReport, setUploadReport] = useState(null);
+  const [sendingEmail, setSendingEmail] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+  
+  // Progress tracking
+  const [overallProgress, setOverallProgress] = useState(0);
+  const [currentFolderIndex, setCurrentFolderIndex] = useState(0);
+  const [startTime, setStartTime] = useState(null);
+  const [estimatedTimeRemaining, setEstimatedTimeRemaining] = useState(null);
+  const [uploadSpeed, setUploadSpeed] = useState(null); // folders per second
+  
+  const fileInputRef = useRef(null);
+  const folderListRef = useRef(null);
+  const activeFolderRef = useRef(null);
+  
   /**
    * Format time in mm:ss or hh:mm:ss
    */
@@ -265,82 +289,55 @@ if (typeof React !== 'undefined') {
     }
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   }
-
-  /**
-   * R2 Style Uploader Component
-   * Drag-and-drop folder upload for SuperAdmin
-   */
-  function R2StyleUploader({ onClose, userEmail }) {
-    const [folders, setFolders] = useState([]);
-    const [validationResults, setValidationResults] = useState({});
-    const [uploadStatus, setUploadStatus] = useState({});
-    const [overwriteExisting, setOverwriteExisting] = useState(false);
-    const [isUploading, setIsUploading] = useState(false);
-    const [dragOver, setDragOver] = useState(false);
-    const [showCompletionModal, setShowCompletionModal] = useState(false);
-    const [uploadReport, setUploadReport] = useState(null);
-    const [sendingEmail, setSendingEmail] = useState(false);
-    const [emailSent, setEmailSent] = useState(false);
+  
+  // Auto-scroll to active folder
+  useEffect(() => {
+    if (isUploading && activeFolderRef.current && folderListRef.current) {
+      activeFolderRef.current.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center' 
+      });
+    }
+  }, [currentFolderIndex, isUploading]);
+  
+  // Handle folder selection
+  const handleFolderSelect = useCallback((fileList) => {
+    const folderMap = new Map();
     
-    // Progress tracking
-    const [overallProgress, setOverallProgress] = useState(0);
-    const [currentFolderIndex, setCurrentFolderIndex] = useState(0);
-    const [startTime, setStartTime] = useState(null);
-    const [estimatedTimeRemaining, setEstimatedTimeRemaining] = useState(null);
-    const [uploadSpeed, setUploadSpeed] = useState(null); // folders per second
-    
-    const fileInputRef = useRef(null);
-    const folderListRef = useRef(null);
-    const activeFolderRef = useRef(null);
-    
-    // Auto-scroll to active folder
-    useEffect(() => {
-      if (isUploading && activeFolderRef.current && folderListRef.current) {
-        activeFolderRef.current.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'center' 
-        });
-      }
-    }, [currentFolderIndex, isUploading]);
-    
-    // Handle folder selection
-    const handleFolderSelect = useCallback((fileList) => {
-      const folderMap = new Map();
-      
-      // Group files by their parent folder
-      for (const file of fileList) {
-        // webkitRelativePath gives us "folderName/fileName"
-        const pathParts = file.webkitRelativePath.split('/');
-        if (pathParts.length >= 2) {
-          const folderName = pathParts[0];
-          
-          if (!folderMap.has(folderName)) {
-            folderMap.set(folderName, {
-              name: folderName,
-              styleId: R2Upload.extractStyleId(folderName),
-              files: []
-            });
-          }
-          
-          folderMap.get(folderName).files.push(file);
+    // Group files by their parent folder
+    for (const file of fileList) {
+      // webkitRelativePath gives us "folderName/fileName"
+      const pathParts = file.webkitRelativePath.split('/');
+      if (pathParts.length >= 2) {
+        const folderName = pathParts[0];
+        
+        if (!folderMap.has(folderName)) {
+          folderMap.set(folderName, {
+            name: folderName,
+            styleId: R2Upload.extractStyleId(folderName),
+            files: []
+          });
         }
+        
+        folderMap.get(folderName).files.push(file);
       }
+    }
+    
+    // Validate each folder
+    const newFolders = [];
+    const newValidations = {};
+    
+    for (const [folderName, folder] of folderMap) {
+      const styleId = folder.styleId || folderName;
+      const validation = R2Upload.validateFolder(styleId, folder.files);
       
-      // Validate each folder
-      const newFolders = [];
-      const newValidations = {};
+      newFolders.push({
+        ...folder,
+        styleId,
+        validation
+      });
       
-      for (const [folderName, folder] of folderMap) {
-        const styleId = folder.styleId || folderName;
-        const validation = R2Upload.validateFolder(styleId, folder.files);
-        
-        newFolders.push({
-          ...folder,
-          styleId,
-          validation
-        });
-        
-        newValidations[folderName] = validation;
+      newValidations[folderName] = validation;
       }
       
       setFolders(newFolders);
@@ -837,20 +834,18 @@ if (typeof React !== 'undefined') {
         }, `Upload ${validCount} Style${validCount !== 1 ? 's' : ''}`)
       )
     );
-  }
-
-  // ========================================
-  // EXPORTS
-  // ========================================
-  window.SocietyArts = window.SocietyArts || {};
-  window.SocietyArts.AdminUtils = {
-    R2Upload,
-    R2StyleUploader
-  };
-  console.log('admin-utils.js: R2StyleUploader exported to window.SocietyArts.AdminUtils');
 }
 
-// Export for vanilla JS
+// ========================================
+// EXPORTS
+// ========================================
+window.SocietyArts = window.SocietyArts || {};
+window.SocietyArts.AdminUtils = {
+  R2Upload,
+  R2StyleUploader
+};
+
+// Export R2Upload for vanilla JS (always available)
 if (typeof window !== 'undefined') {
   window.R2Upload = R2Upload;
 }
