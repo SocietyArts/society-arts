@@ -1266,7 +1266,10 @@
                     <div className="admin-tools-grid">
                       <button 
                         className="admin-tool-btn"
-                        onClick={() => setShowR2Uploader(true)}
+                        onClick={() => {
+                          console.log('Opening R2 Uploader. Component available:', !!window.SocietyArts?.AdminUtils?.R2StyleUploader);
+                          setShowR2Uploader(true);
+                        }}
                       >
                         <UploadCloudIcon />
                         <span>Upload Styles to Society Arts™</span>
@@ -1296,13 +1299,32 @@
           )}
           
           {/* R2 Upload Modal - SuperAdmin Only */}
-          {showR2Uploader && isSuperAdmin && window.SocietyArts?.AdminUtils?.R2StyleUploader && (
+          {showR2Uploader && isSuperAdmin && (
             <div className="r2-uploader-overlay" onClick={() => setShowR2Uploader(false)}>
               <div onClick={e => e.stopPropagation()}>
-                {React.createElement(window.SocietyArts.AdminUtils.R2StyleUploader, {
-                  onClose: () => setShowR2Uploader(false),
-                  userEmail: user?.email
-                })}
+                {(() => {
+                  try {
+                    if (window.SocietyArts?.AdminUtils?.R2StyleUploader) {
+                      return React.createElement(window.SocietyArts.AdminUtils.R2StyleUploader, {
+                        onClose: () => setShowR2Uploader(false),
+                        userEmail: user?.email
+                      });
+                    } else {
+                      console.error('R2StyleUploader not found');
+                      return <div className="r2-uploader" style={{background: 'white', padding: '40px', borderRadius: '12px', textAlign: 'center'}}>
+                        <p style={{marginBottom: '20px'}}>R2StyleUploader component not loaded</p>
+                        <button className="btn btn-secondary" onClick={() => setShowR2Uploader(false)}>Close</button>
+                      </div>;
+                    }
+                  } catch (err) {
+                    console.error('Error rendering R2StyleUploader:', err);
+                    return <div className="r2-uploader" style={{background: 'white', padding: '40px', borderRadius: '12px', textAlign: 'center'}}>
+                      <p style={{marginBottom: '10px', color: 'red'}}>Error loading uploader</p>
+                      <p style={{marginBottom: '20px', fontSize: '12px'}}>{err.message}</p>
+                      <button className="btn btn-secondary" onClick={() => setShowR2Uploader(false)}>Close</button>
+                    </div>;
+                  }
+                })()}
               </div>
             </div>
           )}
@@ -1317,7 +1339,7 @@
       let attempts = 0;
       const check = () => {
         attempts++;
-        if (window.SocietyArts?.Sidebar && window.SocietyArts?.Header && window.SocietyArts?.useAuth) {
+        if (window.SocietyArts?.Sidebar && window.SocietyArts?.Header && window.SocietyArts?.useAuth && window.SocietyArts?.AdminUtils?.R2StyleUploader) {
           // Initialize auth before rendering
           if (window.initializeAuth && !window.AuthState?.initialized) {
             window.initializeAuth().then(callback);
@@ -1327,7 +1349,7 @@
         } else if (attempts < maxAttempts) {
           setTimeout(check, 100);
         } else {
-          console.error('Components failed to load');
+          console.error('Components failed to load. AdminUtils:', !!window.SocietyArts?.AdminUtils);
           callback();
         }
       };

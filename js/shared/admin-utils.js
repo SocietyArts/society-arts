@@ -4,6 +4,8 @@
    Version: 2.0
    ======================================== */
 
+console.log('admin-utils.js loading, React available:', typeof React !== 'undefined');
+
 // ========================================
 // R2 UPLOAD UTILITIES
 // ========================================
@@ -845,6 +847,7 @@ if (typeof React !== 'undefined') {
     R2Upload,
     R2StyleUploader
   };
+  console.log('admin-utils.js: R2StyleUploader exported to window.SocietyArts.AdminUtils');
 }
 
 // Export for vanilla JS
