@@ -2316,271 +2316,9 @@
         </div>
     </div>
     
-    <!-- ============================================ -->
-    <!-- AUTH MODAL -->
-    <!-- ============================================ -->
-    <div class="auth-modal-overlay" id="authModalOverlay">
-        <div class="auth-modal" id="authModal">
-            <button class="auth-modal-close" onclick="closeAuthModal()">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-            </button>
-            
-            <!-- Welcome View (Default) -->
-            <div class="auth-view" id="authViewWelcome">
-                <div class="auth-header">
-                    <h1 class="auth-title">Welcome</h1>
-                    <p class="auth-subtitle">Start exploring and creating – sign in to never lose your results.</p>
-                </div>
-                
-                <div class="auth-social-buttons">
-                    <!-- Google -->
-                    <button class="auth-social-btn" onclick="signInWithGoogle()">
-                        <span class="auth-social-icon google">
-                            <svg viewBox="0 0 24 24" width="20" height="20">
-                                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                            </svg>
-                        </span>
-                        Continue with Google
-                    </button>
-                    
-                    <!-- Apple (Coming Soon) -->
-                    <button class="auth-social-btn disabled" onclick="showUnderConstruction('Apple')">
-                        <span class="auth-social-icon">
-                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                                <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
-                            </svg>
-                        </span>
-                        Continue with Apple
-                    </button>
-                    
-                    <!-- Facebook (Coming Soon) -->
-                    <button class="auth-social-btn disabled" onclick="showUnderConstruction('Facebook')">
-                        <span class="auth-social-icon">
-                            <svg viewBox="0 0 24 24" width="20" height="20" fill="#1877F2">
-                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                            </svg>
-                        </span>
-                        Continue with Facebook
-                    </button>
-                </div>
-                
-                <div class="auth-divider">
-                    <span class="auth-divider-line"></span>
-                    <span class="auth-divider-text">or</span>
-                    <span class="auth-divider-line"></span>
-                </div>
-                
-                <form class="auth-form" onsubmit="handleEmailSubmit(event)">
-                    <div class="auth-input-group">
-                        <input type="email" class="auth-input" id="authEmailInput" placeholder="Email address" required>
-                    </div>
-                    <button type="submit" class="auth-submit-btn" id="authEmailBtn">Continue with Email</button>
-                </form>
-                
-                <div class="auth-footer">
-                    Already have an account? <span class="auth-footer-link" onclick="showAuthView('signin')">Sign In</span>
-                </div>
-            </div>
-            
-            <!-- Sign In View -->
-            <div class="auth-view" id="authViewSignin" style="display: none;">
-                <div class="auth-header">
-                    <h1 class="auth-title">Welcome Back</h1>
-                    <p class="auth-subtitle">Sign in to your account</p>
-                </div>
-                
-                <div class="auth-social-buttons">
-                    <!-- Google -->
-                    <button class="auth-social-btn" onclick="signInWithGoogle()">
-                        <span class="auth-social-icon google">
-                            <svg viewBox="0 0 24 24" width="20" height="20">
-                                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                            </svg>
-                        </span>
-                        Continue with Google
-                    </button>
-                    
-                    <!-- Apple (Coming Soon) -->
-                    <button class="auth-social-btn disabled" onclick="showUnderConstruction('Apple')">
-                        <span class="auth-social-icon">
-                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                                <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
-                            </svg>
-                        </span>
-                        Continue with Apple
-                    </button>
-                    
-                    <!-- Facebook (Coming Soon) -->
-                    <button class="auth-social-btn disabled" onclick="showUnderConstruction('Facebook')">
-                        <span class="auth-social-icon">
-                            <svg viewBox="0 0 24 24" width="20" height="20" fill="#1877F2">
-                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                            </svg>
-                        </span>
-                        Continue with Facebook
-                    </button>
-                </div>
-                
-                <div class="auth-divider">
-                    <span class="auth-divider-line"></span>
-                    <span class="auth-divider-text">or</span>
-                    <span class="auth-divider-line"></span>
-                </div>
-                
-                <div id="authSigninMessage"></div>
-                
-                <form class="auth-form" onsubmit="handleSignIn(event)">
-                    <div class="auth-input-group">
-                        <label class="auth-input-label">Email</label>
-                        <input type="email" class="auth-input" id="signinEmail" placeholder="Enter your email" required>
-                    </div>
-                    <div class="auth-input-group">
-                        <label class="auth-input-label">Password</label>
-                        <div class="auth-password-wrapper">
-                            <input type="password" class="auth-input" id="signinPassword" placeholder="Enter your password" required>
-                            <button type="button" class="auth-password-toggle" onclick="togglePasswordVisibility('signinPassword')">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                    <circle cx="12" cy="12" r="3"></circle>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="auth-forgot-link">
-                        <a onclick="showAuthView('forgot')">Forgot password?</a>
-                    </div>
-                    <button type="submit" class="auth-submit-btn" id="signinBtn">Sign In</button>
-                </form>
-                
-                <div class="auth-footer">
-                    Don't have an account? <span class="auth-footer-link" onclick="showAuthView('welcome')">Sign Up</span>
-                </div>
-            </div>
-            
-            <!-- Sign Up View -->
-            <div class="auth-view" id="authViewSignup" style="display: none;">
-                <span class="auth-back-link" onclick="showAuthView('welcome')">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="15 18 9 12 15 6"></polyline>
-                    </svg>
-                    Back
-                </span>
-                
-                <div class="auth-header">
-                    <h1 class="auth-title">Create Account</h1>
-                    <p class="auth-subtitle">Join Society Arts today</p>
-                </div>
-                
-                <div id="authSignupMessage"></div>
-                
-                <form class="auth-form" onsubmit="handleSignUp(event)">
-                    <div class="auth-input-group">
-                        <label class="auth-input-label">Display Name</label>
-                        <input type="text" class="auth-input" id="signupName" placeholder="Enter your name" required>
-                    </div>
-                    <div class="auth-input-group">
-                        <label class="auth-input-label">Email</label>
-                        <input type="email" class="auth-input" id="signupEmail" placeholder="Enter your email" required>
-                    </div>
-                    <div class="auth-input-group">
-                        <label class="auth-input-label">Password</label>
-                        <div class="auth-password-wrapper">
-                            <input type="password" class="auth-input" id="signupPassword" placeholder="Create a password (min. 8 characters)" required minlength="8">
-                            <button type="button" class="auth-password-toggle" onclick="togglePasswordVisibility('signupPassword')">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                    <circle cx="12" cy="12" r="3"></circle>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="auth-input-group">
-                        <label class="auth-input-label">Confirm Password</label>
-                        <div class="auth-password-wrapper">
-                            <input type="password" class="auth-input" id="signupPasswordConfirm" placeholder="Confirm your password" required>
-                            <button type="button" class="auth-password-toggle" onclick="togglePasswordVisibility('signupPasswordConfirm')">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                    <circle cx="12" cy="12" r="3"></circle>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                    <button type="submit" class="auth-submit-btn" id="signupBtn">Create Account</button>
-                </form>
-                
-                <p class="auth-terms">
-                    By creating an account, you agree to our <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>.
-                </p>
-                
-                <div class="auth-footer">
-                    Already have an account? <span class="auth-footer-link" onclick="showAuthView('signin')">Sign In</span>
-                </div>
-            </div>
-            
-            <!-- Forgot Password View -->
-            <div class="auth-view" id="authViewForgot" style="display: none;">
-                <span class="auth-back-link" onclick="showAuthView('signin')">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="15 18 9 12 15 6"></polyline>
-                    </svg>
-                    Back
-                </span>
-                
-                <div class="auth-header">
-                    <h1 class="auth-title">Reset Password</h1>
-                    <p class="auth-subtitle">Enter your email and we'll send you a link to reset your password.</p>
-                </div>
-                
-                <div id="authForgotMessage"></div>
-                
-                <form class="auth-form" onsubmit="handleForgotPassword(event)">
-                    <div class="auth-input-group">
-                        <label class="auth-input-label">Email</label>
-                        <input type="email" class="auth-input" id="forgotEmail" placeholder="Enter your email" required>
-                    </div>
-                    <button type="submit" class="auth-submit-btn" id="forgotBtn">Send Reset Link</button>
-                </form>
-                
-                <div class="auth-footer">
-                    Remember your password? <span class="auth-footer-link" onclick="showAuthView('signin')">Sign In</span>
-                </div>
-            </div>
-            
-            <!-- Under Construction View -->
-            <div class="auth-view" id="authViewConstruction" style="display: none;">
-                <span class="auth-back-link" onclick="showAuthView('welcome')">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="15 18 9 12 15 6"></polyline>
-                    </svg>
-                    Back
-                </span>
-                
-                <div class="under-construction">
-                    <div class="under-construction-icon">
-                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                            <line x1="12" y1="9" x2="12" y2="13"></line>
-                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                        </svg>
-                    </div>
-                    <h2 id="constructionTitle">Coming Soon</h2>
-                    <p id="constructionText">This login option is coming soon. Please use Google or email sign-in for now.</p>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- AUTH MODAL: Now handled by shared auth.js -->
     
-    <!-- ============================================ -->
+        <!-- ============================================ -->
     <!-- PROFILE MODAL -->
     <!-- ============================================ -->
     <div class="auth-modal-overlay" id="profileModalOverlay">
@@ -4159,68 +3897,41 @@
         let userProfile = null;
         let currentEditStyleId = null;
         
-        // Initialize Auth on page load
-        async function initializeAuth() {
-            const { supabase } = window.SocietyArts;
+        // Initialize Auth using shared auth.js
+        async function initializeAuthLocal() {
+            // Use shared auth initialization
+            await window.initializeAuthLocal();
             
-            // Check current session
-            const { data: { session } } = await supabase.auth.getSession();
+            // Sync local variables with shared state
+            currentUser = window.AuthState.user;
+            userProfile = window.AuthState.profile;
             
-            if (session) {
-                currentUser = session.user;
-                
-                // Also update shared AuthState for projects.js functions
-                if (window.SocietyArts?.AuthState) {
-                    window.SocietyArts.AuthState.user = session.user;
-                }
-                
-                await loadUserProfile();
-                
-                // Load user's favorites from database
+            // Load favorites if logged in
+            if (currentUser) {
                 await loadUserFavoritesLocal();
-                
-                updateAuthUI();
             }
             
-            // Listen for auth changes
-            supabase.auth.onAuthStateChange(async (event, session) => {
-                console.log('Auth event:', event);
+            updateAuthUI();
+            
+            // Listen for auth changes via shared system
+            window.addAuthListener(async (state) => {
+                const wasLoggedIn = !!currentUser;
+                currentUser = state.user;
+                userProfile = state.profile;
                 
-                if (event === 'SIGNED_IN' && session) {
-                    currentUser = session.user;
-                    
-                    // Also update shared AuthState
-                    if (window.SocietyArts?.AuthState) {
-                        window.SocietyArts.AuthState.user = session.user;
-                    }
-                    
-                    await loadUserProfile();
-                    
-                    // Load user's favorites from database
+                if (state.user && !wasLoggedIn) {
+                    // Just signed in
                     await loadUserFavoritesLocal();
-                    
-                    // Re-render styles to show correct favorite states
                     renderStyles();
-                    
-                    updateAuthUI();
-                    closeAuthModal();
                     showToast('Signed in successfully!');
-                } else if (event === 'SIGNED_OUT') {
-                    currentUser = null;
-                    userProfile = null;
+                } else if (!state.user && wasLoggedIn) {
+                    // Just signed out
                     localFavorites = [];
-                    
-                    // Clear shared AuthState
-                    if (window.SocietyArts?.AuthState) {
-                        window.SocietyArts.AuthState.user = null;
-                        window.SocietyArts.AuthState.profile = null;
-                    }
-                    
-                    updateAuthUI();
-                    // Re-render to clear favorite states
                     renderStyles();
                     showToast('Signed out');
                 }
+                
+                updateAuthUI();
             });
         }
         
@@ -4347,200 +4058,60 @@
         }
         
         // ============================================
-        // AUTH MODAL FUNCTIONS
+        // AUTH MODAL FUNCTIONS (Handled by shared auth.js)
         // ============================================
         
-        function openAuthModal() {
-            document.getElementById('authModalOverlay').classList.add('open');
-            showAuthView('welcome');
-        }
-        
-        function closeAuthModal() {
-            document.getElementById('authModalOverlay').classList.remove('open');
-        }
-        
-        function showAuthView(view) {
-            // Hide all views
-            document.querySelectorAll('.auth-view').forEach(v => v.style.display = 'none');
-            
-            // Show requested view
-            const viewElement = document.getElementById(`authView${view.charAt(0).toUpperCase() + view.slice(1)}`);
-            if (viewElement) {
-                viewElement.style.display = 'block';
-            }
-            
-            // Clear any messages
-            document.querySelectorAll('[id$="Message"]').forEach(el => el.innerHTML = '');
-        }
+        // openAuthModal, closeAuthModal, showAuthView are now provided by /js/shared/auth.js
+        // The auth modal is dynamically injected by the shared auth system
         
         function showUnderConstruction(provider) {
-            document.getElementById('constructionTitle').textContent = `${provider} Sign In Coming Soon`;
-            document.getElementById('constructionText').textContent = `${provider} login is coming soon. Please use Google or email sign-in for now.`;
-            showAuthView('construction');
+            showToast(`${provider} login coming soon! Please use Google or email sign-in.`);
         }
         
-        // Toggle password visibility
+        // Toggle password visibility (for profile edit)
         function togglePasswordVisibility(inputId) {
             const input = document.getElementById(inputId);
-            input.type = input.type === 'password' ? 'text' : 'password';
+            if (input) {
+                input.type = input.type === 'password' ? 'text' : 'password';
+            }
         }
         
         // ============================================
-        // AUTH HANDLERS
+        // AUTH HANDLERS (Using shared auth.js)
         // ============================================
         
-        // Google Sign In
-        async function signInWithGoogle() {
-            const { supabase } = window.SocietyArts;
-            
-            // Always redirect to production URL (works for both local testing and production)
-            const productionUrl = 'https://studio.societyarts.com';
-            const currentPath = window.location.pathname;
-            
-            const { data, error } = await supabase.auth.signInWithOAuth({
-                provider: 'google',
-                options: {
-                    redirectTo: productionUrl + currentPath
-                }
-            });
-            
-            if (error) {
-                console.error('Google sign in error:', error);
-                showAuthMessage('authSigninMessage', 'error', 'Failed to sign in with Google. Please try again.');
-            }
-        }
+        // signInWithGoogle is now provided by shared auth.js (window.signInWithGoogle)
+        // The shared auth modal handles all form submissions
         
-        // Email submit (check if user exists)
-        async function handleEmailSubmit(event) {
-            event.preventDefault();
-            
-            const email = document.getElementById('authEmailInput').value.trim();
-            
-            // Pre-fill email in signup form and show it
-            document.getElementById('signupEmail').value = email;
-            showAuthView('signup');
-        }
-        
-        // Sign In
-        async function handleSignIn(event) {
-            event.preventDefault();
-            
-            const email = document.getElementById('signinEmail').value.trim();
-            const password = document.getElementById('signinPassword').value;
-            const btn = document.getElementById('signinBtn');
-            
-            btn.classList.add('loading');
-            btn.disabled = true;
-            
-            const { supabase } = window.SocietyArts;
-            
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email,
-                password
-            });
-            
-            btn.classList.remove('loading');
-            btn.disabled = false;
-            
-            if (error) {
-                showAuthMessage('authSigninMessage', 'error', error.message);
-                return;
-            }
-            
-            // Success - auth state change will handle the rest
-        }
-        
-        // Sign Up
-        async function handleSignUp(event) {
-            event.preventDefault();
-            
-            const name = document.getElementById('signupName').value.trim();
-            const email = document.getElementById('signupEmail').value.trim();
-            const password = document.getElementById('signupPassword').value;
-            const passwordConfirm = document.getElementById('signupPasswordConfirm').value;
-            const btn = document.getElementById('signupBtn');
-            
-            // Validate passwords match
-            if (password !== passwordConfirm) {
-                showAuthMessage('authSignupMessage', 'error', 'Passwords do not match.');
-                return;
-            }
-            
-            btn.classList.add('loading');
-            btn.disabled = true;
-            
-            const { supabase } = window.SocietyArts;
-            
-            const { data, error } = await supabase.auth.signUp({
-                email,
-                password,
-                options: {
-                    data: {
-                        full_name: name
-                    },
-                    emailRedirectTo: 'https://studio.societyarts.com/style-finder.html'
-                }
-            });
-            
-            btn.classList.remove('loading');
-            btn.disabled = false;
-            
-            if (error) {
-                showAuthMessage('authSignupMessage', 'error', error.message);
-                return;
-            }
-            
-            // Check if email confirmation is required
-            if (data.user && !data.session) {
-                showAuthMessage('authSignupMessage', 'success', 'Check your email for a confirmation link to complete your registration.');
-            }
-        }
-        
-        // Forgot Password
-        async function handleForgotPassword(event) {
-            event.preventDefault();
-            
-            const email = document.getElementById('forgotEmail').value.trim();
-            const btn = document.getElementById('forgotBtn');
-            
-            btn.classList.add('loading');
-            btn.disabled = true;
-            
-            const { supabase } = window.SocietyArts;
-            
-            const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: 'https://studio.societyarts.com/style-finder.html'
-            });
-            
-            btn.classList.remove('loading');
-            btn.disabled = false;
-            
-            if (error) {
-                showAuthMessage('authForgotMessage', 'error', error.message);
-                return;
-            }
-            
-            showAuthMessage('authForgotMessage', 'success', 'If an account exists with this email, you will receive a password reset link.');
-        }
-        
-        // Logout
+        // Logout handler - use shared signOut
         async function handleLogout() {
-            const { supabase } = window.SocietyArts;
-            
-            const { error } = await supabase.auth.signOut();
-            
-            if (error) {
+            try {
+                await window.signOut();
+            } catch (error) {
                 console.error('Logout error:', error);
             }
-            
             closeUserMenu();
         }
         
-        function showAuthMessage(elementId, type, message) {
-            const el = document.getElementById(elementId);
-            if (el) {
-                el.innerHTML = `<div class="auth-message ${type}">${message}</div>`;
-            }
+        // Legacy form handlers - redirect to shared auth modal
+        function handleEmailSubmit(event) {
+            event?.preventDefault();
+            openAuthModal();
+        }
+        
+        function handleSignIn(event) {
+            event?.preventDefault();
+            openAuthModal();
+        }
+        
+        function handleSignUp(event) {
+            event?.preventDefault();
+            openAuthModal();
+        }
+        
+        function handleForgotPassword(event) {
+            event?.preventDefault();
+            openAuthModal();
         }
         
         // ============================================
@@ -4848,9 +4419,7 @@
         }
         
         // Close modals when clicking overlay
-        document.getElementById('authModalOverlay').addEventListener('click', (e) => {
-            if (e.target === e.currentTarget) closeAuthModal();
-        });
+        // Note: Auth modal overlay is handled by shared auth.js
         
         document.getElementById('profileModalOverlay').addEventListener('click', (e) => {
             if (e.target === e.currentTarget) closeProfileModal();
@@ -4863,7 +4432,7 @@
         // Close modals with Escape key
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                closeAuthModal();
+                // closeAuthModal handled by shared auth.js
                 closeProfileModal();
                 closeEditStyleModal();
                 closeHelpModal();
