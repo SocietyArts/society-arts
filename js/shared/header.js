@@ -219,10 +219,16 @@ if (typeof React !== 'undefined') {
     };
 
     // ========================================
-    // TOP HEADER (Simplified)
+    // TOP HEADER (Self-contained with auth)
     // ========================================
-    const Header = ({ user, profile, onAuthClick }) => {
+    const Header = ({ user: propUser, profile: propProfile, onAuthClick }) => {
         const [dropdownOpen, setDropdownOpen] = useState(false);
+        const [authModalOpen, setAuthModalOpen] = useState(false);
+        
+        // Use internal auth state if no props provided
+        const authHook = window.SocietyArts?.useAuth?.();
+        const user = propUser !== undefined ? propUser : authHook?.user;
+        const profile = propProfile !== undefined ? propProfile : authHook?.profile;
 
         useEffect(() => {
             const handleClickOutside = (e) => {
@@ -233,73 +239,104 @@ if (typeof React !== 'undefined') {
             document.addEventListener('click', handleClickOutside);
             return () => document.removeEventListener('click', handleClickOutside);
         }, []);
+        
+        // Register this header's auth modal opener globally
+        useEffect(() => {
+            if (typeof registerAuthModal === 'function') {
+                registerAuthModal(() => setAuthModalOpen(true));
+            }
+        }, []);
 
         const displayName = profile?.display_name || user?.email?.split('@')[0] || 'User';
         const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
         const isAdmin = profile?.role === 'admin' || profile?.role === 'super_admin';
         const roleLabel = profile?.role === 'super_admin' ? 'Super Admin' : (profile?.role === 'admin' ? 'Admin' : null);
+        
+        const handleAuthClick = () => {
+            if (onAuthClick) {
+                onAuthClick();
+            } else {
+                setAuthModalOpen(true);
+            }
+        };
+        
+        const handleLogoutClick = async () => {
+            if (typeof signOut === 'function') {
+                await signOut();
+            } else if (window.SocietyArts?.signOut) {
+                await window.SocietyArts.signOut();
+            }
+            setDropdownOpen(false);
+        };
 
-        return React.createElement('header', { className: 'header' },
-            // Spacer to account for sidebar width
-            React.createElement('div', { className: 'header-spacer' }),
-            
-            // Right side actions
-            React.createElement('div', { className: 'header-right' },
-                React.createElement('a', {
-                    href: 'story-builder.html',
-                    className: 'btn btn-primary new-project-btn'
-                }, 'New Project'),
+        return React.createElement(React.Fragment, null,
+            React.createElement('header', { className: 'header' },
+                // Spacer to account for sidebar width
+                React.createElement('div', { className: 'header-spacer' }),
                 
-                // Auth section
-                React.createElement('div', { className: 'header-auth' },
-                    !user ? 
-                        React.createElement('button', {
-                            className: 'btn btn-secondary',
-                            onClick: onAuthClick || (() => typeof openAuthModal === 'function' && openAuthModal())
-                        }, 'Log In') :
-                        React.createElement('div', { className: 'user-menu-container' },
+                // Right side actions
+                React.createElement('div', { className: 'header-right' },
+                    React.createElement('a', {
+                        href: 'story-builder.html',
+                        className: 'btn btn-primary new-project-btn'
+                    }, 'New Project'),
+                    
+                    // Auth section
+                    React.createElement('div', { className: 'header-auth' },
+                        !user ? 
                             React.createElement('button', {
-                                className: 'user-avatar-btn',
-                                onClick: (e) => { e.stopPropagation(); setDropdownOpen(!dropdownOpen); }
-                            },
-                                React.createElement('div', { className: 'user-avatar' },
-                                    React.createElement('span', null, initials)
-                                ),
-                                React.createElement('span', { className: 'user-name' }, displayName),
-                                React.createElement('span', { dangerouslySetInnerHTML: { __html: HEADER_ICONS.chevronDown } })
-                            ),
-                            React.createElement('div', { className: `user-dropdown ${dropdownOpen ? 'open' : ''}` },
-                                React.createElement('div', { className: 'user-dropdown-header' },
-                                    React.createElement('div', { className: 'user-dropdown-name' }, displayName),
-                                    React.createElement('div', { className: 'user-dropdown-email' }, user.email),
-                                    roleLabel && React.createElement('span', { className: 'user-dropdown-role' }, roleLabel)
-                                ),
+                                className: 'btn btn-secondary',
+                                onClick: handleAuthClick
+                            }, 'Log In') :
+                            React.createElement('div', { className: 'user-menu-container' },
                                 React.createElement('button', {
-                                    className: 'user-dropdown-item',
-                                    onClick: () => typeof openProfileModal === 'function' && openProfileModal()
+                                    className: 'user-avatar-btn',
+                                    onClick: (e) => { e.stopPropagation(); setDropdownOpen(!dropdownOpen); }
                                 },
-                                    React.createElement('span', { dangerouslySetInnerHTML: { __html: HEADER_ICONS.user } }),
-                                    'Profile'
+                                    React.createElement('div', { className: 'user-avatar' },
+                                        React.createElement('span', null, initials)
+                                    ),
+                                    React.createElement('span', { className: 'user-name' }, displayName),
+                                    React.createElement('span', { dangerouslySetInnerHTML: { __html: HEADER_ICONS.chevronDown } })
                                 ),
-                                isAdmin && React.createElement('button', {
-                                    className: 'user-dropdown-item',
-                                    onClick: () => typeof openAdminUsersModal === 'function' && openAdminUsersModal()
-                                },
-                                    React.createElement('span', { dangerouslySetInnerHTML: { __html: HEADER_ICONS.users } }),
-                                    'Manage Users'
-                                ),
-                                React.createElement('div', { className: 'user-dropdown-divider' }),
-                                React.createElement('button', {
-                                    className: 'user-dropdown-item logout',
-                                    onClick: () => typeof handleLogout === 'function' && handleLogout()
-                                },
-                                    React.createElement('span', { dangerouslySetInnerHTML: { __html: HEADER_ICONS.logout } }),
-                                    'Sign Out'
+                                React.createElement('div', { className: `user-dropdown ${dropdownOpen ? 'open' : ''}` },
+                                    React.createElement('div', { className: 'user-dropdown-header' },
+                                        React.createElement('div', { className: 'user-dropdown-name' }, displayName),
+                                        React.createElement('div', { className: 'user-dropdown-email' }, user.email),
+                                        roleLabel && React.createElement('span', { className: 'user-dropdown-role' }, roleLabel)
+                                    ),
+                                    React.createElement('button', {
+                                        className: 'user-dropdown-item',
+                                        onClick: () => window.location.href = 'settings.html'
+                                    },
+                                        React.createElement('span', { dangerouslySetInnerHTML: { __html: HEADER_ICONS.settings } }),
+                                        'Settings'
+                                    ),
+                                    isAdmin && React.createElement('button', {
+                                        className: 'user-dropdown-item',
+                                        onClick: () => typeof openAdminUsersModal === 'function' && openAdminUsersModal()
+                                    },
+                                        React.createElement('span', { dangerouslySetInnerHTML: { __html: HEADER_ICONS.users } }),
+                                        'Manage Users'
+                                    ),
+                                    React.createElement('div', { className: 'user-dropdown-divider' }),
+                                    React.createElement('button', {
+                                        className: 'user-dropdown-item logout',
+                                        onClick: handleLogoutClick
+                                    },
+                                        React.createElement('span', { dangerouslySetInnerHTML: { __html: HEADER_ICONS.logout } }),
+                                        'Sign Out'
+                                    )
                                 )
                             )
-                        )
+                    )
                 )
-            )
+            ),
+            // Auth Modal (built into Header)
+            authModalOpen && window.SocietyArts?.AuthModal && React.createElement(window.SocietyArts.AuthModal, {
+                isOpen: authModalOpen,
+                onClose: () => setAuthModalOpen(false)
+            })
         );
     };
 
@@ -386,6 +423,33 @@ if (typeof React !== 'undefined') {
     };
 
     // ========================================
+    // UNIFIED APP LAYOUT
+    // Combines Sidebar, Header, Footer into one component
+    // Use this for consistent layout across all pages
+    // ========================================
+    const AppLayout = ({ children, showFooter = false }) => {
+        // Get auth state
+        const authHook = window.SocietyArts?.useAuth?.();
+        const user = authHook?.user;
+        const profile = authHook?.profile;
+        const isLoading = authHook?.isLoading;
+        
+        // Initialize auth on mount
+        useEffect(() => {
+            if (window.SocietyArts?.initializeAuth && !authHook) {
+                window.SocietyArts.initializeAuth();
+            }
+        }, []);
+        
+        return React.createElement('div', { className: 'page-container' },
+            React.createElement(Sidebar, null),
+            React.createElement(Header, { user, profile }),
+            React.createElement('main', { className: 'main-content' }, children),
+            showFooter && React.createElement(Footer, null)
+        );
+    };
+
+    // ========================================
     // FOOTER COMPONENT
     // ========================================
     const Footer = ({ children }) => {
@@ -424,6 +488,7 @@ if (typeof React !== 'undefined') {
     window.SocietyArts.Header = Header;
     window.SocietyArts.Sidebar = Sidebar;
     window.SocietyArts.Footer = Footer;
+    window.SocietyArts.AppLayout = AppLayout;
     window.SocietyArts.NavSidebar = NavSidebar; // Legacy
     window.SocietyArts.Subheader = Subheader; // Legacy
     window.SocietyArts.FormatSelector = FormatSelector;
