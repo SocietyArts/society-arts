@@ -75,7 +75,8 @@ function getCurrentPageId() {
         'story-builder': 'story-builder',
         'favorites': 'favorites',
         'collections': 'collections',
-        'projects': 'collections'
+        'projects': 'collections',
+        'settings': 'settings'
     };
     return pageMap[page] || 'home';
 }
@@ -104,8 +105,7 @@ function closeHelpModal() {
 }
 
 function openSettingsModal() {
-    // For now, redirect to under construction
-    window.location.href = 'under-construction.html?feature=Settings';
+    window.location.href = 'settings.html';
 }
 
 // Export to window for vanilla JS pages
