@@ -345,6 +345,80 @@ exports.handler = async (event, context) => {
       };
     }
 
+    // Action: upload-single-file - Upload one file at a time (avoids 6MB payload limit)
+    if (action === 'upload-single-file') {
+      const { fileName, fileData } = body;
+      
+      if (!styleId || !fileName || !fileData) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ 
+            error: 'Missing required fields',
+            details: {
+              hasStyleId: !!styleId,
+              hasFileName: !!fileName,
+              hasFileData: !!fileData
+            }
+          }),
+        };
+      }
+
+      // Validate style ID format
+      if (!STYLE_ID_PATTERN.test(styleId)) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({
+            error: `Invalid Style ID format: "${styleId}". Expected format: AAA-## (e.g., ABF-49)`,
+            code: 'INVALID_STYLE_ID'
+          }),
+        };
+      }
+
+      // Validate file name pattern
+      const expectedPattern = new RegExp(`^${styleId}-0[0-9]\\.webp$`);
+      if (!expectedPattern.test(fileName)) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({
+            error: `Invalid file name: "${fileName}". Expected format: ${styleId}-0#.webp`,
+            code: 'INVALID_FILE_NAME'
+          }),
+        };
+      }
+
+      // Upload the file
+      try {
+        const fileBuffer = Buffer.from(fileData, 'base64');
+        const result = await uploadFileToR2(styleId, fileName, fileBuffer);
+        
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify({
+            success: true,
+            styleId,
+            fileName,
+            url: result.url
+          }),
+        };
+      } catch (uploadError) {
+        return {
+          statusCode: 500,
+          headers,
+          body: JSON.stringify({
+            success: false,
+            error: uploadError.message,
+            code: 'UPLOAD_FAILED',
+            styleId,
+            fileName
+          }),
+        };
+      }
+    }
+
     // Action: send-report - Send email confirmation of upload
     if (action === 'send-report') {
       const { email, report } = body;
@@ -384,12 +458,56 @@ Details:
 `;
       
       for (const result of report.results) {
-        const status = result.success ? '✓' : '✗';
-        emailBody += `${status} ${result.styleId} - ${result.success ? 'Success' : 'Failed: ' + result.error}`;
+        const status = result.success ? '✓' : (result.partialSuccess ? '⚠' : '✗');
+        const statusText = result.success 
+          ? 'Success' 
+          : (result.partialSuccess 
+              ? `Partial (${result.filesUploaded}/${result.totalFiles || 10} files)` 
+              : 'Failed');
+        
+        emailBody += `${status} ${result.styleId} - ${statusText}`;
+        
         if (result.warnings && result.warnings.length > 0) {
-          emailBody += ` (Warning: ${result.warnings.join(', ')})`;
+          emailBody += `\n   ⚡ Warnings: ${result.warnings.join(', ')}`;
         }
-        emailBody += `\n`;
+        
+        if (result.error && !result.success) {
+          emailBody += `\n   ❌ Error: ${result.error}`;
+        }
+        
+        // Include file-level errors
+        if (result.fileErrors && result.fileErrors.length > 0) {
+          emailBody += `\n   📁 File Errors:`;
+          for (const fileError of result.fileErrors) {
+            emailBody += `\n      - ${fileError.file}: ${fileError.error}`;
+            if (fileError.code) {
+              emailBody += ` [${fileError.code}]`;
+            }
+          }
+        }
+        
+        emailBody += `\n\n`;
+      }
+      
+      // Add troubleshooting tips for common errors
+      const hasPayloadErrors = report.results.some(r => 
+        r.error?.includes('payload') || r.error?.includes('size') || r.error?.includes('6MB')
+      );
+      const hasNetworkErrors = report.results.some(r =>
+        r.fileErrors?.some(fe => fe.code === 'NETWORK_ERROR')
+      );
+      
+      if (hasPayloadErrors || hasNetworkErrors) {
+        emailBody += `
+Troubleshooting Tips:
+--------------------
+`;
+        if (hasPayloadErrors) {
+          emailBody += `• Payload Size Error: Try reducing image file sizes or upload fewer styles at once.\n`;
+        }
+        if (hasNetworkErrors) {
+          emailBody += `• Network Error: Check your internet connection and try again.\n`;
+        }
       }
       
       emailBody += `
@@ -457,7 +575,7 @@ This is an automated message from Society Arts™
       headers,
       body: JSON.stringify({ 
         error: 'Invalid action',
-        validActions: ['validate', 'upload', 'check', 'send-report'],
+        validActions: ['validate', 'upload', 'upload-single-file', 'check', 'send-report'],
       }),
     };
 

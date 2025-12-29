@@ -119,27 +119,12 @@ const R2Upload = {
    * @returns {Promise<Object>} - Upload result
    */
   async uploadStyle(styleId, files, onProgress = () => {}, overwrite = false) {
+    const errors = [];
+    const uploadedFiles = [];
+    
     try {
-      // Convert files to base64
-      onProgress({ stage: 'preparing', message: 'Preparing files for upload...', percent: 0 });
-      
-      const fileData = [];
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const base64 = await this.fileToBase64(file);
-        fileData.push({
-          name: file.name,
-          data: base64
-        });
-        onProgress({ 
-          stage: 'preparing', 
-          message: `Prepared ${i + 1}/${files.length} files`, 
-          percent: Math.round(((i + 1) / files.length) * 30) 
-        });
-      }
-      
-      // Validate on server
-      onProgress({ stage: 'validating', message: 'Validating with server...', percent: 30 });
+      // Step 1: Validate with server (lightweight - no file data)
+      onProgress({ stage: 'validating', message: 'Checking style with server...', percent: 0 });
       
       const validateResponse = await fetch('/.netlify/functions/r2-upload', {
         method: 'POST',
@@ -147,7 +132,7 @@ const R2Upload = {
         body: JSON.stringify({
           action: 'validate',
           styleId,
-          files: fileData.map(f => ({ name: f.name })),
+          files: files.map(f => ({ name: f.name })),
           overwrite
         })
       });
@@ -155,49 +140,103 @@ const R2Upload = {
       const validateResult = await validateResponse.json();
       
       if (!validateResult.canUpload) {
+        const errorMsg = validateResult.existsInR2 && !overwrite 
+          ? 'Style already exists in R2. Enable overwrite to replace.'
+          : validateResult.validation?.errors?.join(', ') || 'Server validation failed';
         return {
           success: false,
-          error: validateResult.existsInR2 && !overwrite 
-            ? 'Style already exists in R2. Enable overwrite to replace.'
-            : 'Server validation failed',
+          error: errorMsg,
+          errorCode: 'VALIDATION_FAILED',
           validation: validateResult.validation,
           existsInR2: validateResult.existsInR2
         };
       }
       
-      // Upload files
-      onProgress({ stage: 'uploading', message: 'Uploading to CloudFlare R2...', percent: 40 });
+      // Step 2: Upload each file INDIVIDUALLY to avoid 6MB payload limit
+      onProgress({ stage: 'uploading', message: 'Uploading files...', percent: 5 });
       
-      const uploadResponse = await fetch('/.netlify/functions/r2-upload', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'upload',
-          styleId,
-          files: fileData,
-          overwrite
-        })
-      });
+      const totalFiles = files.length;
       
-      const uploadResult = await uploadResponse.json();
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        
+        // Convert single file to base64
+        const base64 = await this.fileToBase64(file);
+        const fileSizeKB = Math.round(file.size / 1024);
+        
+        onProgress({ 
+          stage: 'uploading', 
+          message: `Uploading ${file.name} (${fileSizeKB}KB)...`, 
+          percent: 5 + Math.round((i / totalFiles) * 90)
+        });
+        
+        try {
+          const uploadResponse = await fetch('/.netlify/functions/r2-upload', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'upload-single-file',
+              styleId,
+              fileName: file.name,
+              fileData: base64
+            })
+          });
+          
+          const uploadResult = await uploadResponse.json();
+          
+          if (uploadResult.success) {
+            uploadedFiles.push({
+              name: file.name,
+              url: uploadResult.url,
+              size: file.size
+            });
+          } else {
+            errors.push({
+              file: file.name,
+              error: uploadResult.error || 'Upload failed',
+              code: uploadResult.code || 'UNKNOWN'
+            });
+          }
+        } catch (uploadError) {
+          errors.push({
+            file: file.name,
+            error: uploadError.message,
+            code: 'NETWORK_ERROR'
+          });
+        }
+      }
       
       onProgress({ stage: 'complete', message: 'Upload complete!', percent: 100 });
       
+      // Determine overall success
+      const allUploaded = uploadedFiles.length === totalFiles;
+      const partialSuccess = uploadedFiles.length > 0 && errors.length > 0;
+      
       return {
-        success: uploadResult.success,
+        success: allUploaded,
+        partialSuccess,
         styleId,
-        uploaded: uploadResult.uploaded,
-        results: uploadResult.results,
-        errors: uploadResult.errors,
+        uploaded: uploadedFiles.length,
+        total: totalFiles,
+        files: uploadedFiles,
+        errors: errors.length > 0 ? errors : undefined,
         warnings: validateResult.warnings || [],
-        existsInSupabase: validateResult.existsInSupabase
+        existsInSupabase: validateResult.existsInSupabase,
+        error: errors.length > 0 
+          ? `Failed to upload ${errors.length} file(s): ${errors.map(e => `${e.file} (${e.error})`).join(', ')}`
+          : undefined
       };
       
     } catch (error) {
       console.error('Upload error:', error);
       return {
         success: false,
-        error: error.message
+        error: error.message,
+        errorCode: 'UNEXPECTED_ERROR',
+        uploaded: uploadedFiles.length,
+        files: uploadedFiles,
+        errors: errors.length > 0 ? errors : [{ file: 'overall', error: error.message }]
+      };
       };
     }
   }
@@ -462,23 +501,36 @@ if (typeof React !== 'undefined') {
           errorCount++;
         }
         
-        results.push({
+        // Build detailed result with file-level errors
+        const detailedResult = {
           styleId: folder.styleId,
           folderName: folder.name,
           success: result.success,
+          partialSuccess: result.partialSuccess || false,
           error: result.error,
+          errorCode: result.errorCode,
           warnings: result.warnings || [],
-          filesUploaded: result.success ? 10 : 0,
+          filesUploaded: result.uploaded || 0,
+          totalFiles: result.total || 10,
+          fileErrors: result.errors || [],
           duration: folderDuration
-        });
+        };
+        
+        results.push(detailedResult);
+        
+        // Build detailed status message
+        let statusMessage = result.success ? 'Upload complete!' : result.error;
+        if (result.partialSuccess) {
+          statusMessage = `Partial success: ${result.uploaded}/${result.total} files uploaded`;
+        }
         
         setUploadStatus(prev => ({
           ...prev,
           [folder.name]: {
-            status: result.success ? 'success' : 'error',
+            status: result.success ? 'success' : (result.partialSuccess ? 'partial' : 'error'),
             progress: 100,
-            message: result.success ? 'Upload complete!' : result.error,
-            result
+            message: statusMessage,
+            result: detailedResult
           }
         }));
       }
