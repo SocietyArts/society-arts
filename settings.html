@@ -975,7 +975,7 @@
       return (
         <div className="page-container">
           <Sidebar />
-          <Header user={user} profile={profile} />
+          <Header />
           
           <main className="settings-content">
             <div className="settings-header">
@@ -1295,13 +1295,18 @@
 
     const root = ReactDOM.createRoot(document.getElementById('root'));
     
-    // Wait for all components to be loaded
+    // Wait for all components to be loaded and auth initialized
     function waitForComponents(callback, maxAttempts = 50) {
       let attempts = 0;
       const check = () => {
         attempts++;
         if (window.SocietyArts?.Sidebar && window.SocietyArts?.Header && window.SocietyArts?.useAuth) {
-          callback();
+          // Initialize auth before rendering
+          if (window.initializeAuth && !window.AuthState?.initialized) {
+            window.initializeAuth().then(callback);
+          } else {
+            callback();
+          }
         } else if (attempts < maxAttempts) {
           setTimeout(check, 100);
         } else {
