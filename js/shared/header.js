@@ -1,14 +1,14 @@
 /* ========================================
    SOCIETY ARTS - UNIFIED HEADER SYSTEM
    Single source of truth for header/sidebar across ALL pages
-   Version: 6.0 - True component unification
+   Version: 7.0 - Logo image header, fixed sidebar
    ======================================== */
 
 // ========================================
 // CONFIGURATION
 // ========================================
 const SITE_CONFIG = {
-    siteName: 'SOCIETY ARTS',
+    siteName: 'Society Arts',
     logoMonogram: 'https://pub-acb560f551f141db830964aed1fa005f.r2.dev/site-assets/SA_Monogram_Black%401x%201x1.png',
     logoWordmark: 'https://pub-acb560f551f141db830964aed1fa005f.r2.dev/site-assets/SA_Wordmark_Brown%401x.png',
     year: new Date().getFullYear()
@@ -175,7 +175,10 @@ function generateHeaderHTML(user, profile) {
     return `
         <header class="header" id="sa-header">
             <div class="header-brand">
-                <a href="/index.html" class="header-site-name">${SITE_CONFIG.siteName}</a>
+                <a href="/index.html" class="header-logo-link">
+                    <img src="${SITE_CONFIG.logoMonogram}" alt="${SITE_CONFIG.siteName}" class="header-logo-icon">
+                    <img src="${SITE_CONFIG.logoWordmark}" alt="${SITE_CONFIG.siteName}" class="header-logo-text">
+                </a>
             </div>
             <div class="header-right">
                 <a href="/story-builder.html" class="btn btn-primary new-project-btn">New Project</a>
@@ -215,11 +218,7 @@ function generateSidebarHTML() {
     
     return `
         <aside class="sidebar" id="sa-sidebar">
-            <a href="/index.html" class="sidebar-logo">
-                <img src="${SITE_CONFIG.logoMonogram}" alt="${SITE_CONFIG.siteName}" class="sidebar-logo-mono">
-                <img src="${SITE_CONFIG.logoWordmark}" alt="${SITE_CONFIG.siteName}" class="sidebar-logo-word">
-            </a>
-            <nav class="sidebar-nav">
+            <nav class="sidebar-nav sidebar-nav-main">
                 <ul>${mainNavItems}</ul>
             </nav>
             <nav class="sidebar-nav sidebar-nav-bottom">
@@ -318,11 +317,13 @@ async function handleLogout() {
 
 function openAdminUtilities() {
     closeUserMenu();
-    // Check if R2StyleUploader exists
-    if (window.R2StyleUploader) {
-        window.R2StyleUploader.open();
+    // On settings page, trigger the state change
+    if (window.setShowR2Uploader) {
+        window.setShowR2Uploader(true);
+    } else if (window.SocietyArts?.AdminUtils?.R2StyleUploader) {
+        // Navigate to settings if R2 uploader available but no state setter
+        window.location.href = '/settings.html?openUploader=true';
     } else {
-        alert('Admin Utilities not available on this page. Please go to Settings.');
         window.location.href = '/settings.html';
     }
 }
@@ -417,7 +418,10 @@ if (typeof React !== 'undefined') {
         return h(React.Fragment, null,
             h('header', { className: 'header', id: 'sa-header' },
                 h('div', { className: 'header-brand' },
-                    h('a', { href: '/index.html', className: 'header-site-name' }, SITE_CONFIG.siteName)
+                    h('a', { href: '/index.html', className: 'header-logo-link' },
+                        h('img', { src: SITE_CONFIG.logoMonogram, alt: SITE_CONFIG.siteName, className: 'header-logo-icon' }),
+                        h('img', { src: SITE_CONFIG.logoWordmark, alt: SITE_CONFIG.siteName, className: 'header-logo-text' })
+                    )
                 ),
                 h('div', { className: 'header-right' },
                     h('a', { href: '/story-builder.html', className: 'btn btn-primary new-project-btn' }, 'New Project'),
@@ -477,11 +481,7 @@ if (typeof React !== 'undefined') {
 
         return h(React.Fragment, null,
             h('aside', { className: 'sidebar', id: 'sa-sidebar' },
-                h('a', { href: '/index.html', className: 'sidebar-logo' },
-                    h('img', { src: SITE_CONFIG.logoMonogram, alt: SITE_CONFIG.siteName, className: 'sidebar-logo-mono' }),
-                    h('img', { src: SITE_CONFIG.logoWordmark, alt: SITE_CONFIG.siteName, className: 'sidebar-logo-word' })
-                ),
-                h('nav', { className: 'sidebar-nav' },
+                h('nav', { className: 'sidebar-nav sidebar-nav-main' },
                     h('ul', null,
                         NAV_ITEMS.map(item =>
                             h('li', { key: item.id },

@@ -852,6 +852,23 @@
       const [authModalOpen, setAuthModalOpen] = useState(false);
       const [showR2Uploader, setShowR2Uploader] = useState(false);
       
+      // Expose setShowR2Uploader globally for header dropdown
+      useEffect(() => {
+        window.setShowR2Uploader = setShowR2Uploader;
+        
+        // Check URL params to auto-open uploader
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('openUploader') === 'true') {
+          setShowR2Uploader(true);
+          // Clean up URL
+          window.history.replaceState({}, document.title, '/settings.html');
+        }
+        
+        return () => {
+          delete window.setShowR2Uploader;
+        };
+      }, []);
+      
       // Check if user is super admin
       const isSuperAdmin = profile?.role === 'super_admin';
       
