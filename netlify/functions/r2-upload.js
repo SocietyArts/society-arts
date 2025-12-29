@@ -345,12 +345,119 @@ exports.handler = async (event, context) => {
       };
     }
 
+    // Action: send-report - Send email confirmation of upload
+    if (action === 'send-report') {
+      const { email, report } = body;
+      
+      if (!email || !report) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ error: 'Missing email or report data' }),
+        };
+      }
+      
+      // Format the email content
+      const formatDuration = (seconds) => {
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.round(seconds % 60);
+        return mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
+      };
+      
+      const timestamp = new Date(report.timestamp).toLocaleString();
+      
+      let emailBody = `
+Society Arts™ - Style Upload Report
+====================================
+
+Upload completed at: ${timestamp}
+
+Summary:
+--------
+• Total Styles: ${report.totalFolders}
+• Successful: ${report.successCount}
+• Failed: ${report.errorCount}
+• Total Time: ${formatDuration(report.totalDuration)}
+
+Details:
+--------
+`;
+      
+      for (const result of report.results) {
+        const status = result.success ? '✓' : '✗';
+        emailBody += `${status} ${result.styleId} - ${result.success ? 'Success' : 'Failed: ' + result.error}`;
+        if (result.warnings && result.warnings.length > 0) {
+          emailBody += ` (Warning: ${result.warnings.join(', ')})`;
+        }
+        emailBody += `\n`;
+      }
+      
+      emailBody += `
+====================================
+This is an automated message from Society Arts™
+`;
+
+      // Check if we have email service configured
+      // For now, we'll log the email and return success
+      // In production, integrate with SendGrid, AWS SES, or similar
+      console.log('Email Report Request:');
+      console.log('To:', email);
+      console.log('Subject: Society Arts™ - Style Upload Report');
+      console.log('Body:', emailBody);
+      
+      // If SENDGRID_API_KEY is configured, send via SendGrid
+      if (process.env.SENDGRID_API_KEY) {
+        try {
+          const sgMail = require('@sendgrid/mail');
+          sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+          
+          await sgMail.send({
+            to: email,
+            from: process.env.SENDGRID_FROM_EMAIL || 'noreply@societyarts.com',
+            subject: 'Society Arts™ - Style Upload Report',
+            text: emailBody,
+          });
+          
+          return {
+            statusCode: 200,
+            headers,
+            body: JSON.stringify({ 
+              success: true, 
+              message: 'Email sent successfully' 
+            }),
+          };
+        } catch (emailError) {
+          console.error('SendGrid error:', emailError);
+          return {
+            statusCode: 500,
+            headers,
+            body: JSON.stringify({ 
+              success: false, 
+              error: 'Failed to send email',
+              details: emailError.message 
+            }),
+          };
+        }
+      }
+      
+      // No email service configured - return the report for display
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ 
+          success: true, 
+          message: 'Report generated (email service not configured)',
+          report: emailBody
+        }),
+      };
+    }
+
     return {
       statusCode: 400,
       headers,
       body: JSON.stringify({ 
         error: 'Invalid action',
-        validActions: ['validate', 'upload', 'check'],
+        validActions: ['validate', 'upload', 'check', 'send-report'],
       }),
     };
 

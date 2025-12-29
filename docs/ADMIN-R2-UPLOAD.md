@@ -1,8 +1,8 @@
-# Admin Utilities - R2 Style Upload
+# Admin Utilities - Upload Styles to Society Arts™
 
 ## Overview
 
-The R2 Style Upload utility allows SuperAdmin users to upload style folders directly to CloudFlare R2 from the Settings page. This eliminates the need to use rclone from the command line.
+The "Upload Styles to Society Arts™" utility allows SuperAdmin users to upload style folders directly to CloudFlare R2 from the Settings page. This eliminates the need to use rclone from the command line.
 
 ## Requirements
 
@@ -80,15 +80,23 @@ Examples: `ABF-49`, `XYZ-01`, `MNO-99`
 
 1. Navigate to Settings page
 2. Scroll to "Admin Utilities" section (visible only to SuperAdmins)
-3. Click "Upload Styles to R2"
+3. Click "Upload Styles to Society Arts™"
 4. Drag folders onto the drop zone OR click to select folders
 5. The system validates:
    - Style ID format
    - Presence of all 10 required WEBP files
    - Correct file naming
+   - Whether the Style ID exists in the database (warning only)
 6. Invalid folders are marked with errors
 7. Click "Upload" to send valid folders to R2
-8. Progress is shown for each folder
+8. During upload:
+   - Overall progress bar shows total completion
+   - Countdown timer estimates remaining time
+   - Current folder is highlighted and auto-scrolled into view
+   - Individual progress shown per folder
+9. When complete:
+   - Summary shows successful/failed counts
+   - Option to receive email confirmation with detailed report
 
 ### Features
 
@@ -97,7 +105,11 @@ Examples: `ABF-49`, `XYZ-01`, `MNO-99`
 - **Smart Filtering**: Only WEBP files matching the pattern are uploaded; other files are ignored
 - **Validation**: Client-side AND server-side validation
 - **Overwrite Option**: Choose to replace existing styles or skip them
-- **Progress Tracking**: Real-time upload progress per folder
+- **Overall Progress Bar**: Shows total upload progress across all folders
+- **Countdown Timer**: Estimates remaining time based on upload speed
+- **Auto-Scroll**: Automatically scrolls to the currently uploading folder
+- **Email Confirmation**: Option to receive detailed upload report via email
+- **Database Validation**: Warns if Style ID isn't in the Supabase database
 
 ## R2 Bucket Structure
 
@@ -144,6 +156,16 @@ The upload uses a Netlify serverless function at `/.netlify/functions/r2-upload`
 - `validate`: Check folder contents before uploading
 - `upload`: Upload validated files to R2
 - `check`: Check if a style already exists
+- `send-report`: Send email confirmation of upload (requires SendGrid configuration)
+
+### Email Configuration (Optional)
+
+To enable email confirmations, add these environment variables:
+
+```
+SENDGRID_API_KEY=<your-sendgrid-api-key>
+SENDGRID_FROM_EMAIL=noreply@societyarts.com
+```
 
 ## Security
 

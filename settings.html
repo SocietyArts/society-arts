@@ -671,6 +671,157 @@
       border-top: 1px solid var(--color-border-light);
       background: var(--color-tan-10);
     }
+    
+    /* Overall Progress Bar */
+    .r2-overall-progress {
+      padding: var(--space-lg) var(--space-xl);
+      background: linear-gradient(135deg, #BE185D 0%, #9D174D 100%);
+      color: white;
+    }
+    
+    .r2-overall-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-sm);
+    }
+    
+    .r2-overall-label {
+      font-weight: 600;
+    }
+    
+    .r2-time-remaining {
+      font-size: var(--text-sm);
+      opacity: 0.9;
+    }
+    
+    .r2-overall-bar {
+      height: 8px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .r2-overall-fill {
+      height: 100%;
+      background: white;
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+    
+    .r2-overall-percent {
+      text-align: center;
+      margin-top: var(--space-xs);
+      font-size: var(--text-sm);
+      font-weight: 600;
+    }
+    
+    /* Active folder indicator */
+    .r2-folder-item.active {
+      border-color: #BE185D;
+      background: #FDF2F8;
+      box-shadow: 0 0 0 2px rgba(190, 24, 93, 0.2);
+    }
+    
+    .r2-active-badge {
+      background: #BE185D;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-left: var(--space-sm);
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+    
+    /* Completion Modal */
+    .r2-completion-modal {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 400px;
+    }
+    
+    .r2-completion-content {
+      text-align: center;
+      padding: var(--space-2xl);
+    }
+    
+    .r2-completion-icon {
+      font-size: 64px;
+      margin-bottom: var(--space-lg);
+    }
+    
+    .r2-completion-content h2 {
+      font-family: var(--font-serif);
+      font-size: var(--text-2xl);
+      margin-bottom: var(--space-xl);
+      color: var(--color-text-primary);
+    }
+    
+    .r2-completion-stats {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-xl);
+      margin-bottom: var(--space-2xl);
+    }
+    
+    .r2-stat {
+      text-align: center;
+    }
+    
+    .r2-stat-value {
+      display: block;
+      font-size: var(--text-3xl);
+      font-weight: 700;
+      color: #059669;
+    }
+    
+    .r2-stat.error .r2-stat-value {
+      color: #DC2626;
+    }
+    
+    .r2-stat-label {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+    }
+    
+    .r2-email-prompt {
+      margin-top: var(--space-xl);
+    }
+    
+    .r2-email-prompt p {
+      margin-bottom: var(--space-md);
+      color: var(--color-text-secondary);
+    }
+    
+    .r2-email-address {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+      font-style: italic;
+    }
+    
+    .r2-completion-actions {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-md);
+      margin-top: var(--space-lg);
+    }
+    
+    .r2-email-sent {
+      margin-top: var(--space-xl);
+    }
+    
+    .r2-success-message {
+      font-size: var(--text-lg);
+      color: #059669;
+      margin-bottom: var(--space-lg);
+    }
   </style>
 </head>
 <body>
@@ -1101,7 +1252,7 @@
                         onClick={() => setShowR2Uploader(true)}
                       >
                         <UploadCloudIcon />
-                        <span>Upload Styles to R2</span>
+                        <span>Upload Styles to Society Arts™</span>
                       </button>
                       <button 
                         className="admin-tool-btn"
@@ -1132,7 +1283,8 @@
             <div className="r2-uploader-overlay" onClick={() => setShowR2Uploader(false)}>
               <div onClick={e => e.stopPropagation()}>
                 {React.createElement(window.SocietyArts.AdminUtils.R2StyleUploader, {
-                  onClose: () => setShowR2Uploader(false)
+                  onClose: () => setShowR2Uploader(false),
+                  userEmail: user?.email
                 })}
               </div>
             </div>

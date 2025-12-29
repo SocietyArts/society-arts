@@ -1,7 +1,7 @@
 /* ========================================
    SOCIETY ARTS - ADMIN UTILITIES
    SuperAdmin tools for style management
-   Version: 1.0
+   Version: 2.0
    ======================================== */
 
 // ========================================
@@ -208,20 +208,59 @@ const R2Upload = {
 // ========================================
 
 if (typeof React !== 'undefined') {
-  const { useState, useRef, useCallback } = React;
+  const { useState, useRef, useCallback, useEffect } = React;
+
+  /**
+   * Format time in mm:ss or hh:mm:ss
+   */
+  function formatTime(seconds) {
+    if (!seconds || seconds === Infinity || isNaN(seconds)) return '--:--';
+    seconds = Math.round(seconds);
+    const hours = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    if (hours > 0) {
+      return `${hours}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  }
 
   /**
    * R2 Style Uploader Component
    * Drag-and-drop folder upload for SuperAdmin
    */
-  function R2StyleUploader({ onClose }) {
+  function R2StyleUploader({ onClose, userEmail }) {
     const [folders, setFolders] = useState([]);
     const [validationResults, setValidationResults] = useState({});
     const [uploadStatus, setUploadStatus] = useState({});
     const [overwriteExisting, setOverwriteExisting] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const [dragOver, setDragOver] = useState(false);
+    const [showCompletionModal, setShowCompletionModal] = useState(false);
+    const [uploadReport, setUploadReport] = useState(null);
+    const [sendingEmail, setSendingEmail] = useState(false);
+    const [emailSent, setEmailSent] = useState(false);
+    
+    // Progress tracking
+    const [overallProgress, setOverallProgress] = useState(0);
+    const [currentFolderIndex, setCurrentFolderIndex] = useState(0);
+    const [startTime, setStartTime] = useState(null);
+    const [estimatedTimeRemaining, setEstimatedTimeRemaining] = useState(null);
+    const [uploadSpeed, setUploadSpeed] = useState(null); // folders per second
+    
     const fileInputRef = useRef(null);
+    const folderListRef = useRef(null);
+    const activeFolderRef = useRef(null);
+    
+    // Auto-scroll to active folder
+    useEffect(() => {
+      if (isUploading && activeFolderRef.current && folderListRef.current) {
+        activeFolderRef.current.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center' 
+        });
+      }
+    }, [currentFolderIndex, isUploading]);
     
     // Handle folder selection
     const handleFolderSelect = useCallback((fileList) => {
@@ -361,12 +400,28 @@ if (typeof React !== 'undefined') {
       if (validFolders.length === 0) return;
       
       setIsUploading(true);
+      setStartTime(Date.now());
+      setCurrentFolderIndex(0);
+      setOverallProgress(0);
       
-      for (const folder of validFolders) {
+      const results = [];
+      let successCount = 0;
+      let errorCount = 0;
+      
+      for (let i = 0; i < validFolders.length; i++) {
+        const folder = validFolders[i];
+        setCurrentFolderIndex(i);
+        
+        // Calculate overall progress
+        const baseProgress = (i / validFolders.length) * 100;
+        setOverallProgress(baseProgress);
+        
         setUploadStatus(prev => ({
           ...prev,
           [folder.name]: { status: 'uploading', progress: 0, message: 'Starting...' }
         }));
+        
+        const folderStartTime = Date.now();
         
         const result = await R2Upload.uploadStyle(
           folder.styleId,
@@ -380,9 +435,42 @@ if (typeof React !== 'undefined') {
                 message: progress.message
               }
             }));
+            
+            // Update overall progress with sub-progress
+            const subProgress = (progress.percent / 100) * (1 / validFolders.length) * 100;
+            setOverallProgress(baseProgress + subProgress);
           },
           overwriteExisting
         );
+        
+        const folderEndTime = Date.now();
+        const folderDuration = (folderEndTime - folderStartTime) / 1000;
+        
+        // Update time estimate based on actual upload speed
+        const completedFolders = i + 1;
+        const remainingFolders = validFolders.length - completedFolders;
+        const elapsedTime = (folderEndTime - startTime) / 1000;
+        const avgTimePerFolder = elapsedTime / completedFolders;
+        const newEstimate = avgTimePerFolder * remainingFolders;
+        
+        setEstimatedTimeRemaining(newEstimate);
+        setUploadSpeed(completedFolders / elapsedTime);
+        
+        if (result.success) {
+          successCount++;
+        } else {
+          errorCount++;
+        }
+        
+        results.push({
+          styleId: folder.styleId,
+          folderName: folder.name,
+          success: result.success,
+          error: result.error,
+          warnings: result.warnings || [],
+          filesUploaded: result.success ? 10 : 0,
+          duration: folderDuration
+        });
         
         setUploadStatus(prev => ({
           ...prev,
@@ -395,7 +483,65 @@ if (typeof React !== 'undefined') {
         }));
       }
       
+      const endTime = Date.now();
+      const totalDuration = (endTime - startTime) / 1000;
+      
+      // Create upload report
+      const report = {
+        timestamp: new Date().toISOString(),
+        totalFolders: validFolders.length,
+        successCount,
+        errorCount,
+        totalDuration,
+        results
+      };
+      
+      setUploadReport(report);
+      setOverallProgress(100);
       setIsUploading(false);
+      setEstimatedTimeRemaining(0);
+      
+      // Show completion modal
+      setShowCompletionModal(true);
+    };
+    
+    // Send email report
+    const handleSendEmail = async () => {
+      if (!userEmail || !uploadReport) return;
+      
+      setSendingEmail(true);
+      
+      try {
+        const response = await fetch('/.netlify/functions/r2-upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'send-report',
+            email: userEmail,
+            report: uploadReport
+          })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          setEmailSent(true);
+        } else {
+          console.error('Failed to send email:', result.error);
+          alert('Failed to send email. Please try again.');
+        }
+      } catch (error) {
+        console.error('Email error:', error);
+        alert('Failed to send email. Please try again.');
+      }
+      
+      setSendingEmail(false);
+    };
+    
+    // Close completion modal and main uploader
+    const handleCloseCompletion = () => {
+      setShowCompletionModal(false);
+      onClose();
     };
     
     // Remove a folder from the list
@@ -422,21 +568,94 @@ if (typeof React !== 'undefined') {
     };
     
     const validCount = folders.filter(f => f.validation.valid).length;
-    const hasUploaded = Object.values(uploadStatus).some(s => s.status === 'success');
+    const validFolders = folders.filter(f => f.validation.valid);
+    
+    // Completion Modal
+    if (showCompletionModal && uploadReport) {
+      return React.createElement('div', { className: 'r2-uploader r2-completion-modal' },
+        React.createElement('div', { className: 'r2-completion-content' },
+          React.createElement('div', { className: 'r2-completion-icon' },
+            uploadReport.errorCount === 0 ? '✅' : '⚠️'
+          ),
+          React.createElement('h2', null, 'Upload Complete!'),
+          React.createElement('div', { className: 'r2-completion-stats' },
+            React.createElement('div', { className: 'r2-stat' },
+              React.createElement('span', { className: 'r2-stat-value' }, uploadReport.successCount),
+              React.createElement('span', { className: 'r2-stat-label' }, 'Successful')
+            ),
+            uploadReport.errorCount > 0 && React.createElement('div', { className: 'r2-stat error' },
+              React.createElement('span', { className: 'r2-stat-value' }, uploadReport.errorCount),
+              React.createElement('span', { className: 'r2-stat-label' }, 'Failed')
+            ),
+            React.createElement('div', { className: 'r2-stat' },
+              React.createElement('span', { className: 'r2-stat-value' }, formatTime(uploadReport.totalDuration)),
+              React.createElement('span', { className: 'r2-stat-label' }, 'Total Time')
+            )
+          ),
+          
+          !emailSent ? React.createElement('div', { className: 'r2-email-prompt' },
+            React.createElement('p', null, 'Would you like to receive an email confirmation with upload details?'),
+            userEmail && React.createElement('p', { className: 'r2-email-address' }, `Email will be sent to: ${userEmail}`),
+            React.createElement('div', { className: 'r2-completion-actions' },
+              React.createElement('button', {
+                className: 'btn btn-secondary',
+                onClick: handleCloseCompletion,
+                disabled: sendingEmail
+              }, 'No Thanks'),
+              React.createElement('button', {
+                className: 'btn btn-primary',
+                onClick: handleSendEmail,
+                disabled: sendingEmail || !userEmail
+              }, sendingEmail ? 'Sending...' : 'Yes, Send Email')
+            )
+          ) : React.createElement('div', { className: 'r2-email-sent' },
+            React.createElement('p', { className: 'r2-success-message' }, '📧 Email confirmation sent!'),
+            React.createElement('button', {
+              className: 'btn btn-primary',
+              onClick: handleCloseCompletion
+            }, 'Done')
+          )
+        )
+      );
+    }
     
     return React.createElement('div', { className: 'r2-uploader' },
       // Header
       React.createElement('div', { className: 'r2-uploader-header' },
-        React.createElement('h2', null, 'Upload Styles to R2'),
+        React.createElement('h2', null, 'Upload Styles to Society Arts™'),
         React.createElement('button', { 
           className: 'r2-close-btn',
           onClick: onClose,
-          'aria-label': 'Close'
+          'aria-label': 'Close',
+          disabled: isUploading
         }, '×')
       ),
       
+      // Overall Progress (when uploading)
+      isUploading && React.createElement('div', { className: 'r2-overall-progress' },
+        React.createElement('div', { className: 'r2-overall-header' },
+          React.createElement('span', { className: 'r2-overall-label' }, 
+            `Uploading ${currentFolderIndex + 1} of ${validCount} styles`
+          ),
+          React.createElement('span', { className: 'r2-time-remaining' },
+            estimatedTimeRemaining !== null && estimatedTimeRemaining > 0
+              ? `⏱️ ${formatTime(estimatedTimeRemaining)} remaining`
+              : ''
+          )
+        ),
+        React.createElement('div', { className: 'r2-overall-bar' },
+          React.createElement('div', { 
+            className: 'r2-overall-fill',
+            style: { width: `${overallProgress}%` }
+          })
+        ),
+        React.createElement('div', { className: 'r2-overall-percent' }, 
+          `${Math.round(overallProgress)}%`
+        )
+      ),
+      
       // Drop Zone
-      React.createElement('div', {
+      !isUploading && React.createElement('div', {
         className: `r2-drop-zone ${dragOver ? 'drag-over' : ''} ${folders.length > 0 ? 'has-folders' : ''}`,
         onDragOver: handleDragOver,
         onDragLeave: handleDragLeave,
@@ -468,28 +687,33 @@ if (typeof React !== 'undefined') {
       ),
       
       // Folder List
-      folders.length > 0 && React.createElement('div', { className: 'r2-folder-list' },
+      folders.length > 0 && React.createElement('div', { 
+        className: 'r2-folder-list',
+        ref: folderListRef
+      },
         React.createElement('div', { className: 'r2-list-header' },
-          React.createElement('span', null, `${folders.length} folder${folders.length !== 1 ? 's' : ''} selected`),
-          React.createElement('button', { 
+          React.createElement('span', null, `${folders.length} folder${folders.length !== 1 ? 's' : ''} selected (${validCount} valid)`),
+          !isUploading && React.createElement('button', { 
             className: 'r2-clear-btn',
-            onClick: clearAll,
-            disabled: isUploading
+            onClick: clearAll
           }, 'Clear All')
         ),
         
-        folders.map(folder => {
+        folders.map((folder, index) => {
           const status = uploadStatus[folder.name];
           const validation = folder.validation;
+          const isActive = isUploading && validFolders[currentFolderIndex]?.name === folder.name;
           
           return React.createElement('div', { 
             key: folder.name,
-            className: `r2-folder-item ${validation.valid ? 'valid' : 'invalid'} ${status?.status || ''}`
+            ref: isActive ? activeFolderRef : null,
+            className: `r2-folder-item ${validation.valid ? 'valid' : 'invalid'} ${status?.status || ''} ${isActive ? 'active' : ''}`
           },
             React.createElement('div', { className: 'r2-folder-info' },
               React.createElement('div', { className: 'r2-folder-name' },
                 React.createElement('span', { className: 'r2-style-id' }, folder.styleId),
-                !validation.valid && React.createElement('span', { className: 'r2-error-badge' }, 'Invalid')
+                !validation.valid && React.createElement('span', { className: 'r2-error-badge' }, 'Invalid'),
+                isActive && React.createElement('span', { className: 'r2-active-badge' }, '● Uploading')
               ),
               React.createElement('div', { className: 'r2-folder-meta' },
                 `${validation.foundCount}/${validation.expectedCount} files`
@@ -535,34 +759,28 @@ if (typeof React !== 'undefined') {
       ),
       
       // Options
-      folders.length > 0 && React.createElement('div', { className: 'r2-options' },
+      folders.length > 0 && !isUploading && React.createElement('div', { className: 'r2-options' },
         React.createElement('label', { className: 'r2-checkbox-label' },
           React.createElement('input', {
             type: 'checkbox',
             checked: overwriteExisting,
-            onChange: (e) => setOverwriteExisting(e.target.checked),
-            disabled: isUploading
+            onChange: (e) => setOverwriteExisting(e.target.checked)
           }),
           'Overwrite existing styles in R2'
         )
       ),
       
       // Actions
-      React.createElement('div', { className: 'r2-actions' },
+      !isUploading && React.createElement('div', { className: 'r2-actions' },
         React.createElement('button', {
           className: 'btn btn-secondary',
-          onClick: onClose,
-          disabled: isUploading
-        }, hasUploaded ? 'Done' : 'Cancel'),
+          onClick: onClose
+        }, 'Cancel'),
         React.createElement('button', {
           className: 'btn btn-primary',
           onClick: handleUpload,
-          disabled: isUploading || validCount === 0
-        }, 
-          isUploading 
-            ? 'Uploading...' 
-            : `Upload ${validCount} Style${validCount !== 1 ? 's' : ''}`
-        )
+          disabled: validCount === 0
+        }, `Upload ${validCount} Style${validCount !== 1 ? 's' : ''}`)
       )
     );
   }
