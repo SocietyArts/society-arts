@@ -71,15 +71,6 @@
       color: #FAF8F5;
     }
     
-    .panel-header-active .panel-info-btn {
-      color: #FAF8F5;
-      opacity: 0.8;
-    }
-    
-    .panel-header-active .panel-info-btn:hover {
-      opacity: 1;
-    }
-    
     .panel-header-title {
       font-family: 'Domine', var(--font-serif);
       font-size: 20px;
@@ -95,56 +86,91 @@
       background: none;
       border: none;
       cursor: pointer;
-      color: var(--color-text-muted);
       padding: 4px;
       border-radius: var(--radius-sm);
       display: flex;
       align-items: center;
       justify-content: center;
       transition: all 0.15s;
+      opacity: 0.7;
     }
     
     .panel-info-btn:hover,
     .panel-info-btn.active {
-      color: var(--color-text-primary);
-      background: var(--color-surface-hover);
+      opacity: 1;
+      background: rgba(0,0,0,0.1);
     }
     
-    /* Panel Info Tooltip */
+    .panel-header-active .panel-info-btn {
+      opacity: 0.8;
+    }
+    
+    .panel-header-active .panel-info-btn:hover,
+    .panel-header-active .panel-info-btn.active {
+      opacity: 1;
+      background: rgba(255,255,255,0.15);
+    }
+    
+    /* Info icon - uses fill for better visibility */
+    .panel-info-btn svg,
+    .chat-info-btn svg,
+    .styles-info-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+    
+    /* Dark header - white icon */
+    .panel-header-active .panel-info-btn svg {
+      fill: #FAF8F5;
+    }
+    
+    /* Light header - dark icon */
+    .panel-info-btn svg {
+      fill: var(--color-text-secondary);
+    }
+    
+    /* Panel Info Tooltip - positioned below icon */
     .panel-info-tooltip {
       position: absolute;
-      top: calc(100% + 8px);
+      top: calc(100% + 4px);
       right: 0;
       z-index: 100;
-      width: 280px;
+      width: 300px;
     }
     
     .panel-info-content {
       background: white;
       border-radius: var(--radius-lg);
       padding: var(--space-lg);
-      box-shadow: 0 8px 32px rgba(62, 35, 24, 0.15);
+      box-shadow: 0 8px 32px rgba(62, 35, 24, 0.2);
       border: 1px solid var(--color-border-light);
     }
     
     .panel-info-content h4 {
-      font-family: var(--font-serif);
-      font-size: var(--text-base);
+      font-family: 'Domine', var(--font-serif);
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--color-text-primary);
       margin: 0 0 var(--space-sm) 0;
     }
     
     .panel-info-content p {
-      font-size: var(--text-sm);
+      font-size: 14px;
       color: var(--color-text-secondary);
       margin: 0 0 var(--space-md) 0;
-      line-height: 1.5;
+      line-height: 1.6;
+    }
+    
+    .panel-info-content p:last-of-type {
+      margin-bottom: var(--space-md);
     }
     
     .panel-info-content ul {
       margin: 0 0 var(--space-md) 0;
       padding-left: var(--space-lg);
-      font-size: var(--text-sm);
+      font-size: 14px;
       color: var(--color-text-secondary);
+      line-height: 1.6;
     }
     
     .panel-info-content li {
@@ -154,16 +180,94 @@
     .panel-info-close {
       background: var(--color-tan-10);
       border: none;
-      padding: 8px 16px;
+      padding: 10px 16px;
       border-radius: var(--radius-md);
-      font-size: var(--text-sm);
+      font-size: 14px;
+      font-weight: 500;
       cursor: pointer;
       width: 100%;
       transition: background 0.15s;
+      color: var(--color-text-primary);
     }
     
     .panel-info-close:hover {
       background: var(--color-tan-20);
+    }
+
+    /* Chat panel info button */
+    .chat-info-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+      opacity: 0.7;
+    }
+    
+    .chat-info-btn:hover {
+      opacity: 1;
+      background: rgba(0,0,0,0.1);
+    }
+    
+    .chat-title-bar .chat-info-btn {
+      opacity: 0.8;
+    }
+    
+    .chat-title-bar .chat-info-btn:hover {
+      opacity: 1;
+      background: rgba(255,255,255,0.15);
+    }
+    
+    .chat-title-bar .chat-info-btn svg {
+      fill: #FAF8F5;
+    }
+    
+    .chat-title-bar-empty .chat-info-btn svg {
+      fill: var(--color-text-secondary);
+    }
+    
+    /* Styles panel info button */
+    .styles-info-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+      opacity: 0.8;
+    }
+    
+    .styles-info-btn:hover {
+      opacity: 1;
+      background: rgba(255,255,255,0.15);
+    }
+    
+    .styles-info-btn svg {
+      fill: #FAF8F5;
+    }
+    
+    /* Styles info tooltip */
+    .styles-info-tooltip {
+      position: absolute;
+      top: calc(100% + 4px);
+      right: 0;
+      z-index: 100;
+      width: 300px;
+    }
+    
+    .styles-info-tooltip .panel-info-content {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      box-shadow: 0 8px 32px rgba(62, 35, 24, 0.2);
+      border: 1px solid var(--color-border-light);
     }
     
     /* Story badges moved inside card content */
@@ -436,19 +540,6 @@
     
     .styles-info-btn:hover {
       opacity: 1;
-    }
-    
-    .styles-info-tooltip {
-      position: absolute;
-      top: calc(100% + 8px);
-      right: 0;
-      z-index: 100;
-      width: 260px;
-      background: white;
-      border-radius: var(--radius-lg);
-      padding: var(--space-lg);
-      box-shadow: 0 8px 32px rgba(62, 35, 24, 0.15);
-      border: 1px solid var(--color-border-light);
     }
     
     .styles-list {
@@ -3410,10 +3501,8 @@
                     onClick={() => setShowChatInfo(!showChatInfo)}
                     title="About this panel"
                   >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <line x1="12" y1="16" x2="12" y2="12"></line>
-                      <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    <svg viewBox="0 0 128 128" width="20" height="20">
+                      <path d="M 64 6 C 32 6 6 32 6 64 C 6 96 32 122 64 122 C 96 122 122 96 122 64 C 122 32 96 6 64 6 z M 64 12 C 92.7 12 116 35.3 116 64 C 116 92.7 92.7 116 64 116 C 35.3 116 12 92.7 12 64 C 12 35.3 35.3 12 64 12 z M 64 30 A 9 9 0 0 0 64 48 A 9 9 0 0 0 64 30 z M 64 59 C 59 59 55 63 55 68 L 55 92 C 55 97 59 101 64 101 C 69 101 73 97 73 92 L 73 68 C 73 63 69 59 64 59 z"/>
                     </svg>
                   </button>
                 </div>
@@ -3425,49 +3514,27 @@
                     onClick={() => setShowChatInfo(!showChatInfo)}
                     title="About this panel"
                   >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <line x1="12" y1="16" x2="12" y2="12"></line>
-                      <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    <svg viewBox="0 0 128 128" width="20" height="20">
+                      <path d="M 64 6 C 32 6 6 32 6 64 C 6 96 32 122 64 122 C 96 122 122 96 122 64 C 122 32 96 6 64 6 z M 64 12 C 92.7 12 116 35.3 116 64 C 116 92.7 92.7 116 64 116 C 35.3 116 12 92.7 12 64 C 12 35.3 35.3 12 64 12 z M 64 30 A 9 9 0 0 0 64 48 A 9 9 0 0 0 64 30 z M 64 59 C 59 59 55 63 55 68 L 55 92 C 55 97 59 101 64 101 C 69 101 73 97 73 92 L 73 68 C 73 63 69 59 64 59 z"/>
                     </svg>
                   </button>
                 </div>
               )}
               
               {showChatInfo && (
-                <div style={{
-                  position: 'absolute',
-                  top: '56px',
-                  right: 'var(--space-md)',
-                  zIndex: 100,
-                  width: '280px',
-                  background: 'white',
-                  borderRadius: 'var(--radius-lg)',
-                  padding: 'var(--space-lg)',
-                  boxShadow: '0 8px 32px rgba(62, 35, 24, 0.15)',
-                  border: '1px solid var(--color-border-light)'
-                }}>
-                  <h4 style={{ fontFamily: 'var(--font-serif)', fontSize: 'var(--text-base)', margin: '0 0 var(--space-sm) 0' }}>Your Story Title</h4>
-                  <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)', margin: '0 0 var(--space-md) 0', lineHeight: 1.5 }}>
-                    As you share your story through conversation, I'll automatically generate a title that captures the essence of your narrative.
-                  </p>
-                  <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)', margin: '0 0 var(--space-md) 0', lineHeight: 1.5 }}>
-                    The title bar will turn dark when your story has developed enough for me to name it.
-                  </p>
-                  <button 
-                    onClick={() => setShowChatInfo(false)}
-                    style={{
-                      background: 'var(--color-tan-10)',
-                      border: 'none',
-                      padding: '8px 16px',
-                      borderRadius: 'var(--radius-md)',
-                      fontSize: 'var(--text-sm)',
-                      cursor: 'pointer',
-                      width: '100%'
-                    }}
-                  >
-                    Got it
-                  </button>
+                <div className="panel-info-tooltip" style={{ top: '52px', right: 'var(--space-md)' }}>
+                  <div className="panel-info-content">
+                    <h4>Build Your Story</h4>
+                    <p>
+                      This is where your story comes to life. Share your memory or idea by typing in the chat below, or click the voice icon to speak naturally — I'll listen and capture your words.
+                    </p>
+                    <p>
+                      As your story develops, a title will automatically appear above. The title bar turns dark when your narrative is complete enough to name.
+                    </p>
+                    <button className="panel-info-close" onClick={() => setShowChatInfo(false)}>
+                      Got it
+                    </button>
+                  </div>
                 </div>
               )}
               
@@ -3531,36 +3598,25 @@
                   onClick={() => setShowStylesInfo(!showStylesInfo)}
                   title="About this panel"
                 >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="16" x2="12" y2="12"></line>
-                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                  <svg viewBox="0 0 128 128" width="20" height="20">
+                    <path d="M 64 6 C 32 6 6 32 6 64 C 6 96 32 122 64 122 C 96 122 122 96 122 64 C 122 32 96 6 64 6 z M 64 12 C 92.7 12 116 35.3 116 64 C 116 92.7 92.7 116 64 116 C 35.3 116 12 92.7 12 64 C 12 35.3 35.3 12 64 12 z M 64 30 A 9 9 0 0 0 64 48 A 9 9 0 0 0 64 30 z M 64 59 C 59 59 55 63 55 68 L 55 92 C 55 97 59 101 64 101 C 69 101 73 97 73 92 L 73 68 C 73 63 69 59 64 59 z"/>
                   </svg>
                 </button>
                 
                 {showStylesInfo && (
                   <div className="styles-info-tooltip">
-                    <h4 style={{ fontFamily: 'var(--font-serif)', fontSize: 'var(--text-base)', margin: '0 0 var(--space-sm) 0' }}>Your Styles</h4>
-                    <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)', margin: '0 0 var(--space-md) 0', lineHeight: 1.5 }}>
-                      Select up to 4 artistic styles that will influence how your story becomes a visual artwork.
-                    </p>
-                    <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)', margin: '0 0 var(--space-md) 0', lineHeight: 1.5 }}>
-                      Click "Add Style" to browse our collection and find the perfect aesthetic for your vision.
-                    </p>
-                    <button 
-                      onClick={() => setShowStylesInfo(false)}
-                      style={{
-                        background: 'var(--color-tan-10)',
-                        border: 'none',
-                        padding: '8px 16px',
-                        borderRadius: 'var(--radius-md)',
-                        fontSize: 'var(--text-sm)',
-                        cursor: 'pointer',
-                        width: '100%'
-                      }}
-                    >
-                      Got it
-                    </button>
+                    <div className="panel-info-content">
+                      <h4>Choose Your Art Styles</h4>
+                      <p>
+                        Select up to 4 artistic styles that will shape how your story becomes visual art. Each style brings a unique aesthetic — from watercolors to bold oils, photography to illustration.
+                      </p>
+                      <p>
+                        Click "Add Style" to open the Style Finder, where you can browse by medium, mood, or search for exactly what you envision.
+                      </p>
+                      <button className="panel-info-close" onClick={() => setShowStylesInfo(false)}>
+                        Got it
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>

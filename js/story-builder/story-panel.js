@@ -1,8 +1,20 @@
 /* ========================================
    SOCIETY ARTS - STORY PANEL
    Left sidebar for story display
-   Version: 5.0 (v20)
+   Version: 5.1 (v21) - Updated info icons & tooltips
    ======================================== */
+
+/**
+ * Info Icon SVG Component - Pastel Glyph Style
+ * Uses fill instead of stroke for better visibility
+ */
+function InfoIcon({ className }) {
+  return (
+    <svg viewBox="0 0 128 128" width="20" height="20" className={className}>
+      <path d="M 64 6 C 32 6 6 32 6 64 C 6 96 32 122 64 122 C 96 122 122 96 122 64 C 122 32 96 6 64 6 z M 64 12 C 92.7 12 116 35.3 116 64 C 116 92.7 92.7 116 64 116 C 35.3 116 12 92.7 12 64 C 12 35.3 35.3 12 64 12 z M 64 30 A 9 9 0 0 0 64 48 A 9 9 0 0 0 64 30 z M 64 59 C 59 59 55 63 55 68 L 55 92 C 55 97 59 101 64 101 C 69 101 73 97 73 92 L 73 68 C 73 63 69 59 64 59 z"/>
+    </svg>
+  );
+}
 
 /**
  * Panel Header Component (reusable for all 3 panels)
@@ -19,11 +31,7 @@ function PanelHeader({ title, hasContent, infoContent, onInfoClick, showInfo }) 
           onClick={onInfoClick}
           title="More info"
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="12" y1="16" x2="12" y2="12"></line>
-            <line x1="12" y1="8" x2="12.01" y2="8"></line>
-          </svg>
+          <InfoIcon />
         </button>
       )}
     </div>
@@ -84,11 +92,12 @@ function StoryCard({ story, isVoiceMode, transformedStory, transformLabel, onCle
       
       <InfoTooltip show={showInfo} onClose={() => setShowInfo(false)}>
         <h4>Your Story</h4>
-        <p>This panel captures your story as you share it through voice or text conversation.</p>
-        <ul>
-          <li><strong>Auto-populates</strong> as you tell your story</li>
-          <li><strong>Editable</strong> — type directly or refine any words</li>
-        </ul>
+        <p>
+          This panel displays your story as it develops. You can type or paste your story directly here, or it will auto-populate as you share through the conversation in the center panel.
+        </p>
+        <p>
+          Feel free to edit any text — click anywhere to refine words, add details, or make changes. Your story is always editable until you generate your artwork.
+        </p>
       </InfoTooltip>
       
       <div className="card-content">
@@ -270,7 +279,15 @@ function VariationSelector({ currentStory, onVariationApplied, disabled }) {
       
       <InfoTooltip show={showInfo} onClose={() => setShowInfo(false)}>
         <h4>Transform Your Story</h4>
-        <p>These tools help you refine your story for the best visual results. Hover over each option to learn more about what it does.</p>
+        <p>
+          These optional tools can enhance your story for better visual results. Each transformation offers a unique approach:
+        </p>
+        <p>
+          <strong>Optimize</strong> refines your words for the AI. <strong>Enrich</strong> adds vivid detail. <strong>Simplify</strong> distills to the core concept. <strong>No People</strong> removes human figures for symbolic representation.
+        </p>
+        <p>
+          Hover over each button to learn more, or try one to see how it transforms your story.
+        </p>
       </InfoTooltip>
       
       <div className="variation-buttons">
@@ -351,6 +368,7 @@ if (typeof window !== 'undefined') {
   window.SocietyArts.StoryPanel = {
     PanelHeader,
     InfoTooltip,
+    InfoIcon,
     StoryCard,
     VariationSelector,
     StoryPanel
