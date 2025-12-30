@@ -91,7 +91,7 @@ function StoryCard({ story, isVoiceMode, transformedStory, transformLabel, onCle
       />
       
       <InfoTooltip show={showInfo} onClose={() => setShowInfo(false)}>
-        <h4>Your Story</h4>
+        <h4 style={{ color: '#3E2318' }}>Your Story</h4>
         <p>
           This panel displays your story as it develops. You can type or paste your story directly here, or it will auto-populate as you share through the conversation in the center panel.
         </p>
@@ -278,7 +278,7 @@ function VariationSelector({ currentStory, onVariationApplied, disabled }) {
       />
       
       <InfoTooltip show={showInfo} onClose={() => setShowInfo(false)}>
-        <h4>Transform Your Story</h4>
+        <h4 style={{ color: '#3E2318' }}>Transform Your Story</h4>
         <p>
           These optional tools can enhance your story for better visual results. Each transformation offers a unique approach:
         </p>

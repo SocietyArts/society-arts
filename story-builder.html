@@ -150,7 +150,7 @@
       font-family: 'Domine', var(--font-serif);
       font-size: 16px;
       font-weight: 600;
-      color: var(--color-text-primary);
+      color: #3E2318;
       margin: 0 0 var(--space-sm) 0;
     }
     
@@ -498,16 +498,10 @@
       align-items: center;
       justify-content: center;
       padding: 14px var(--space-xl);
-      border-bottom: 1px solid var(--color-border-light);
       position: relative;
-      background: var(--color-surface-alt);
-      margin: 0;
-    }
-    
-    .styles-panel-header.has-styles {
       background: #3E2318;
       color: #FAF8F5;
-      border-bottom: none;
+      margin: 0;
     }
     
     .styles-panel-title {
@@ -524,22 +518,22 @@
       background: none;
       border: none;
       cursor: pointer;
-      color: var(--color-text-muted);
       padding: 4px;
       border-radius: var(--radius-sm);
       display: flex;
       align-items: center;
       justify-content: center;
       transition: all 0.15s;
-    }
-    
-    .styles-panel-header.has-styles .styles-info-btn {
-      color: #FAF8F5;
       opacity: 0.8;
     }
     
     .styles-info-btn:hover {
       opacity: 1;
+      background: rgba(255,255,255,0.15);
+    }
+    
+    .styles-info-btn svg {
+      fill: #FAF8F5;
     }
     
     .styles-list {
@@ -3505,6 +3499,22 @@
                       <path d="M 64 6 C 32 6 6 32 6 64 C 6 96 32 122 64 122 C 96 122 122 96 122 64 C 122 32 96 6 64 6 z M 64 12 C 92.7 12 116 35.3 116 64 C 116 92.7 92.7 116 64 116 C 35.3 116 12 92.7 12 64 C 12 35.3 35.3 12 64 12 z M 64 30 A 9 9 0 0 0 64 48 A 9 9 0 0 0 64 30 z M 64 59 C 59 59 55 63 55 68 L 55 92 C 55 97 59 101 64 101 C 69 101 73 97 73 92 L 73 68 C 73 63 69 59 64 59 z"/>
                     </svg>
                   </button>
+                  {showChatInfo && (
+                    <div className="panel-info-tooltip">
+                      <div className="panel-info-content">
+                        <h4 style={{ color: '#3E2318' }}>Build Your Story</h4>
+                        <p>
+                          This is where your story comes to life. Share your memory or idea by typing in the chat below, or click the voice icon to speak naturally — I'll listen and capture your words.
+                        </p>
+                        <p>
+                          As your story develops, a title will automatically appear above. The title bar turns dark when your narrative is complete enough to name.
+                        </p>
+                        <button className="panel-info-close" onClick={() => setShowChatInfo(false)}>
+                          Got it
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="chat-title-bar-empty">
@@ -3518,23 +3528,22 @@
                       <path d="M 64 6 C 32 6 6 32 6 64 C 6 96 32 122 64 122 C 96 122 122 96 122 64 C 122 32 96 6 64 6 z M 64 12 C 92.7 12 116 35.3 116 64 C 116 92.7 92.7 116 64 116 C 35.3 116 12 92.7 12 64 C 12 35.3 35.3 12 64 12 z M 64 30 A 9 9 0 0 0 64 48 A 9 9 0 0 0 64 30 z M 64 59 C 59 59 55 63 55 68 L 55 92 C 55 97 59 101 64 101 C 69 101 73 97 73 92 L 73 68 C 73 63 69 59 64 59 z"/>
                     </svg>
                   </button>
-                </div>
-              )}
-              
-              {showChatInfo && (
-                <div className="panel-info-tooltip" style={{ top: '52px', right: 'var(--space-md)' }}>
-                  <div className="panel-info-content">
-                    <h4>Build Your Story</h4>
-                    <p>
-                      This is where your story comes to life. Share your memory or idea by typing in the chat below, or click the voice icon to speak naturally — I'll listen and capture your words.
-                    </p>
-                    <p>
-                      As your story develops, a title will automatically appear above. The title bar turns dark when your narrative is complete enough to name.
-                    </p>
-                    <button className="panel-info-close" onClick={() => setShowChatInfo(false)}>
-                      Got it
-                    </button>
-                  </div>
+                  {showChatInfo && (
+                    <div className="panel-info-tooltip">
+                      <div className="panel-info-content">
+                        <h4 style={{ color: '#3E2318' }}>Build Your Story</h4>
+                        <p>
+                          This is where your story comes to life. Share your memory or idea by typing in the chat below, or click the voice icon to speak naturally — I'll listen and capture your words.
+                        </p>
+                        <p>
+                          As your story develops, a title will automatically appear above. The title bar turns dark when your narrative is complete enough to name.
+                        </p>
+                        <button className="panel-info-close" onClick={() => setShowChatInfo(false)}>
+                          Got it
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
               
@@ -3591,7 +3600,7 @@
             
             {/* Right Column - Styles */}
             <div className="styles-column">
-              <div className={`styles-panel-header ${selectedStyles.length > 0 ? 'has-styles' : ''}`}>
+              <div className="styles-panel-header">
                 <span className="styles-panel-title">Your Styles</span>
                 <button 
                   className="styles-info-btn"
@@ -3606,7 +3615,7 @@
                 {showStylesInfo && (
                   <div className="styles-info-tooltip">
                     <div className="panel-info-content">
-                      <h4>Choose Your Art Styles</h4>
+                      <h4 style={{ color: '#3E2318' }}>Choose Your Art Styles</h4>
                       <p>
                         Select up to 4 artistic styles that will shape how your story becomes visual art. Each style brings a unique aesthetic — from watercolors to bold oils, photography to illustration.
                       </p>
