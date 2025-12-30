@@ -1422,21 +1422,28 @@
             .limit(500);
           
           if (error) throw error;
+          console.log('[DEBUG] Styles loaded:', stylesData?.length);
 
           // Load art medium assignments from junction table
-          const { data: artMediumLinks } = await supabase
+          const { data: artMediumLinks, error: amError } = await supabase
             .from('style_art_mediums')
             .select('style_id, art_medium_id');
 
+          console.log('[DEBUG] Art medium query error:', amError);
+          console.log('[DEBUG] Art medium links:', artMediumLinks);
+
           // Build a map of style_id -> array of art_medium_ids
           const artMediumMap = {};
-          if (artMediumLinks) {
+          if (artMediumLinks && artMediumLinks.length > 0) {
             artMediumLinks.forEach(link => {
               if (!artMediumMap[link.style_id]) {
                 artMediumMap[link.style_id] = [];
               }
               artMediumMap[link.style_id].push(link.art_medium_id);
             });
+            console.log('[DEBUG] Art medium map:', artMediumMap);
+          } else {
+            console.log('[DEBUG] No art medium links found!');
           }
 
           // Merge art mediums with styles
@@ -1444,6 +1451,10 @@
             ...s,
             art_medium_ids: artMediumMap[s.id] || []
           }));
+
+          // Debug: Check a few styles
+          const stylesWithMediums = stylesWithAttrs.filter(s => s.art_medium_ids.length > 0);
+          console.log('[DEBUG] Styles with mediums:', stylesWithMediums.length, stylesWithMediums);
 
           setAllStyles(stylesWithAttrs);
           setFilteredStyles(stylesWithAttrs);
