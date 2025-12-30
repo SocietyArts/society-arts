@@ -425,7 +425,7 @@
       gap: var(--space-sm);
       font-family: 'Domine', var(--font-serif);
       font-size: 20px;
-      font-weight: var(--weight-medium);
+      font-weight: 600;
       color: var(--color-text-muted);
       flex-shrink: 0;
       position: relative;
@@ -499,15 +499,21 @@
       justify-content: center;
       padding: 14px var(--space-xl);
       position: relative;
+      background: var(--color-surface-alt);
+      border-bottom: 1px solid var(--color-border-light);
+      margin: 0;
+    }
+    
+    .styles-panel-header.has-styles {
       background: #3E2318;
       color: #FAF8F5;
-      margin: 0;
+      border-bottom: none;
     }
     
     .styles-panel-title {
       font-family: 'Domine', var(--font-serif);
       font-size: 20px;
-      font-weight: var(--weight-medium);
+      font-weight: 500;
     }
     
     .styles-info-btn {
@@ -524,15 +530,27 @@
       align-items: center;
       justify-content: center;
       transition: all 0.15s;
-      opacity: 0.8;
+      opacity: 0.7;
     }
     
     .styles-info-btn:hover {
       opacity: 1;
-      background: rgba(255,255,255,0.15);
+      background: rgba(0,0,0,0.1);
     }
     
     .styles-info-btn svg {
+      fill: var(--color-text-secondary);
+    }
+    
+    .styles-panel-header.has-styles .styles-info-btn {
+      opacity: 0.8;
+    }
+    
+    .styles-panel-header.has-styles .styles-info-btn:hover {
+      background: rgba(255,255,255,0.15);
+    }
+    
+    .styles-panel-header.has-styles .styles-info-btn svg {
       fill: #FAF8F5;
     }
     
@@ -3108,6 +3126,23 @@
       
       const messagesEndRef = useRef(null);
       const extractionTimeoutRef = useRef(null);
+      const chatInfoRef = useRef(null);
+      const stylesInfoRef = useRef(null);
+
+      // Click outside to close tooltips
+      useEffect(() => {
+        const handleClickOutside = (e) => {
+          if (showChatInfo && chatInfoRef.current && !chatInfoRef.current.contains(e.target)) {
+            setShowChatInfo(false);
+          }
+          if (showStylesInfo && stylesInfoRef.current && !stylesInfoRef.current.contains(e.target)) {
+            setShowStylesInfo(false);
+          }
+        };
+        
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+      }, [showChatInfo, showStylesInfo]);
 
       // Load project from URL on mount
       useEffect(() => {
@@ -3488,7 +3523,7 @@
             {/* Center Column - Chat */}
             <div className="chat-container">
               {title ? (
-                <div className="chat-title-bar">
+                <div className="chat-title-bar" ref={chatInfoRef}>
                   <span>{title}</span>
                   <button 
                     className="chat-info-btn"
@@ -3517,7 +3552,7 @@
                   )}
                 </div>
               ) : (
-                <div className="chat-title-bar-empty">
+                <div className="chat-title-bar-empty" ref={chatInfoRef}>
                   <span>Your Story Title</span>
                   <button 
                     className="chat-info-btn"
@@ -3600,7 +3635,7 @@
             
             {/* Right Column - Styles */}
             <div className="styles-column">
-              <div className="styles-panel-header">
+              <div className={`styles-panel-header ${selectedStyles.length > 0 ? 'has-styles' : ''}`} ref={stylesInfoRef}>
                 <span className="styles-panel-title">Your Styles</span>
                 <button 
                   className="styles-info-btn"

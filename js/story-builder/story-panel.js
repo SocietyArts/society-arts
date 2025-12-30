@@ -1,7 +1,7 @@
 /* ========================================
    SOCIETY ARTS - STORY PANEL
    Left sidebar for story display
-   Version: 5.1 (v21) - Updated info icons & tooltips
+   Version: 5.2 (v22) - Fixed tooltip positioning & click-outside-to-close
    ======================================== */
 
 /**
@@ -17,13 +17,29 @@ function InfoIcon({ className }) {
 }
 
 /**
- * Panel Header Component (reusable for all 3 panels)
+ * Panel Header Component with integrated tooltip
+ * Tooltip is now inside the header for proper positioning
  */
-function PanelHeader({ title, hasContent, infoContent, onInfoClick, showInfo }) {
+function PanelHeader({ title, hasContent, infoContent, showInfo, onInfoClick, onInfoClose, children }) {
   const headerClass = hasContent ? 'panel-header panel-header-active' : 'panel-header';
+  const headerRef = React.useRef(null);
+  
+  // Click outside to close
+  React.useEffect(() => {
+    if (!showInfo) return;
+    
+    const handleClickOutside = (e) => {
+      if (headerRef.current && !headerRef.current.contains(e.target)) {
+        onInfoClose();
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showInfo, onInfoClose]);
   
   return (
-    <div className={headerClass}>
+    <div className={headerClass} ref={headerRef}>
       <span className="panel-header-title">{title}</span>
       {infoContent && (
         <button 
@@ -34,22 +50,14 @@ function PanelHeader({ title, hasContent, infoContent, onInfoClick, showInfo }) 
           <InfoIcon />
         </button>
       )}
-    </div>
-  );
-}
-
-/**
- * Info Tooltip Component
- */
-function InfoTooltip({ show, onClose, children }) {
-  if (!show) return null;
-  
-  return (
-    <div className="panel-info-tooltip">
-      <div className="panel-info-content">
-        {children}
-        <button className="panel-info-close" onClick={onClose}>Got it</button>
-      </div>
+      {showInfo && (
+        <div className="panel-info-tooltip">
+          <div className="panel-info-content">
+            {children}
+            <button className="panel-info-close" onClick={onInfoClose}>Got it</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -86,11 +94,10 @@ function StoryCard({ story, isVoiceMode, transformedStory, transformLabel, onCle
         title="Your Story"
         hasContent={hasContent}
         infoContent={true}
-        onInfoClick={() => setShowInfo(!showInfo)}
         showInfo={showInfo}
-      />
-      
-      <InfoTooltip show={showInfo} onClose={() => setShowInfo(false)}>
+        onInfoClick={() => setShowInfo(!showInfo)}
+        onInfoClose={() => setShowInfo(false)}
+      >
         <h4 style={{ color: '#3E2318' }}>Your Story</h4>
         <p>
           This panel displays your story as it develops. You can type or paste your story directly here, or it will auto-populate as you share through the conversation in the center panel.
@@ -98,7 +105,7 @@ function StoryCard({ story, isVoiceMode, transformedStory, transformLabel, onCle
         <p>
           Feel free to edit any text — click anywhere to refine words, add details, or make changes. Your story is always editable until you generate your artwork.
         </p>
-      </InfoTooltip>
+      </PanelHeader>
       
       <div className="card-content">
         <div className="story-badges">
@@ -273,11 +280,10 @@ function VariationSelector({ currentStory, onVariationApplied, disabled }) {
         title="Transform Your Story"
         hasContent={false}
         infoContent={true}
-        onInfoClick={() => setShowInfo(!showInfo)}
         showInfo={showInfo}
-      />
-      
-      <InfoTooltip show={showInfo} onClose={() => setShowInfo(false)}>
+        onInfoClick={() => setShowInfo(!showInfo)}
+        onInfoClose={() => setShowInfo(false)}
+      >
         <h4 style={{ color: '#3E2318' }}>Transform Your Story</h4>
         <p>
           These optional tools can enhance your story for better visual results. Each transformation offers a unique approach:
@@ -288,7 +294,7 @@ function VariationSelector({ currentStory, onVariationApplied, disabled }) {
         <p>
           Hover over each button to learn more, or try one to see how it transforms your story.
         </p>
-      </InfoTooltip>
+      </PanelHeader>
       
       <div className="variation-buttons">
         {variationList.map((variation) => (
@@ -367,7 +373,6 @@ if (typeof window !== 'undefined') {
   window.SocietyArts = window.SocietyArts || {};
   window.SocietyArts.StoryPanel = {
     PanelHeader,
-    InfoTooltip,
     InfoIcon,
     StoryCard,
     VariationSelector,
