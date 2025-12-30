@@ -532,8 +532,8 @@
       resultStyleId.textContent = styleId;
       resultSref.textContent = data.sref_code ? `sRef: ${data.sref_code}` : 'No sRef';
       
-      // Display title from styles table
-      const title = data.styles?.title || 'Untitled Style';
+      // Display title
+      const title = data.title || 'Untitled Style';
       resultTitle.textContent = title;
       
       // Display image from CloudFlare R2
@@ -593,10 +593,10 @@
       showLoading();
       
       try {
-        // Use Supabase REST API directly with fetch
-        const url = `${SUPABASE_URL}/rest/v1/prompts?style_id=eq.${styleId}&select=style_id,prompt_core,prompt_suffix,sref_code,styles(title)`;
+        // Query prompts table
+        const promptsUrl = `${SUPABASE_URL}/rest/v1/prompts?style_id=eq.${styleId}&select=style_id,prompt_core,prompt_suffix,sref_code`;
         
-        const response = await fetch(url, {
+        const promptsResponse = await fetch(promptsUrl, {
           method: 'GET',
           headers: {
             'apikey': SUPABASE_ANON_KEY,
@@ -605,21 +605,47 @@
           }
         });
         
-        if (!response.ok) {
-          const errorData = await response.json();
+        if (!promptsResponse.ok) {
+          const errorData = await promptsResponse.json();
           console.error('API Error:', errorData);
-          showError(`API Error: ${errorData.message || response.status}`);
+          showError(`API Error: ${errorData.message || promptsResponse.status}`);
           return;
         }
         
-        const data = await response.json();
+        const promptsData = await promptsResponse.json();
         
-        if (!data || data.length === 0) {
+        if (!promptsData || promptsData.length === 0) {
           showError(`Style "${styleId}" not found in database`);
           return;
         }
         
-        showResults(data[0]);
+        // Query styles table for title
+        const stylesUrl = `${SUPABASE_URL}/rest/v1/styles?id=eq.${styleId}&select=title`;
+        
+        const stylesResponse = await fetch(stylesUrl, {
+          method: 'GET',
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        let title = 'Untitled Style';
+        if (stylesResponse.ok) {
+          const stylesData = await stylesResponse.json();
+          if (stylesData && stylesData.length > 0 && stylesData[0].title) {
+            title = stylesData[0].title;
+          }
+        }
+        
+        // Combine data
+        const data = {
+          ...promptsData[0],
+          title: title
+        };
+        
+        showResults(data);
         
       } catch (err) {
         console.error('Fetch error:', err);
