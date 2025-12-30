@@ -134,7 +134,7 @@
       position: absolute;
       top: calc(100% + 4px);
       right: 0;
-      z-index: 100;
+      z-index: 9999;
       width: 300px;
     }
     
@@ -258,7 +258,7 @@
       position: absolute;
       top: calc(100% + 4px);
       right: 0;
-      z-index: 100;
+      z-index: 9999;
       width: 300px;
     }
     
@@ -335,7 +335,7 @@
     /* Story Card adjustments - MUST override .card padding */
     .card.story-card {
       border-radius: var(--radius-lg);
-      overflow: hidden;
+      overflow: visible;
       background: var(--color-tan-10);
       padding: 0 !important; /* Override .card padding so header fills full width */
       border: none;
@@ -350,7 +350,7 @@
     .variation-selector {
       background: var(--color-tan-10);
       border-radius: var(--radius-lg);
-      overflow: hidden;
+      overflow: visible;
       padding: 0 !important;
     }
     
