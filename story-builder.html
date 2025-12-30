@@ -1433,11 +1433,13 @@
       background: white;
       border-radius: 16px;
       width: 100%;
-      max-width: 800px;
+      max-width: 1000px;
       max-height: 90vh;
-      overflow-y: auto;
+      overflow: hidden;
       box-shadow: 0 24px 64px rgba(62, 35, 24, 0.3);
       animation: modalSlideIn 0.25s ease-out;
+      display: flex;
+      flex-direction: column;
     }
     
     @keyframes modalSlideIn {
@@ -1516,14 +1518,32 @@
     }
     
     .style-detail-content {
-      padding: 20px;
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+    
+    .style-detail-info {
+      width: 320px;
+      min-width: 320px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--color-border-light);
+      overflow-y: auto;
+    }
+    
+    .style-detail-images {
+      flex: 1;
+      padding: 24px;
+      overflow-y: auto;
+      background: var(--color-tan-10);
     }
     
     .style-detail-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-bottom: 24px;
+      gap: 12px;
     }
     
     .style-detail-grid-item {
@@ -1546,10 +1566,11 @@
     
     .style-detail-name {
       font-family: 'Domine', var(--font-serif);
-      font-size: 24px;
+      font-size: 22px;
       font-weight: 600;
       color: var(--color-text-primary);
-      margin-bottom: 8px;
+      margin-bottom: 4px;
+      line-height: 1.3;
     }
     
     .style-detail-divider {
@@ -1559,30 +1580,61 @@
     }
     
     .style-detail-description {
-      font-size: 15px;
-      line-height: 1.6;
+      font-size: 14px;
+      line-height: 1.7;
       color: var(--color-text-secondary);
-      margin-bottom: 16px;
+      flex: 1;
+      overflow-y: auto;
+    }
+    
+    .style-detail-meta {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--color-border-light);
+    }
+    
+    .style-detail-meta-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: 13px;
+    }
+    
+    .style-detail-meta-label {
+      color: var(--color-text-muted);
+      min-width: 60px;
+    }
+    
+    .style-detail-meta-value {
+      color: var(--color-text-secondary);
+      font-weight: 500;
     }
     
     .style-detail-id {
-      font-size: 12px;
+      display: inline-block;
+      font-size: 11px;
       color: var(--color-text-muted);
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      margin-bottom: 24px;
+      background: var(--color-tan-10);
+      padding: 4px 8px;
+      border-radius: 4px;
+      margin-bottom: 16px;
     }
     
     .style-detail-actions {
       display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--color-border-light);
     }
     
     .style-detail-btn-primary {
-      flex: 1;
-      min-width: 160px;
-      padding: 12px 24px;
+      width: 100%;
+      padding: 12px 20px;
       border: none;
       background: var(--color-accent);
       color: white;
@@ -1606,9 +1658,8 @@
     }
     
     .style-detail-btn-secondary {
-      flex: 1;
-      min-width: 160px;
-      padding: 12px 24px;
+      width: 100%;
+      padding: 12px 20px;
       border: 1px solid var(--color-border-medium);
       background: white;
       color: var(--color-text-primary);
@@ -2969,6 +3020,7 @@
                       <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                     </svg>
                   </button>
+                  <span style={{ fontFamily: 'Domine, serif', fontSize: '16px', fontWeight: '600', color: 'var(--color-text-primary)' }}>Style Detail</span>
                   <button className="style-detail-close" onClick={() => setDetailStyle(null)}>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -2977,57 +3029,81 @@
                   </button>
                 </div>
                 <div className="style-detail-content">
-                  {/* 3x3 Image Grid */}
-                  <div className="style-detail-grid">
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
-                      <div 
-                        key={num}
-                        className="style-detail-grid-item"
-                        onClick={() => setViewerImage({ styleId: detailStyle.id, imageIndex: num })}
+                  {/* Left Panel - Info */}
+                  <div className="style-detail-info">
+                    <h2 className="style-detail-name">{detailStyle.name}</h2>
+                    <div className="style-detail-id">ID: {detailStyle.id}</div>
+                    
+                    <div className="style-detail-divider"></div>
+                    
+                    <p className="style-detail-description">
+                      {detailStyle.description || 'No description available for this style.'}
+                    </p>
+                    
+                    {(detailStyle.art_medium || detailStyle.style_attributes) && (
+                      <div className="style-detail-meta">
+                        {detailStyle.art_medium && (
+                          <div className="style-detail-meta-item">
+                            <span className="style-detail-meta-label">Medium:</span>
+                            <span className="style-detail-meta-value">{detailStyle.art_medium}</span>
+                          </div>
+                        )}
+                        {detailStyle.style_attributes && (
+                          <div className="style-detail-meta-item">
+                            <span className="style-detail-meta-label">Style:</span>
+                            <span className="style-detail-meta-value">{detailStyle.style_attributes}</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    <div className="style-detail-actions">
+                      <button 
+                        className={`style-detail-btn-primary ${tempSelected.has(detailStyle.id) ? 'remove' : ''}`}
+                        onClick={() => handleAddToProject(detailStyle.id)}
                       >
-                        <img 
-                          src={`https://pub-acb560f551f141db830964aed1fa005f.r2.dev/${detailStyle.id}/${detailStyle.id}-0${num}.webp`}
-                          alt={`${detailStyle.name} - Image ${num}`}
-                          onError={(e) => { e.target.style.opacity = '0.3'; }}
-                        />
-                      </div>
-                    ))}
-                  </div>
-
-                  <h2 className="style-detail-name">{detailStyle.name}</h2>
-                  <div className="style-detail-divider"></div>
-                  <p className="style-detail-description">
-                    {detailStyle.description || 'No description available for this style.'}
-                  </p>
-                  <div className="style-detail-id">STYLE #{detailStyle.id}</div>
-
-                  <div className="style-detail-actions">
-                    <button 
-                      className={`style-detail-btn-primary ${tempSelected.has(detailStyle.id) ? 'remove' : ''}`}
-                      onClick={() => handleAddToProject(detailStyle.id)}
-                    >
-                      {tempSelected.has(detailStyle.id) ? 'Remove from Project' : 'Add to Project'}
-                    </button>
-                    <button className="style-detail-btn-secondary">
-                      Add to Collection
-                    </button>
-                  </div>
-
-                  {isSuperAdmin && (
-                    <div className="style-detail-admin">
-                      <div className="style-detail-admin-buttons">
-                        <button className="style-detail-admin-btn" onClick={() => handleFlagForReview(detailStyle.id)}>
-                          Flag for Review
-                        </button>
-                        <button className="style-detail-admin-btn danger" onClick={() => handleUnlist(detailStyle.id)}>
-                          Unlist
-                        </button>
-                        <button className="style-detail-admin-btn" onClick={() => handleEdit(detailStyle.id)}>
-                          Edit
-                        </button>
-                      </div>
+                        {tempSelected.has(detailStyle.id) ? '− Remove from Project' : '+ Add to Project'}
+                      </button>
+                      <button className="style-detail-btn-secondary">
+                        Add to Collection
+                      </button>
                     </div>
-                  )}
+
+                    {isSuperAdmin && (
+                      <div className="style-detail-admin">
+                        <div className="style-detail-admin-buttons">
+                          <button className="style-detail-admin-btn" onClick={() => handleFlagForReview(detailStyle.id)}>
+                            Flag for Review
+                          </button>
+                          <button className="style-detail-admin-btn danger" onClick={() => handleUnlist(detailStyle.id)}>
+                            Unlist
+                          </button>
+                          <button className="style-detail-admin-btn" onClick={() => handleEdit(detailStyle.id)}>
+                            Edit
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Right Panel - Image Grid */}
+                  <div className="style-detail-images">
+                    <div className="style-detail-grid">
+                      {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
+                        <div 
+                          key={num}
+                          className="style-detail-grid-item"
+                          onClick={() => setViewerImage({ styleId: detailStyle.id, imageIndex: num })}
+                        >
+                          <img 
+                            src={`https://pub-acb560f551f141db830964aed1fa005f.r2.dev/${detailStyle.id}/${detailStyle.id}-0${num}.webp`}
+                            alt={`${detailStyle.name} - Image ${num}`}
+                            onError={(e) => { e.target.style.opacity = '0.3'; }}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
