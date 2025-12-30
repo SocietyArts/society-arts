@@ -38,7 +38,7 @@
     
     .container {
       width: 100%;
-      max-width: 600px;
+      max-width: 900px;
     }
     
     /* Header */
@@ -71,6 +71,8 @@
       border-radius: 16px;
       padding: 32px;
       box-shadow: 0 2px 8px rgba(62, 35, 24, 0.08);
+      max-width: 600px;
+      margin: 0 auto;
     }
     
     .input-group {
@@ -147,26 +149,67 @@
       display: block;
     }
     
+    .results-card {
+      background: var(--color-white);
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 2px 8px rgba(62, 35, 24, 0.08);
+    }
+    
+    .results-layout {
+      display: flex;
+      gap: 32px;
+      align-items: flex-start;
+    }
+    
+    .results-content {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .results-image {
+      flex-shrink: 0;
+      width: 320px;
+    }
+    
+    .style-image {
+      width: 100%;
+      height: auto;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(62, 35, 24, 0.15);
+    }
+    
     .result-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
     
     .result-style-id {
-      font-family: 'Domine', Georgia, serif;
-      font-size: 20px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
       font-weight: 600;
-      color: var(--color-brown);
+      color: var(--color-brown-60);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     
     .result-sref {
-      font-size: 14px;
+      font-size: 13px;
       color: var(--color-brown-60);
       background: var(--color-tan-10);
-      padding: 6px 12px;
+      padding: 4px 10px;
       border-radius: 6px;
+    }
+    
+    .result-title {
+      font-family: 'Domine', Georgia, serif;
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--color-brown);
+      margin: 0 0 16px 0;
+      line-height: 1.3;
     }
     
     .prompt-box {
@@ -238,6 +281,26 @@
       font-size: 14px;
     }
     
+    /* Prompt Warning */
+    .prompt-warning {
+      background: #FFFBEB;
+      border: 1px solid #FCD34D;
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      display: none;
+    }
+    
+    .prompt-warning.visible {
+      display: block;
+    }
+    
+    .prompt-warning p {
+      color: #92400E;
+      font-size: 13px;
+      margin: 0;
+    }
+    
     /* Loading */
     .loading {
       text-align: center;
@@ -282,6 +345,17 @@
     }
     
     /* Responsive */
+    @media (max-width: 768px) {
+      .results-layout {
+        flex-direction: column-reverse;
+      }
+      
+      .results-image {
+        width: 100%;
+        margin-bottom: 16px;
+      }
+    }
+    
     @media (max-width: 480px) {
       body {
         padding: 24px 16px;
@@ -295,12 +369,20 @@
         padding: 24px;
       }
       
+      .results-card {
+        padding: 24px;
+      }
+      
       .input-group {
         flex-direction: column;
       }
       
       .search-btn {
         width: 100%;
+      }
+      
+      .result-title {
+        font-size: 18px;
       }
     }
   </style>
@@ -344,20 +426,36 @@
       <div id="error" class="error">
         <p class="error-text" id="errorText"></p>
       </div>
-      
-      <!-- Results -->
-      <div id="results" class="results">
-        <div class="result-header">
-          <span class="result-style-id" id="resultStyleId"></span>
-          <span class="result-sref" id="resultSref"></span>
+    </div>
+    
+    <!-- Results Card (separate for wider layout) -->
+    <div id="results" class="results">
+      <div class="results-card">
+        <div class="results-layout">
+          <div class="results-content">
+            <div class="result-header">
+              <span class="result-style-id" id="resultStyleId"></span>
+              <span class="result-sref" id="resultSref"></span>
+            </div>
+            
+            <h2 class="result-title" id="resultTitle"></h2>
+            
+            <div class="prompt-box">
+              <p class="prompt-label">Midjourney Prompt</p>
+              <p class="prompt-text" id="promptText"></p>
+            </div>
+            
+            <div id="promptWarning" class="prompt-warning">
+              <p>⚠️ This prompt is incomplete in our system. The authorities have been notified.</p>
+            </div>
+            
+            <button id="copyBtn" class="copy-btn">Copy Prompt</button>
+          </div>
+          
+          <div class="results-image">
+            <img id="styleImage" src="" alt="Style preview" class="style-image">
+          </div>
         </div>
-        
-        <div class="prompt-box">
-          <p class="prompt-label">Midjourney Prompt</p>
-          <p class="prompt-text" id="promptText"></p>
-        </div>
-        
-        <button id="copyBtn" class="copy-btn">Copy Prompt</button>
       </div>
     </div>
     
@@ -386,8 +484,15 @@
     const results = document.getElementById('results');
     const resultStyleId = document.getElementById('resultStyleId');
     const resultSref = document.getElementById('resultSref');
+    const resultTitle = document.getElementById('resultTitle');
     const promptText = document.getElementById('promptText');
     const copyBtn = document.getElementById('copyBtn');
+    const styleImage = document.getElementById('styleImage');
+    
+    // ========================================
+    // CONSTANTS
+    // ========================================
+    const R2_BASE_URL = 'https://pub-acb560f551f141db830964aed1fa005f.r2.dev';
     
     // ========================================
     // STATE
@@ -422,13 +527,31 @@
       error.classList.remove('visible');
       results.classList.add('visible');
       
-      resultStyleId.textContent = data.style_id;
+      const styleId = data.style_id;
+      
+      resultStyleId.textContent = styleId;
       resultSref.textContent = data.sref_code ? `sRef: ${data.sref_code}` : 'No sRef';
+      
+      // Display title from styles table
+      const title = data.styles?.title || 'Untitled Style';
+      resultTitle.textContent = title;
+      
+      // Display image from CloudFlare R2
+      styleImage.src = `${R2_BASE_URL}/${styleId}/${styleId}-00.webp`;
+      styleImage.alt = `${title} - Style ${styleId}`;
       
       // Combine prompt_core and prompt_suffix
       const fullPrompt = [data.prompt_core, data.prompt_suffix].filter(Boolean).join(' ');
       promptText.textContent = fullPrompt || 'No prompt available';
       currentPrompt = fullPrompt || '';
+      
+      // Check if prompt is incomplete (missing suffix)
+      const warningEl = document.getElementById('promptWarning');
+      if (!data.prompt_suffix) {
+        warningEl.classList.add('visible');
+      } else {
+        warningEl.classList.remove('visible');
+      }
       
       // Reset copy button
       copyBtn.textContent = 'Copy Prompt';
@@ -471,7 +594,7 @@
       
       try {
         // Use Supabase REST API directly with fetch
-        const url = `${SUPABASE_URL}/rest/v1/prompts?style_id=eq.${styleId}&select=style_id,prompt_core,prompt_suffix,sref_code`;
+        const url = `${SUPABASE_URL}/rest/v1/prompts?style_id=eq.${styleId}&select=style_id,prompt_core,prompt_suffix,sref_code,styles(title)`;
         
         const response = await fetch(url, {
           method: 'GET',
