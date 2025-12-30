@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prompt Finder | Society Arts</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Domine:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    :root {
+      --color-brown: #3E2318;
+      --color-brown-60: #8B7B75;
+      --color-beige: #EAE4DA;
+      --color-tan-10: #F3F1EE;
+      --color-tan-20: #E7E2DC;
+      --color-orange: #C73314;
+      --color-white: #FFFFFF;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--color-beige);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+      color: var(--color-brown);
+    }
+    
+    .container {
+      width: 100%;
+      max-width: 600px;
+    }
+    
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    
+    .logo {
+      height: 40px;
+      margin-bottom: 24px;
+    }
+    
+    .title {
+      font-family: 'Domine', Georgia, serif;
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--color-brown);
+      margin-bottom: 8px;
+    }
+    
+    .subtitle {
+      font-size: 15px;
+      color: var(--color-brown-60);
+    }
+    
+    /* Search Card */
+    .search-card {
+      background: var(--color-white);
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 2px 8px rgba(62, 35, 24, 0.08);
+    }
+    
+    .input-group {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    
+    .style-input {
+      flex: 1;
+      padding: 16px 20px;
+      font-size: 18px;
+      font-family: 'Inter', sans-serif;
+      border: 2px solid var(--color-tan-20);
+      border-radius: 12px;
+      background: var(--color-tan-10);
+      color: var(--color-brown);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    
+    .style-input:focus {
+      outline: none;
+      border-color: var(--color-brown);
+      box-shadow: 0 0 0 3px rgba(62, 35, 24, 0.1);
+    }
+    
+    .style-input::placeholder {
+      text-transform: none;
+      letter-spacing: normal;
+      color: var(--color-brown-60);
+    }
+    
+    .search-btn {
+      padding: 16px 28px;
+      font-size: 16px;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      background: var(--color-brown);
+      color: var(--color-white);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+    
+    .search-btn:hover {
+      background: #2d1a12;
+    }
+    
+    .search-btn:active {
+      transform: scale(0.98);
+    }
+    
+    .search-btn:disabled {
+      background: var(--color-brown-60);
+      cursor: not-allowed;
+    }
+    
+    .input-hint {
+      font-size: 13px;
+      color: var(--color-brown-60);
+      margin-left: 4px;
+    }
+    
+    /* Results */
+    .results {
+      margin-top: 24px;
+      display: none;
+    }
+    
+    .results.visible {
+      display: block;
+    }
+    
+    .result-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    
+    .result-style-id {
+      font-family: 'Domine', Georgia, serif;
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--color-brown);
+    }
+    
+    .result-sref {
+      font-size: 14px;
+      color: var(--color-brown-60);
+      background: var(--color-tan-10);
+      padding: 6px 12px;
+      border-radius: 6px;
+    }
+    
+    .prompt-box {
+      background: var(--color-tan-10);
+      border: 1px solid var(--color-tan-20);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    
+    .prompt-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--color-brown-60);
+      margin-bottom: 8px;
+    }
+    
+    .prompt-text {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--color-brown);
+      word-break: break-word;
+    }
+    
+    .copy-btn {
+      width: 100%;
+      padding: 14px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      background: var(--color-orange);
+      color: var(--color-white);
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+    
+    .copy-btn:hover {
+      background: #a82a10;
+    }
+    
+    .copy-btn:active {
+      transform: scale(0.98);
+    }
+    
+    .copy-btn.copied {
+      background: #4A9D6E;
+    }
+    
+    /* Error State */
+    .error {
+      background: #FEF2F2;
+      border: 1px solid #FECACA;
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-top: 24px;
+      display: none;
+    }
+    
+    .error.visible {
+      display: block;
+    }
+    
+    .error-text {
+      color: #B91C1C;
+      font-size: 14px;
+    }
+    
+    /* Loading */
+    .loading {
+      text-align: center;
+      padding: 24px;
+      color: var(--color-brown-60);
+      display: none;
+    }
+    
+    .loading.visible {
+      display: block;
+    }
+    
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid var(--color-tan-20);
+      border-top-color: var(--color-brown);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 12px;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* Footer */
+    .footer {
+      margin-top: 48px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--color-brown-60);
+    }
+    
+    .footer a {
+      color: var(--color-brown);
+      text-decoration: none;
+    }
+    
+    .footer a:hover {
+      text-decoration: underline;
+    }
+    
+    /* Responsive */
+    @media (max-width: 480px) {
+      body {
+        padding: 24px 16px;
+      }
+      
+      .title {
+        font-size: 24px;
+      }
+      
+      .search-card {
+        padding: 24px;
+      }
+      
+      .input-group {
+        flex-direction: column;
+      }
+      
+      .search-btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <img 
+        src="https://pub-acb560f551f141db830964aed1fa005f.r2.dev/site-assets/SA_Wordmark_Brown%401x.png" 
+        alt="Society Arts" 
+        class="logo"
+      >
+      <h1 class="title">Prompt Finder</h1>
+      <p class="subtitle">Look up Midjourney prompts by Style ID</p>
+    </header>
+    
+    <!-- Search Card -->
+    <div class="search-card">
+      <div class="input-group">
+        <input 
+          type="text" 
+          id="styleInput" 
+          class="style-input" 
+          placeholder="Enter Style ID (e.g., ABF-49)"
+          maxlength="10"
+          autocomplete="off"
+          spellcheck="false"
+        >
+        <button id="searchBtn" class="search-btn">Find</button>
+      </div>
+      <p class="input-hint">Format: AAA-## (e.g., XYZ-12)</p>
+      
+      <!-- Loading State -->
+      <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <p>Searching...</p>
+      </div>
+      
+      <!-- Error State -->
+      <div id="error" class="error">
+        <p class="error-text" id="errorText"></p>
+      </div>
+      
+      <!-- Results -->
+      <div id="results" class="results">
+        <div class="result-header">
+          <span class="result-style-id" id="resultStyleId"></span>
+          <span class="result-sref" id="resultSref"></span>
+        </div>
+        
+        <div class="prompt-box">
+          <p class="prompt-label">Midjourney Prompt</p>
+          <p class="prompt-text" id="promptText"></p>
+        </div>
+        
+        <button id="copyBtn" class="copy-btn">Copy Prompt</button>
+      </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="footer">
+      <p>Internal Tool • <a href="https://societyarts.com">Society Arts</a></p>
+    </footer>
+  </div>
+  
+  <script>
+    // ========================================
+    // SUPABASE REST API CONFIG
+    // Using fetch instead of JS client for compatibility
+    // ========================================
+    const SUPABASE_URL = 'https://yspxlhcebcijeuemkaed.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlzcHhsaGNlYmNpamV1ZW1rYWVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYzMTczMTQsImV4cCI6MjA4MTg5MzMxNH0.MD0xQGkLnNdQ4hebC06lijU96AbPHPULhW_vjXuiGGE';
+    
+    // ========================================
+    // DOM ELEMENTS
+    // ========================================
+    const styleInput = document.getElementById('styleInput');
+    const searchBtn = document.getElementById('searchBtn');
+    const loading = document.getElementById('loading');
+    const error = document.getElementById('error');
+    const errorText = document.getElementById('errorText');
+    const results = document.getElementById('results');
+    const resultStyleId = document.getElementById('resultStyleId');
+    const resultSref = document.getElementById('resultSref');
+    const promptText = document.getElementById('promptText');
+    const copyBtn = document.getElementById('copyBtn');
+    
+    // ========================================
+    // STATE
+    // ========================================
+    let currentPrompt = '';
+    
+    // ========================================
+    // FUNCTIONS
+    // ========================================
+    
+    function showLoading() {
+      loading.classList.add('visible');
+      error.classList.remove('visible');
+      results.classList.remove('visible');
+      searchBtn.disabled = true;
+    }
+    
+    function hideLoading() {
+      loading.classList.remove('visible');
+      searchBtn.disabled = false;
+    }
+    
+    function showError(message) {
+      hideLoading();
+      errorText.textContent = message;
+      error.classList.add('visible');
+      results.classList.remove('visible');
+    }
+    
+    function showResults(data) {
+      hideLoading();
+      error.classList.remove('visible');
+      results.classList.add('visible');
+      
+      resultStyleId.textContent = data.style_id;
+      resultSref.textContent = data.sref_code ? `sRef: ${data.sref_code}` : 'No sRef';
+      promptText.textContent = data.prompt_core || 'No prompt available';
+      currentPrompt = data.prompt_core || '';
+      
+      // Reset copy button
+      copyBtn.textContent = 'Copy Prompt';
+      copyBtn.classList.remove('copied');
+    }
+    
+    function formatStyleId(input) {
+      // Remove any non-alphanumeric characters except hyphen
+      let cleaned = input.toUpperCase().replace(/[^A-Z0-9-]/g, '');
+      
+      // If they entered without hyphen (e.g., "ABF49"), try to format it
+      if (cleaned.length >= 4 && !cleaned.includes('-')) {
+        // Check if it looks like AAA## format
+        const letters = cleaned.match(/^[A-Z]+/);
+        const numbers = cleaned.match(/\d+$/);
+        if (letters && numbers) {
+          cleaned = `${letters[0]}-${numbers[0]}`;
+        }
+      }
+      
+      return cleaned;
+    }
+    
+    async function searchPrompt() {
+      const rawInput = styleInput.value.trim();
+      if (!rawInput) {
+        showError('Please enter a Style ID');
+        return;
+      }
+      
+      const styleId = formatStyleId(rawInput);
+      
+      // Basic validation
+      if (!styleId.match(/^[A-Z]{2,4}-\d{1,2}$/)) {
+        showError('Invalid format. Use AAA-## (e.g., ABF-49, XY-7)');
+        return;
+      }
+      
+      showLoading();
+      
+      try {
+        // Use Supabase REST API directly with fetch
+        const url = `${SUPABASE_URL}/rest/v1/prompts?style_id=eq.${styleId}&select=style_id,prompt_core,sref_code`;
+        
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error('API Error:', errorData);
+          showError(`API Error: ${errorData.message || response.status}`);
+          return;
+        }
+        
+        const data = await response.json();
+        
+        if (!data || data.length === 0) {
+          showError(`Style "${styleId}" not found in database`);
+          return;
+        }
+        
+        showResults(data[0]);
+        
+      } catch (err) {
+        console.error('Fetch error:', err);
+        showError('Connection error. Please check your internet.');
+      }
+    }
+    
+    async function copyPrompt() {
+      if (!currentPrompt) return;
+      
+      try {
+        await navigator.clipboard.writeText(currentPrompt);
+        copyBtn.textContent = 'Copied!';
+        copyBtn.classList.add('copied');
+        
+        setTimeout(() => {
+          copyBtn.textContent = 'Copy Prompt';
+          copyBtn.classList.remove('copied');
+        }, 2000);
+      } catch (err) {
+        // Fallback for older browsers
+        const textarea = document.createElement('textarea');
+        textarea.value = currentPrompt;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        
+        copyBtn.textContent = 'Copied!';
+        copyBtn.classList.add('copied');
+        
+        setTimeout(() => {
+          copyBtn.textContent = 'Copy Prompt';
+          copyBtn.classList.remove('copied');
+        }, 2000);
+      }
+    }
+    
+    // ========================================
+    // EVENT LISTENERS
+    // ========================================
+    
+    searchBtn.addEventListener('click', searchPrompt);
+    
+    styleInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        searchPrompt();
+      }
+    });
+    
+    copyBtn.addEventListener('click', copyPrompt);
+    
+    // Auto-focus input on load
+    styleInput.focus();
+  </script>
+</body>
+</html>
