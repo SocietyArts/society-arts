@@ -1329,45 +1329,45 @@
     // STYLE PICKER MODAL COMPONENT
     // ============================================
     
-    // Medium categories for faceted navigation
+    // Medium categories for faceted navigation - uses AMD codes from art_mediums table
     const MEDIUM_CATEGORIES = {
       painting: {
         name: 'Painting',
         mediums: [
-          { id: 'bold_paint', name: 'Bold Paint (Oil/Acrylic)', dbKey: 'bold_paint_oil_acrylic' },
-          { id: 'fluid_paint', name: 'Fluid Paint (Watercolor)', dbKey: 'fluid_paint_watercolor' },
-          { id: 'flat_paint', name: 'Flat Paint (Poster/Gouache)', dbKey: 'flat_paint_poster_gouache' }
+          { id: 'AMD001', name: 'Bold Paint (Oil/Acrylic)' },
+          { id: 'AMD002', name: 'Fluid Paint (Watercolor)' },
+          { id: 'AMD003', name: 'Flat Paint (Poster/Gouache)' }
         ]
       },
       drawing: {
         name: 'Drawing',
         mediums: [
-          { id: 'pencil_graphite', name: 'Pencil/Graphite', dbKey: 'sketch_pencil_graphite' },
-          { id: 'ink_charcoal', name: 'Ink/Charcoal', dbKey: 'bold_line_ink_charcoal' },
-          { id: 'pastel_colored', name: 'Pastel/Colored Pencil', dbKey: 'color_drawing_pastel_colored_pencil' }
+          { id: 'AMD004', name: 'Sketch (Pencil/Graphite)' },
+          { id: 'AMD005', name: 'Bold Line (Ink/Charcoal)' },
+          { id: 'AMD006', name: 'Color Drawing (Pastel/Colored Pencil)' }
         ]
       },
       photography: {
         name: 'Photography',
         mediums: [
-          { id: 'color_photo', name: 'Color', dbKey: 'color_photography' },
-          { id: 'bw_photo', name: 'Black & White', dbKey: 'black_white_photography' }
+          { id: 'AMD007', name: 'Color Photography' },
+          { id: 'AMD008', name: 'Black & White Photography' }
         ]
       },
       printmaking: {
         name: 'Printmaking',
         mediums: [
-          { id: 'woodcut_linocut', name: 'Woodcut/Linocut', dbKey: 'bold_carved_print_woodcut_linocut' },
-          { id: 'etching_engraving', name: 'Etching/Engraving', dbKey: 'fine_line_print_etching_engraving' },
-          { id: 'screenprint', name: 'Screenprint', dbKey: 'poster_print_screenprint' }
+          { id: 'AMD009', name: 'Bold Carved Print (Woodcut/Linocut)' },
+          { id: 'AMD010', name: 'Fine Line Print (Etching/Engraving)' },
+          { id: 'AMD011', name: 'Poster Print (Screenprint)' }
         ]
       },
       collage: {
         name: 'Collage / Mixed Media',
         mediums: [
-          { id: 'paper_collage', name: 'Paper Collage', dbKey: 'paper_collage' },
-          { id: 'photo_collage', name: 'Photo Collage', dbKey: 'photo_collage' },
-          { id: 'mixed_layers', name: 'Mixed Layers', dbKey: 'mixed_layers' }
+          { id: 'AMD012', name: 'Paper Collage' },
+          { id: 'AMD013', name: 'Photo Collage' },
+          { id: 'AMD014', name: 'Mixed Layers' }
         ]
       }
     };
@@ -1394,7 +1394,6 @@
       const [expandedCategories, setExpandedCategories] = useState(new Set(['painting', 'drawing']));
       const [activeTab, setActiveTab] = useState('browse'); // browse, ai-match, mood, color
       const [tempSelected, setTempSelected] = useState(new Set(selectedStyles));
-      const [styleAttributes, setStyleAttributes] = useState({});
 
       // Load styles on mount
       useEffect(() => {
@@ -1424,26 +1423,26 @@
           
           if (error) throw error;
 
-          // Load attributes
-          const { data: attributes } = await supabase
-            .from('style_attributes')
-            .select('style_id, medium, medium_category, overlay');
+          // Load art medium assignments from junction table
+          const { data: artMediumLinks } = await supabase
+            .from('style_art_mediums')
+            .select('style_id, art_medium_id');
 
-          // Build attributes map
-          const attrsMap = {};
-          if (attributes) {
-            attributes.forEach(attr => {
-              attrsMap[attr.style_id] = attr;
+          // Build a map of style_id -> array of art_medium_ids
+          const artMediumMap = {};
+          if (artMediumLinks) {
+            artMediumLinks.forEach(link => {
+              if (!artMediumMap[link.style_id]) {
+                artMediumMap[link.style_id] = [];
+              }
+              artMediumMap[link.style_id].push(link.art_medium_id);
             });
           }
-          setStyleAttributes(attrsMap);
 
-          // Merge attributes with styles
+          // Merge art mediums with styles
           const stylesWithAttrs = stylesData.map(s => ({
             ...s,
-            medium: attrsMap[s.id]?.medium || null,
-            medium_category: attrsMap[s.id]?.medium_category || null,
-            overlay: attrsMap[s.id]?.overlay || null
+            art_medium_ids: artMediumMap[s.id] || []
           }));
 
           setAllStyles(stylesWithAttrs);
@@ -1466,24 +1465,15 @@
           );
         }
 
-        // Medium filter
+        // Medium filter - check if style has any of the selected art_medium_ids
         if (selectedMediums.size > 0) {
           results = results.filter(s => {
-            // Check if style matches any selected medium
-            for (const mediumId of selectedMediums) {
-              // Find the medium config
-              for (const cat of Object.values(MEDIUM_CATEGORIES)) {
-                const medium = cat.mediums.find(m => m.id === mediumId);
-                if (medium && (s.medium === medium.dbKey || s.medium === medium.id)) {
-                  return true;
-                }
-              }
-            }
-            return false;
+            // Check if any of the style's art_medium_ids match any selected medium
+            return s.art_medium_ids?.some(amId => selectedMediums.has(amId));
           });
         }
 
-        // Overlay filter
+        // Overlay filter (keeping for future use)
         if (selectedOverlays.size > 0) {
           results = results.filter(s => selectedOverlays.has(s.overlay));
         }
@@ -1627,7 +1617,7 @@
                         </div>
                         <span className="sp-category-count">
                           {category.mediums.reduce((sum, m) => {
-                            const count = allStyles.filter(s => s.medium === m.dbKey || s.medium === m.id).length;
+                            const count = allStyles.filter(s => s.art_medium_ids?.includes(m.id)).length;
                             return sum + count;
                           }, 0)}
                         </span>
