@@ -1417,7 +1417,7 @@
           const { data: stylesData, error } = await supabase
             .from('styles')
             .select('id, name, image_urls, status')
-            .eq('status', 'active')
+            .eq('is_active', true)
             .order('name')
             .limit(500);
           
