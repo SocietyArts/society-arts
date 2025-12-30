@@ -1419,7 +1419,7 @@
             .select('id, name, thumbnail_url')
             .eq('is_active', true)
             .order('name')
-            .limit(500);
+            .limit(2000);
           
           if (error) throw error;
           console.log('[DEBUG] Styles loaded:', stylesData?.length);
