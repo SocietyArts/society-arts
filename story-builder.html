@@ -2484,12 +2484,13 @@
         try {
           const { supabase } = window.SocietyArts;
           
-          // Load styles
+          // Load styles - sorted by market viability (highest first), then alphabetically
           const { data: stylesData, error } = await supabase
             .from('styles')
-            .select('id, name, thumbnail_url')
+            .select('id, name, thumbnail_url, market_viability_score')
             .eq('is_active', true)
-            .order('name')
+            .order('market_viability_score', { ascending: false, nullsFirst: false })
+            .order('name', { ascending: true })
             .limit(5000);
           
           if (error) throw error;
