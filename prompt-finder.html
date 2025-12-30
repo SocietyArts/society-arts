@@ -424,8 +424,11 @@
       
       resultStyleId.textContent = data.style_id;
       resultSref.textContent = data.sref_code ? `sRef: ${data.sref_code}` : 'No sRef';
-      promptText.textContent = data.prompt_core || 'No prompt available';
-      currentPrompt = data.prompt_core || '';
+      
+      // Combine prompt_core and prompt_suffix
+      const fullPrompt = [data.prompt_core, data.prompt_suffix].filter(Boolean).join(' ');
+      promptText.textContent = fullPrompt || 'No prompt available';
+      currentPrompt = fullPrompt || '';
       
       // Reset copy button
       copyBtn.textContent = 'Copy Prompt';
@@ -468,7 +471,7 @@
       
       try {
         // Use Supabase REST API directly with fetch
-        const url = `${SUPABASE_URL}/rest/v1/prompts?style_id=eq.${styleId}&select=style_id,prompt_core,sref_code`;
+        const url = `${SUPABASE_URL}/rest/v1/prompts?style_id=eq.${styleId}&select=style_id,prompt_core,prompt_suffix,sref_code`;
         
         const response = await fetch(url, {
           method: 'GET',
