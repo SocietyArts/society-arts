@@ -17,17 +17,17 @@
   <link rel="stylesheet" href="/css/components.css">
   
   <style>
-    /* Page-specific styles only */
+    /* Page-specific styles */
     .videos-content {
       margin-left: 64px;
-      padding: var(--space-3xl, 48px) var(--space-4xl, 64px);
-      padding-top: calc(64px + var(--space-3xl, 48px));
+      padding: 48px 64px;
+      padding-top: calc(64px + 48px);
       min-height: 100vh;
       max-width: 1200px;
     }
     
     .videos-header {
-      margin-bottom: var(--space-3xl, 48px);
+      margin-bottom: 48px;
     }
     
     .videos-title {
@@ -51,7 +51,7 @@
       border-radius: 16px;
       overflow: hidden;
       box-shadow: 0 4px 20px rgba(62, 35, 24, 0.08);
-      margin-bottom: var(--space-3xl, 48px);
+      margin-bottom: 48px;
       border: 1px solid #E8E4E0;
     }
     
@@ -285,16 +285,6 @@
       border: none;
     }
     
-    /* Loading state */
-    .loading-state {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      font-family: 'Familjen Grotesk', sans-serif;
-      color: #7A6F6A;
-    }
-    
     /* Responsive */
     @media (max-width: 768px) {
       .videos-content {
@@ -314,36 +304,68 @@
   </style>
 </head>
 <body>
-  <div id="root"></div>
+  <div class="page-container">
+    <!-- Sidebar and Header will be auto-injected by header.js -->
+    
+    <main class="videos-content">
+      <div class="videos-header">
+        <h1 class="videos-title">Video Guides</h1>
+        <p class="videos-subtitle">Learn how to create beautiful art from your memories</p>
+      </div>
+      
+      <!-- Featured Video -->
+      <div class="featured-video">
+        <span class="featured-label">Start Here</span>
+        <div class="featured-player">
+          <iframe
+            src="https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0"
+            title="Welcome to Society Arts"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+        <div class="featured-info">
+          <h2 class="featured-title">Welcome to Society Arts</h2>
+          <p class="featured-desc">Get started with creating beautiful art from your meaningful memories. Learn the basics of our story-to-art process.</p>
+        </div>
+      </div>
+      
+      <!-- More Tutorials -->
+      <h2 class="videos-section-title">More Tutorials</h2>
+      <div class="videos-grid" id="videosGrid">
+        <!-- Videos will be rendered by JavaScript -->
+      </div>
+    </main>
+  </div>
   
-  <!-- React -->
-  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <!-- Video Modal -->
+  <div class="video-modal-overlay" id="videoModal">
+    <button class="video-modal-close" onclick="closeModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+    <div class="video-modal">
+      <div class="video-modal-player">
+        <iframe id="modalIframe" src="" title="Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
   
   <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
-  <!-- Shared Components - Same as index.html -->
-  <script type="text/babel" src="/js/shared/supabase-client.js"></script>
-  <script type="text/babel" src="/js/shared/api.js"></script>
-  <script type="text/babel" src="/js/shared/auth.js"></script>
-  <script type="text/babel" src="/js/shared/header.js"></script>
+  <!-- Shared Components (vanilla JS - NO type="text/babel") -->
+  <script src="/js/shared/supabase-client.js"></script>
+  <script src="/js/shared/api.js"></script>
+  <script src="/js/shared/auth.js"></script>
+  <script src="/js/shared/header.js"></script>
   
-  <!-- Video Guides App -->
-  <script type="text/babel">
-    const { useState, useEffect } = React;
-    
-    // Video Data
-    const VIDEOS = [
-      {
-        id: 1,
-        title: 'Welcome to Society Arts',
-        description: 'Get started with creating beautiful art from your meaningful memories. Learn the basics of our story-to-art process.',
-        videoId: 'dQw4w9WgXcQ',
-        duration: '5:23',
-        featured: true
-      },
+  <!-- Page-specific JavaScript -->
+  <script>
+    // Video data
+    const videos = [
       {
         id: 2,
         title: 'Crafting Your Story',
@@ -381,186 +403,70 @@
       }
     ];
     
-    // Icons
-    const PlayIcon = () => (
-      <svg viewBox="0 0 24 24" fill="currentColor">
-        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-      </svg>
-    );
-    
-    const CloseIcon = () => (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        <line x1="18" y1="6" x2="6" y2="18"></line>
-        <line x1="6" y1="6" x2="18" y2="18"></line>
-      </svg>
-    );
-    
-    function VideoGuidesPage() {
-      const [selectedVideo, setSelectedVideo] = useState(null);
-      const [componentsReady, setComponentsReady] = useState(false);
-      const [user, setUser] = useState(null);
-      const [profile, setProfile] = useState(null);
+    // Render video cards
+    function renderVideos() {
+      const grid = document.getElementById('videosGrid');
+      if (!grid) return;
       
-      // Wait for shared components to load
-      useEffect(() => {
-        const checkComponents = setInterval(() => {
-          if (window.SocietyArts?.Sidebar && window.SocietyArts?.Header) {
-            clearInterval(checkComponents);
-            setComponentsReady(true);
-            
-            // Load auth state
-            if (window.SocietyArts.AuthState) {
-              setUser(window.SocietyArts.AuthState.user);
-              setProfile(window.SocietyArts.AuthState.profile);
-            }
-          }
-        }, 50);
-        
-        // Timeout after 5 seconds
-        const timeout = setTimeout(() => {
-          clearInterval(checkComponents);
-          setComponentsReady(true); // Render anyway
-        }, 5000);
-        
-        return () => {
-          clearInterval(checkComponents);
-          clearTimeout(timeout);
-        };
-      }, []);
-      
-      // Listen for auth state changes
-      useEffect(() => {
-        if (!componentsReady) return;
-        
-        const handleAuthChange = () => {
-          if (window.SocietyArts?.AuthState) {
-            setUser(window.SocietyArts.AuthState.user);
-            setProfile(window.SocietyArts.AuthState.profile);
-          }
-        };
-        
-        window.addEventListener('societyarts:authchange', handleAuthChange);
-        return () => window.removeEventListener('societyarts:authchange', handleAuthChange);
-      }, [componentsReady]);
-      
-      // Close modal on escape
-      useEffect(() => {
-        const handleEscape = (e) => {
-          if (e.key === 'Escape') setSelectedVideo(null);
-        };
-        document.addEventListener('keydown', handleEscape);
-        return () => document.removeEventListener('keydown', handleEscape);
-      }, []);
-      
-      // Show loading state while waiting for components
-      if (!componentsReady) {
-        return <div className="loading-state">Loading...</div>;
-      }
-      
-      // Get the shared components
-      const { Sidebar, Header } = window.SocietyArts || {};
-      
-      const featuredVideo = VIDEOS.find(v => v.featured);
-      const otherVideos = VIDEOS.filter(v => !v.featured);
-      
-      const getYouTubeThumbnail = (videoId) => {
-        return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-      };
-      
-      return (
-        <div className="page-container">
-          {/* Use shared Sidebar component */}
-          {Sidebar && <Sidebar currentPage="video-guides" />}
-          
-          {/* Use shared Header component */}
-          {Header && <Header user={user} profile={profile} />}
-          
-          <main className="videos-content">
-            <div className="videos-header">
-              <h1 className="videos-title">Video Guides</h1>
-              <p className="videos-subtitle">Learn how to create beautiful art from your memories</p>
+      grid.innerHTML = videos.map(video => `
+        <div class="video-card" onclick="openModal('${video.videoId}', '${video.title}')">
+          <div class="video-thumbnail">
+            <img 
+              src="https://img.youtube.com/vi/${video.videoId}/maxresdefault.jpg" 
+              alt="${video.title}"
+              onerror="this.src='https://img.youtube.com/vi/${video.videoId}/hqdefault.jpg'"
+            />
+            <div class="video-play-btn">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
             </div>
-            
-            {/* Featured Video */}
-            {featuredVideo && (
-              <div className="featured-video">
-                <span className="featured-label">Start Here</span>
-                <div className="featured-player">
-                  <iframe
-                    src={`https://www.youtube.com/embed/${featuredVideo.videoId}?rel=0`}
-                    title={featuredVideo.title}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                </div>
-                <div className="featured-info">
-                  <h2 className="featured-title">{featuredVideo.title}</h2>
-                  <p className="featured-desc">{featuredVideo.description}</p>
-                </div>
-              </div>
-            )}
-            
-            {/* Other Videos */}
-            <h2 className="videos-section-title">More Tutorials</h2>
-            <div className="videos-grid">
-              {otherVideos.map((video) => (
-                <div 
-                  key={video.id} 
-                  className="video-card"
-                  onClick={() => setSelectedVideo(video)}
-                >
-                  <div className="video-thumbnail">
-                    <img 
-                      src={getYouTubeThumbnail(video.videoId)} 
-                      alt={video.title}
-                      onError={(e) => {
-                        e.target.src = `https://img.youtube.com/vi/${video.videoId}/hqdefault.jpg`;
-                      }}
-                    />
-                    <div className="video-play-btn"><PlayIcon /></div>
-                    <span className="video-duration">{video.duration}</span>
-                  </div>
-                  <div className="video-info">
-                    <h3 className="video-title">{video.title}</h3>
-                    <p className="video-desc">{video.description}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </main>
-          
-          {/* Video Modal */}
-          <div 
-            className={`video-modal-overlay ${selectedVideo ? 'open' : ''}`}
-            onClick={() => setSelectedVideo(null)}
-          >
-            <button 
-              className="video-modal-close"
-              onClick={() => setSelectedVideo(null)}
-            >
-              <CloseIcon />
-            </button>
-            
-            {selectedVideo && (
-              <div className="video-modal" onClick={(e) => e.stopPropagation()}>
-                <div className="video-modal-player">
-                  <iframe
-                    src={`https://www.youtube.com/embed/${selectedVideo.videoId}?autoplay=1&rel=0`}
-                    title={selectedVideo.title}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                </div>
-              </div>
-            )}
+            <span class="video-duration">${video.duration}</span>
+          </div>
+          <div class="video-info">
+            <h3 class="video-title">${video.title}</h3>
+            <p class="video-desc">${video.description}</p>
           </div>
         </div>
-      );
+      `).join('');
     }
     
-    // Initialize the app
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<VideoGuidesPage />);
+    // Modal functions
+    function openModal(videoId, title) {
+      const modal = document.getElementById('videoModal');
+      const iframe = document.getElementById('modalIframe');
+      iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+      iframe.title = title;
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    
+    function closeModal() {
+      const modal = document.getElementById('videoModal');
+      const iframe = document.getElementById('modalIframe');
+      modal.classList.remove('open');
+      iframe.src = '';
+      document.body.style.overflow = '';
+    }
+    
+    // Close modal on overlay click
+    document.getElementById('videoModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeModal();
+      }
+    });
+    
+    // Close modal on Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeModal();
+      }
+    });
+    
+    // Initialize when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+      renderVideos();
+    });
   </script>
 </body>
 </html>
