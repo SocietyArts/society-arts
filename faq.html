@@ -3,13 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FAQ | Society Arts</title>
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <title>FAQ - Society Arts</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
   
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=Domine:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Domine:wght@400;500;600;700&family=Familjen+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Shared CSS -->
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/components.css">
   
   <!-- React -->
   <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
@@ -18,36 +23,16 @@
   
   <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  
-  <!-- Shared CSS Variables -->
-  <link rel="stylesheet" href="/css/variables.css">
+  <script src="/js/shared/supabase-client.js"></script>
   
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
-    body {
-      font-family: var(--font-primary, 'Familjen Grotesk', sans-serif);
-      background-color: var(--color-surface, #F5F3EF);
-      color: var(--color-text-primary, #2D2018);
-      line-height: 1.6;
-    }
-    
-    /* Page Layout */
-    .page-container {
-      display: flex;
-      min-height: 100vh;
-    }
-    
+    /* FAQ Page Specific Styles */
     .faq-content {
-      flex: 1;
-      margin-left: 72px;
-      padding: calc(60px + var(--space-2xl, 32px)) var(--space-2xl, 32px) var(--space-2xl, 32px);
+      margin-left: 64px;
+      padding: var(--space-3xl, 48px) var(--space-4xl, 64px);
+      padding-top: calc(64px + var(--space-3xl, 48px));
+      min-height: 100vh;
       max-width: 900px;
-      margin-right: auto;
     }
     
     /* Page Header */
@@ -56,16 +41,17 @@
     }
     
     .faq-title {
-      font-family: var(--font-serif, 'Domine', serif);
-      font-size: var(--text-3xl, 30px);
-      font-weight: var(--weight-semibold, 600);
-      color: var(--color-text-primary, #2D2018);
-      margin: 0 0 var(--space-sm, 8px) 0;
+      font-family: var(--font-serif, 'Domine', Georgia, serif);
+      font-size: 32px;
+      font-weight: 500;
+      color: var(--color-brown-dark, #3E2318);
+      margin: 0 0 8px 0;
     }
     
     .faq-subtitle {
-      font-size: var(--text-base, 16px);
-      color: var(--color-text-secondary, #6B5D52);
+      font-family: var(--font-primary, 'Familjen Grotesk', sans-serif);
+      font-size: 16px;
+      color: var(--color-text-secondary, #7A6F6A);
       margin: 0;
     }
     
@@ -93,11 +79,11 @@
       width: 100%;
       padding: 14px 48px 14px 48px;
       font-family: var(--font-primary, 'Familjen Grotesk', sans-serif);
-      font-size: var(--text-base, 16px);
+      font-size: 16px;
       border: 1px solid var(--color-border-light, #E5E0D8);
-      border-radius: var(--radius-lg, 12px);
+      border-radius: 12px;
       background: white;
-      color: var(--color-text-primary, #2D2018);
+      color: var(--color-brown-dark, #3E2318);
       transition: all 0.2s ease;
     }
     
@@ -121,7 +107,7 @@
       justify-content: center;
       background: var(--color-surface-alt, #EDE9E3);
       border: none;
-      border-radius: var(--radius-full, 50%);
+      border-radius: 50%;
       cursor: pointer;
       color: var(--color-text-secondary, #6B5D52);
       transition: all 0.15s ease;
@@ -136,18 +122,18 @@
     
     .faq-search-clear:hover {
       background: var(--color-tan-20, #E8E0D5);
-      color: var(--color-text-primary, #2D2018);
+      color: var(--color-brown-dark, #3E2318);
     }
     
     /* Search Results Info */
     .faq-search-info {
-      margin-top: var(--space-sm, 8px);
-      font-size: var(--text-sm, 14px);
-      color: var(--color-text-secondary, #6B5D52);
+      margin-top: 8px;
+      font-size: 14px;
+      color: var(--color-text-secondary, #7A6F6A);
     }
     
     .faq-search-info strong {
-      color: var(--color-text-primary, #2D2018);
+      color: var(--color-brown-dark, #3E2318);
     }
     
     /* FAQ Sections */
@@ -159,29 +145,29 @@
     
     .faq-section {
       background: white;
-      border-radius: var(--radius-xl, 16px);
+      border-radius: 16px;
       border: 1px solid var(--color-border-light, #E5E0D8);
       overflow: hidden;
     }
     
     .faq-section-header {
-      padding: var(--space-lg, 20px) var(--space-xl, 24px);
+      padding: 20px 24px;
       background: var(--color-surface-alt, #EDE9E3);
       border-bottom: 1px solid var(--color-border-light, #E5E0D8);
     }
     
     .faq-section-title {
-      font-family: var(--font-serif, 'Domine', serif);
-      font-size: var(--text-lg, 18px);
-      font-weight: var(--weight-semibold, 600);
-      color: var(--color-text-primary, #2D2018);
+      font-family: var(--font-serif, 'Domine', Georgia, serif);
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--color-brown-dark, #3E2318);
       margin: 0;
     }
     
     .faq-section-desc {
-      font-size: var(--text-sm, 14px);
-      color: var(--color-text-secondary, #6B5D52);
-      margin: var(--space-xs, 4px) 0 0 0;
+      font-size: 14px;
+      color: var(--color-text-secondary, #7A6F6A);
+      margin: 4px 0 0 0;
     }
     
     /* FAQ Items */
@@ -200,7 +186,7 @@
     
     .faq-question {
       width: 100%;
-      padding: var(--space-lg, 20px) var(--space-xl, 24px);
+      padding: 20px 24px;
       background: none;
       border: none;
       text-align: left;
@@ -208,11 +194,11 @@
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
-      gap: var(--space-md, 16px);
+      gap: 16px;
       font-family: var(--font-primary, 'Familjen Grotesk', sans-serif);
-      font-size: var(--text-base, 16px);
-      font-weight: var(--weight-medium, 500);
-      color: var(--color-text-primary, #2D2018);
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--color-brown-dark, #3E2318);
       line-height: 1.5;
       transition: background 0.15s ease;
     }
@@ -257,14 +243,14 @@
     }
     
     .faq-answer-content {
-      padding: 0 var(--space-xl, 24px) var(--space-lg, 20px) var(--space-xl, 24px);
-      color: var(--color-text-secondary, #6B5D52);
+      padding: 0 24px 20px 24px;
+      color: var(--color-text-secondary, #7A6F6A);
       line-height: 1.7;
     }
     
     .faq-answer-content strong {
-      color: var(--color-text-primary, #2D2018);
-      font-weight: var(--weight-semibold, 600);
+      color: var(--color-brown-dark, #3E2318);
+      font-weight: 600;
     }
     
     /* Highlight for search matches */
@@ -277,66 +263,66 @@
     /* No Results */
     .faq-no-results {
       text-align: center;
-      padding: var(--space-3xl, 48px) var(--space-xl, 24px);
+      padding: 48px 24px;
       background: white;
-      border-radius: var(--radius-xl, 16px);
+      border-radius: 16px;
       border: 1px solid var(--color-border-light, #E5E0D8);
     }
     
     .faq-no-results-icon {
       width: 64px;
       height: 64px;
-      margin: 0 auto var(--space-lg, 20px);
+      margin: 0 auto 20px;
       color: var(--color-text-light, #9C8E82);
     }
     
     .faq-no-results-title {
-      font-family: var(--font-serif, 'Domine', serif);
-      font-size: var(--text-lg, 18px);
-      font-weight: var(--weight-semibold, 600);
-      color: var(--color-text-primary, #2D2018);
-      margin: 0 0 var(--space-sm, 8px) 0;
+      font-family: var(--font-serif, 'Domine', Georgia, serif);
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--color-brown-dark, #3E2318);
+      margin: 0 0 8px 0;
     }
     
     .faq-no-results-text {
-      color: var(--color-text-secondary, #6B5D52);
+      color: var(--color-text-secondary, #7A6F6A);
       margin: 0;
     }
     
     /* Contact CTA */
     .faq-cta {
       text-align: center;
-      padding: var(--space-2xl, 32px);
+      padding: 32px;
       background: var(--color-tan-10, #F5F0E8);
-      border-radius: var(--radius-xl, 16px);
-      margin-top: var(--space-2xl, 32px);
+      border-radius: 16px;
+      margin-top: 32px;
     }
     
     .faq-cta-title {
-      font-family: var(--font-serif, 'Domine', serif);
-      font-size: var(--text-lg, 18px);
-      font-weight: var(--weight-semibold, 600);
-      color: var(--color-text-primary, #2D2018);
-      margin: 0 0 var(--space-sm, 8px) 0;
+      font-family: var(--font-serif, 'Domine', Georgia, serif);
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--color-brown-dark, #3E2318);
+      margin: 0 0 8px 0;
     }
     
     .faq-cta-text {
-      color: var(--color-text-secondary, #6B5D52);
-      margin: 0 0 var(--space-lg, 20px) 0;
+      color: var(--color-text-secondary, #7A6F6A);
+      margin: 0 0 20px 0;
     }
     
     .faq-cta-link {
       display: inline-flex;
       align-items: center;
-      gap: var(--space-sm, 8px);
+      gap: 8px;
       color: var(--color-accent, #8B6914);
-      font-weight: var(--weight-semibold, 600);
+      font-weight: 600;
       text-decoration: none;
       transition: gap 0.2s ease;
     }
     
     .faq-cta-link:hover {
-      gap: var(--space-md, 16px);
+      gap: 16px;
     }
     
     .faq-cta-link svg {
@@ -347,7 +333,7 @@
     /* Loading State */
     .faq-loading {
       text-align: center;
-      padding: var(--space-3xl, 48px);
+      padding: 48px;
     }
     
     .faq-loading-spinner {
@@ -356,7 +342,7 @@
       border: 3px solid var(--color-border-light, #E5E0D8);
       border-top-color: var(--color-accent, #8B6914);
       border-radius: 50%;
-      margin: 0 auto var(--space-lg, 20px);
+      margin: 0 auto 20px;
       animation: spin 0.8s linear infinite;
     }
     
@@ -365,22 +351,22 @@
     }
     
     .faq-loading-text {
-      color: var(--color-text-secondary, #6B5D52);
+      color: var(--color-text-secondary, #7A6F6A);
     }
     
     /* Error State */
     .faq-error {
       text-align: center;
-      padding: var(--space-2xl, 32px);
+      padding: 32px;
       background: #FEF2F2;
       border: 1px solid #FECACA;
-      border-radius: var(--radius-xl, 16px);
+      border-radius: 16px;
     }
     
     .faq-error-title {
-      font-weight: var(--weight-semibold, 600);
+      font-weight: 600;
       color: #991B1B;
-      margin: 0 0 var(--space-sm, 8px) 0;
+      margin: 0 0 8px 0;
     }
     
     .faq-error-text {
@@ -392,19 +378,20 @@
     @media (max-width: 768px) {
       .faq-content {
         margin-left: 0;
-        padding: calc(60px + var(--space-lg, 20px)) var(--space-lg, 20px) var(--space-lg, 20px);
+        padding: 20px;
+        padding-top: calc(64px + 20px);
       }
       
       .faq-title {
-        font-size: var(--text-2xl, 24px);
+        font-size: 24px;
       }
       
       .faq-question {
-        padding: var(--space-md, 16px);
+        padding: 16px;
       }
       
       .faq-answer-content {
-        padding: 0 var(--space-md, 16px) var(--space-md, 16px);
+        padding: 0 16px 16px;
       }
     }
   </style>
@@ -514,7 +501,8 @@
     
     // Main FAQ Page Component
     function FAQPage() {
-      const { Sidebar, Header, useAuth, supabase } = window.SocietyArts || {};
+      const { Sidebar, Header } = window.SocietyArts || {};
+      const supabase = window.SocietyArts?.supabase;
       
       const [categories, setCategories] = useState([]);
       const [faqs, setFaqs] = useState([]);
@@ -522,10 +510,6 @@
       const [error, setError] = useState(null);
       const [searchQuery, setSearchQuery] = useState('');
       const [openItems, setOpenItems] = useState(new Set());
-      
-      // Get auth state if available
-      const auth = useAuth ? useAuth() : { user: null, profile: null, isLoading: false };
-      const { user, profile } = auth;
       
       // Fetch FAQ data from Supabase
       useEffect(() => {
@@ -622,8 +606,8 @@
       
       return (
         <div className="page-container">
-          <Sidebar />
-          <Header user={user} profile={profile} />
+          <Sidebar currentPage="faq" />
+          <Header />
           
           <main className="faq-content">
             {/* Page Header */}
