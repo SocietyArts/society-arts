@@ -12,7 +12,7 @@ const R2_BASE_URL = 'https://pub-acb560f551f141db830964aed1fa005f.r2.dev';
 
 const IMAGE_CONFIG = {
     // Enable/disable Netlify Image CDN (set to false to use direct R2 URLs)
-    useNetlifyImageCDN: true,
+    useNetlifyImageCDN: false,
     
     // Image size presets (width in pixels)
     sizes: {
