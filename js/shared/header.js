@@ -220,8 +220,9 @@ function generateSidebarHTML() {
                 </div>
                 <button class="account-trigger" onclick="window.SocietyArts.toggleAccountMenu()" title="${isLoggedIn ? 'Account menu' : 'Help & Info'}">
                     ${accountTrigger}
+                    <span class="account-trigger-name">${isLoggedIn ? displayName : 'Help & Info'}</span>
                 </button>
-            </div>
+                </div>
         </aside>
     `;
 }
@@ -617,7 +618,8 @@ if (typeof React !== 'undefined') {
                 },
                     user
                         ? h('span', { className: 'account-trigger-initials' }, initials)
-                        : h('span', { className: 'account-trigger-question', dangerouslySetInnerHTML: { __html: ICONS.questionMark } })
+                        : h('span', { className: 'account-trigger-question', dangerouslySetInnerHTML: { __html: ICONS.questionMark } }),
+                    h('span', { className: 'account-trigger-name' }, user ? displayName : 'Help & Info')
                 )
             )
         );
