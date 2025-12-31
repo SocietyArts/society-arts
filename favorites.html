@@ -279,7 +279,7 @@
         if (style?.image_urls?.length > 0) {
           return style.image_urls[0];
         }
-        return `https://pub-d4d49982f29749dea52e2eb37c29ad51.r2.dev/${styleId}/${styleId}_1.webp`;
+        return window.SocietyArts.getAltStyleThumbnailUrl(styleId);
       };
 
       const formatDate = (dateString) => {
@@ -355,11 +355,11 @@
                         >
                           <td>
                             <div className="favorite-thumbnail">
-                              <img 
+                              <img loading="lazy"
                                 src={getStyleImage(style.id)}
                                 alt={style.name}
                                 onError={e => {
-                                  e.target.src = `https://pub-d4d49982f29749dea52e2eb37c29ad51.r2.dev/${style.id}/${style.id}_1.webp`;
+                                  e.target.src = window.SocietyArts.getAltStyleThumbnailUrl(style.id);
                                 }}
                               />
                             </div>

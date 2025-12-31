@@ -2613,7 +2613,7 @@
         if (style.thumbnail_url) {
           return style.thumbnail_url;
         }
-        return `https://pub-acb560f551f141db830964aed1fa005f.r2.dev/${style.id}/${style.id}-00.webp`;
+        return window.SocietyArts.getStyleThumbnailUrl(style.id, 0);
       };
 
       if (!isOpen) return null;
@@ -2849,7 +2849,7 @@
                             alt={style.name}
                             loading="lazy"
                             onError={(e) => {
-                              e.target.src = `https://pub-acb560f551f141db830964aed1fa005f.r2.dev/${style.id}/${style.id}-00.webp`;
+                              e.target.src = window.SocietyArts.getStyleThumbnailUrl(style.id, 0);
                             }}
                           />
                         </div>
@@ -2858,7 +2858,7 @@
                           alt={style.name}
                           loading="lazy"
                           onError={(e) => {
-                            e.target.src = `https://pub-acb560f551f141db830964aed1fa005f.r2.dev/${style.id}/${style.id}-00.webp`;
+                            e.target.src = window.SocietyArts.getStyleThumbnailUrl(style.id, 0);
                           }}
                         />
 
@@ -3035,7 +3035,7 @@
                           onClick={() => setViewerImage({ styleId: detailStyle.id, imageIndex: num })}
                         >
                           <img 
-                            src={`https://pub-acb560f551f141db830964aed1fa005f.r2.dev/${detailStyle.id}/${detailStyle.id}-0${num}.webp`}
+                            src={window.SocietyArts.getStylePreviewUrl(detailStyle.id, num)}
                             alt={`${detailStyle.name} - Image ${num}`}
                             onError={(e) => { e.target.style.opacity = '0.3'; }}
                           />
@@ -3068,7 +3068,7 @@
                 
                 <div className="image-viewer-container">
                   <img 
-                    src={`https://pub-acb560f551f141db830964aed1fa005f.r2.dev/${viewerImage.styleId}/${viewerImage.styleId}-0${viewerImage.imageIndex}.webp`}
+                    src={window.SocietyArts.getStyleFullUrl(viewerImage.styleId, viewerImage.imageIndex)}
                     alt={`Image ${viewerImage.imageIndex}`}
                     draggable={false}
                   />
@@ -3491,7 +3491,7 @@
         if (cached?.thumbnail_url) {
           return cached.thumbnail_url;
         }
-        return `https://pub-acb560f551f141db830964aed1fa005f.r2.dev/${styleId}/${styleId}-00.webp`;
+        return window.SocietyArts.getStyleThumbnailUrl(styleId, 0);
       };
 
       // Get style name
@@ -3694,7 +3694,7 @@
                       src={getStyleImage(styleId)} 
                       alt={getStyleName(styleId)}
                       onError={(e) => {
-                        e.target.src = `https://pub-acb560f551f141db830964aed1fa005f.r2.dev/${styleId}/${styleId}-00.webp`;
+                        e.target.src = window.SocietyArts.getStyleThumbnailUrl(styleId, 0);
                       }}
                     />
                     <button 

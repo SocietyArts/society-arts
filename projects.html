@@ -375,8 +375,8 @@
                       >
                         <div className="project-thumbnail">
                           {project.selected_styles?.[0] && (
-                            <img 
-                              src={`https://pub-d4d49982f29749dea52e2eb37c29ad51.r2.dev/${project.selected_styles[0]}/${project.selected_styles[0]}_1.webp`}
+                            <img loading="lazy"
+                              src={window.SocietyArts.getAltStyleThumbnailUrl(project.selected_styles[0])}
                               alt=""
                               onError={e => e.target.style.display = 'none'}
                             />

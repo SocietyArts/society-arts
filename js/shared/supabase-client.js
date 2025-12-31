@@ -110,12 +110,56 @@ function getStyleSrcSet(styleId, imageIndex = 0) {
 }
 
 // ============================================
+// ALTERNATE BUCKET HELPERS (for legacy pages)
+// ============================================
+// Some pages use the alternate R2 bucket with different naming convention
+
+const R2_ALT_BASE_URL = 'https://pub-d4d49982f29749dea52e2eb37c29ad51.r2.dev';
+
+/**
+ * Get optimized image URL for alternate bucket (legacy format)
+ * Uses _1.webp naming convention instead of -00.webp
+ */
+function getAltStyleThumbnailUrl(styleId) {
+    const rawUrl = `${R2_ALT_BASE_URL}/${styleId}/${styleId}_1.webp`;
+    
+    if (!IMAGE_CONFIG.useNetlifyImageCDN) {
+        return rawUrl;
+    }
+    
+    const params = new URLSearchParams();
+    params.set('url', rawUrl);
+    params.set('w', IMAGE_CONFIG.sizes.thumbnail);
+    
+    return `/.netlify/images?${params.toString()}`;
+}
+
+/**
+ * Convert any raw R2 URL to optimized Netlify CDN URL
+ */
+function getOptimizedImageUrl(rawUrl, width = null) {
+    if (!IMAGE_CONFIG.useNetlifyImageCDN) {
+        return rawUrl;
+    }
+    
+    const params = new URLSearchParams();
+    params.set('url', rawUrl);
+    
+    if (width) {
+        params.set('w', width);
+    }
+    
+    return `/.netlify/images?${params.toString()}`;
+}
+
+// ============================================
 // EXPORT
 // ============================================
 
 window.SocietyArts = window.SocietyArts || {};
 window.SocietyArts.supabase = supabaseClient;
 window.SocietyArts.R2_BASE_URL = R2_BASE_URL;
+window.SocietyArts.R2_ALT_BASE_URL = R2_ALT_BASE_URL;
 window.SocietyArts.IMAGE_CONFIG = IMAGE_CONFIG;
 
 // Image URL functions
@@ -126,5 +170,9 @@ window.SocietyArts.getStyleFullUrl = getStyleFullUrl;
 window.SocietyArts.getAllStyleImageUrls = getAllStyleImageUrls;
 window.SocietyArts.getStyleSrcSet = getStyleSrcSet;
 window.SocietyArts.getRawImageUrl = getRawImageUrl;
+
+// Alternate bucket functions (legacy pages)
+window.SocietyArts.getAltStyleThumbnailUrl = getAltStyleThumbnailUrl;
+window.SocietyArts.getOptimizedImageUrl = getOptimizedImageUrl;
 
 console.log('Supabase client initialized with Netlify Image CDN support');

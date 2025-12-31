@@ -616,7 +616,7 @@ if (typeof React !== 'undefined') {
                             }
                         },
                             project.selected_styles?.[0] && h('img', {
-                                src: `https://pub-d4d49982f29749dea52e2eb37c29ad51.r2.dev/${project.selected_styles[0]}/${project.selected_styles[0]}_1.webp`,
+                                src: window.SocietyArts.getAltStyleThumbnailUrl(project.selected_styles[0]),
                                 alt: '',
                                 style: { width: '100%', height: '100%', objectFit: 'cover' },
                                 onError: (e) => e.target.style.display = 'none'
