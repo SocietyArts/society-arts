@@ -895,27 +895,33 @@
 .account-trigger {
     width: 36px;
     height: 36px;
-    border-radius: 50%;
+    border-radius: 18px;
     border: none;
     background: var(--color-tan-20, #E7E2DC);
     cursor: pointer;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
+    gap: 10px;
+    padding: 0;
     transition: all 0.15s ease;
-    margin: 0 auto;
+    overflow: hidden;
 }
 
-.account-trigger:hover {
-    background: var(--color-tan-40, #CFC5B9);
-    transform: scale(1.05);
+.sidebar:hover .account-trigger {
+    width: 100%;
+    border-radius: 6px;
+    padding: 0 12px 0 0;
 }
 
 /* Question mark icon (not logged in) */
 .account-trigger-question {
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
 }
 
 .account-trigger-question svg {
@@ -926,6 +932,12 @@
 
 /* User initials (logged in) */
 .account-trigger-initials {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
     font-family: var(--font-primary, 'Familjen Grotesk', sans-serif);
     font-size: 13px;
     font-weight: 600;
@@ -940,6 +952,22 @@
     border-radius: 50%;
     object-fit: cover;
 }
+
+/* Account trigger name (shown on hover) */
+.account-trigger-name {
+    font-family: var(--font-primary, 'Familjen Grotesk', sans-serif);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-brown, #3E2318);
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity var(--sidebar-transition);
+}
+
+.sidebar:hover .account-trigger-name {
+    opacity: 1;
+}
+
 
 /* ========================================
    ACCOUNT MENU POPUP
