@@ -11,17 +11,146 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Domine:wght@400;500;600;700&family=Familjen+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   
-  <!-- Shared CSS -->
-  <link rel="stylesheet" href="/css/variables.css">
-  <link rel="stylesheet" href="/css/base.css">
-  <link rel="stylesheet" href="/css/components.css">
-  
   <style>
+    /* Reset & Base */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    :root {
+      --color-cream: #FAF8F5;
+      --color-brown-dark: #3E2318;
+      --color-rust: #C75B3F;
+      --color-text-primary: #3E2318;
+      --color-text-secondary: #7A6F6A;
+      --color-surface: #FFFFFF;
+      --color-border-light: #E8E4E0;
+      --font-serif: 'Domine', Georgia, serif;
+      --font-sans: 'Familjen Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --space-xs: 4px;
+      --space-sm: 8px;
+      --space-md: 12px;
+      --space-lg: 16px;
+      --space-xl: 24px;
+      --space-2xl: 32px;
+      --space-3xl: 48px;
+      --space-4xl: 64px;
+    }
+    
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--color-cream);
+      color: var(--color-text-primary);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+    
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 64px;
+      background: var(--color-brown-dark);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: var(--space-lg) 0;
+      z-index: 100;
+    }
+    
+    .sidebar-logo {
+      width: 40px;
+      height: 40px;
+      margin-bottom: var(--space-xl);
+    }
+    
+    .sidebar-logo svg {
+      width: 100%;
+      height: 100%;
+    }
+    
+    .sidebar-nav {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+      align-items: center;
+    }
+    
+    .sidebar-link {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(250, 248, 245, 0.6);
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    
+    .sidebar-link:hover {
+      background: rgba(250, 248, 245, 0.1);
+      color: var(--color-cream);
+    }
+    
+    .sidebar-link.active {
+      background: rgba(250, 248, 245, 0.15);
+      color: var(--color-cream);
+    }
+    
+    .sidebar-link svg {
+      width: 22px;
+      height: 22px;
+    }
+    
+    /* Header */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 64px;
+      right: 0;
+      height: 64px;
+      background: var(--color-cream);
+      border-bottom: 1px solid var(--color-border-light);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 0 var(--space-xl);
+      z-index: 90;
+    }
+    
+    .header-btn {
+      padding: 10px 20px;
+      background: var(--color-brown-dark);
+      color: var(--color-cream);
+      border: none;
+      border-radius: var(--radius-md);
+      font-family: var(--font-sans);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    
+    .header-btn:hover {
+      background: #2a1810;
+    }
+    
     /* Page Layout */
     .videos-content {
       margin-left: 64px;
       padding: var(--space-3xl) var(--space-4xl);
-      min-height: calc(100vh - 64px);
+      padding-top: calc(64px + var(--space-3xl));
+      min-height: 100vh;
       max-width: 1200px;
     }
     
@@ -30,41 +159,41 @@
     }
     
     .videos-title {
-      font-family: 'Domine', var(--font-serif);
+      font-family: var(--font-serif);
       font-size: 32px;
       font-weight: 500;
-      color: var(--color-text-primary, #3E2318);
+      color: var(--color-text-primary);
       margin: 0 0 var(--space-sm) 0;
     }
     
     .videos-subtitle {
-      font-family: 'Familjen Grotesk', var(--font-sans);
+      font-family: var(--font-sans);
       font-size: 16px;
-      color: var(--color-text-secondary, #7A6F6A);
+      color: var(--color-text-secondary);
       margin: 0;
     }
     
     /* Featured Video */
     .featured-video {
-      background: var(--color-surface, #FFFFFF);
-      border-radius: var(--radius-xl, 16px);
+      background: var(--color-surface);
+      border-radius: var(--radius-xl);
       overflow: hidden;
       box-shadow: 0 4px 20px rgba(62, 35, 24, 0.08);
       margin-bottom: var(--space-3xl);
-      border: 1px solid var(--color-border-light, #E8E4E0);
+      border: 1px solid var(--color-border-light);
     }
     
     .featured-label {
       display: inline-block;
-      background: var(--color-rust, #C75B3F);
+      background: var(--color-rust);
       color: white;
-      font-family: 'Familjen Grotesk', var(--font-sans);
+      font-family: var(--font-sans);
       font-size: 12px;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       padding: 6px 14px;
-      border-radius: 0 0 var(--radius-md, 8px) 0;
+      border-radius: 0 0 var(--radius-md) 0;
     }
     
     .featured-player {
@@ -89,27 +218,27 @@
     }
     
     .featured-title {
-      font-family: 'Domine', var(--font-serif);
+      font-family: var(--font-serif);
       font-size: 22px;
       font-weight: 500;
-      color: var(--color-text-primary, #3E2318);
+      color: var(--color-text-primary);
       margin: 0 0 var(--space-sm) 0;
     }
     
     .featured-desc {
-      font-family: 'Familjen Grotesk', var(--font-sans);
+      font-family: var(--font-sans);
       font-size: 15px;
-      color: var(--color-text-secondary, #7A6F6A);
+      color: var(--color-text-secondary);
       margin: 0;
       line-height: 1.6;
     }
     
     /* Section Title */
     .videos-section-title {
-      font-family: 'Domine', var(--font-serif);
+      font-family: var(--font-serif);
       font-size: 22px;
       font-weight: 500;
-      color: var(--color-text-primary, #3E2318);
+      color: var(--color-text-primary);
       margin: 0 0 var(--space-xl) 0;
     }
     
@@ -121,11 +250,11 @@
     }
     
     .video-card {
-      background: var(--color-surface, #FFFFFF);
-      border-radius: var(--radius-lg, 12px);
+      background: var(--color-surface);
+      border-radius: var(--radius-lg);
       overflow: hidden;
       box-shadow: 0 2px 12px rgba(62, 35, 24, 0.06);
-      border: 1px solid var(--color-border-light, #E8E4E0);
+      border: 1px solid var(--color-border-light);
       cursor: pointer;
       transition: all 0.2s ease;
     }
@@ -168,7 +297,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--color-rust, #C75B3F);
+      color: var(--color-rust);
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
       transition: all 0.2s ease;
     }
@@ -190,7 +319,7 @@
       right: 8px;
       background: rgba(0, 0, 0, 0.8);
       color: white;
-      font-family: 'Familjen Grotesk', var(--font-sans);
+      font-family: var(--font-sans);
       font-size: 12px;
       font-weight: 500;
       padding: 4px 8px;
@@ -202,17 +331,17 @@
     }
     
     .video-title {
-      font-family: 'Domine', var(--font-serif);
+      font-family: var(--font-serif);
       font-size: 17px;
       font-weight: 500;
-      color: var(--color-text-primary, #3E2318);
+      color: var(--color-text-primary);
       margin: 0 0 var(--space-xs) 0;
     }
     
     .video-desc {
-      font-family: 'Familjen Grotesk', var(--font-sans);
+      font-family: var(--font-sans);
       font-size: 14px;
-      color: var(--color-text-secondary, #7A6F6A);
+      color: var(--color-text-secondary);
       margin: 0;
       line-height: 1.5;
     }
@@ -225,18 +354,14 @@
       right: 0;
       bottom: 0;
       background: rgba(0, 0, 0, 0.9);
-      display: flex;
+      display: none;
       align-items: center;
       justify-content: center;
       z-index: 1000;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s ease;
     }
     
     .video-modal-overlay.open {
-      opacity: 1;
-      visibility: visible;
+      display: flex;
     }
     
     .video-modal-close {
@@ -275,7 +400,7 @@
       position: relative;
       padding-bottom: 56.25%;
       background: #000;
-      border-radius: var(--radius-lg, 12px);
+      border-radius: var(--radius-lg);
       overflow: hidden;
     }
     
@@ -288,22 +413,20 @@
       border: none;
     }
     
-    /* Loading State */
-    .loading-state {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      font-family: 'Familjen Grotesk', var(--font-sans);
-      color: var(--color-text-secondary, #7A6F6A);
-    }
-    
     /* Responsive */
     @media (max-width: 768px) {
+      .sidebar {
+        display: none;
+      }
+      
+      .header {
+        left: 0;
+      }
+      
       .videos-content {
         margin-left: 0;
         padding: var(--space-xl);
-        padding-top: 80px;
+        padding-top: calc(64px + var(--space-xl));
       }
       
       .videos-title {
@@ -317,33 +440,95 @@
   </style>
 </head>
 <body>
-  <div id="root"></div>
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <a href="/" class="sidebar-logo">
+      <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="20" cy="20" r="18" stroke="#FAF8F5" stroke-width="2"/>
+        <path d="M12 28C12 28 14 24 20 24C26 24 28 28 28 28" stroke="#FAF8F5" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="14" cy="16" r="2" fill="#FAF8F5"/>
+        <circle cx="26" cy="16" r="2" fill="#FAF8F5"/>
+      </svg>
+    </a>
+    <div class="sidebar-nav">
+      <a href="/story-builder.html" class="sidebar-link" title="Story Builder">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
+          <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
+          <path d="M2 2l7.586 7.586"></path>
+          <circle cx="11" cy="11" r="2"></circle>
+        </svg>
+      </a>
+      <a href="/style-finder.html" class="sidebar-link" title="Style Finder">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7"></rect>
+          <rect x="14" y="3" width="7" height="7"></rect>
+          <rect x="14" y="14" width="7" height="7"></rect>
+          <rect x="3" y="14" width="7" height="7"></rect>
+        </svg>
+      </a>
+      <a href="/video-guides.html" class="sidebar-link active" title="Video Guides">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="5 3 19 12 5 21 5 3"></polygon>
+        </svg>
+      </a>
+    </div>
+  </nav>
   
-  <!-- Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Header -->
+  <header class="header">
+    <a href="/login.html" class="header-btn">Sign In</a>
+  </header>
   
-  <!-- React -->
-  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  
-  <!-- Shared Components -->
-  <script type="text/babel" src="/js/shared/api.js"></script>
-  <script type="text/babel" src="/js/shared/header.js"></script>
-  
-  <script type="text/babel">
-    const { useState, useEffect } = React;
+  <!-- Main Content -->
+  <main class="videos-content">
+    <div class="videos-header">
+      <h1 class="videos-title">Video Guides</h1>
+      <p class="videos-subtitle">Learn how to create beautiful art from your memories</p>
+    </div>
     
-    // Video Data
-    const VIDEOS = [
-      {
-        id: 1,
-        title: 'Welcome to Society Arts',
-        description: 'Get started with creating beautiful art from your meaningful memories. Learn the basics of our story-to-art process.',
-        videoId: 'dQw4w9WgXcQ',
-        duration: '5:23',
-        featured: true
-      },
+    <!-- Featured Video -->
+    <div class="featured-video">
+      <span class="featured-label">Start Here</span>
+      <div class="featured-player">
+        <iframe
+          src="https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0"
+          title="Welcome to Society Arts"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+        ></iframe>
+      </div>
+      <div class="featured-info">
+        <h2 class="featured-title">Welcome to Society Arts</h2>
+        <p class="featured-desc">Get started with creating beautiful art from your meaningful memories. Learn the basics of our story-to-art process.</p>
+      </div>
+    </div>
+    
+    <!-- More Tutorials -->
+    <h2 class="videos-section-title">More Tutorials</h2>
+    <div class="videos-grid" id="videosGrid">
+      <!-- Videos will be inserted here by JavaScript -->
+    </div>
+  </main>
+  
+  <!-- Video Modal -->
+  <div class="video-modal-overlay" id="videoModal">
+    <button class="video-modal-close" onclick="closeModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+    <div class="video-modal">
+      <div class="video-modal-player">
+        <iframe id="modalIframe" src="" title="Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // Video data
+    const videos = [
       {
         id: 2,
         title: 'Crafting Your Story',
@@ -381,203 +566,66 @@
       }
     ];
     
-    // Icons
-    const PlayIcon = () => (
-      <svg viewBox="0 0 24 24" fill="currentColor">
-        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-      </svg>
-    );
-    
-    const CloseIcon = () => (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        <line x1="18" y1="6" x2="6" y2="18"></line>
-        <line x1="6" y1="6" x2="18" y2="18"></line>
-      </svg>
-    );
-    
-    // Wait for components to load
-    function waitForComponents() {
-      return new Promise((resolve) => {
-        const check = () => {
-          if (window.SocietyArts?.Sidebar && window.SocietyArts?.Header) {
-            resolve();
-          } else {
-            setTimeout(check, 50);
-          }
-        };
-        check();
-      });
-    }
-    
-    function VideoGuidesPage() {
-      const [componentsReady, setComponentsReady] = useState(false);
-      const [selectedVideo, setSelectedVideo] = useState(null);
-      const [user, setUser] = useState(null);
-      const [profile, setProfile] = useState(null);
-      
-      // Wait for shared components
-      useEffect(() => {
-        waitForComponents().then(() => setComponentsReady(true));
-      }, []);
-      
-      // Load auth state
-      useEffect(() => {
-        if (!componentsReady) return;
-        
-        const loadAuth = async () => {
-          try {
-            const { data: { session } } = await window.SocietyArts.supabase.auth.getSession();
-            if (session?.user) {
-              setUser(session.user);
-              // Load profile
-              const { data: profileData } = await window.SocietyArts.supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', session.user.id)
-                .single();
-              setProfile(profileData);
-            }
-          } catch (err) {
-            console.log('Auth not loaded:', err);
-          }
-        };
-        
-        loadAuth();
-        
-        // Listen for auth changes
-        const { data: { subscription } } = window.SocietyArts.supabase.auth.onAuthStateChange(
-          async (event, session) => {
-            setUser(session?.user || null);
-            if (session?.user) {
-              const { data: profileData } = await window.SocietyArts.supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', session.user.id)
-                .single();
-              setProfile(profileData);
-            } else {
-              setProfile(null);
-            }
-          }
-        );
-        
-        return () => subscription?.unsubscribe();
-      }, [componentsReady]);
-      
-      // Close modal on escape
-      useEffect(() => {
-        const handleEscape = (e) => {
-          if (e.key === 'Escape') setSelectedVideo(null);
-        };
-        document.addEventListener('keydown', handleEscape);
-        return () => document.removeEventListener('keydown', handleEscape);
-      }, []);
-      
-      if (!componentsReady) {
-        return <div className="loading-state">Loading...</div>;
-      }
-      
-      const { Sidebar, Header } = window.SocietyArts;
-      const featuredVideo = VIDEOS.find(v => v.featured);
-      const otherVideos = VIDEOS.filter(v => !v.featured);
-      
-      const getYouTubeThumbnail = (videoId) => {
-        return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-      };
-      
-      return (
-        <div className="page-container">
-          <Sidebar />
-          <Header user={user} profile={profile} />
-          
-          <main className="videos-content">
-            <div className="videos-header">
-              <h1 className="videos-title">Video Guides</h1>
-              <p className="videos-subtitle">Learn how to create beautiful art from your memories</p>
+    // Render video cards
+    function renderVideos() {
+      const grid = document.getElementById('videosGrid');
+      grid.innerHTML = videos.map(video => `
+        <div class="video-card" onclick="openModal('${video.videoId}', '${video.title}')">
+          <div class="video-thumbnail">
+            <img 
+              src="https://img.youtube.com/vi/${video.videoId}/maxresdefault.jpg" 
+              alt="${video.title}"
+              onerror="this.src='https://img.youtube.com/vi/${video.videoId}/hqdefault.jpg'"
+            />
+            <div class="video-play-btn">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
             </div>
-            
-            {/* Featured Video */}
-            {featuredVideo && (
-              <div className="featured-video">
-                <span className="featured-label">Start Here</span>
-                <div className="featured-player">
-                  <iframe
-                    src={`https://www.youtube.com/embed/${featuredVideo.videoId}?rel=0`}
-                    title={featuredVideo.title}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                </div>
-                <div className="featured-info">
-                  <h2 className="featured-title">{featuredVideo.title}</h2>
-                  <p className="featured-desc">{featuredVideo.description}</p>
-                </div>
-              </div>
-            )}
-            
-            {/* Other Videos */}
-            <h2 className="videos-section-title">More Tutorials</h2>
-            <div className="videos-grid">
-              {otherVideos.map((video) => (
-                <div 
-                  key={video.id} 
-                  className="video-card"
-                  onClick={() => setSelectedVideo(video)}
-                >
-                  <div className="video-thumbnail">
-                    <img 
-                      src={getYouTubeThumbnail(video.videoId)} 
-                      alt={video.title}
-                      onError={(e) => {
-                        e.target.src = `https://img.youtube.com/vi/${video.videoId}/hqdefault.jpg`;
-                      }}
-                    />
-                    <div className="video-play-btn"><PlayIcon /></div>
-                    <span className="video-duration">{video.duration}</span>
-                  </div>
-                  <div className="video-info">
-                    <h3 className="video-title">{video.title}</h3>
-                    <p className="video-desc">{video.description}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </main>
-          
-          {/* Video Modal */}
-          <div 
-            className={`video-modal-overlay ${selectedVideo ? 'open' : ''}`}
-            onClick={() => setSelectedVideo(null)}
-          >
-            <button 
-              className="video-modal-close"
-              onClick={() => setSelectedVideo(null)}
-            >
-              <CloseIcon />
-            </button>
-            
-            {selectedVideo && (
-              <div className="video-modal" onClick={(e) => e.stopPropagation()}>
-                <div className="video-modal-player">
-                  <iframe
-                    src={`https://www.youtube.com/embed/${selectedVideo.videoId}?autoplay=1&rel=0`}
-                    title={selectedVideo.title}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                </div>
-              </div>
-            )}
+            <span class="video-duration">${video.duration}</span>
+          </div>
+          <div class="video-info">
+            <h3 class="video-title">${video.title}</h3>
+            <p class="video-desc">${video.description}</p>
           </div>
         </div>
-      );
+      `).join('');
     }
     
-    // Initialize
-    waitForComponents().then(() => {
-      const root = ReactDOM.createRoot(document.getElementById('root'));
-      root.render(<VideoGuidesPage />);
+    // Modal functions
+    function openModal(videoId, title) {
+      const modal = document.getElementById('videoModal');
+      const iframe = document.getElementById('modalIframe');
+      iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+      iframe.title = title;
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    
+    function closeModal() {
+      const modal = document.getElementById('videoModal');
+      const iframe = document.getElementById('modalIframe');
+      modal.classList.remove('open');
+      iframe.src = '';
+      document.body.style.overflow = '';
+    }
+    
+    // Close modal on overlay click
+    document.getElementById('videoModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeModal();
+      }
     });
+    
+    // Close modal on Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeModal();
+      }
+    });
+    
+    // Initialize
+    renderVideos();
   </script>
 </body>
 </html>
