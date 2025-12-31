@@ -17,55 +17,57 @@
   <link rel="stylesheet" href="/css/components.css">
   
   <style>
-    /* Page Layout */
+    /* Page-specific styles only - layout handled by base.css */
+    
+    /* Videos Content */
     .videos-content {
       margin-left: 64px;
-      padding: var(--space-3xl) var(--space-4xl);
-      padding-top: calc(64px + var(--space-3xl));
+      padding: var(--space-3xl, 48px) var(--space-4xl, 64px);
+      padding-top: calc(64px + var(--space-3xl, 48px));
       min-height: 100vh;
       max-width: 1200px;
     }
     
     .videos-header {
-      margin-bottom: var(--space-3xl);
+      margin-bottom: var(--space-3xl, 48px);
     }
     
     .videos-title {
-      font-family: 'Domine', var(--font-serif);
+      font-family: 'Domine', Georgia, serif;
       font-size: 32px;
       font-weight: 500;
-      color: var(--color-text-primary, #3E2318);
-      margin: 0 0 var(--space-sm) 0;
+      color: #3E2318;
+      margin: 0 0 8px 0;
     }
     
     .videos-subtitle {
-      font-family: 'Familjen Grotesk', var(--font-sans);
+      font-family: 'Familjen Grotesk', sans-serif;
       font-size: 16px;
-      color: var(--color-text-secondary, #7A6F6A);
+      color: #7A6F6A;
       margin: 0;
     }
     
     /* Featured Video */
     .featured-video {
-      background: var(--color-surface, #FFFFFF);
-      border-radius: var(--radius-xl, 16px);
+      background: #FFFFFF;
+      border-radius: 16px;
       overflow: hidden;
       box-shadow: 0 4px 20px rgba(62, 35, 24, 0.08);
-      margin-bottom: var(--space-3xl);
-      border: 1px solid var(--color-border-light, #E8E4E0);
+      margin-bottom: var(--space-3xl, 48px);
+      border: 1px solid #E8E4E0;
     }
     
     .featured-label {
       display: inline-block;
-      background: var(--color-rust, #C75B3F);
+      background: #C75B3F;
       color: white;
-      font-family: 'Familjen Grotesk', var(--font-sans);
+      font-family: 'Familjen Grotesk', sans-serif;
       font-size: 12px;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       padding: 6px 14px;
-      border-radius: 0 0 var(--radius-md, 8px) 0;
+      border-radius: 0 0 8px 0;
     }
     
     .featured-player {
@@ -86,47 +88,47 @@
     }
     
     .featured-info {
-      padding: var(--space-xl);
+      padding: 24px;
     }
     
     .featured-title {
-      font-family: 'Domine', var(--font-serif);
+      font-family: 'Domine', Georgia, serif;
       font-size: 22px;
       font-weight: 500;
-      color: var(--color-text-primary, #3E2318);
-      margin: 0 0 var(--space-sm) 0;
+      color: #3E2318;
+      margin: 0 0 8px 0;
     }
     
     .featured-desc {
-      font-family: 'Familjen Grotesk', var(--font-sans);
+      font-family: 'Familjen Grotesk', sans-serif;
       font-size: 15px;
-      color: var(--color-text-secondary, #7A6F6A);
+      color: #7A6F6A;
       margin: 0;
       line-height: 1.6;
     }
     
     /* Section Title */
     .videos-section-title {
-      font-family: 'Domine', var(--font-serif);
+      font-family: 'Domine', Georgia, serif;
       font-size: 22px;
       font-weight: 500;
-      color: var(--color-text-primary, #3E2318);
-      margin: 0 0 var(--space-xl) 0;
+      color: #3E2318;
+      margin: 0 0 24px 0;
     }
     
     /* Video Grid */
     .videos-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: var(--space-xl);
+      gap: 24px;
     }
     
     .video-card {
-      background: var(--color-surface, #FFFFFF);
-      border-radius: var(--radius-lg, 12px);
+      background: #FFFFFF;
+      border-radius: 12px;
       overflow: hidden;
       box-shadow: 0 2px 12px rgba(62, 35, 24, 0.06);
-      border: 1px solid var(--color-border-light, #E8E4E0);
+      border: 1px solid #E8E4E0;
       cursor: pointer;
       transition: all 0.2s ease;
     }
@@ -169,7 +171,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--color-rust, #C75B3F);
+      color: #C75B3F;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
       transition: all 0.2s ease;
     }
@@ -191,7 +193,7 @@
       right: 8px;
       background: rgba(0, 0, 0, 0.8);
       color: white;
-      font-family: 'Familjen Grotesk', var(--font-sans);
+      font-family: 'Familjen Grotesk', sans-serif;
       font-size: 12px;
       font-weight: 500;
       padding: 4px 8px;
@@ -199,21 +201,21 @@
     }
     
     .video-info {
-      padding: var(--space-lg);
+      padding: 16px;
     }
     
     .video-title {
-      font-family: 'Domine', var(--font-serif);
+      font-family: 'Domine', Georgia, serif;
       font-size: 17px;
       font-weight: 500;
-      color: var(--color-text-primary, #3E2318);
-      margin: 0 0 var(--space-xs) 0;
+      color: #3E2318;
+      margin: 0 0 4px 0;
     }
     
     .video-desc {
-      font-family: 'Familjen Grotesk', var(--font-sans);
+      font-family: 'Familjen Grotesk', sans-serif;
       font-size: 14px;
-      color: var(--color-text-secondary, #7A6F6A);
+      color: #7A6F6A;
       margin: 0;
       line-height: 1.5;
     }
@@ -226,18 +228,14 @@
       right: 0;
       bottom: 0;
       background: rgba(0, 0, 0, 0.9);
-      display: flex;
+      display: none;
       align-items: center;
       justify-content: center;
       z-index: 1000;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s ease;
     }
     
     .video-modal-overlay.open {
-      opacity: 1;
-      visibility: visible;
+      display: flex;
     }
     
     .video-modal-close {
@@ -276,7 +274,7 @@
       position: relative;
       padding-bottom: 56.25%;
       background: #000;
-      border-radius: var(--radius-lg, 12px);
+      border-radius: 12px;
       overflow: hidden;
     }
     
@@ -289,22 +287,12 @@
       border: none;
     }
     
-    /* Loading State */
-    .loading-state {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      font-family: 'Familjen Grotesk', var(--font-sans);
-      color: var(--color-text-secondary, #7A6F6A);
-    }
-    
     /* Responsive */
     @media (max-width: 768px) {
       .videos-content {
         margin-left: 0;
-        padding: var(--space-xl);
-        padding-top: calc(64px + var(--space-xl));
+        padding: 24px;
+        padding-top: calc(64px + 24px);
       }
       
       .videos-title {
@@ -327,10 +315,10 @@
   
   <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- Shared JS - Load these but we'll use our own simple sidebar/header -->
   <script type="text/babel" src="/js/shared/supabase-client.js"></script>
   <script type="text/babel" src="/js/shared/api.js"></script>
-  <script type="text/babel" src="/js/shared/auth.js"></script>
-  <script type="text/babel" src="/js/shared/header.js"></script>
   
   <!-- Video Guides App -->
   <script type="text/babel">
@@ -383,6 +371,66 @@
       }
     ];
     
+    // Simple Sidebar Component (matches site design)
+    function SimpleSidebar() {
+      return (
+        <nav className="sidebar">
+          <a href="/" className="sidebar-logo" title="Home">
+            <svg width="32" height="32" viewBox="0 0 100 100" fill="none">
+              <path d="M50 5C25.1 5 5 25.1 5 50s20.1 45 45 45 45-20.1 45-45S74.9 5 50 5zm0 80c-19.3 0-35-15.7-35-35s15.7-35 35-35 35 15.7 35 35-15.7 35-35 35z" fill="#FAF8F5"/>
+              <circle cx="35" cy="42" r="6" fill="#FAF8F5"/>
+              <circle cx="65" cy="42" r="6" fill="#FAF8F5"/>
+              <path d="M50 75c-11 0-20-6-20-6s5-9 20-9 20 9 20 9-9 6-20 6z" fill="#FAF8F5"/>
+            </svg>
+          </a>
+          <div className="sidebar-nav">
+            <a href="/story-builder.html" className="sidebar-link" title="Story Builder">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 19l7-7 3 3-7 7-3-3z"/>
+                <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/>
+                <path d="M2 2l7.586 7.586"/>
+                <circle cx="11" cy="11" r="2"/>
+              </svg>
+            </a>
+            <a href="/style-finder.html" className="sidebar-link" title="Style Finder">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="3" y="3" width="7" height="7"/>
+                <rect x="14" y="3" width="7" height="7"/>
+                <rect x="14" y="14" width="7" height="7"/>
+                <rect x="3" y="14" width="7" height="7"/>
+              </svg>
+            </a>
+            <a href="/video-guides.html" className="sidebar-link active" title="Video Guides">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polygon points="5 3 19 12 5 21 5 3"/>
+              </svg>
+            </a>
+          </div>
+        </nav>
+      );
+    }
+    
+    // Simple Header Component
+    function SimpleHeader({ user }) {
+      return (
+        <header className="header">
+          <div className="header-right">
+            {user ? (
+              <span style={{ 
+                fontFamily: "'Familjen Grotesk', sans-serif",
+                color: '#3E2318',
+                fontSize: '14px'
+              }}>
+                {user.email}
+              </span>
+            ) : (
+              <a href="/login.html" className="btn btn-primary">Sign In</a>
+            )}
+          </div>
+        </header>
+      );
+    }
+    
     // Icons
     const PlayIcon = () => (
       <svg viewBox="0 0 24 24" fill="currentColor">
@@ -398,75 +446,33 @@
     );
     
     function VideoGuidesPage() {
-      // Get shared components
-      const { Header, Sidebar } = window.SocietyArts || {};
-      
       const [selectedVideo, setSelectedVideo] = useState(null);
       const [user, setUser] = useState(null);
-      const [profile, setProfile] = useState(null);
-      const [isLoading, setIsLoading] = useState(true);
       
-      // Load auth state
+      // Check auth state
       useEffect(() => {
-        const loadAuth = async () => {
+        const checkAuth = async () => {
           try {
             if (window.SocietyArts?.supabase) {
               const { data: { session } } = await window.SocietyArts.supabase.auth.getSession();
-              if (session?.user) {
-                setUser(session.user);
-                const { data: profileData } = await window.SocietyArts.supabase
-                  .from('profiles')
-                  .select('*')
-                  .eq('id', session.user.id)
-                  .single();
-                setProfile(profileData);
-              }
+              setUser(session?.user || null);
             }
           } catch (err) {
             console.log('Auth check:', err);
-          } finally {
-            setIsLoading(false);
           }
         };
         
-        // Wait for SocietyArts to be ready
-        const checkReady = setInterval(() => {
-          if (window.SocietyArts?.Sidebar && window.SocietyArts?.Header) {
-            clearInterval(checkReady);
-            loadAuth();
+        // Wait for supabase to load
+        const interval = setInterval(() => {
+          if (window.SocietyArts?.supabase) {
+            clearInterval(interval);
+            checkAuth();
           }
-        }, 50);
+        }, 100);
         
-        // Timeout after 3 seconds
-        setTimeout(() => {
-          clearInterval(checkReady);
-          setIsLoading(false);
-        }, 3000);
+        setTimeout(() => clearInterval(interval), 3000);
         
-        return () => clearInterval(checkReady);
-      }, []);
-      
-      // Auth state listener
-      useEffect(() => {
-        if (!window.SocietyArts?.supabase) return;
-        
-        const { data: { subscription } } = window.SocietyArts.supabase.auth.onAuthStateChange(
-          async (event, session) => {
-            setUser(session?.user || null);
-            if (session?.user) {
-              const { data: profileData } = await window.SocietyArts.supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', session.user.id)
-                .single();
-              setProfile(profileData);
-            } else {
-              setProfile(null);
-            }
-          }
-        );
-        
-        return () => subscription?.unsubscribe();
+        return () => clearInterval(interval);
       }, []);
       
       // Close modal on escape
@@ -478,12 +484,6 @@
         return () => document.removeEventListener('keydown', handleEscape);
       }, []);
       
-      // Loading state check
-      if (isLoading || !window.SocietyArts?.Sidebar || !window.SocietyArts?.Header) {
-        return <div className="loading-state">Loading...</div>;
-      }
-      
-      const { Sidebar: SidebarComponent, Header: HeaderComponent } = window.SocietyArts;
       const featuredVideo = VIDEOS.find(v => v.featured);
       const otherVideos = VIDEOS.filter(v => !v.featured);
       
@@ -493,8 +493,8 @@
       
       return (
         <div className="page-container">
-          <SidebarComponent />
-          <HeaderComponent user={user} profile={profile} />
+          <SimpleSidebar />
+          <SimpleHeader user={user} />
           
           <main className="videos-content">
             <div className="videos-header">
@@ -579,18 +579,9 @@
       );
     }
     
-    // Initialize when DOM is ready
-    const initApp = () => {
-      const root = ReactDOM.createRoot(document.getElementById('root'));
-      root.render(<VideoGuidesPage />);
-    };
-    
-    // Wait for everything to load
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initApp);
-    } else {
-      initApp();
-    }
+    // Initialize
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<VideoGuidesPage />);
   </script>
 </body>
 </html>
