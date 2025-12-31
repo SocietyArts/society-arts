@@ -27,194 +27,341 @@
   <link rel="stylesheet" href="/css/help-modals.css">
   
   <style>
-    /* ===== Page Layout (matching help.html) ===== */
+    /* ===================================================
+       COLLECTIONS PAGE - TYPOGRAPHIC SYSTEM
+       Inspired by Art Center College of Design principles
+       =================================================== */
+    
+    /* === Page Layout === */
     .collections-content {
       flex: 1;
       padding: var(--space-2xl);
-      max-width: 900px;
+      max-width: 1100px;
       overflow-y: auto;
     }
     
+    /* === Breadcrumb Navigation === */
     .collections-breadcrumb {
       display: flex;
       align-items: center;
       gap: var(--space-sm);
-      font-size: var(--text-sm);
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.01em;
       color: var(--color-text-muted);
-      margin-bottom: var(--space-md);
+      margin-bottom: var(--space-lg);
     }
     
     .collections-breadcrumb a {
       color: var(--color-text-muted);
       text-decoration: none;
-      transition: color 0.2s;
+      transition: color 0.2s ease;
     }
     
     .collections-breadcrumb a:hover {
       color: var(--color-accent);
     }
     
+    .collections-breadcrumb span:last-child {
+      color: var(--color-text-primary);
+    }
+    
+    /* === Page Header === */
     .collections-header {
-      margin-bottom: var(--space-2xl);
+      margin-bottom: var(--space-3xl);
     }
     
     .collections-title {
       font-family: var(--font-serif);
-      font-size: var(--text-3xl);
-      font-weight: var(--weight-medium);
+      font-size: clamp(32px, 5vw, 42px);
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
       color: var(--color-text-primary);
       margin: 0 0 var(--space-sm) 0;
     }
     
     .collections-subtitle {
-      font-size: var(--text-base);
+      font-family: var(--font-sans);
+      font-size: 16px;
+      font-weight: 400;
+      letter-spacing: 0.005em;
+      line-height: 1.5;
       color: var(--color-text-muted);
       margin: 0;
     }
     
-    /* ===== Collections Grid ===== */
+    /* === Collection Grid === */
     .collections-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
       gap: var(--space-lg);
     }
     
+    /* === Collection Card (Spotify-Inspired) === */
     .collection-card {
-      background: var(--color-surface-alt);
-      border-radius: var(--radius-lg);
+      position: relative;
+      aspect-ratio: 1.1;
+      min-height: 180px;
+      border-radius: 8px;
       padding: var(--space-xl);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
       cursor: pointer;
-      transition: all 0.2s;
-      border: 1px solid var(--color-border-light);
+      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                  box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+    }
+    
+    .collection-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        180deg,
+        transparent 0%,
+        rgba(0, 0, 0, 0.03) 100%
+      );
+      pointer-events: none;
     }
     
     .collection-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(62, 35, 24, 0.1);
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.12),
+        0 8px 16px rgba(0, 0, 0, 0.08);
     }
     
-    .collection-card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: var(--space-md);
+    /* Card Typography - Light text on dark backgrounds */
+    .collection-card.text-light .collection-card-name,
+    .collection-card.text-light .collection-card-meta {
+      color: white;
     }
     
-    .collection-name {
+    .collection-card.text-light .collection-card-name {
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    }
+    
+    .collection-card.text-light .collection-card-meta {
+      color: rgba(255, 255, 255, 0.75);
+    }
+    
+    /* Card Typography - Dark text on light backgrounds */
+    .collection-card.text-dark .collection-card-name {
+      color: var(--color-text-primary);
+      text-shadow: none;
+    }
+    
+    .collection-card.text-dark .collection-card-meta {
+      color: rgba(62, 35, 24, 0.6);
+    }
+    
+    /* Collection Name Typography */
+    .collection-card-name {
       font-family: var(--font-serif);
-      font-size: var(--text-lg);
-      font-weight: var(--weight-medium);
+      font-size: clamp(22px, 3vw, 26px);
+      font-weight: 600;
+      letter-spacing: -0.015em;
+      line-height: 1.15;
       margin: 0;
+      word-break: break-word;
+      hyphens: auto;
+      /* Limit to 3 lines */
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
     
-    .collection-count {
-      font-size: var(--text-sm);
-      color: var(--color-text-muted);
-      background: var(--color-tan-10);
-      padding: 4px 10px;
-      border-radius: 12px;
+    /* Collection Meta (count) */
+    .collection-card-meta {
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      text-align: right;
+      margin: 0;
+      align-self: flex-end;
     }
     
-    .collection-description {
-      font-size: var(--text-sm);
-      color: var(--color-text-secondary);
-      margin-bottom: var(--space-md);
+    /* Folder icon for collections with sub-collections */
+    .collection-card-icon {
+      position: absolute;
+      top: var(--space-lg);
+      right: var(--space-lg);
+      opacity: 0.5;
     }
     
-    .collection-preview {
-      display: flex;
-      gap: 8px;
+    .collection-card.text-light .collection-card-icon {
+      color: white;
     }
     
-    .collection-preview-img {
-      width: 48px;
-      height: 48px;
-      border-radius: var(--radius-md);
-      object-fit: cover;
-      background: var(--color-tan-10);
-    }
-    
-    .collection-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: var(--space-sm);
-      margin-top: var(--space-md);
-      padding-top: var(--space-md);
-      border-top: 1px solid var(--color-border-light);
-    }
-    
-    .collection-action-btn {
-      padding: 6px 12px;
-      border: none;
-      background: transparent;
-      color: var(--color-text-muted);
-      font-size: var(--text-sm);
-      cursor: pointer;
-      border-radius: var(--radius-sm);
-      transition: all 0.15s;
-    }
-    
-    .collection-action-btn:hover {
-      background: var(--color-tan-10);
+    .collection-card.text-dark .collection-card-icon {
       color: var(--color-text-primary);
     }
     
-    .collection-action-btn.danger:hover {
-      background: #fee;
-      color: #c00;
-    }
-    
-    /* ===== New Collection Card ===== */
+    /* === New Collection Card === */
     .new-collection-card {
-      background: transparent;
+      aspect-ratio: 1.1;
+      min-height: 180px;
       border: 2px dashed var(--color-border);
-      border-radius: var(--radius-lg);
-      padding: var(--space-xl);
-      cursor: pointer;
-      transition: all 0.2s;
+      border-radius: 8px;
+      background: transparent;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 180px;
+      gap: var(--space-md);
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
     
     .new-collection-card:hover {
       border-color: var(--color-accent);
-      background: var(--color-accent-light);
+      background: rgba(192, 113, 91, 0.06);
+      transform: translateY(-4px);
     }
     
     .new-collection-icon {
-      width: 48px;
-      height: 48px;
+      width: 56px;
+      height: 56px;
       border-radius: 50%;
       background: var(--color-tan-10);
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: var(--space-md);
       color: var(--color-text-muted);
+      transition: all 0.25s ease;
     }
     
     .new-collection-card:hover .new-collection-icon {
       background: var(--color-accent);
       color: white;
+      transform: scale(1.1);
     }
     
     .new-collection-text {
-      font-size: var(--text-base);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
       color: var(--color-text-muted);
     }
     
-    /* ===== Empty & Loading States ===== */
+    .new-collection-card:hover .new-collection-text {
+      color: var(--color-accent);
+    }
+    
+    /* === Back Navigation (when inside collection) === */
+    .collections-back-nav {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-xl);
+      padding: var(--space-md) 0;
+      border-bottom: 1px solid var(--color-border-light);
+    }
+    
+    .collections-back-btn {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+      padding: var(--space-sm) var(--space-md);
+      border: none;
+      background: var(--color-surface-alt);
+      border-radius: var(--radius-md);
+      font-family: var(--font-sans);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    
+    .collections-back-btn:hover {
+      background: var(--color-tan-20);
+      color: var(--color-text-primary);
+    }
+    
+    /* === Section Headers (inside collection view) === */
+    .collections-section-header {
+      font-family: var(--font-sans);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      margin: var(--space-2xl) 0 var(--space-lg) 0;
+    }
+    
+    .collections-section-header:first-of-type {
+      margin-top: 0;
+    }
+    
+    /* === Styles Grid (inside collection) === */
+    .styles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: var(--space-md);
+    }
+    
+    .style-thumbnail {
+      position: relative;
+      aspect-ratio: 1;
+      border-radius: 6px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .style-thumbnail:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    }
+    
+    .style-thumbnail img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .style-thumbnail-remove {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.6);
+      border: none;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+    }
+    
+    .style-thumbnail:hover .style-thumbnail-remove {
+      opacity: 1;
+    }
+    
+    .style-thumbnail-remove:hover {
+      background: rgba(200, 0, 0, 0.8);
+    }
+    
+    /* === Empty States === */
     .empty-state {
       text-align: center;
       padding: var(--space-5xl) var(--space-xl);
     }
     
     .empty-icon {
-      width: 80px;
-      height: 80px;
+      width: 88px;
+      height: 88px;
       margin: 0 auto var(--space-xl);
       background: var(--color-tan-10);
       border-radius: 50%;
@@ -226,22 +373,33 @@
     
     .empty-title {
       font-family: var(--font-serif);
-      font-size: var(--text-xl);
-      margin-bottom: var(--space-sm);
+      font-size: 24px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      color: var(--color-text-primary);
+      margin: 0 0 var(--space-sm) 0;
     }
     
     .empty-text {
+      font-family: var(--font-sans);
+      font-size: 15px;
       color: var(--color-text-muted);
-      margin-bottom: var(--space-xl);
+      margin: 0 0 var(--space-xl) 0;
+      max-width: 320px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.5;
     }
     
+    /* === Loading State === */
     .loading-state {
       text-align: center;
       padding: var(--space-5xl);
       color: var(--color-text-muted);
+      font-family: var(--font-sans);
     }
     
-    /* ===== Login Prompt ===== */
+    /* === Login Prompt === */
     .login-prompt {
       text-align: center;
       padding: var(--space-5xl) var(--space-xl);
@@ -249,58 +407,260 @@
     
     .login-prompt h2 {
       font-family: var(--font-serif);
-      margin-bottom: var(--space-md);
+      font-size: 26px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      margin: 0 0 var(--space-md) 0;
     }
     
     .login-prompt p {
+      font-family: var(--font-sans);
+      font-size: 15px;
       color: var(--color-text-muted);
-      margin-bottom: var(--space-xl);
+      margin: 0 0 var(--space-xl) 0;
     }
     
-    /* ===== Modal ===== */
+    /* === Modal Styles === */
     .modal-overlay {
       position: fixed;
       inset: 0;
       background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 1000;
+      animation: fadeIn 0.2s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
     
     .modal-content {
       background: white;
-      border-radius: var(--radius-xl);
-      padding: var(--space-xl);
+      border-radius: 12px;
+      padding: var(--space-2xl);
       width: 100%;
-      max-width: 400px;
+      max-width: 440px;
       margin: var(--space-md);
+      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.2);
+      animation: slideUp 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    @keyframes slideUp {
+      from { 
+        opacity: 0;
+        transform: translateY(20px) scale(0.98);
+      }
+      to { 
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
     }
     
     .modal-title {
       font-family: var(--font-serif);
-      font-size: var(--text-xl);
-      margin-bottom: var(--space-lg);
+      font-size: 24px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      color: var(--color-text-primary);
+      margin: 0 0 var(--space-lg) 0;
+    }
+    
+    .modal-label {
+      display: block;
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-xs);
     }
     
     .modal-input {
       width: 100%;
-      padding: 12px 16px;
+      padding: 14px 16px;
       border: 1px solid var(--color-border);
-      border-radius: var(--radius-md);
-      font-size: var(--text-base);
-      margin-bottom: var(--space-md);
+      border-radius: 8px;
+      font-family: var(--font-sans);
+      font-size: 15px;
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-lg);
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
     
     .modal-input:focus {
       outline: none;
       border-color: var(--color-accent);
+      box-shadow: 0 0 0 3px rgba(192, 113, 91, 0.15);
+    }
+    
+    .modal-input::placeholder {
+      color: var(--color-text-light);
+    }
+    
+    /* Color Picker Grid */
+    .color-picker {
+      margin-bottom: var(--space-lg);
+    }
+    
+    .color-picker-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: var(--space-sm);
+      margin-top: var(--space-sm);
+    }
+    
+    .color-picker-swatch {
+      aspect-ratio: 1;
+      border-radius: 8px;
+      border: 3px solid transparent;
+      cursor: pointer;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+    }
+    
+    .color-picker-swatch:hover {
+      transform: scale(1.1);
+    }
+    
+    .color-picker-swatch.selected {
+      border-color: var(--color-text-primary);
+      transform: scale(1.1);
     }
     
     .modal-actions {
       display: flex;
       gap: var(--space-sm);
       justify-content: flex-end;
+      margin-top: var(--space-xl);
+    }
+    
+    /* === Collection Header (inside view) === */
+    .collection-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: var(--space-xl);
+      margin-bottom: var(--space-2xl);
+      padding-bottom: var(--space-xl);
+      border-bottom: 1px solid var(--color-border-light);
+    }
+    
+    .collection-header-info {
+      flex: 1;
+    }
+    
+    .collection-header-color {
+      width: 80px;
+      height: 80px;
+      border-radius: 8px;
+      flex-shrink: 0;
+    }
+    
+    .collection-header-title {
+      font-family: var(--font-serif);
+      font-size: clamp(28px, 4vw, 36px);
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      color: var(--color-text-primary);
+      margin: 0 0 var(--space-xs) 0;
+    }
+    
+    .collection-header-meta {
+      font-family: var(--font-sans);
+      font-size: 14px;
+      color: var(--color-text-muted);
+      margin: 0 0 var(--space-md) 0;
+    }
+    
+    .collection-header-actions {
+      display: flex;
+      gap: var(--space-sm);
+    }
+    
+    .collection-action-btn {
+      padding: 8px 16px;
+      border: 1px solid var(--color-border);
+      background: white;
+      border-radius: 6px;
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    
+    .collection-action-btn:hover {
+      border-color: var(--color-text-muted);
+      color: var(--color-text-primary);
+    }
+    
+    .collection-action-btn.danger:hover {
+      border-color: #e53935;
+      color: #e53935;
+      background: #ffebee;
+    }
+    
+    /* === Add Styles Card === */
+    .add-style-card {
+      aspect-ratio: 1;
+      border: 2px dashed var(--color-border);
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-xs);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--color-text-muted);
+    }
+    
+    .add-style-card:hover {
+      border-color: var(--color-accent);
+      color: var(--color-accent);
+      background: rgba(192, 113, 91, 0.04);
+    }
+    
+    .add-style-card span {
+      font-family: var(--font-sans);
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    /* === Responsive === */
+    @media (max-width: 768px) {
+      .collections-content {
+        padding: var(--space-lg);
+      }
+      
+      .collections-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-md);
+      }
+      
+      .collection-card {
+        min-height: 150px;
+        padding: var(--space-lg);
+      }
+      
+      .collection-card-name {
+        font-size: 18px;
+      }
+      
+      .collection-header {
+        flex-direction: column-reverse;
+        gap: var(--space-lg);
+      }
+      
+      .collection-header-color {
+        width: 60px;
+        height: 60px;
+      }
     }
   </style>
 </head>
@@ -316,15 +676,343 @@
   
   <!-- Collections App -->
   <script type="text/babel">
-    const { useState, useEffect } = React;
+    const { useState, useEffect, useCallback } = React;
 
-    // Chevron Icon for breadcrumb
+    // ==========================================
+    // ICONS
+    // ==========================================
+    
     const ChevronRightIcon = () => (
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
         <polyline points="9 18 15 12 9 6"></polyline>
       </svg>
     );
+    
+    const ChevronLeftIcon = () => (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    );
+    
+    const PlusIcon = () => (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+    );
+    
+    const FolderIcon = () => (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+      </svg>
+    );
+    
+    const LayersIcon = () => (
+      <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+        <polyline points="2 17 12 22 22 17"></polyline>
+        <polyline points="2 12 12 17 22 12"></polyline>
+      </svg>
+    );
+    
+    const XIcon = () => (
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    );
 
+    // ==========================================
+    // DEFAULT PALETTE (fallback)
+    // ==========================================
+    
+    const DEFAULT_PALETTE = [
+      { id: 1, name: "Coral", hex: "#E07A5F", text: "light" },
+      { id: 2, name: "Sage", hex: "#81B29A", text: "light" },
+      { id: 3, name: "Ocean", hex: "#3D5A80", text: "light" },
+      { id: 4, name: "Sunset", hex: "#F2994A", text: "dark" },
+      { id: 5, name: "Plum", hex: "#9B5DE5", text: "light" },
+      { id: 6, name: "Gold", hex: "#D4A853", text: "dark" },
+      { id: 7, name: "Rose", hex: "#C97B84", text: "light" },
+      { id: 8, name: "Forest", hex: "#588157", text: "light" },
+      { id: 9, name: "Slate", hex: "#5C677D", text: "light" },
+      { id: 10, name: "Peach", hex: "#FFBE98", text: "dark" },
+      { id: 11, name: "Indigo", hex: "#5E60CE", text: "light" },
+      { id: 12, name: "Copper", hex: "#B87333", text: "light" }
+    ];
+
+    // ==========================================
+    // COLLECTION CARD COMPONENT
+    // ==========================================
+    
+    function CollectionCard({ collection, palette, onClick }) {
+      const paletteColor = palette.find(c => c.hex === collection.color) || palette[0];
+      const textClass = paletteColor.text === 'dark' ? 'text-dark' : 'text-light';
+      
+      const styleCount = collection.styles?.length || 0;
+      const subCount = collection.subcollection_count || 0;
+      
+      let metaText = '';
+      if (subCount > 0 && styleCount > 0) {
+        metaText = `${subCount} folder${subCount !== 1 ? 's' : ''} · ${styleCount} style${styleCount !== 1 ? 's' : ''}`;
+      } else if (subCount > 0) {
+        metaText = `${subCount} folder${subCount !== 1 ? 's' : ''}`;
+      } else {
+        metaText = `${styleCount} style${styleCount !== 1 ? 's' : ''}`;
+      }
+      
+      return (
+        <div 
+          className={`collection-card ${textClass}`}
+          style={{ backgroundColor: collection.color || paletteColor.hex }}
+          onClick={() => onClick(collection)}
+        >
+          {subCount > 0 && (
+            <div className="collection-card-icon">
+              <FolderIcon />
+            </div>
+          )}
+          <h3 className="collection-card-name">{collection.name}</h3>
+          <p className="collection-card-meta">{metaText}</p>
+        </div>
+      );
+    }
+
+    // ==========================================
+    // NEW COLLECTION CARD COMPONENT
+    // ==========================================
+    
+    function NewCollectionCard({ onClick }) {
+      return (
+        <div className="new-collection-card" onClick={onClick}>
+          <div className="new-collection-icon">
+            <PlusIcon />
+          </div>
+          <span className="new-collection-text">New Collection</span>
+        </div>
+      );
+    }
+
+    // ==========================================
+    // CREATE/EDIT MODAL COMPONENT
+    // ==========================================
+    
+    function CollectionModal({ 
+      isOpen, 
+      onClose, 
+      onSave, 
+      collection = null, 
+      palette,
+      parentId = null 
+    }) {
+      const [name, setName] = useState(collection?.name || '');
+      const [description, setDescription] = useState(collection?.description || '');
+      const [selectedColor, setSelectedColor] = useState(collection?.color || palette[0]?.hex);
+      
+      useEffect(() => {
+        if (collection) {
+          setName(collection.name || '');
+          setDescription(collection.description || '');
+          setSelectedColor(collection.color || palette[0]?.hex);
+        } else {
+          setName('');
+          setDescription('');
+          // Auto-assign next color in rotation
+          setSelectedColor(palette[0]?.hex);
+        }
+      }, [collection, palette]);
+      
+      const handleSave = () => {
+        if (!name.trim()) return;
+        onSave({
+          id: collection?.id,
+          name: name.trim(),
+          description: description.trim(),
+          color: selectedColor,
+          parent_id: parentId
+        });
+        onClose();
+      };
+      
+      if (!isOpen) return null;
+      
+      return (
+        <div className="modal-overlay" onClick={onClose}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <h2 className="modal-title">
+              {collection ? 'Edit Collection' : 'New Collection'}
+            </h2>
+            
+            <label className="modal-label">Name</label>
+            <input 
+              type="text"
+              className="modal-input"
+              placeholder="My Collection"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              autoFocus
+              maxLength={50}
+            />
+            
+            <label className="modal-label">Description (optional)</label>
+            <input 
+              type="text"
+              className="modal-input"
+              placeholder="A brief description..."
+              value={description}
+              onChange={e => setDescription(e.target.value)}
+              maxLength={200}
+            />
+            
+            <div className="color-picker">
+              <label className="modal-label">Color</label>
+              <div className="color-picker-grid">
+                {palette.map(color => (
+                  <div
+                    key={color.id}
+                    className={`color-picker-swatch ${selectedColor === color.hex ? 'selected' : ''}`}
+                    style={{ backgroundColor: color.hex }}
+                    onClick={() => setSelectedColor(color.hex)}
+                    title={color.name}
+                  />
+                ))}
+              </div>
+            </div>
+            
+            <div className="modal-actions">
+              <button className="btn btn-ghost" onClick={onClose}>
+                Cancel
+              </button>
+              <button 
+                className="btn btn-primary" 
+                onClick={handleSave}
+                disabled={!name.trim()}
+              >
+                {collection ? 'Save Changes' : 'Create'}
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ==========================================
+    // COLLECTION VIEW COMPONENT
+    // ==========================================
+    
+    function CollectionView({ 
+      collection, 
+      subCollections, 
+      palette, 
+      onBack, 
+      onEdit, 
+      onDelete,
+      onCollectionClick,
+      onCreateSubCollection,
+      onRemoveStyle
+    }) {
+      const paletteColor = palette.find(c => c.hex === collection.color) || palette[0];
+      const styles = collection.styles || [];
+      const styleCount = styles.length;
+      const subCount = subCollections.length;
+      
+      let metaText = '';
+      if (subCount > 0 && styleCount > 0) {
+        metaText = `${subCount} sub-collection${subCount !== 1 ? 's' : ''} · ${styleCount} style${styleCount !== 1 ? 's' : ''}`;
+      } else if (subCount > 0) {
+        metaText = `${subCount} sub-collection${subCount !== 1 ? 's' : ''}`;
+      } else {
+        metaText = `${styleCount} style${styleCount !== 1 ? 's' : ''}`;
+      }
+      
+      const getStyleThumbnail = (styleId) => {
+        return window.SocietyArts?.getAltStyleThumbnailUrl?.(styleId) || 
+          `https://pub-acb560f551f141db830964aed1fa005f.r2.dev/styles/${styleId}/thumbnail.webp`;
+      };
+      
+      return (
+        <>
+          {/* Back Navigation */}
+          <div className="collections-back-nav">
+            <button className="collections-back-btn" onClick={onBack}>
+              <ChevronLeftIcon />
+              Back
+            </button>
+          </div>
+          
+          {/* Collection Header */}
+          <div className="collection-header">
+            <div className="collection-header-info">
+              <h1 className="collection-header-title">{collection.name}</h1>
+              <p className="collection-header-meta">{metaText}</p>
+              {collection.description && (
+                <p className="collections-subtitle">{collection.description}</p>
+              )}
+              <div className="collection-header-actions">
+                <button className="collection-action-btn" onClick={() => onEdit(collection)}>
+                  Edit
+                </button>
+                <button className="collection-action-btn danger" onClick={() => onDelete(collection)}>
+                  Delete
+                </button>
+              </div>
+            </div>
+            <div 
+              className="collection-header-color"
+              style={{ backgroundColor: collection.color }}
+            />
+          </div>
+          
+          {/* Sub-collections */}
+          {(subCollections.length > 0 || true) && (
+            <>
+              <h4 className="collections-section-header">Sub-collections</h4>
+              <div className="collections-grid">
+                <NewCollectionCard onClick={onCreateSubCollection} />
+                {subCollections.map(sub => (
+                  <CollectionCard 
+                    key={sub.id}
+                    collection={sub}
+                    palette={palette}
+                    onClick={onCollectionClick}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+          
+          {/* Styles */}
+          <h4 className="collections-section-header">Styles in this collection</h4>
+          <div className="styles-grid">
+            {styles.map(styleId => (
+              <div key={styleId} className="style-thumbnail">
+                <img 
+                  src={getStyleThumbnail(styleId)} 
+                  alt={styleId}
+                  onError={e => e.target.style.opacity = 0.3}
+                />
+                <button 
+                  className="style-thumbnail-remove"
+                  onClick={() => onRemoveStyle(collection.id, styleId)}
+                  title="Remove from collection"
+                >
+                  <XIcon />
+                </button>
+              </div>
+            ))}
+            <div className="add-style-card" onClick={() => window.location.href = '/style-finder.html'}>
+              <PlusIcon />
+              <span>Add Styles</span>
+            </div>
+          </div>
+        </>
+      );
+    }
+
+    // ==========================================
+    // MAIN COLLECTIONS PAGE COMPONENT
+    // ==========================================
+    
     function CollectionsPage() {
       const { Header, Sidebar } = window.SocietyArts || {};
       
@@ -333,38 +1021,221 @@
       }
       
       const { user, profile, isLoading: authLoading } = window.SocietyArts.useAuth();
-      const { collections, isLoading, loadCollections, createCollection, deleteCollection } = window.SocietyArts.useCollections();
+      const [collections, setCollections] = useState([]);
+      const [palette, setPalette] = useState(DEFAULT_PALETTE);
+      const [isLoading, setIsLoading] = useState(true);
       const [authModalOpen, setAuthModalOpen] = useState(false);
       const [createModalOpen, setCreateModalOpen] = useState(false);
-      const [newName, setNewName] = useState('');
-      const [newDescription, setNewDescription] = useState('');
+      const [editingCollection, setEditingCollection] = useState(null);
+      const [currentView, setCurrentView] = useState(null); // null = root, or collection object
+      const [breadcrumbs, setBreadcrumbs] = useState([]);
+      const [createParentId, setCreateParentId] = useState(null);
+
+      // Load palette from admin_settings
+      useEffect(() => {
+        const loadPalette = async () => {
+          try {
+            const { data, error } = await window.supabase
+              .from('admin_settings')
+              .select('value')
+              .eq('key', 'collection_palette')
+              .single();
+            
+            if (data?.value?.colors) {
+              setPalette(data.value.colors);
+            }
+          } catch (err) {
+            console.log('Using default palette');
+          }
+        };
+        loadPalette();
+      }, []);
+
+      // Load collections
+      const loadCollections = useCallback(async () => {
+        if (!user) return;
+        
+        setIsLoading(true);
+        try {
+          const { data, error } = await window.supabase
+            .from('user_collections')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('sort_order', { ascending: true })
+            .order('created_at', { ascending: false });
+          
+          if (error) throw error;
+          
+          // Calculate subcollection counts
+          const withCounts = (data || []).map(col => ({
+            ...col,
+            subcollection_count: (data || []).filter(c => c.parent_id === col.id).length
+          }));
+          
+          setCollections(withCounts);
+        } catch (err) {
+          console.error('Error loading collections:', err);
+        } finally {
+          setIsLoading(false);
+        }
+      }, [user]);
 
       useEffect(() => {
         if (user) {
           loadCollections();
         }
-      }, [user]);
+      }, [user, loadCollections]);
 
-      const handleCreate = async () => {
-        if (!newName.trim()) return;
-        await createCollection(newName.trim(), newDescription.trim());
-        setNewName('');
-        setNewDescription('');
-        setCreateModalOpen(false);
+      // Get root collections (no parent)
+      const rootCollections = collections.filter(c => !c.parent_id);
+      
+      // Get sub-collections for current view
+      const getSubCollections = (parentId) => {
+        return collections.filter(c => c.parent_id === parentId);
       };
 
-      const handleDelete = async (e, collectionId) => {
-        e.stopPropagation();
-        if (confirm('Delete this collection? This cannot be undone.')) {
-          await deleteCollection(collectionId);
+      // Handle create/update collection
+      const handleSaveCollection = async (collectionData) => {
+        try {
+          if (collectionData.id) {
+            // Update existing
+            const { error } = await window.supabase
+              .from('user_collections')
+              .update({
+                name: collectionData.name,
+                description: collectionData.description,
+                color: collectionData.color,
+                updated_at: new Date().toISOString()
+              })
+              .eq('id', collectionData.id);
+            
+            if (error) throw error;
+          } else {
+            // Create new
+            const { error } = await window.supabase
+              .from('user_collections')
+              .insert({
+                user_id: user.id,
+                name: collectionData.name,
+                description: collectionData.description,
+                color: collectionData.color,
+                parent_id: collectionData.parent_id,
+                styles: []
+              });
+            
+            if (error) throw error;
+          }
+          
+          await loadCollections();
+          setEditingCollection(null);
+          setCreateParentId(null);
+        } catch (err) {
+          console.error('Error saving collection:', err);
+          alert('Failed to save collection. Please try again.');
         }
       };
 
-      const getStyleImage = (styleId) => {
-        return window.SocietyArts.getAltStyleThumbnailUrl(styleId);
+      // Handle delete collection
+      const handleDeleteCollection = async (collection) => {
+        const subCount = collections.filter(c => c.parent_id === collection.id).length;
+        const message = subCount > 0 
+          ? `Delete "${collection.name}" and its ${subCount} sub-collection${subCount !== 1 ? 's' : ''}? This cannot be undone.`
+          : `Delete "${collection.name}"? This cannot be undone.`;
+        
+        if (!confirm(message)) return;
+        
+        try {
+          const { error } = await window.supabase
+            .from('user_collections')
+            .delete()
+            .eq('id', collection.id);
+          
+          if (error) throw error;
+          
+          await loadCollections();
+          
+          // If we deleted the current view, go back
+          if (currentView?.id === collection.id) {
+            handleBack();
+          }
+        } catch (err) {
+          console.error('Error deleting collection:', err);
+          alert('Failed to delete collection. Please try again.');
+        }
       };
 
-      const AuthModal = window.SocietyArts.AuthModal;
+      // Handle collection click
+      const handleCollectionClick = (collection) => {
+        setBreadcrumbs(prev => [...prev, currentView].filter(Boolean));
+        setCurrentView(collection);
+      };
+
+      // Handle back navigation
+      const handleBack = () => {
+        const prevView = breadcrumbs[breadcrumbs.length - 1] || null;
+        setBreadcrumbs(prev => prev.slice(0, -1));
+        setCurrentView(prevView);
+      };
+
+      // Handle create sub-collection
+      const handleCreateSubCollection = () => {
+        setCreateParentId(currentView?.id || null);
+        setCreateModalOpen(true);
+      };
+
+      // Handle remove style from collection
+      const handleRemoveStyle = async (collectionId, styleId) => {
+        try {
+          const collection = collections.find(c => c.id === collectionId);
+          if (!collection) return;
+          
+          const updatedStyles = (collection.styles || []).filter(s => s !== styleId);
+          
+          const { error } = await window.supabase
+            .from('user_collections')
+            .update({ 
+              styles: updatedStyles,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', collectionId);
+          
+          if (error) throw error;
+          
+          await loadCollections();
+          
+          // Update current view if we're viewing this collection
+          if (currentView?.id === collectionId) {
+            setCurrentView(prev => ({ ...prev, styles: updatedStyles }));
+          }
+        } catch (err) {
+          console.error('Error removing style:', err);
+        }
+      };
+
+      // Build breadcrumb path
+      const buildBreadcrumbPath = () => {
+        const path = [{ name: 'Collections', onClick: () => { setCurrentView(null); setBreadcrumbs([]); }}];
+        
+        breadcrumbs.forEach((crumb, index) => {
+          if (crumb) {
+            path.push({
+              name: crumb.name,
+              onClick: () => {
+                setBreadcrumbs(prev => prev.slice(0, index));
+                setCurrentView(crumb);
+              }
+            });
+          }
+        });
+        
+        if (currentView) {
+          path.push({ name: currentView.name, onClick: null });
+        }
+        
+        return path;
+      };
+
+      const AuthModal = window.SocietyArts?.AuthModal;
 
       return (
         <div className="page-container">
@@ -376,21 +1247,35 @@
             <div className="collections-breadcrumb">
               <a href="index.html">Home</a>
               <ChevronRightIcon />
-              <span>Collections</span>
+              {buildBreadcrumbPath().map((crumb, index, arr) => (
+                <React.Fragment key={index}>
+                  {crumb.onClick ? (
+                    <a href="#" onClick={e => { e.preventDefault(); crumb.onClick(); }}>
+                      {crumb.name}
+                    </a>
+                  ) : (
+                    <span>{crumb.name}</span>
+                  )}
+                  {index < arr.length - 1 && <ChevronRightIcon />}
+                </React.Fragment>
+              ))}
             </div>
             
-            {/* Page Header */}
-            <div className="collections-header">
-              <h1 className="collections-title">Collections</h1>
-              <p className="collections-subtitle">Organize and save your favorite art styles</p>
-            </div>
+            {/* Page Header (only on root view) */}
+            {!currentView && (
+              <div className="collections-header">
+                <h1 className="collections-title">Collections</h1>
+                <p className="collections-subtitle">Organize and save your favorite art styles</p>
+              </div>
+            )}
             
+            {/* Main Content */}
             {authLoading || isLoading ? (
               <div className="loading-state">Loading...</div>
             ) : !user ? (
               <div className="login-prompt">
                 <h2>Sign in to view your collections</h2>
-                <p>Create collections to organize your favorite styles.</p>
+                <p>Create collections to organize your favorite styles into groups.</p>
                 <button 
                   className="btn btn-primary"
                   onClick={() => setAuthModalOpen(true)}
@@ -398,17 +1283,29 @@
                   Sign In
                 </button>
               </div>
-            ) : collections.length === 0 ? (
+            ) : currentView ? (
+              // Collection Detail View
+              <CollectionView
+                collection={currentView}
+                subCollections={getSubCollections(currentView.id)}
+                palette={palette}
+                onBack={handleBack}
+                onEdit={setEditingCollection}
+                onDelete={handleDeleteCollection}
+                onCollectionClick={handleCollectionClick}
+                onCreateSubCollection={handleCreateSubCollection}
+                onRemoveStyle={handleRemoveStyle}
+              />
+            ) : rootCollections.length === 0 ? (
+              // Empty State
               <div className="empty-state">
                 <div className="empty-icon">
-                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                    <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-                    <polyline points="2 17 12 22 22 17"></polyline>
-                    <polyline points="2 12 12 17 22 12"></polyline>
-                  </svg>
+                  <LayersIcon />
                 </div>
                 <h2 className="empty-title">No collections yet</h2>
-                <p className="empty-text">Create your first collection to organize styles.</p>
+                <p className="empty-text">
+                  Create your first collection to start organizing styles into meaningful groups.
+                </p>
                 <button 
                   className="btn btn-primary"
                   onClick={() => setCreateModalOpen(true)}
@@ -417,109 +1314,50 @@
                 </button>
               </div>
             ) : (
+              // Root Collections Grid
               <div className="collections-grid">
-                <div 
-                  className="new-collection-card"
-                  onClick={() => setCreateModalOpen(true)}
-                >
-                  <div className="new-collection-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <line x1="12" y1="5" x2="12" y2="19"></line>
-                      <line x1="5" y1="12" x2="19" y2="12"></line>
-                    </svg>
-                  </div>
-                  <span className="new-collection-text">New Collection</span>
-                </div>
-                
-                {collections.map((collection) => (
-                  <div key={collection.id} className="collection-card">
-                    <div className="collection-card-header">
-                      <h3 className="collection-name">{collection.name}</h3>
-                      <span className="collection-count">
-                        {(collection.styles || []).length} styles
-                      </span>
-                    </div>
-                    
-                    {collection.description && (
-                      <p className="collection-description">{collection.description}</p>
-                    )}
-                    
-                    {(collection.styles || []).length > 0 && (
-                      <div className="collection-preview">
-                        {(collection.styles || []).slice(0, 4).map((styleId) => (
-                          <img 
-                            key={styleId}
-                            src={getStyleImage(styleId)}
-                            alt=""
-                            className="collection-preview-img"
-                            onError={(e) => e.target.style.display = 'none'}
-                          />
-                        ))}
-                      </div>
-                    )}
-                    
-                    <div className="collection-actions">
-                      <button 
-                        className="collection-action-btn danger"
-                        onClick={(e) => handleDelete(e, collection.id)}
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </div>
+                <NewCollectionCard onClick={() => setCreateModalOpen(true)} />
+                {rootCollections.map(collection => (
+                  <CollectionCard 
+                    key={collection.id}
+                    collection={collection}
+                    palette={palette}
+                    onClick={handleCollectionClick}
+                  />
                 ))}
               </div>
             )}
           </main>
           
-          {authModalOpen && (
+          {/* Auth Modal */}
+          {authModalOpen && AuthModal && (
             <AuthModal 
               isOpen={authModalOpen}
               onClose={() => setAuthModalOpen(false)}
             />
           )}
           
-          {createModalOpen && (
-            <div className="modal-overlay" onClick={() => setCreateModalOpen(false)}>
-              <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                <h2 className="modal-title">New Collection</h2>
-                <input 
-                  type="text"
-                  className="modal-input"
-                  placeholder="Collection name"
-                  value={newName}
-                  onChange={(e) => setNewName(e.target.value)}
-                  autoFocus
-                />
-                <input 
-                  type="text"
-                  className="modal-input"
-                  placeholder="Description (optional)"
-                  value={newDescription}
-                  onChange={(e) => setNewDescription(e.target.value)}
-                />
-                <div className="modal-actions">
-                  <button 
-                    className="btn btn-ghost"
-                    onClick={() => setCreateModalOpen(false)}
-                  >
-                    Cancel
-                  </button>
-                  <button 
-                    className="btn btn-primary"
-                    onClick={handleCreate}
-                    disabled={!newName.trim()}
-                  >
-                    Create
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
+          {/* Create/Edit Modal */}
+          <CollectionModal
+            isOpen={createModalOpen || !!editingCollection}
+            onClose={() => {
+              setCreateModalOpen(false);
+              setEditingCollection(null);
+              setCreateParentId(null);
+            }}
+            onSave={handleSaveCollection}
+            collection={editingCollection}
+            palette={palette}
+            parentId={createParentId}
+          />
         </div>
       );
     }
 
+    // ==========================================
+    // INITIALIZE APP
+    // ==========================================
+    
     const root = ReactDOM.createRoot(document.getElementById('root'));
     
     function waitForComponents(callback, maxAttempts = 50) {
