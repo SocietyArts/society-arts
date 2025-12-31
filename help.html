@@ -4,7 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Get Help - Society Arts</title>
-  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="https://pub-acb560f551f141db830964aed1fa005f.r2.dev/site-assets/SA_Monogram_Black%401x%201x1.png">
+  
+  <!-- React -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,41 +23,44 @@
   <link rel="stylesheet" href="/css/base.css">
   <link rel="stylesheet" href="/css/components.css">
   <link rel="stylesheet" href="/css/header.css">
-  
-  <!-- React -->
-  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  
-  <!-- Supabase -->
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="/css/auth.css">
+  <link rel="stylesheet" href="/css/help-modals.css">
   
   <style>
-    .page-container {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      padding-left: var(--sidebar-width-collapsed, 50px);
-      padding-top: var(--logo-bar-height, 48px);
-      background: var(--color-background);
-    }
-    
     .help-content {
       flex: 1;
-      padding: var(--space-3xl) var(--space-4xl);
+      padding: var(--space-2xl);
       max-width: 900px;
-      margin: 0 auto;
-      width: 100%;
+      overflow-y: auto;
     }
     
     .help-header {
-      margin-bottom: var(--space-3xl);
+      margin-bottom: var(--space-2xl);
+    }
+    
+    .help-breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-md);
+    }
+    
+    .help-breadcrumb a {
+      color: var(--color-text-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    
+    .help-breadcrumb a:hover {
+      color: var(--color-accent);
     }
     
     .help-title {
       font-family: var(--font-serif);
       font-size: var(--text-3xl);
-      font-weight: var(--weight-normal);
+      font-weight: var(--weight-medium);
       color: var(--color-text-primary);
       margin: 0 0 var(--space-sm) 0;
     }
@@ -63,14 +73,14 @@
     
     .help-section {
       background: white;
-      border-radius: var(--radius-lg);
+      border-radius: var(--radius-xl);
       padding: var(--space-2xl);
       margin-bottom: var(--space-xl);
       border: 1px solid var(--color-border-light);
     }
     
     .help-section-title {
-      font-family: var(--font-primary);
+      font-family: var(--font-serif);
       font-size: var(--text-lg);
       font-weight: var(--weight-semibold);
       color: var(--color-text-primary);
@@ -97,7 +107,7 @@
       gap: var(--space-md);
       padding: var(--space-lg);
       background: var(--color-surface-alt);
-      border-radius: var(--radius-md);
+      border-radius: var(--radius-lg);
       text-decoration: none;
       color: var(--color-text-primary);
       transition: all 0.15s ease;
@@ -105,22 +115,24 @@
     
     .help-link:hover {
       background: var(--color-tan-20);
+      transform: translateX(4px);
     }
     
     .help-link-icon {
-      width: 40px;
-      height: 40px;
+      width: 44px;
+      height: 44px;
       display: flex;
       align-items: center;
       justify-content: center;
       background: white;
-      border-radius: var(--radius-md);
-      color: var(--color-text-muted);
+      border-radius: var(--radius-lg);
+      color: var(--color-accent);
+      flex-shrink: 0;
     }
     
     .help-link-icon svg {
-      width: 20px;
-      height: 20px;
+      width: 22px;
+      height: 22px;
     }
     
     .help-link-content {
@@ -139,6 +151,11 @@
     
     .help-link-arrow {
       color: var(--color-text-light);
+      transition: transform 0.15s ease;
+    }
+    
+    .help-link:hover .help-link-arrow {
+      transform: translateX(4px);
     }
     
     .contact-section {
@@ -149,15 +166,15 @@
     }
     
     .contact-card {
-      padding: var(--space-lg);
+      padding: var(--space-xl);
       background: var(--color-surface-alt);
-      border-radius: var(--radius-md);
+      border-radius: var(--radius-lg);
       text-align: center;
     }
     
     .contact-card-icon {
-      width: 48px;
-      height: 48px;
+      width: 56px;
+      height: 56px;
       margin: 0 auto var(--space-md);
       display: flex;
       align-items: center;
@@ -168,12 +185,13 @@
     }
     
     .contact-card-icon svg {
-      width: 24px;
-      height: 24px;
+      width: 26px;
+      height: 26px;
     }
     
     .contact-card-title {
       font-weight: var(--weight-semibold);
+      color: var(--color-text-primary);
       margin-bottom: var(--space-xs);
     }
     
@@ -194,10 +212,6 @@
     }
     
     @media (max-width: 768px) {
-      .help-content {
-        padding: var(--space-xl);
-      }
-      
       .contact-section {
         grid-template-columns: 1fr;
       }
@@ -207,25 +221,16 @@
 <body>
   <div id="root"></div>
   
-  <script type="text/babel" src="/js/shared/api.js"></script>
-  <script type="text/babel" src="/js/shared/header.js"></script>
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/shared/supabase-client.js"></script>
+  <script src="/js/shared/api.js"></script>
+  <script src="/js/shared/auth.js"></script>
+  <script src="/js/shared/header.js"></script>
   
+  <!-- Help Page -->
   <script type="text/babel">
-    const { useState, useEffect } = React;
-    
-    // Wait for components to load
-    function waitForComponents() {
-      return new Promise((resolve) => {
-        const check = () => {
-          if (window.SocietyArts?.Sidebar && window.SocietyArts?.Header) {
-            resolve();
-          } else {
-            setTimeout(check, 50);
-          }
-        };
-        check();
-      });
-    }
+    const { useState } = React;
     
     // Icons
     const BookIcon = () => (
@@ -268,12 +273,12 @@
         <polyline points="9 18 15 12 9 6"></polyline>
       </svg>
     );
-    
+
     function HelpPage() {
-      const { Sidebar, Header } = window.SocietyArts || {};
+      const { Header, Sidebar } = window.SocietyArts || {};
       
       if (!Sidebar || !Header) {
-        return <div className="loading-state">Loading...</div>;
+        return React.createElement('div', { className: 'loading-state' }, 'Loading...');
       }
       
       const { user, profile, isLoading: authLoading } = window.SocietyArts.useAuth();
@@ -287,14 +292,14 @@
         },
         {
           icon: <VideoIcon />,
-          title: 'Video Guides',
-          desc: 'Watch step-by-step tutorials',
+          title: 'Video Tutorials',
+          desc: 'Watch step-by-step video guides',
           href: '/video-guides.html'
         },
         {
           icon: <HelpCircleIcon />,
           title: 'FAQ',
-          desc: 'Answers to common questions',
+          desc: 'Answers to frequently asked questions',
           href: '/faq.html'
         }
       ];
@@ -305,6 +310,13 @@
           <Header user={user} profile={profile} />
           
           <main className="help-content">
+            {/* Breadcrumb */}
+            <div className="help-breadcrumb">
+              <a href="index.html">Home</a>
+              <ChevronRightIcon />
+              <span>Help</span>
+            </div>
+            
             <div className="help-header">
               <h1 className="help-title">Get Help</h1>
               <p className="help-subtitle">Find answers, watch tutorials, and get support</p>
@@ -360,10 +372,26 @@
         </div>
       );
     }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
     
-    // Initialize
-    waitForComponents().then(() => {
-      const root = ReactDOM.createRoot(document.getElementById('root'));
+    function waitForComponents(callback, maxAttempts = 50) {
+      let attempts = 0;
+      const check = () => {
+        attempts++;
+        if (window.SocietyArts?.Sidebar && window.SocietyArts?.Header && window.SocietyArts?.useAuth) {
+          callback();
+        } else if (attempts < maxAttempts) {
+          setTimeout(check, 100);
+        } else {
+          console.error('Components failed to load');
+          callback();
+        }
+      };
+      check();
+    }
+    
+    waitForComponents(() => {
       root.render(<HelpPage />);
     });
   </script>
