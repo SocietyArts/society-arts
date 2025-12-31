@@ -1031,11 +1031,21 @@
       const [breadcrumbs, setBreadcrumbs] = useState([]);
       const [createParentId, setCreateParentId] = useState(null);
 
+      // Get Supabase client
+      const getSupabase = () => {
+        return window.SocietyArts?.supabase || window.supabaseClient || window.supabase;
+      };
+
       // Load palette from admin_settings
       useEffect(() => {
         const loadPalette = async () => {
           try {
-            const { data, error } = await window.supabase
+            const supabase = getSupabase();
+            if (!supabase?.from) {
+              console.log('Supabase client not ready, using default palette');
+              return;
+            }
+            const { data, error } = await supabase
               .from('admin_settings')
               .select('value')
               .eq('key', 'collection_palette')
@@ -1057,7 +1067,14 @@
         
         setIsLoading(true);
         try {
-          const { data, error } = await window.supabase
+          const supabase = getSupabase();
+          if (!supabase?.from) {
+            console.error('Supabase client not available');
+            setIsLoading(false);
+            return;
+          }
+          
+          const { data, error } = await supabase
             .from('user_collections')
             .select('*')
             .eq('user_id', user.id)
@@ -1097,9 +1114,14 @@
       // Handle create/update collection
       const handleSaveCollection = async (collectionData) => {
         try {
+          const supabase = getSupabase();
+          if (!supabase?.from) {
+            throw new Error('Supabase client not available');
+          }
+          
           if (collectionData.id) {
             // Update existing
-            const { error } = await window.supabase
+            const { error } = await supabase
               .from('user_collections')
               .update({
                 name: collectionData.name,
@@ -1112,7 +1134,7 @@
             if (error) throw error;
           } else {
             // Create new
-            const { error } = await window.supabase
+            const { error } = await supabase
               .from('user_collections')
               .insert({
                 user_id: user.id,
@@ -1145,7 +1167,12 @@
         if (!confirm(message)) return;
         
         try {
-          const { error } = await window.supabase
+          const supabase = getSupabase();
+          if (!supabase?.from) {
+            throw new Error('Supabase client not available');
+          }
+          
+          const { error } = await supabase
             .from('user_collections')
             .delete()
             .eq('id', collection.id);
@@ -1186,12 +1213,17 @@
       // Handle remove style from collection
       const handleRemoveStyle = async (collectionId, styleId) => {
         try {
+          const supabase = getSupabase();
+          if (!supabase?.from) {
+            throw new Error('Supabase client not available');
+          }
+          
           const collection = collections.find(c => c.id === collectionId);
           if (!collection) return;
           
           const updatedStyles = (collection.styles || []).filter(s => s !== styleId);
           
-          const { error } = await window.supabase
+          const { error } = await supabase
             .from('user_collections')
             .update({ 
               styles: updatedStyles,
@@ -1364,12 +1396,15 @@
       let attempts = 0;
       const check = () => {
         attempts++;
-        if (window.SocietyArts?.Sidebar && window.SocietyArts?.Header && window.SocietyArts?.useAuth) {
+        const hasComponents = window.SocietyArts?.Sidebar && window.SocietyArts?.Header && window.SocietyArts?.useAuth;
+        const hasSupabase = window.SocietyArts?.supabase?.from || window.supabaseClient?.from || window.supabase?.from;
+        
+        if (hasComponents && hasSupabase) {
           callback();
         } else if (attempts < maxAttempts) {
           setTimeout(check, 100);
         } else {
-          console.error('Components failed to load');
+          console.error('Components or Supabase failed to load');
           callback();
         }
       };
