@@ -1,6 +1,7 @@
 /* ========================================
    SOCIETY ARTS - UNIFIED HEADER SYSTEM
-   Version: 8.0 - Account Menu System
+   Version: 8.1 - Account Menu System (FIXED)
+   - Uses useAuth from auth.js (no duplicate)
    - Removed Settings & Help from sidebar
    - Added Account Trigger (? or avatar)
    - Added Account Menu popup
@@ -78,7 +79,7 @@ const ICONS = {
 // ========================================
 const h = React.createElement;
 
-function getInitials(name, email) {
+function getInitialsFromHeader(name, email) {
     if (name) {
         const parts = name.trim().split(' ');
         if (parts.length >= 2) {
@@ -130,9 +131,21 @@ const Sidebar = ({ user, profile, onLogout }) => {
     
     const handleMenuItemClick = (item) => {
         if (item.action === 'logout') {
-            onLogout && onLogout();
+            // Use signOut from auth.js
+            if (typeof window.signOut === 'function') {
+                window.signOut().then(() => {
+                    window.location.href = '/index.html';
+                });
+            } else if (onLogout) {
+                onLogout();
+            }
         } else if (item.action === 'login') {
-            window.location.href = '/login?returnTo=%2Fnew%3F';
+            // Use openAuthModal from auth.js
+            if (typeof window.openAuthModal === 'function') {
+                window.openAuthModal();
+            } else {
+                window.location.href = '/login?returnTo=' + encodeURIComponent(window.location.pathname);
+            }
         } else if (item.href) {
             window.location.href = item.href;
         }
@@ -227,7 +240,7 @@ const Sidebar = ({ user, profile, onLogout }) => {
                             className: 'account-trigger-avatar'
                         })
                         : h('span', { className: 'account-trigger-initials' }, 
-                            getInitials(profile?.display_name, user?.email)
+                            getInitialsFromHeader(profile?.display_name, user?.email)
                         )
                     )
                     : h('span', { 
@@ -258,84 +271,30 @@ const Header = ({ user, profile }) => {
         // Right side - Try Society Arts button (only if not logged in)
         h('div', { className: 'header-right' },
             !user && h('a', { 
-                href: '/login?returnTo=%2Fnew%3F',
-                className: 'try-button'
+                href: '#',
+                className: 'try-button',
+                onClick: (e) => {
+                    e.preventDefault();
+                    if (typeof window.openAuthModal === 'function') {
+                        window.openAuthModal();
+                    } else {
+                        window.location.href = '/login?returnTo=' + encodeURIComponent(window.location.pathname);
+                    }
+                }
             }, 'Try Society Arts')
         )
     );
 };
 
 // ========================================
-// AUTH HOOK
-// ========================================
-const useAuth = () => {
-    const [user, setUser] = React.useState(null);
-    const [profile, setProfile] = React.useState(null);
-    const [isLoading, setIsLoading] = React.useState(true);
-    
-    React.useEffect(() => {
-        const initAuth = async () => {
-            try {
-                if (typeof window.supabase !== 'undefined') {
-                    const { data: { user } } = await window.supabase.auth.getUser();
-                    setUser(user);
-                    
-                    if (user) {
-                        const { data: profileData } = await window.supabase
-                            .from('user_profiles')
-                            .select('*')
-                            .eq('id', user.id)
-                            .single();
-                        setProfile(profileData);
-                    }
-                }
-            } catch (error) {
-                console.error('Auth error:', error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        
-        initAuth();
-        
-        // Listen for auth changes
-        if (typeof window.supabase !== 'undefined') {
-            const { data: { subscription } } = window.supabase.auth.onAuthStateChange(
-                async (event, session) => {
-                    setUser(session?.user || null);
-                    if (session?.user) {
-                        const { data: profileData } = await window.supabase
-                            .from('user_profiles')
-                            .select('*')
-                            .eq('id', session.user.id)
-                            .single();
-                        setProfile(profileData);
-                    } else {
-                        setProfile(null);
-                    }
-                }
-            );
-            
-            return () => subscription?.unsubscribe();
-        }
-    }, []);
-    
-    const logout = async () => {
-        if (typeof window.supabase !== 'undefined') {
-            await window.supabase.auth.signOut();
-            window.location.href = '/index.html';
-        }
-    };
-    
-    return { user, profile, isLoading, logout };
-};
-
-// ========================================
-// EXPORT
+// EXPORT - NO useAuth here (use from auth.js)
 // ========================================
 window.SocietyArts = window.SocietyArts || {};
 window.SocietyArts.Sidebar = Sidebar;
 window.SocietyArts.Header = Header;
-window.SocietyArts.useAuth = useAuth;
 window.SocietyArts.ICONS = ICONS;
 window.SocietyArts.SITE_CONFIG = SITE_CONFIG;
+
+// For pages that use these directly
+window.Sidebar = Sidebar;
+window.Header = Header;
