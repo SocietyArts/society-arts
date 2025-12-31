@@ -960,3 +960,218 @@
         margin-left: 0;
     }
 }
+
+
+
+/* ========================================
+   ACCOUNT MENU STYLES
+   Add to header.css or include separately
+   ======================================== */
+
+/* ========================================
+   SIDEBAR ACCOUNT SECTION
+   ======================================== */
+.sidebar-account {
+    position: relative;
+    padding: var(--space-md);
+    border-top: 1px solid var(--color-border-light);
+}
+
+/* Account Trigger Button */
+.account-trigger {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    background: var(--color-tan-10);
+    margin: 0 auto;
+}
+
+.account-trigger:hover {
+    background: var(--color-tan-20);
+    transform: scale(1.05);
+}
+
+/* Question mark icon (not logged in) */
+.account-trigger-question {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.account-trigger-question svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* User initials (logged in, no avatar) */
+.account-trigger-initials {
+    font-family: var(--font-primary);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: var(--color-text-primary);
+    text-transform: uppercase;
+}
+
+/* User avatar (logged in, has avatar) */
+.account-trigger-avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* ========================================
+   ACCOUNT MENU POPUP
+   ======================================== */
+.account-menu {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 240px;
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 8px 32px rgba(62, 35, 24, 0.15);
+    border: 1px solid var(--color-border-light);
+    z-index: 1000;
+    overflow: hidden;
+}
+
+/* Arrow pointing down */
+.account-menu::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 8px solid transparent;
+    border-top-color: white;
+    border-bottom: none;
+}
+
+/* User name header */
+.account-menu-header {
+    padding: var(--space-md) var(--space-lg);
+    border-bottom: 1px solid var(--color-border-light);
+    background: var(--color-surface-alt);
+}
+
+.account-menu-name {
+    font-weight: var(--weight-semibold);
+    color: var(--color-text-primary);
+    font-size: var(--text-sm);
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Menu items container */
+.account-menu-items {
+    padding: var(--space-xs) 0;
+}
+
+/* Menu item */
+.account-menu-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-sm) var(--space-lg);
+    color: var(--color-text-primary);
+    text-decoration: none;
+    font-size: var(--text-sm);
+    transition: background 0.15s ease;
+    cursor: pointer;
+}
+
+.account-menu-item:hover {
+    background: var(--color-tan-10);
+}
+
+.account-menu-item-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    color: var(--color-text-muted);
+}
+
+.account-menu-item-icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+.account-menu-item-label {
+    flex: 1;
+}
+
+/* Divider */
+.account-menu-divider {
+    height: 1px;
+    background: var(--color-border-light);
+    margin: var(--space-xs) var(--space-lg);
+}
+
+/* ========================================
+   HEADER - TRY BUTTON
+   ======================================== */
+.try-button {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-sm) var(--space-lg);
+    background: var(--color-accent);
+    color: white;
+    border-radius: var(--radius-full);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+
+.try-button:hover {
+    background: var(--color-accent-hover);
+    transform: translateY(-1px);
+}
+
+/* ========================================
+   SIDEBAR ADJUSTMENTS
+   ======================================== */
+
+/* Remove old bottom nav if it exists */
+.sidebar-nav-bottom {
+    display: none;
+}
+
+/* Ensure spacer pushes account to bottom */
+.sidebar-spacer {
+    flex: 1;
+}
+
+/* Sidebar layout */
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* ========================================
+   RESPONSIVE - EXPANDED SIDEBAR LABELS
+   ======================================== */
+.sidebar:hover .account-menu {
+    left: calc(var(--sidebar-width-expanded) / 2);
+}
+
+/* When sidebar is expanded, menu should position correctly */
+@media (min-width: 769px) {
+    .sidebar:hover .account-menu {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+}
