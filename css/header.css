@@ -972,9 +972,9 @@
 /* ========================================
    ACCOUNT MENU POPUP
    ======================================== */
-.account-menu {
-    position: absolute;
-    bottom: calc(100% + 8px);
+.account-menu .account-menu {
+    position: fixed;
+    bottom: 70px;
     left: 8px;
     width: 220px;
     background: white;
@@ -1072,13 +1072,7 @@
     margin: 8px 16px;
 }
 
-/* ========================================
-   RESPONSIVE - Sidebar expanded state
-   ======================================== */
-.sidebar:hover .account-menu {
-    left: 8px;
-    width: 200px;
-}
+
 
 /* ========================================
    RESPONSIVE ADJUSTMENTS
