@@ -152,9 +152,8 @@ function generateHeaderHTML(user, profile) {
         <header class="header" id="sa-header">
             <div class="header-brand">
                 <a href="/index.html" class="header-logo-link">
-                    <img src="${SITE_CONFIG.logoMonogram}" alt="${SITE_CONFIG.siteName}" class="header-logo-icon">
-                    <img src="${SITE_CONFIG.logoWordmark}" alt="${SITE_CONFIG.siteName}" class="header-logo-text">
-                </a>
+                <img src="${SITE_CONFIG.logoWordmark}" alt="${SITE_CONFIG.siteName}" class="header-logo-text">
+            </a>
             </div>
             <div class="header-right">
                 <a href="/story-builder.html" class="btn btn-primary new-project-btn">New Project</a>
@@ -477,7 +476,6 @@ if (typeof React !== 'undefined') {
             h('header', { className: 'header', id: 'sa-header' },
                 h('div', { className: 'header-brand' },
                     h('a', { href: '/index.html', className: 'header-logo-link' },
-                        h('img', { src: SITE_CONFIG.logoMonogram, alt: SITE_CONFIG.siteName, className: 'header-logo-icon' }),
                         h('img', { src: SITE_CONFIG.logoWordmark, alt: SITE_CONFIG.siteName, className: 'header-logo-text' })
                     )
                 ),
