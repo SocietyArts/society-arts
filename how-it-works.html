@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How It Works - Society Arts</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=Domine:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/header.css">
+  
+  <!-- React -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  
+  <!-- Supabase -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  
+  <style>
+    .page-container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding-left: var(--sidebar-width-collapsed, 50px);
+      padding-top: var(--logo-bar-height, 48px);
+      background: var(--color-background);
+    }
+    
+    .hiw-content {
+      flex: 1;
+      padding: var(--space-3xl) var(--space-4xl);
+      max-width: 900px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    
+    .hiw-header {
+      text-align: center;
+      margin-bottom: var(--space-4xl);
+    }
+    
+    .hiw-title {
+      font-family: var(--font-serif);
+      font-size: var(--text-3xl);
+      font-weight: var(--weight-normal);
+      color: var(--color-text-primary);
+      margin: 0 0 var(--space-md) 0;
+    }
+    
+    .hiw-subtitle {
+      font-size: var(--text-lg);
+      color: var(--color-text-muted);
+      margin: 0;
+    }
+    
+    /* Formula Section */
+    .formula-section {
+      background: white;
+      border-radius: var(--radius-xl);
+      padding: var(--space-3xl);
+      margin-bottom: var(--space-3xl);
+      border: 1px solid var(--color-border-light);
+      text-align: center;
+    }
+    
+    .formula {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-xl);
+      flex-wrap: wrap;
+    }
+    
+    .formula-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    
+    .formula-icon {
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-tan-10);
+      border-radius: var(--radius-lg);
+      color: var(--color-text-primary);
+    }
+    
+    .formula-icon svg {
+      width: 40px;
+      height: 40px;
+    }
+    
+    .formula-label {
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-primary);
+    }
+    
+    .formula-operator {
+      font-family: var(--font-serif);
+      font-size: var(--text-3xl);
+      color: var(--color-text-light);
+    }
+    
+    .formula-result {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    
+    .formula-result-icon {
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-accent);
+      border-radius: var(--radius-lg);
+      color: white;
+    }
+    
+    .formula-result-icon svg {
+      width: 40px;
+      height: 40px;
+    }
+    
+    /* Steps Section */
+    .steps-section {
+      margin-bottom: var(--space-3xl);
+    }
+    
+    .steps-title {
+      font-family: var(--font-serif);
+      font-size: var(--text-2xl);
+      color: var(--color-text-primary);
+      margin: 0 0 var(--space-2xl) 0;
+      text-align: center;
+    }
+    
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xl);
+    }
+    
+    .step {
+      display: flex;
+      gap: var(--space-xl);
+      align-items: flex-start;
+    }
+    
+    .step-number {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-text-primary);
+      color: white;
+      border-radius: 50%;
+      font-weight: var(--weight-bold);
+      font-size: var(--text-lg);
+      flex-shrink: 0;
+    }
+    
+    .step-content {
+      flex: 1;
+      padding-top: var(--space-xs);
+    }
+    
+    .step-title {
+      font-weight: var(--weight-semibold);
+      font-size: var(--text-lg);
+      color: var(--color-text-primary);
+      margin: 0 0 var(--space-xs) 0;
+    }
+    
+    .step-text {
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+      margin: 0;
+    }
+    
+    /* CTA */
+    .cta-section {
+      text-align: center;
+      padding: var(--space-3xl);
+      background: var(--color-tan-10);
+      border-radius: var(--radius-lg);
+    }
+    
+    .cta-title {
+      font-family: var(--font-serif);
+      font-size: var(--text-2xl);
+      color: var(--color-text-primary);
+      margin: 0 0 var(--space-md) 0;
+    }
+    
+    .cta-text {
+      color: var(--color-text-muted);
+      margin: 0 0 var(--space-xl) 0;
+    }
+    
+    .cta-button {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-md) var(--space-2xl);
+      background: var(--color-accent);
+      color: white;
+      border: none;
+      border-radius: var(--radius-full);
+      font-weight: var(--weight-semibold);
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+    
+    .cta-button:hover {
+      background: var(--color-accent-hover);
+      transform: translateY(-1px);
+    }
+    
+    @media (max-width: 768px) {
+      .hiw-content {
+        padding: var(--space-xl);
+      }
+      
+      .formula {
+        flex-direction: column;
+        gap: var(--space-lg);
+      }
+      
+      .formula-operator {
+        transform: rotate(90deg);
+      }
+      
+      .step {
+        flex-direction: column;
+        gap: var(--space-md);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  
+  <script type="text/babel" src="/js/shared/api.js"></script>
+  <script type="text/babel" src="/js/shared/header.js"></script>
+  
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+    
+    function waitForComponents() {
+      return new Promise((resolve) => {
+        const check = () => {
+          if (window.SocietyArts?.Sidebar && window.SocietyArts?.Header) {
+            resolve();
+          } else {
+            setTimeout(check, 50);
+          }
+        };
+        check();
+      });
+    }
+    
+    // Icons
+    const MessageIcon = () => (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+      </svg>
+    );
+    
+    const PaletteIcon = () => (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <circle cx="13.5" cy="6.5" r="0.5" fill="currentColor"></circle>
+        <circle cx="17.5" cy="10.5" r="0.5" fill="currentColor"></circle>
+        <circle cx="8.5" cy="7.5" r="0.5" fill="currentColor"></circle>
+        <circle cx="6.5" cy="12.5" r="0.5" fill="currentColor"></circle>
+        <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.555C21.965 6.012 17.461 2 12 2z"></path>
+      </svg>
+    );
+    
+    const ImageIcon = () => (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+        <polyline points="21 15 16 10 5 21"></polyline>
+      </svg>
+    );
+    
+    const ArrowRightIcon = () => (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+        <polyline points="12 5 19 12 12 19"></polyline>
+      </svg>
+    );
+    
+    function HowItWorksPage() {
+      const { Sidebar, Header } = window.SocietyArts || {};
+      
+      if (!Sidebar || !Header) {
+        return <div className="loading-state">Loading...</div>;
+      }
+      
+      const { user, profile, isLoading: authLoading } = window.SocietyArts.useAuth();
+      
+      const steps = [
+        {
+          title: 'Share Your Story',
+          text: 'Tell us about your memory — type it out or use voice mode to speak naturally. Describe the moment, the feeling, the details that matter to you.'
+        },
+        {
+          title: 'Choose Your Style',
+          text: 'Browse our curated collection of artistic styles. From watercolors to bold oils, photography to illustration — find the aesthetic that speaks to your memory.'
+        },
+        {
+          title: 'Transform & Refine',
+          text: 'Optionally enhance your story with our transform tools. Simplify, enrich, or optimize your narrative for the perfect visual result.'
+        },
+        {
+          title: 'Generate Your Art',
+          text: 'Watch as your memory becomes wall-worthy artwork. Download, print, and display — your story, beautifully preserved.'
+        }
+      ];
+      
+      return (
+        <div className="page-container">
+          <Sidebar />
+          <Header user={user} profile={profile} />
+          
+          <main className="hiw-content">
+            <div className="hiw-header">
+              <h1 className="hiw-title">How It Works</h1>
+              <p className="hiw-subtitle">Transform your memories into beautiful art in minutes</p>
+            </div>
+            
+            {/* Formula */}
+            <div className="formula-section">
+              <div className="formula">
+                <div className="formula-item">
+                  <div className="formula-icon"><MessageIcon /></div>
+                  <span className="formula-label">Your Story</span>
+                </div>
+                
+                <span className="formula-operator">+</span>
+                
+                <div className="formula-item">
+                  <div className="formula-icon"><PaletteIcon /></div>
+                  <span className="formula-label">Art Style</span>
+                </div>
+                
+                <span className="formula-operator">=</span>
+                
+                <div className="formula-result">
+                  <div className="formula-result-icon"><ImageIcon /></div>
+                  <span className="formula-label">Your Art</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Steps */}
+            <div className="steps-section">
+              <h2 className="steps-title">Step by Step</h2>
+              <div className="steps">
+                {steps.map((step, index) => (
+                  <div key={index} className="step">
+                    <div className="step-number">{index + 1}</div>
+                    <div className="step-content">
+                      <h3 className="step-title">{step.title}</h3>
+                      <p className="step-text">{step.text}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {/* CTA */}
+            <div className="cta-section">
+              <h2 className="cta-title">Ready to Begin?</h2>
+              <p className="cta-text">Create your first piece of art from a memory.</p>
+              <a href="/story-builder.html" className="cta-button">
+                Start Creating <ArrowRightIcon />
+              </a>
+            </div>
+          </main>
+        </div>
+      );
+    }
+    
+    waitForComponents().then(() => {
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(<HowItWorksPage />);
+    });
+  </script>
+</body>
+</html>

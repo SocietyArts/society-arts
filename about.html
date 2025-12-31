@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About - Society Arts</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=Domine:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/header.css">
+  
+  <!-- React -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  
+  <!-- Supabase -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  
+  <style>
+    .page-container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding-left: var(--sidebar-width-collapsed, 50px);
+      padding-top: var(--logo-bar-height, 48px);
+      background: var(--color-background);
+    }
+    
+    .about-content {
+      flex: 1;
+      padding: var(--space-3xl) var(--space-4xl);
+      max-width: 800px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    
+    .about-header {
+      text-align: center;
+      margin-bottom: var(--space-4xl);
+    }
+    
+    .about-title {
+      font-family: var(--font-serif);
+      font-size: var(--text-4xl);
+      font-weight: var(--weight-normal);
+      color: var(--color-text-primary);
+      margin: 0 0 var(--space-lg) 0;
+      letter-spacing: 0.5px;
+    }
+    
+    .about-tagline {
+      font-size: var(--text-xl);
+      color: var(--color-text-muted);
+      margin: 0;
+      font-style: italic;
+    }
+    
+    .about-section {
+      margin-bottom: var(--space-3xl);
+    }
+    
+    .about-section-title {
+      font-family: var(--font-serif);
+      font-size: var(--text-2xl);
+      font-weight: var(--weight-normal);
+      color: var(--color-text-primary);
+      margin: 0 0 var(--space-lg) 0;
+    }
+    
+    .about-text {
+      font-size: var(--text-base);
+      color: var(--color-text-secondary);
+      line-height: 1.8;
+      margin: 0 0 var(--space-lg) 0;
+    }
+    
+    .about-text:last-child {
+      margin-bottom: 0;
+    }
+    
+    .values-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-xl);
+      margin-top: var(--space-2xl);
+    }
+    
+    .value-card {
+      text-align: center;
+      padding: var(--space-xl);
+      background: white;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--color-border-light);
+    }
+    
+    .value-icon {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto var(--space-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-tan-10);
+      border-radius: 50%;
+      color: var(--color-accent);
+    }
+    
+    .value-icon svg {
+      width: 28px;
+      height: 28px;
+    }
+    
+    .value-title {
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-xs);
+    }
+    
+    .value-text {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+      line-height: 1.5;
+    }
+    
+    .cta-section {
+      text-align: center;
+      padding: var(--space-3xl);
+      background: var(--color-tan-10);
+      border-radius: var(--radius-lg);
+      margin-top: var(--space-3xl);
+    }
+    
+    .cta-title {
+      font-family: var(--font-serif);
+      font-size: var(--text-2xl);
+      color: var(--color-text-primary);
+      margin: 0 0 var(--space-md) 0;
+    }
+    
+    .cta-text {
+      color: var(--color-text-muted);
+      margin: 0 0 var(--space-xl) 0;
+    }
+    
+    .cta-button {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-md) var(--space-2xl);
+      background: var(--color-accent);
+      color: white;
+      border: none;
+      border-radius: var(--radius-full);
+      font-weight: var(--weight-semibold);
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+    
+    .cta-button:hover {
+      background: var(--color-accent-hover);
+      transform: translateY(-1px);
+    }
+    
+    @media (max-width: 768px) {
+      .about-content {
+        padding: var(--space-xl);
+      }
+      
+      .values-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  
+  <script type="text/babel" src="/js/shared/api.js"></script>
+  <script type="text/babel" src="/js/shared/header.js"></script>
+  
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+    
+    function waitForComponents() {
+      return new Promise((resolve) => {
+        const check = () => {
+          if (window.SocietyArts?.Sidebar && window.SocietyArts?.Header) {
+            resolve();
+          } else {
+            setTimeout(check, 50);
+          }
+        };
+        check();
+      });
+    }
+    
+    // Icons
+    const HeartIcon = () => (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+      </svg>
+    );
+    
+    const SparklesIcon = () => (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M12 3L14.5 8.5L20 9L16 13.5L17 19L12 16L7 19L8 13.5L4 9L9.5 8.5L12 3Z"></path>
+      </svg>
+    );
+    
+    const UsersIcon = () => (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+        <circle cx="9" cy="7" r="4"></circle>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+      </svg>
+    );
+    
+    const ArrowRightIcon = () => (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+        <polyline points="12 5 19 12 12 19"></polyline>
+      </svg>
+    );
+    
+    function AboutPage() {
+      const { Sidebar, Header } = window.SocietyArts || {};
+      
+      if (!Sidebar || !Header) {
+        return <div className="loading-state">Loading...</div>;
+      }
+      
+      const { user, profile, isLoading: authLoading } = window.SocietyArts.useAuth();
+      
+      const values = [
+        {
+          icon: <HeartIcon />,
+          title: 'Memory First',
+          text: 'Every piece of art starts with a story worth preserving'
+        },
+        {
+          icon: <SparklesIcon />,
+          title: 'Quality Matters',
+          text: 'Gallery-worthy results you\'ll be proud to display'
+        },
+        {
+          icon: <UsersIcon />,
+          title: 'For Everyone',
+          text: 'No artistic skill required — just your memories'
+        }
+      ];
+      
+      return (
+        <div className="page-container">
+          <Sidebar />
+          <Header user={user} profile={profile} />
+          
+          <main className="about-content">
+            <div className="about-header">
+              <h1 className="about-title">Society Arts</h1>
+              <p className="about-tagline">Where Memories Become Art</p>
+            </div>
+            
+            <div className="about-section">
+              <h2 className="about-section-title">Our Mission</h2>
+              <p className="about-text">
+                Society Arts transforms your most meaningful memories into beautiful, wall-worthy artwork. 
+                We believe everyone has stories worth preserving — moments that shaped who you are, 
+                places that hold special meaning, and people who matter most.
+              </p>
+              <p className="about-text">
+                Using the power of AI combined with carefully curated artistic styles, we help you 
+                turn those memories into stunning visual art. No artistic skill required — just 
+                share your story, choose a style, and watch as your memory becomes art.
+              </p>
+            </div>
+            
+            <div className="about-section">
+              <h2 className="about-section-title">What We Believe</h2>
+              <div className="values-grid">
+                {values.map((value, index) => (
+                  <div key={index} className="value-card">
+                    <div className="value-icon">{value.icon}</div>
+                    <div className="value-title">{value.title}</div>
+                    <div className="value-text">{value.text}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <div className="cta-section">
+              <h2 className="cta-title">Ready to Create?</h2>
+              <p className="cta-text">Transform your first memory into art today.</p>
+              <a href="/story-builder.html" className="cta-button">
+                Start Creating <ArrowRightIcon />
+              </a>
+            </div>
+          </main>
+        </div>
+      );
+    }
+    
+    waitForComponents().then(() => {
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(<AboutPage />);
+    });
+  </script>
+</body>
+</html>
