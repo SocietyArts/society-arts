@@ -359,8 +359,8 @@ async function loadStyles(filters = {}) {
         
         allStyles = (data || []).map(style => ({
             ...style,
-            thumbnail: style.thumbnail_url || window.SocietyArts.getStyleImageUrl(style.id, 0),
-            images: window.SocietyArts.getAllStyleImageUrls(style.id),
+            thumbnail: style.thumbnail_url || window.SocietyArts.getStyleThumbnailUrl(style.id, 0),
+            images: window.SocietyArts.getAllStyleImageUrls(style.id, 'full'),
             quality_score: qualityScores[style.id] || 0
         }));
         
@@ -642,8 +642,8 @@ async function getStyleById(styleId) {
     
     return {
         ...style,
-        thumbnail: style.thumbnail_url || window.SocietyArts.getStyleImageUrl(styleId, 0),
-        images: window.SocietyArts.getAllStyleImageUrls(styleId),
+        thumbnail: style.thumbnail_url || window.SocietyArts.getStyleThumbnailUrl(styleId, 0),
+        images: window.SocietyArts.getAllStyleImageUrls(styleId, 'full'),
         // Related attributes as arrays of names
         artTypes: getNames(artTypes, 'art_types', 'art_type_id'),
         mediums: getNames(mediums, 'mediums', 'medium_id'),
