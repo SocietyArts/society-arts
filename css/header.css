@@ -1,9 +1,10 @@
 /* ========================================
    SOCIETY ARTS - HEADER & SIDEBAR
-   A++ Brand Standards v4.0
+   A++ Brand Standards v4.1 - CLEANED
    ========================================
-   Persistent left sidebar (Supabase-style)
-   Expands on hover to show labels
+   Fixed duplicate CSS rules
+   Fixed sidebar height calculation
+   Added account menu at bottom
    ======================================== */
 
 /* ========================================
@@ -258,11 +259,9 @@
     flex: 1;
 }
 
-/* Bottom Navigation */
+/* Bottom Navigation - HIDDEN (replaced by account menu) */
 .sidebar-nav-bottom {
-    border-top: 1px solid var(--color-tan-20, #E7E2DC);
-    padding-top: 12px;
-    margin-top: 0;
+    display: none;
 }
 
 /* ========================================
@@ -770,40 +769,6 @@
 }
 
 /* ========================================
-   RESPONSIVE ADJUSTMENTS
-   ======================================== */
-@media (max-width: 768px) {
-    .app-sidebar {
-        transform: translateX(-100%);
-        width: var(--sidebar-width-expanded);
-    }
-    
-    .app-sidebar.open {
-        transform: translateX(0);
-    }
-    
-    .app-sidebar .sidebar-nav-label {
-        opacity: 1;
-    }
-    
-    .app-sidebar .sidebar-logo-text {
-        opacity: 1;
-    }
-    
-    .header {
-        left: 0;
-    }
-    
-    .page-container {
-        padding-left: 0;
-    }
-    
-    .user-name {
-        display: none;
-    }
-}
-
-/* ========================================
    ICON UTILITY
    ======================================== */
 .icon {
@@ -832,6 +797,7 @@
     flex-direction: column;
     transition: width var(--sidebar-transition);
     overflow: hidden;
+    /* IMPORTANT: Do NOT set height here - use top/bottom positioning */
 }
 
 .sidebar:hover {
@@ -845,6 +811,7 @@
 
 .sidebar .sidebar-nav-main {
     flex: 1;
+    overflow-y: auto;
 }
 
 .sidebar .sidebar-nav ul {
@@ -854,13 +821,6 @@
     display: flex;
     flex-direction: column;
     gap: 4px;
-}
-
-.sidebar .sidebar-nav-bottom {
-    flex: 0;
-    border-top: 1px solid var(--color-tan-20, #E7E2DC);
-    padding-top: 12px;
-    margin-top: auto;
 }
 
 .sidebar .sidebar-nav-item {
@@ -911,19 +871,6 @@
     opacity: 1;
 }
 
-/* Page Container adjustments */
-.page-container {
-    padding-left: var(--sidebar-width-collapsed);
-    padding-top: var(--header-height);
-    min-height: 100vh;
-    transition: padding-left var(--sidebar-transition);
-}
-
-/* Main Content Area */
-.main-content {
-    padding: 24px;
-}
-
 /* Site Footer */
 .site-footer {
     padding: 20px;
@@ -933,7 +880,181 @@
     margin-left: var(--sidebar-width-collapsed);
 }
 
-/* Responsive */
+/* ========================================
+   ACCOUNT MENU SECTION - Bottom of Sidebar
+   ======================================== */
+.sidebar-account {
+    flex-shrink: 0;
+    position: relative;
+    padding: 12px 8px;
+    border-top: 1px solid var(--color-tan-20, #E7E2DC);
+    margin-top: auto;
+}
+
+/* Account Trigger Button */
+.account-trigger {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: var(--color-tan-20, #E7E2DC);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    margin: 0 auto;
+}
+
+.account-trigger:hover {
+    background: var(--color-tan-40, #CFC5B9);
+    transform: scale(1.05);
+}
+
+/* Question mark icon (not logged in) */
+.account-trigger-question {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.account-trigger-question svg {
+    width: 20px;
+    height: 20px;
+    fill: var(--color-brown, #3E2318);
+}
+
+/* User initials (logged in) */
+.account-trigger-initials {
+    font-family: var(--font-primary, 'Familjen Grotesk', sans-serif);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-brown, #3E2318);
+    text-transform: uppercase;
+}
+
+/* User avatar image */
+.account-trigger-avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* ========================================
+   ACCOUNT MENU POPUP
+   ======================================== */
+.account-menu {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 8px;
+    width: 220px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(62, 35, 24, 0.15);
+    border: 1px solid var(--color-tan-20, #E7E2DC);
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+    transition: all 0.2s ease;
+    overflow: hidden;
+}
+
+.account-menu.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Arrow pointing down */
+.account-menu::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 20px;
+    border: 8px solid transparent;
+    border-top-color: white;
+    border-bottom: none;
+}
+
+/* User name header */
+.account-menu-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--color-tan-20, #E7E2DC);
+    background: var(--color-tan-5, #F9F8F6);
+}
+
+.account-menu-name {
+    font-family: var(--font-primary, 'Familjen Grotesk', sans-serif);
+    font-weight: 600;
+    color: var(--color-brown, #3E2318);
+    font-size: 14px;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Menu items container */
+.account-menu-items {
+    padding: 8px 0;
+}
+
+/* Menu item */
+.account-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    color: var(--color-brown, #3E2318);
+    text-decoration: none;
+    font-family: var(--font-primary, 'Familjen Grotesk', sans-serif);
+    font-size: 14px;
+    transition: background 0.15s ease;
+    cursor: pointer;
+}
+
+.account-menu-item:hover {
+    background: var(--color-tan-10, #F3F1EE);
+}
+
+.account-menu-item-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    color: var(--color-brown-60, #8B7B75);
+}
+
+.account-menu-item-icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+.account-menu-item-label {
+    flex: 1;
+}
+
+/* Divider */
+.account-menu-divider {
+    height: 1px;
+    background: var(--color-tan-20, #E7E2DC);
+    margin: 8px 16px;
+}
+
+/* ========================================
+   RESPONSIVE - Sidebar expanded state
+   ======================================== */
+.sidebar:hover .account-menu {
+    left: 8px;
+    width: 200px;
+}
+
+/* ========================================
+   RESPONSIVE ADJUSTMENTS
+   ======================================== */
 @media (max-width: 768px) {
     .sidebar {
         transform: translateX(-100%);
@@ -959,615 +1080,8 @@
     .site-footer {
         margin-left: 0;
     }
-}
-
-
-
-/* ========================================
-   ACCOUNT MENU STYLES
-   Add to header.css or include separately
-   ======================================== */
-
-/* ========================================
-   SIDEBAR ACCOUNT SECTION
-   ======================================== */
-.sidebar-account {
-    position: relative;
-    padding: var(--space-md);
-    border-top: 1px solid var(--color-border-light);
-}
-
-/* Account Trigger Button */
-.account-trigger {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.15s ease;
-    background: var(--color-tan-10);
-    margin: 0 auto;
-}
-
-.account-trigger:hover {
-    background: var(--color-tan-20);
-    transform: scale(1.05);
-}
-
-/* Question mark icon (not logged in) */
-.account-trigger-question {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.account-trigger-question svg {
-    width: 24px;
-    height: 24px;
-}
-
-/* User initials (logged in, no avatar) */
-.account-trigger-initials {
-    font-family: var(--font-primary);
-    font-size: var(--text-sm);
-    font-weight: var(--weight-semibold);
-    color: var(--color-text-primary);
-    text-transform: uppercase;
-}
-
-/* User avatar (logged in, has avatar) */
-.account-trigger-avatar {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    object-fit: cover;
-}
-
-/* ========================================
-   ACCOUNT MENU POPUP
-   ======================================== */
-.account-menu {
-    position: absolute;
-    bottom: calc(100% + 8px);
-    left: 50%;
-    transform: translateX(-50%);
-    width: 240px;
-    background: white;
-    border-radius: var(--radius-lg);
-    box-shadow: 0 8px 32px rgba(62, 35, 24, 0.15);
-    border: 1px solid var(--color-border-light);
-    z-index: 1000;
-    overflow: hidden;
-}
-
-/* Arrow pointing down */
-.account-menu::after {
-    content: '';
-    position: absolute;
-    bottom: -8px;
-    left: 50%;
-    transform: translateX(-50%);
-    border: 8px solid transparent;
-    border-top-color: white;
-    border-bottom: none;
-}
-
-/* User name header */
-.account-menu-header {
-    padding: var(--space-md) var(--space-lg);
-    border-bottom: 1px solid var(--color-border-light);
-    background: var(--color-surface-alt);
-}
-
-.account-menu-name {
-    font-weight: var(--weight-semibold);
-    color: var(--color-text-primary);
-    font-size: var(--text-sm);
-    display: block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-/* Menu items container */
-.account-menu-items {
-    padding: var(--space-xs) 0;
-}
-
-/* Menu item */
-.account-menu-item {
-    display: flex;
-    align-items: center;
-    gap: var(--space-md);
-    padding: var(--space-sm) var(--space-lg);
-    color: var(--color-text-primary);
-    text-decoration: none;
-    font-size: var(--text-sm);
-    transition: background 0.15s ease;
-    cursor: pointer;
-}
-
-.account-menu-item:hover {
-    background: var(--color-tan-10);
-}
-
-.account-menu-item-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 20px;
-    height: 20px;
-    color: var(--color-text-muted);
-}
-
-.account-menu-item-icon svg {
-    width: 18px;
-    height: 18px;
-}
-
-.account-menu-item-label {
-    flex: 1;
-}
-
-/* Divider */
-.account-menu-divider {
-    height: 1px;
-    background: var(--color-border-light);
-    margin: var(--space-xs) var(--space-lg);
-}
-
-/* ========================================
-   HEADER - TRY BUTTON
-   ======================================== */
-.try-button {
-    display: inline-flex;
-    align-items: center;
-    padding: var(--space-sm) var(--space-lg);
-    background: var(--color-accent);
-    color: white;
-    border-radius: var(--radius-full);
-    font-size: var(--text-sm);
-    font-weight: var(--weight-semibold);
-    text-decoration: none;
-    transition: all 0.15s ease;
-}
-
-.try-button:hover {
-    background: var(--color-accent-hover);
-    transform: translateY(-1px);
-}
-
-/* ========================================
-   SIDEBAR ADJUSTMENTS
-   ======================================== */
-
-/* Remove old bottom nav if it exists */
-.sidebar-nav-bottom {
-    display: none;
-}
-
-/* Ensure spacer pushes account to bottom */
-.sidebar-spacer {
-    flex: 1;
-}
-
-/* Sidebar layout */
-.sidebar {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-}
-
-/* ========================================
-   RESPONSIVE - EXPANDED SIDEBAR LABELS
-   ======================================== */
-.sidebar:hover .account-menu {
-    left: calc(var(--sidebar-width-expanded) / 2);
-}
-
-/* When sidebar is expanded, menu should position correctly */
-@media (min-width: 769px) {
-    .sidebar:hover .account-menu {
-        left: 50%;
-        transform: translateX(-50%);
+    
+    .user-name {
+        display: none;
     }
 }
-
-/* ========================================
-   ACCOUNT MENU STYLES
-   Add to header.css or include separately
-   ======================================== */
-
-/* ========================================
-   SIDEBAR ACCOUNT SECTION
-   ======================================== */
-.sidebar-account {
-    position: relative;
-    padding: var(--space-md);
-    border-top: 1px solid var(--color-border-light);
-}
-
-/* Account Trigger Button */
-.account-trigger {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.15s ease;
-    background: var(--color-tan-10);
-    margin: 0 auto;
-}
-
-.account-trigger:hover {
-    background: var(--color-tan-20);
-    transform: scale(1.05);
-}
-
-/* Question mark icon (not logged in) */
-.account-trigger-question {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.account-trigger-question svg {
-    width: 24px;
-    height: 24px;
-}
-
-/* User initials (logged in, no avatar) */
-.account-trigger-initials {
-    font-family: var(--font-primary);
-    font-size: var(--text-sm);
-    font-weight: var(--weight-semibold);
-    color: var(--color-text-primary);
-    text-transform: uppercase;
-}
-
-/* User avatar (logged in, has avatar) */
-.account-trigger-avatar {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    object-fit: cover;
-}
-
-/* ========================================
-   ACCOUNT MENU POPUP
-   ======================================== */
-.account-menu {
-    position: absolute;
-    bottom: calc(100% + 8px);
-    left: 50%;
-    transform: translateX(-50%);
-    width: 240px;
-    background: white;
-    border-radius: var(--radius-lg);
-    box-shadow: 0 8px 32px rgba(62, 35, 24, 0.15);
-    border: 1px solid var(--color-border-light);
-    z-index: 1000;
-    overflow: hidden;
-}
-
-/* Arrow pointing down */
-.account-menu::after {
-    content: '';
-    position: absolute;
-    bottom: -8px;
-    left: 50%;
-    transform: translateX(-50%);
-    border: 8px solid transparent;
-    border-top-color: white;
-    border-bottom: none;
-}
-
-/* User name header */
-.account-menu-header {
-    padding: var(--space-md) var(--space-lg);
-    border-bottom: 1px solid var(--color-border-light);
-    background: var(--color-surface-alt);
-}
-
-.account-menu-name {
-    font-weight: var(--weight-semibold);
-    color: var(--color-text-primary);
-    font-size: var(--text-sm);
-    display: block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-/* Menu items container */
-.account-menu-items {
-    padding: var(--space-xs) 0;
-}
-
-/* Menu item */
-.account-menu-item {
-    display: flex;
-    align-items: center;
-    gap: var(--space-md);
-    padding: var(--space-sm) var(--space-lg);
-    color: var(--color-text-primary);
-    text-decoration: none;
-    font-size: var(--text-sm);
-    transition: background 0.15s ease;
-    cursor: pointer;
-}
-
-.account-menu-item:hover {
-    background: var(--color-tan-10);
-}
-
-.account-menu-item-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 20px;
-    height: 20px;
-    color: var(--color-text-muted);
-}
-
-.account-menu-item-icon svg {
-    width: 18px;
-    height: 18px;
-}
-
-.account-menu-item-label {
-    flex: 1;
-}
-
-/* Divider */
-.account-menu-divider {
-    height: 1px;
-    background: var(--color-border-light);
-    margin: var(--space-xs) var(--space-lg);
-}
-
-/* ========================================
-   HEADER - TRY BUTTON
-   ======================================== */
-.try-button {
-    display: inline-flex;
-    align-items: center;
-    padding: var(--space-sm) var(--space-lg);
-    background: var(--color-accent);
-    color: white;
-    border-radius: var(--radius-full);
-    font-size: var(--text-sm);
-    font-weight: var(--weight-semibold);
-    text-decoration: none;
-    transition: all 0.15s ease;
-}
-
-.try-button:hover {
-    background: var(--color-accent-hover);
-    transform: translateY(-1px);
-}
-
-/* ========================================
-   SIDEBAR ADJUSTMENTS
-   ======================================== */
-
-/* Remove old bottom nav if it exists */
-.sidebar-nav-bottom {
-    display: none;
-}
-
-/* Ensure spacer pushes account to bottom */
-.sidebar-spacer {
-    flex: 1;
-}
-
-/* Sidebar layout */
-.sidebar {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-}
-
-/* ========================================
-   RESPONSIVE - EXPANDED SIDEBAR LABELS
-   ======================================== */
-.sidebar:hover .account-menu {
-    left: calc(var(--sidebar-width-expanded) / 2);
-}
-
-/* When sidebar is expanded, menu should position correctly */
-@media (min-width: 769px) {
-    .sidebar:hover .account-menu {
-        left: 50%;
-        transform: translateX(-50%);
-    }
-}
-
-
-/* ========================================
-   ACCOUNT MENU STYLES
-   Append this to the END of header.css
-   ======================================== */
-
-/* Account Section at bottom of sidebar */
-.sidebar-account {
-    position: relative;
-    padding: 16px;
-    border-top: 1px solid rgba(62, 35, 24, 0.1);
-    margin-top: auto;
-}
-
-/* Account Trigger Button */
-.account-trigger {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: none;
-    background: var(--color-tan-40, #CFC5B9);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background-color 0.2s, transform 0.2s;
-}
-
-.account-trigger:hover {
-    background: var(--color-tan-60, #B8A99A);
-    transform: scale(1.05);
-}
-
-/* Question mark icon for logged-out state */
-.account-trigger-question {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.account-trigger-question svg {
-    width: 20px;
-    height: 20px;
-    fill: var(--color-text-primary, #3E2318);
-}
-
-/* Initials for logged-in state */
-.account-trigger-initials {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--color-text-primary, #3E2318);
-    font-family: var(--font-primary, 'Familjen Grotesk', sans-serif);
-}
-
-/* Avatar image for logged-in state with avatar */
-.account-trigger-avatar {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    object-fit: cover;
-}
-
-/* Account Menu Popup */
-.account-menu {
-    position: absolute;
-    bottom: calc(100% + 8px);
-    left: 16px;
-    width: 240px;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    z-index: 1000;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(8px);
-    transition: opacity 0.2s, visibility 0.2s, transform 0.2s;
-}
-
-.account-menu.open {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-}
-
-/* Arrow pointer at bottom */
-.account-menu::after {
-    content: '';
-    position: absolute;
-    bottom: -6px;
-    left: 24px;
-    width: 12px;
-    height: 12px;
-    background: white;
-    transform: rotate(45deg);
-    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-/* User name header (logged-in only) */
-.account-menu-header {
-    padding: 12px 16px;
-    border-bottom: 1px solid rgba(62, 35, 24, 0.1);
-}
-
-.account-menu-name {
-    font-weight: 600;
-    font-size: 14px;
-    color: var(--color-text-primary, #3E2318);
-    font-family: var(--font-primary, 'Familjen Grotesk', sans-serif);
-}
-
-/* Menu items container */
-.account-menu-items {
-    padding: 8px 0;
-}
-
-/* Individual menu item */
-.account-menu-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 16px;
-    color: var(--color-text-primary, #3E2318);
-    text-decoration: none;
-    font-size: 14px;
-    font-family: var(--font-primary, 'Familjen Grotesk', sans-serif);
-    transition: background-color 0.15s;
-    cursor: pointer;
-    background: none;
-    border: none;
-    width: 100%;
-    text-align: left;
-}
-
-.account-menu-item:hover {
-    background: rgba(62, 35, 24, 0.05);
-}
-
-.account-menu-item-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 20px;
-    height: 20px;
-    opacity: 0.7;
-}
-
-.account-menu-item-icon svg {
-    width: 18px;
-    height: 18px;
-}
-
-.account-menu-item-label {
-    flex: 1;
-}
-
-/* Divider between menu sections */
-.account-menu-divider {
-    height: 1px;
-    background: rgba(62, 35, 24, 0.1);
-    margin: 8px 0;
-}
-
-/* Sidebar adjustments for expanded state */
-.sidebar.expanded .sidebar-account {
-    padding: 16px 20px;
-}
-
-.sidebar.expanded .account-menu {
-    left: 20px;
-    width: 220px;
-}
-
-/* Make sidebar flex column for proper account positioning */
-.sidebar {
-    display: flex;
-    flex-direction: column;
-}
-
-.sidebar-nav-main {
-    flex: 1;
-}
-
