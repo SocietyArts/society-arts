@@ -17,9 +17,7 @@
   <link rel="stylesheet" href="/css/components.css">
   
   <style>
-    /* Page-specific styles only - layout handled by base.css */
-    
-    /* Videos Content */
+    /* Page-specific styles only */
     .videos-content {
       margin-left: 64px;
       padding: var(--space-3xl, 48px) var(--space-4xl, 64px);
@@ -287,6 +285,16 @@
       border: none;
     }
     
+    /* Loading state */
+    .loading-state {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: 'Familjen Grotesk', sans-serif;
+      color: #7A6F6A;
+    }
+    
     /* Responsive */
     @media (max-width: 768px) {
       .videos-content {
@@ -316,9 +324,11 @@
   <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
-  <!-- Shared JS - Load these but we'll use our own simple sidebar/header -->
+  <!-- Shared Components - Same as index.html -->
   <script type="text/babel" src="/js/shared/supabase-client.js"></script>
   <script type="text/babel" src="/js/shared/api.js"></script>
+  <script type="text/babel" src="/js/shared/auth.js"></script>
+  <script type="text/babel" src="/js/shared/header.js"></script>
   
   <!-- Video Guides App -->
   <script type="text/babel">
@@ -371,66 +381,6 @@
       }
     ];
     
-    // Simple Sidebar Component (matches site design)
-    function SimpleSidebar() {
-      return (
-        <nav className="sidebar">
-          <a href="/" className="sidebar-logo" title="Home">
-            <svg width="32" height="32" viewBox="0 0 100 100" fill="none">
-              <path d="M50 5C25.1 5 5 25.1 5 50s20.1 45 45 45 45-20.1 45-45S74.9 5 50 5zm0 80c-19.3 0-35-15.7-35-35s15.7-35 35-35 35 15.7 35 35-15.7 35-35 35z" fill="#FAF8F5"/>
-              <circle cx="35" cy="42" r="6" fill="#FAF8F5"/>
-              <circle cx="65" cy="42" r="6" fill="#FAF8F5"/>
-              <path d="M50 75c-11 0-20-6-20-6s5-9 20-9 20 9 20 9-9 6-20 6z" fill="#FAF8F5"/>
-            </svg>
-          </a>
-          <div className="sidebar-nav">
-            <a href="/story-builder.html" className="sidebar-link" title="Story Builder">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M12 19l7-7 3 3-7 7-3-3z"/>
-                <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/>
-                <path d="M2 2l7.586 7.586"/>
-                <circle cx="11" cy="11" r="2"/>
-              </svg>
-            </a>
-            <a href="/style-finder.html" className="sidebar-link" title="Style Finder">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="3" y="3" width="7" height="7"/>
-                <rect x="14" y="3" width="7" height="7"/>
-                <rect x="14" y="14" width="7" height="7"/>
-                <rect x="3" y="14" width="7" height="7"/>
-              </svg>
-            </a>
-            <a href="/video-guides.html" className="sidebar-link active" title="Video Guides">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polygon points="5 3 19 12 5 21 5 3"/>
-              </svg>
-            </a>
-          </div>
-        </nav>
-      );
-    }
-    
-    // Simple Header Component
-    function SimpleHeader({ user }) {
-      return (
-        <header className="header">
-          <div className="header-right">
-            {user ? (
-              <span style={{ 
-                fontFamily: "'Familjen Grotesk', sans-serif",
-                color: '#3E2318',
-                fontSize: '14px'
-              }}>
-                {user.email}
-              </span>
-            ) : (
-              <a href="/login.html" className="btn btn-primary">Sign In</a>
-            )}
-          </div>
-        </header>
-      );
-    }
-    
     // Icons
     const PlayIcon = () => (
       <svg viewBox="0 0 24 24" fill="currentColor">
@@ -447,33 +397,51 @@
     
     function VideoGuidesPage() {
       const [selectedVideo, setSelectedVideo] = useState(null);
+      const [componentsReady, setComponentsReady] = useState(false);
       const [user, setUser] = useState(null);
+      const [profile, setProfile] = useState(null);
       
-      // Check auth state
+      // Wait for shared components to load
       useEffect(() => {
-        const checkAuth = async () => {
-          try {
-            if (window.SocietyArts?.supabase) {
-              const { data: { session } } = await window.SocietyArts.supabase.auth.getSession();
-              setUser(session?.user || null);
+        const checkComponents = setInterval(() => {
+          if (window.SocietyArts?.Sidebar && window.SocietyArts?.Header) {
+            clearInterval(checkComponents);
+            setComponentsReady(true);
+            
+            // Load auth state
+            if (window.SocietyArts.AuthState) {
+              setUser(window.SocietyArts.AuthState.user);
+              setProfile(window.SocietyArts.AuthState.profile);
             }
-          } catch (err) {
-            console.log('Auth check:', err);
+          }
+        }, 50);
+        
+        // Timeout after 5 seconds
+        const timeout = setTimeout(() => {
+          clearInterval(checkComponents);
+          setComponentsReady(true); // Render anyway
+        }, 5000);
+        
+        return () => {
+          clearInterval(checkComponents);
+          clearTimeout(timeout);
+        };
+      }, []);
+      
+      // Listen for auth state changes
+      useEffect(() => {
+        if (!componentsReady) return;
+        
+        const handleAuthChange = () => {
+          if (window.SocietyArts?.AuthState) {
+            setUser(window.SocietyArts.AuthState.user);
+            setProfile(window.SocietyArts.AuthState.profile);
           }
         };
         
-        // Wait for supabase to load
-        const interval = setInterval(() => {
-          if (window.SocietyArts?.supabase) {
-            clearInterval(interval);
-            checkAuth();
-          }
-        }, 100);
-        
-        setTimeout(() => clearInterval(interval), 3000);
-        
-        return () => clearInterval(interval);
-      }, []);
+        window.addEventListener('societyarts:authchange', handleAuthChange);
+        return () => window.removeEventListener('societyarts:authchange', handleAuthChange);
+      }, [componentsReady]);
       
       // Close modal on escape
       useEffect(() => {
@@ -484,6 +452,14 @@
         return () => document.removeEventListener('keydown', handleEscape);
       }, []);
       
+      // Show loading state while waiting for components
+      if (!componentsReady) {
+        return <div className="loading-state">Loading...</div>;
+      }
+      
+      // Get the shared components
+      const { Sidebar, Header } = window.SocietyArts || {};
+      
       const featuredVideo = VIDEOS.find(v => v.featured);
       const otherVideos = VIDEOS.filter(v => !v.featured);
       
@@ -493,8 +469,11 @@
       
       return (
         <div className="page-container">
-          <SimpleSidebar />
-          <SimpleHeader user={user} />
+          {/* Use shared Sidebar component */}
+          {Sidebar && <Sidebar currentPage="video-guides" />}
+          
+          {/* Use shared Header component */}
+          {Header && <Header user={user} profile={profile} />}
           
           <main className="videos-content">
             <div className="videos-header">
@@ -579,7 +558,7 @@
       );
     }
     
-    // Initialize
+    // Initialize the app
     const root = ReactDOM.createRoot(document.getElementById('root'));
     root.render(<VideoGuidesPage />);
   </script>
