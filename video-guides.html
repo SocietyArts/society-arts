@@ -9,38 +9,20 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=Domine:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Domine:wght@400;500;600;700&family=Familjen+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   
-  <!-- CSS -->
+  <!-- Shared CSS -->
   <link rel="stylesheet" href="/css/variables.css">
   <link rel="stylesheet" href="/css/base.css">
   <link rel="stylesheet" href="/css/components.css">
-  <link rel="stylesheet" href="/css/header.css">
-  
-  <!-- React -->
-  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  
-  <!-- Supabase -->
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   
   <style>
-    .page-container {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      padding-left: var(--sidebar-width-collapsed, 50px);
-      padding-top: var(--logo-bar-height, 48px);
-      background: var(--color-background);
-    }
-    
+    /* Page Layout */
     .videos-content {
-      flex: 1;
+      margin-left: 64px;
       padding: var(--space-3xl) var(--space-4xl);
-      max-width: 1100px;
-      margin: 0 auto;
-      width: 100%;
+      min-height: calc(100vh - 64px);
+      max-width: 1200px;
     }
     
     .videos-header {
@@ -48,42 +30,49 @@
     }
     
     .videos-title {
-      font-family: var(--font-serif);
-      font-size: var(--text-3xl);
-      font-weight: var(--weight-normal);
-      color: var(--color-text-primary);
+      font-family: 'Domine', var(--font-serif);
+      font-size: 32px;
+      font-weight: 500;
+      color: var(--color-text-primary, #3E2318);
       margin: 0 0 var(--space-sm) 0;
     }
     
     .videos-subtitle {
-      font-size: var(--text-base);
-      color: var(--color-text-muted);
+      font-family: 'Familjen Grotesk', var(--font-sans);
+      font-size: 16px;
+      color: var(--color-text-secondary, #7A6F6A);
       margin: 0;
     }
     
     /* Featured Video */
     .featured-video {
+      background: var(--color-surface, #FFFFFF);
+      border-radius: var(--radius-xl, 16px);
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(62, 35, 24, 0.08);
       margin-bottom: var(--space-3xl);
+      border: 1px solid var(--color-border-light, #E8E4E0);
     }
     
     .featured-label {
       display: inline-block;
-      padding: var(--space-xs) var(--space-md);
-      background: var(--color-accent);
+      background: var(--color-rust, #C75B3F);
       color: white;
-      border-radius: var(--radius-full);
-      font-size: var(--text-sm);
-      font-weight: var(--weight-semibold);
-      margin-bottom: var(--space-md);
+      font-family: 'Familjen Grotesk', var(--font-sans);
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 6px 14px;
+      border-radius: 0 0 var(--radius-md, 8px) 0;
     }
     
     .featured-player {
       position: relative;
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      background: var(--color-text-primary);
-      border-radius: var(--radius-lg);
+      padding-bottom: 56.25%;
+      height: 0;
       overflow: hidden;
+      background: #1a1a1a;
     }
     
     .featured-player iframe {
@@ -96,57 +85,75 @@
     }
     
     .featured-info {
-      margin-top: var(--space-lg);
+      padding: var(--space-xl);
     }
     
     .featured-title {
-      font-family: var(--font-serif);
-      font-size: var(--text-xl);
-      color: var(--color-text-primary);
-      margin: 0 0 var(--space-xs) 0;
+      font-family: 'Domine', var(--font-serif);
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--color-text-primary, #3E2318);
+      margin: 0 0 var(--space-sm) 0;
     }
     
     .featured-desc {
-      color: var(--color-text-muted);
+      font-family: 'Familjen Grotesk', var(--font-sans);
+      font-size: 15px;
+      color: var(--color-text-secondary, #7A6F6A);
       margin: 0;
+      line-height: 1.6;
     }
     
-    /* Video Grid */
+    /* Section Title */
     .videos-section-title {
-      font-family: var(--font-serif);
-      font-size: var(--text-xl);
-      color: var(--color-text-primary);
+      font-family: 'Domine', var(--font-serif);
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--color-text-primary, #3E2318);
       margin: 0 0 var(--space-xl) 0;
     }
     
+    /* Video Grid */
     .videos-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
       gap: var(--space-xl);
     }
     
     .video-card {
+      background: var(--color-surface, #FFFFFF);
+      border-radius: var(--radius-lg, 12px);
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(62, 35, 24, 0.06);
+      border: 1px solid var(--color-border-light, #E8E4E0);
       cursor: pointer;
-      transition: transform 0.15s ease;
+      transition: all 0.2s ease;
     }
     
     .video-card:hover {
       transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(62, 35, 24, 0.12);
     }
     
     .video-thumbnail {
       position: relative;
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      background: var(--color-tan-20);
-      border-radius: var(--radius-lg);
+      padding-bottom: 56.25%;
+      background: #2a2420;
       overflow: hidden;
     }
     
     .video-thumbnail img {
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
       object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+    
+    .video-card:hover .video-thumbnail img {
+      transform: scale(1.05);
     }
     
     .video-play-btn {
@@ -156,18 +163,19 @@
       transform: translate(-50%, -50%);
       width: 56px;
       height: 56px;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(255, 255, 255, 0.95);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: white;
-      transition: all 0.15s ease;
+      color: var(--color-rust, #C75B3F);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+      transition: all 0.2s ease;
     }
     
     .video-card:hover .video-play-btn {
-      background: var(--color-accent);
       transform: translate(-50%, -50%) scale(1.1);
+      background: white;
     }
     
     .video-play-btn svg {
@@ -178,33 +186,35 @@
     
     .video-duration {
       position: absolute;
-      bottom: var(--space-sm);
-      right: var(--space-sm);
-      padding: 2px 8px;
+      bottom: 8px;
+      right: 8px;
       background: rgba(0, 0, 0, 0.8);
       color: white;
-      font-size: var(--text-xs);
-      border-radius: var(--radius-sm);
+      font-family: 'Familjen Grotesk', var(--font-sans);
+      font-size: 12px;
+      font-weight: 500;
+      padding: 4px 8px;
+      border-radius: 4px;
     }
     
     .video-info {
-      padding: var(--space-md) 0;
+      padding: var(--space-lg);
     }
     
     .video-title {
-      font-weight: var(--weight-semibold);
-      color: var(--color-text-primary);
+      font-family: 'Domine', var(--font-serif);
+      font-size: 17px;
+      font-weight: 500;
+      color: var(--color-text-primary, #3E2318);
       margin: 0 0 var(--space-xs) 0;
     }
     
     .video-desc {
-      font-size: var(--text-sm);
-      color: var(--color-text-muted);
+      font-family: 'Familjen Grotesk', var(--font-sans);
+      font-size: 14px;
+      color: var(--color-text-secondary, #7A6F6A);
       margin: 0;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
+      line-height: 1.5;
     }
     
     /* Video Modal */
@@ -215,14 +225,13 @@
       right: 0;
       bottom: 0;
       background: rgba(0, 0, 0, 0.9);
-      z-index: 1000;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: var(--space-2xl);
+      z-index: 1000;
       opacity: 0;
       visibility: hidden;
-      transition: all 0.2s ease;
+      transition: all 0.3s ease;
     }
     
     .video-modal-overlay.open {
@@ -230,17 +239,43 @@
       visibility: visible;
     }
     
+    .video-modal-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 44px;
+      height: 44px;
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      border-radius: 50%;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+      z-index: 1001;
+    }
+    
+    .video-modal-close:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    .video-modal-close svg {
+      width: 24px;
+      height: 24px;
+    }
+    
     .video-modal {
-      width: 100%;
+      width: 90%;
       max-width: 1000px;
     }
     
     .video-modal-player {
       position: relative;
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      background: black;
-      border-radius: var(--radius-lg);
+      padding-bottom: 56.25%;
+      background: #000;
+      border-radius: var(--radius-lg, 12px);
       overflow: hidden;
     }
     
@@ -253,41 +288,26 @@
       border: none;
     }
     
-    .video-modal-close {
-      position: absolute;
-      top: var(--space-xl);
-      right: var(--space-xl);
-      width: 48px;
-      height: 48px;
-      background: rgba(255, 255, 255, 0.1);
-      border: none;
-      border-radius: 50%;
-      color: white;
-      cursor: pointer;
+    /* Loading State */
+    .loading-state {
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background 0.15s ease;
+      min-height: 100vh;
+      font-family: 'Familjen Grotesk', var(--font-sans);
+      color: var(--color-text-secondary, #7A6F6A);
     }
     
-    .video-modal-close:hover {
-      background: rgba(255, 255, 255, 0.2);
-    }
-    
-    .video-modal-close svg {
-      width: 24px;
-      height: 24px;
-    }
-    
-    @media (max-width: 900px) {
-      .videos-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-    
-    @media (max-width: 600px) {
+    /* Responsive */
+    @media (max-width: 768px) {
       .videos-content {
+        margin-left: 0;
         padding: var(--space-xl);
+        padding-top: 80px;
+      }
+      
+      .videos-title {
+        font-size: 26px;
       }
       
       .videos-grid {
@@ -299,39 +319,35 @@
 <body>
   <div id="root"></div>
   
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- React -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  
+  <!-- Shared Components -->
   <script type="text/babel" src="/js/shared/api.js"></script>
   <script type="text/babel" src="/js/shared/header.js"></script>
   
   <script type="text/babel">
     const { useState, useEffect } = React;
     
-    function waitForComponents() {
-      return new Promise((resolve) => {
-        const check = () => {
-          if (window.SocietyArts?.Sidebar && window.SocietyArts?.Header) {
-            resolve();
-          } else {
-            setTimeout(check, 50);
-          }
-        };
-        check();
-      });
-    }
-    
-    // Video data
+    // Video Data
     const VIDEOS = [
       {
         id: 1,
-        title: 'Getting Started with Society Arts',
-        description: 'A complete walkthrough of creating your first piece of art from a memory.',
-        videoId: '7u4OmlDVCd4',
+        title: 'Welcome to Society Arts',
+        description: 'Get started with creating beautiful art from your meaningful memories. Learn the basics of our story-to-art process.',
+        videoId: 'dQw4w9WgXcQ',
         duration: '5:23',
         featured: true
       },
       {
         id: 2,
-        title: 'Using Voice Mode',
-        description: 'Learn how to speak your story naturally and let AI capture every detail.',
+        title: 'Crafting Your Story',
+        description: 'Learn how to write compelling memory descriptions that translate into stunning artwork.',
         videoId: 'arNqSo5zFhM',
         duration: '3:45'
       },
@@ -379,22 +395,74 @@
       </svg>
     );
     
+    // Wait for components to load
+    function waitForComponents() {
+      return new Promise((resolve) => {
+        const check = () => {
+          if (window.SocietyArts?.Sidebar && window.SocietyArts?.Header) {
+            resolve();
+          } else {
+            setTimeout(check, 50);
+          }
+        };
+        check();
+      });
+    }
+    
     function VideoGuidesPage() {
-      const { Sidebar, Header } = window.SocietyArts || {};
+      const [componentsReady, setComponentsReady] = useState(false);
       const [selectedVideo, setSelectedVideo] = useState(null);
+      const [user, setUser] = useState(null);
+      const [profile, setProfile] = useState(null);
       
-      if (!Sidebar || !Header) {
-        return <div className="loading-state">Loading...</div>;
-      }
+      // Wait for shared components
+      useEffect(() => {
+        waitForComponents().then(() => setComponentsReady(true));
+      }, []);
       
-      const { user, profile, isLoading: authLoading } = window.SocietyArts.useAuth();
-      
-      const featuredVideo = VIDEOS.find(v => v.featured);
-      const otherVideos = VIDEOS.filter(v => !v.featured);
-      
-      const getYouTubeThumbnail = (videoId) => {
-        return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-      };
+      // Load auth state
+      useEffect(() => {
+        if (!componentsReady) return;
+        
+        const loadAuth = async () => {
+          try {
+            const { data: { session } } = await window.SocietyArts.supabase.auth.getSession();
+            if (session?.user) {
+              setUser(session.user);
+              // Load profile
+              const { data: profileData } = await window.SocietyArts.supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', session.user.id)
+                .single();
+              setProfile(profileData);
+            }
+          } catch (err) {
+            console.log('Auth not loaded:', err);
+          }
+        };
+        
+        loadAuth();
+        
+        // Listen for auth changes
+        const { data: { subscription } } = window.SocietyArts.supabase.auth.onAuthStateChange(
+          async (event, session) => {
+            setUser(session?.user || null);
+            if (session?.user) {
+              const { data: profileData } = await window.SocietyArts.supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', session.user.id)
+                .single();
+              setProfile(profileData);
+            } else {
+              setProfile(null);
+            }
+          }
+        );
+        
+        return () => subscription?.unsubscribe();
+      }, [componentsReady]);
       
       // Close modal on escape
       useEffect(() => {
@@ -404,6 +472,18 @@
         document.addEventListener('keydown', handleEscape);
         return () => document.removeEventListener('keydown', handleEscape);
       }, []);
+      
+      if (!componentsReady) {
+        return <div className="loading-state">Loading...</div>;
+      }
+      
+      const { Sidebar, Header } = window.SocietyArts;
+      const featuredVideo = VIDEOS.find(v => v.featured);
+      const otherVideos = VIDEOS.filter(v => !v.featured);
+      
+      const getYouTubeThumbnail = (videoId) => {
+        return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+      };
       
       return (
         <div className="page-container">
@@ -493,6 +573,7 @@
       );
     }
     
+    // Initialize
     waitForComponents().then(() => {
       const root = ReactDOM.createRoot(document.getElementById('root'));
       root.render(<VideoGuidesPage />);
