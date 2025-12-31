@@ -2405,7 +2405,7 @@
             stylesGrid.innerHTML = styles.map(style => `
                 <div class="style-card" data-style-id="${style.id}">
                     <div class="style-card-image">
-                        <img src="${style.thumbnail}" alt="${style.name}" 
+                        <img src="${style.thumbnail}" alt="${style.name}" loading="lazy"
                              onerror="this.parentElement.innerHTML='<div class=\\'placeholder\\'>Image not available</div>'">
                         <button class="select-checkbox" 
                                 onclick="event.stopPropagation(); toggleStyleSelection('${style.id}')"
@@ -2991,7 +2991,7 @@
             currentModalStyle = style;
             
             const galleryHtml = style.images.map((url, i) => 
-                `<img src="${url}" alt="${style.name} - Image ${i + 1}" 
+                `<img src="${url}" alt="${style.name} - Image ${i + 1}" loading="lazy" 
                       onclick="openLightbox(${i})"
                       onerror="this.style.display='none'">`
             ).join('');
