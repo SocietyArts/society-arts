@@ -211,18 +211,18 @@ function generateSidebarHTML() {
             <nav class="sidebar-nav sidebar-nav-main">
                 <ul>${mainNavItems}</ul>
             </nav>
-            <div class="sidebar-account">
+           <div class="sidebar-account" onmouseenter="window.SocietyArts.openAccountMenu()" onmouseleave="window.SocietyArts.closeAccountMenu()">
                 <div class="account-menu" id="saAccountMenu">
                     ${isLoggedIn ? `<div class="account-menu-header"><span class="account-menu-name">${displayName}</span></div>` : ''}
                     <div class="account-menu-items">
                         ${accountMenuItems}
                     </div>
                 </div>
-                <button class="account-trigger" onclick="window.SocietyArts.toggleAccountMenu()" title="${isLoggedIn ? 'Account menu' : 'Help & Info'}">
+                <button class="account-trigger" title="${isLoggedIn ? 'Account menu' : 'Help & Info'}">
                     ${accountTrigger}
                     <span class="account-trigger-name">${isLoggedIn ? displayName : 'Help & Info'}</span>
                 </button>
-                </div>
+            </div>
         </aside>
     `;
 }
@@ -321,6 +321,13 @@ function toggleAccountMenu() {
     const menu = document.getElementById('saAccountMenu');
     if (menu) {
         menu.classList.toggle('open');
+    }
+}
+
+function openAccountMenu() {
+    const menu = document.getElementById('saAccountMenu');
+    if (menu) {
+        menu.classList.add('open');
     }
 }
 
@@ -585,7 +592,12 @@ if (typeof React !== 'undefined') {
                     )
                 )
             ),
-            h('div', { className: 'sidebar-account', ref: accountRef },
+            h('div', { 
+                className: 'sidebar-account', 
+                ref: accountRef,
+                onMouseEnter: () => setAccountMenuOpen(true),
+                onMouseLeave: () => setAccountMenuOpen(false)
+            },
                 accountMenuOpen && h('div', { className: 'account-menu open' },
                     user && h('div', { className: 'account-menu-header' },
                         h('span', { className: 'account-menu-name' }, displayName)
@@ -613,7 +625,6 @@ if (typeof React !== 'undefined') {
                 ),
                 h('button', {
                     className: 'account-trigger',
-                    onClick: () => setAccountMenuOpen(!accountMenuOpen),
                     title: user ? 'Account menu' : 'Help & Info'
                 },
                     user
@@ -670,6 +681,7 @@ Object.assign(window.SocietyArts, {
     handleLogout,
     openAdminUtilities,
     toggleAccountMenu,
+    openAccountMenu,
     closeAccountMenu,
     handleAccountMenuAction,
     getCurrentPageId,
