@@ -4,7 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>How It Works - Society Arts</title>
-  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="https://pub-acb560f551f141db830964aed1fa005f.r2.dev/site-assets/SA_Monogram_Black%401x%201x1.png">
+  
+  <!-- React -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,36 +23,42 @@
   <link rel="stylesheet" href="/css/base.css">
   <link rel="stylesheet" href="/css/components.css">
   <link rel="stylesheet" href="/css/header.css">
-  
-  <!-- React -->
-  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  
-  <!-- Supabase -->
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="/css/auth.css">
+  <link rel="stylesheet" href="/css/help-modals.css">
   
   <style>
-    .page-container {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      padding-left: var(--sidebar-width-collapsed, 50px);
-      padding-top: var(--logo-bar-height, 48px);
-      background: var(--color-background);
-    }
-    
     .hiw-content {
       flex: 1;
-      padding: var(--space-3xl) var(--space-4xl);
-      max-width: 900px;
-      margin: 0 auto;
-      width: 100%;
+      padding: var(--space-2xl);
+      overflow-y: auto;
     }
     
     .hiw-header {
       text-align: center;
-      margin-bottom: var(--space-4xl);
+      margin-bottom: var(--space-3xl);
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .hiw-breadcrumb {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-sm);
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-md);
+    }
+    
+    .hiw-breadcrumb a {
+      color: var(--color-text-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    
+    .hiw-breadcrumb a:hover {
+      color: var(--color-accent);
     }
     
     .hiw-title {
@@ -70,6 +83,9 @@
       margin-bottom: var(--space-3xl);
       border: 1px solid var(--color-border-light);
       text-align: center;
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
     }
     
     .formula {
@@ -140,6 +156,9 @@
     /* Steps Section */
     .steps-section {
       margin-bottom: var(--space-3xl);
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
     }
     
     .steps-title {
@@ -200,6 +219,8 @@
       padding: var(--space-3xl);
       background: var(--color-tan-10);
       border-radius: var(--radius-lg);
+      max-width: 900px;
+      margin: 0 auto;
     }
     
     .cta-title {
@@ -235,10 +256,6 @@
     }
     
     @media (max-width: 768px) {
-      .hiw-content {
-        padding: var(--space-xl);
-      }
-      
       .formula {
         flex-direction: column;
         gap: var(--space-lg);
@@ -258,24 +275,16 @@
 <body>
   <div id="root"></div>
   
-  <script type="text/babel" src="/js/shared/api.js"></script>
-  <script type="text/babel" src="/js/shared/header.js"></script>
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/shared/supabase-client.js"></script>
+  <script src="/js/shared/api.js"></script>
+  <script src="/js/shared/auth.js"></script>
+  <script src="/js/shared/header.js"></script>
   
+  <!-- How It Works Page -->
   <script type="text/babel">
-    const { useState, useEffect } = React;
-    
-    function waitForComponents() {
-      return new Promise((resolve) => {
-        const check = () => {
-          if (window.SocietyArts?.Sidebar && window.SocietyArts?.Header) {
-            resolve();
-          } else {
-            setTimeout(check, 50);
-          }
-        };
-        check();
-      });
-    }
+    const { useState } = React;
     
     // Icons
     const MessageIcon = () => (
@@ -309,11 +318,17 @@
       </svg>
     );
     
+    const ChevronIcon = () => (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg>
+    );
+
     function HowItWorksPage() {
-      const { Sidebar, Header } = window.SocietyArts || {};
+      const { Header, Sidebar } = window.SocietyArts || {};
       
       if (!Sidebar || !Header) {
-        return <div className="loading-state">Loading...</div>;
+        return React.createElement('div', { className: 'loading-state' }, 'Loading...');
       }
       
       const { user, profile, isLoading: authLoading } = window.SocietyArts.useAuth();
@@ -343,6 +358,13 @@
           <Header user={user} profile={profile} />
           
           <main className="hiw-content">
+            {/* Breadcrumb */}
+            <div className="hiw-breadcrumb">
+              <a href="index.html">Home</a>
+              <ChevronIcon />
+              <span>How It Works</span>
+            </div>
+            
             <div className="hiw-header">
               <h1 className="hiw-title">How It Works</h1>
               <p className="hiw-subtitle">Transform your memories into beautiful art in minutes</p>
@@ -400,9 +422,26 @@
         </div>
       );
     }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
     
-    waitForComponents().then(() => {
-      const root = ReactDOM.createRoot(document.getElementById('root'));
+    function waitForComponents(callback, maxAttempts = 50) {
+      let attempts = 0;
+      const check = () => {
+        attempts++;
+        if (window.SocietyArts?.Sidebar && window.SocietyArts?.Header && window.SocietyArts?.useAuth) {
+          callback();
+        } else if (attempts < maxAttempts) {
+          setTimeout(check, 100);
+        } else {
+          console.error('Components failed to load');
+          callback();
+        }
+      };
+      check();
+    }
+    
+    waitForComponents(() => {
       root.render(<HowItWorksPage />);
     });
   </script>

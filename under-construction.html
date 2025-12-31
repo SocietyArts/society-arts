@@ -13,7 +13,7 @@
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   
-  <!-- Fonts - Familjen Grotesk + Domine -->
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Domine:wght@400;500;600;700&family=Familjen+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -90,31 +90,45 @@
 <body>
   <div id="root"></div>
   
-  <!-- Shared Components -->
-  <script type="text/babel" src="/js/shared/api.js"></script>
-  <script type="text/babel" src="/js/shared/supabase-client.js"></script>
-  <script type="text/babel" src="/js/shared/auth.js"></script>
-  <script type="text/babel" src="/js/shared/header.js"></script>
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/shared/supabase-client.js"></script>
+  <script src="/js/shared/api.js"></script>
+  <script src="/js/shared/auth.js"></script>
+  <script src="/js/shared/header.js"></script>
   
   <!-- Under Construction Page -->
   <script type="text/babel">
-    const { Header, Footer, Icons } = window.SocietyArts;
+    const { useState } = React;
+    
+    const ClockIcon = () => (
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <circle cx="12" cy="12" r="10"></circle>
+        <polyline points="12 6 12 12 16 14"></polyline>
+      </svg>
+    );
 
     function UnderConstructionPage() {
+      const { Header, Sidebar } = window.SocietyArts || {};
+      
+      if (!Sidebar || !Header) {
+        return React.createElement('div', { className: 'loading-state' }, 'Loading...');
+      }
+      
+      const { user, profile, isLoading: authLoading } = window.SocietyArts.useAuth();
+      
       // Get the page name from URL if available
       const urlParams = new URLSearchParams(window.location.search);
       const feature = urlParams.get('feature') || 'This feature';
       
       return (
         <div className="page-container">
-          <Header currentPage="none" />
+          <Sidebar />
+          <Header user={user} profile={profile} />
           
           <main className="construction-content">
             <div className="construction-icon">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <circle cx="12" cy="12" r="10"></circle>
-                <polyline points="12 6 12 12 16 14"></polyline>
-              </svg>
+              <ClockIcon />
             </div>
             
             <h1 className="construction-title">Coming Soon</h1>
@@ -135,18 +149,31 @@
               </a>
             </div>
           </main>
-          
-          <Footer>
-            <span className="footer-text" style={{ marginRight: 'auto' }}>
-              © 2024 Society Arts
-            </span>
-          </Footer>
         </div>
       );
     }
 
     const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<UnderConstructionPage />);
+    
+    function waitForComponents(callback, maxAttempts = 50) {
+      let attempts = 0;
+      const check = () => {
+        attempts++;
+        if (window.SocietyArts?.Sidebar && window.SocietyArts?.Header && window.SocietyArts?.useAuth) {
+          callback();
+        } else if (attempts < maxAttempts) {
+          setTimeout(check, 100);
+        } else {
+          console.error('Components failed to load');
+          callback();
+        }
+      };
+      check();
+    }
+    
+    waitForComponents(() => {
+      root.render(<UnderConstructionPage />);
+    });
   </script>
 </body>
 </html>
