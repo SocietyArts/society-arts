@@ -1,7 +1,12 @@
 /* ========================================
    SOCIETY ARTS - UNIFIED HEADER SYSTEM
    Single source of truth for header/sidebar across ALL pages
-   Version: 7.0 - Logo image header, fixed sidebar
+   Version: 8.1 - Account Menu System
+   Changes:
+   - Removed Settings & Help from sidebar bottom nav
+   - Added Account Trigger at bottom of sidebar (? icon or avatar)
+   - Added Account Menu popup with help pages and settings
+   - Added "Try Society Arts" button for logged-out users
    ======================================== */
 
 // ========================================
@@ -14,6 +19,7 @@ const SITE_CONFIG = {
     year: new Date().getFullYear()
 };
 
+// Main navigation items (Settings & Help moved to Account Menu)
 const NAV_ITEMS = [
     { id: 'home', label: 'Home', href: '/index.html', icon: 'home' },
     { id: 'story-builder', label: 'Story Builder', href: '/story-builder.html', icon: 'edit' },
@@ -22,9 +28,29 @@ const NAV_ITEMS = [
     { id: 'collections', label: 'Collections', href: '/collections.html', icon: 'layers' }
 ];
 
-const BOTTOM_NAV_ITEMS = [
+// Account Menu Items - Logged In
+const ACCOUNT_MENU_LOGGED_IN = [
     { id: 'settings', label: 'Settings', href: '/settings.html', icon: 'settings' },
-    { id: 'help', label: 'Help', href: '#', icon: 'help', action: 'openHelp' }
+    { id: 'help', label: 'Get Help', href: '/help.html', icon: 'help' },
+    { type: 'divider' },
+    { id: 'about', label: 'About Society Arts', href: '/about.html', icon: 'info' },
+    { id: 'how-it-works', label: 'How It Works', href: '/how-it-works.html', icon: 'lightbulb' },
+    { id: 'videos', label: 'Video Guides', href: '/video-guides.html', icon: 'video' },
+    { id: 'faq', label: 'FAQ', href: '/faq.html', icon: 'helpCircle' },
+    { type: 'divider' },
+    { id: 'logout', label: 'Log Out', action: 'logout', icon: 'logout' }
+];
+
+// Account Menu Items - Logged Out
+const ACCOUNT_MENU_LOGGED_OUT = [
+    { id: 'help', label: 'Get Help', href: '/help.html', icon: 'help' },
+    { type: 'divider' },
+    { id: 'about', label: 'About Society Arts', href: '/about.html', icon: 'info' },
+    { id: 'how-it-works', label: 'How It Works', href: '/how-it-works.html', icon: 'lightbulb' },
+    { id: 'videos', label: 'Video Guides', href: '/video-guides.html', icon: 'video' },
+    { id: 'faq', label: 'FAQ', href: '/faq.html', icon: 'helpCircle' },
+    { type: 'divider' },
+    { id: 'login', label: 'Log In', action: 'login', icon: 'login' }
 ];
 
 // ========================================
@@ -40,6 +66,7 @@ const ICONS = {
     help: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`,
     chevronDown: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>`,
     logout: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>`,
+    login: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>`,
     close: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`,
     book: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>`,
     video: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>`,
@@ -47,7 +74,11 @@ const ICONS = {
     mail: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>`,
     arrowRight: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>`,
     upload: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>`,
-    users: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>`
+    users: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>`,
+    info: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`,
+    lightbulb: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="9" y1="18" x2="15" y2="18"></line><line x1="10" y1="22" x2="14" y2="22"></line><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"></path></svg>`,
+    helpCircle: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`,
+    questionMark: `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg>`
 };
 
 // ========================================
@@ -73,62 +104,7 @@ function getInitials(name) {
 }
 
 // ========================================
-// HELP MODAL SYSTEM
-// ========================================
-let helpModalOpen = false;
-
-function openHelpModal() {
-    if (document.getElementById('sa-help-modal')) return;
-    
-    helpModalOpen = true;
-    
-    const helpItems = [
-        { icon: 'book', title: 'Documentation', desc: 'Learn how to use Society Arts', href: '/under-construction.html?feature=Documentation' },
-        { icon: 'video', title: 'Video Tutorials', desc: 'Watch step-by-step guides', href: '/tutorials.html' },
-        { icon: 'messageCircle', title: 'Community', desc: 'Join discussions with other artists', href: '/under-construction.html?feature=Community' },
-        { icon: 'mail', title: 'Contact Support', desc: 'Get help from our team', href: 'mailto:support@societyarts.com' }
-    ];
-    
-    const modalHtml = `
-        <div class="help-modal-overlay" id="sa-help-modal" onclick="closeHelpModal()">
-            <div class="help-modal" onclick="event.stopPropagation()">
-                <div class="help-modal-header">
-                    <h3>Help & Resources</h3>
-                    <button class="help-modal-close" onclick="closeHelpModal()">${ICONS.close}</button>
-                </div>
-                <div class="help-modal-content">
-                    ${helpItems.map(item => `
-                        <a href="${item.href}" class="help-modal-item">
-                            <span class="help-modal-item-icon">${ICONS[item.icon]}</span>
-                            <div class="help-modal-item-text">
-                                <span class="help-modal-item-title">${item.title}</span>
-                                <span class="help-modal-item-desc">${item.desc}</span>
-                            </div>
-                        </a>
-                    `).join('')}
-                </div>
-            </div>
-        </div>
-    `;
-    
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
-}
-
-function closeHelpModal() {
-    const modal = document.getElementById('sa-help-modal');
-    if (modal) {
-        modal.remove();
-        helpModalOpen = false;
-    }
-}
-
-// Make globally available
-window.openHelpModal = openHelpModal;
-window.closeHelpModal = closeHelpModal;
-window.openHelp = openHelpModal;
-
-// ========================================
-// HEADER HTML GENERATOR
+// HEADER HTML GENERATOR (Vanilla JS)
 // ========================================
 function generateHeaderHTML(user, profile) {
     const isLoggedIn = !!user;
@@ -191,10 +167,15 @@ function generateHeaderHTML(user, profile) {
 }
 
 // ========================================
-// SIDEBAR HTML GENERATOR
+// SIDEBAR HTML GENERATOR (Vanilla JS) - Updated with Account Menu
 // ========================================
 function generateSidebarHTML() {
     const currentPage = getCurrentPageId();
+    const user = window.AuthState?.user;
+    const profile = window.AuthState?.profile;
+    const isLoggedIn = !!user;
+    const displayName = profile?.display_name || user?.email?.split('@')[0] || 'User';
+    const initials = getInitials(displayName);
     
     const mainNavItems = NAV_ITEMS.map(item => `
         <li>
@@ -206,24 +187,41 @@ function generateSidebarHTML() {
         </li>
     `).join('');
     
-    const bottomNavItems = BOTTOM_NAV_ITEMS.map(item => `
-        <li>
-            <a href="${item.href}" class="sidebar-nav-item ${currentPage === item.id ? 'active' : ''}"
-               ${item.action ? `onclick="event.preventDefault(); window.${item.action}()"` : ''}>
-                <span class="sidebar-nav-icon">${ICONS[item.icon]}</span>
-                <span class="sidebar-nav-label">${item.label}</span>
+    const menuItems = isLoggedIn ? ACCOUNT_MENU_LOGGED_IN : ACCOUNT_MENU_LOGGED_OUT;
+    const accountMenuItems = menuItems.map((item, index) => {
+        if (item.type === 'divider') {
+            return `<div class="account-menu-divider"></div>`;
+        }
+        return `
+            <a href="${item.href || '#'}" class="account-menu-item" 
+               ${item.action ? `onclick="event.preventDefault(); window.SocietyArts.handleAccountMenuAction('${item.action}')"` : ''}>
+                <span class="account-menu-item-icon">${ICONS[item.icon]}</span>
+                <span class="account-menu-item-label">${item.label}</span>
             </a>
-        </li>
-    `).join('');
+        `;
+    }).join('');
+    
+    // Account trigger - ? icon for logged out, initials/avatar for logged in
+    const accountTrigger = isLoggedIn 
+        ? `<span class="account-trigger-initials">${initials}</span>`
+        : `<span class="account-trigger-question">${ICONS.questionMark}</span>`;
     
     return `
         <aside class="sidebar" id="sa-sidebar">
             <nav class="sidebar-nav sidebar-nav-main">
                 <ul>${mainNavItems}</ul>
             </nav>
-            <nav class="sidebar-nav sidebar-nav-bottom">
-                <ul>${bottomNavItems}</ul>
-            </nav>
+            <div class="sidebar-account">
+                <div class="account-menu" id="saAccountMenu">
+                    ${isLoggedIn ? `<div class="account-menu-header"><span class="account-menu-name">${displayName}</span></div>` : ''}
+                    <div class="account-menu-items">
+                        ${accountMenuItems}
+                    </div>
+                </div>
+                <button class="account-trigger" onclick="window.SocietyArts.toggleAccountMenu()" title="${isLoggedIn ? 'Account menu' : 'Help & Info'}">
+                    ${accountTrigger}
+                </button>
+            </div>
         </aside>
     `;
 }
@@ -252,6 +250,12 @@ function updateHeaderAuth() {
     const header = document.getElementById('sa-header');
     if (header) {
         header.outerHTML = generateHeaderHTML(user, profile);
+    }
+    
+    // Also update sidebar (for account trigger)
+    const sidebar = document.getElementById('sa-sidebar');
+    if (sidebar) {
+        sidebar.outerHTML = generateSidebarHTML();
     }
 }
 
@@ -309,6 +313,51 @@ function closeUserMenu() {
     }
 }
 
+// ========================================
+// ACCOUNT MENU FUNCTIONS (New)
+// ========================================
+function toggleAccountMenu() {
+    const menu = document.getElementById('saAccountMenu');
+    if (menu) {
+        menu.classList.toggle('open');
+    }
+}
+
+function closeAccountMenu() {
+    const menu = document.getElementById('saAccountMenu');
+    if (menu) {
+        menu.classList.remove('open');
+    }
+}
+
+function handleAccountMenuAction(action) {
+    closeAccountMenu();
+    if (action === 'logout') {
+        if (window.signOut) {
+            window.signOut().then(() => {
+                window.location.href = '/index.html';
+            });
+        }
+    } else if (action === 'login') {
+        if (window.openAuthModal) {
+            window.openAuthModal();
+        } else {
+            window.location.href = '/login.html';
+        }
+    }
+}
+
+// Close account menu on outside click
+document.addEventListener('click', (e) => {
+    const accountSection = document.querySelector('.sidebar-account');
+    if (accountSection && !accountSection.contains(e.target)) {
+        closeAccountMenu();
+    }
+});
+
+// ========================================
+// OTHER GLOBAL FUNCTIONS
+// ========================================
 async function handleLogout() {
     closeUserMenu();
     if (window.signOut) {
@@ -343,7 +392,7 @@ document.addEventListener('click', (e) => {
 if (typeof React !== 'undefined') {
     const { useState, useEffect, useRef, createElement: h } = React;
 
-    // useHeaderAuth hook
+    // useHeaderAuth hook - for header.js internal use
     function useHeaderAuth() {
         const [authState, setAuthState] = useState({
             user: window.AuthState?.user || null,
@@ -475,81 +524,100 @@ if (typeof React !== 'undefined') {
         );
     };
 
-    // Sidebar Component
+    // Sidebar Component - Updated with Account Menu
     const Sidebar = () => {
-        const [helpModalOpen, setHelpModalOpen] = useState(false);
+        const { user, profile } = useHeaderAuth();
+        const [accountMenuOpen, setAccountMenuOpen] = useState(false);
         const currentPage = getCurrentPageId();
+        const accountRef = useRef(null);
+        
+        const displayName = profile?.display_name || user?.email?.split('@')[0] || 'User';
+        const initials = getInitials(displayName);
+        const menuItems = user ? ACCOUNT_MENU_LOGGED_IN : ACCOUNT_MENU_LOGGED_OUT;
 
-        return h(React.Fragment, null,
-            h('aside', { className: 'sidebar', id: 'sa-sidebar' },
-                h('nav', { className: 'sidebar-nav sidebar-nav-main' },
-                    h('ul', null,
-                        NAV_ITEMS.map(item =>
-                            h('li', { key: item.id },
-                                h('a', {
-                                    href: item.href,
-                                    className: `sidebar-nav-item ${currentPage === item.id ? 'active' : ''}`
-                                },
-                                    h('span', { className: 'sidebar-nav-icon', dangerouslySetInnerHTML: { __html: ICONS[item.icon] } }),
-                                    h('span', { className: 'sidebar-nav-label' }, item.label)
-                                )
-                            )
-                        )
-                    )
-                ),
-                h('nav', { className: 'sidebar-nav sidebar-nav-bottom' },
-                    h('ul', null,
-                        BOTTOM_NAV_ITEMS.map(item =>
-                            h('li', { key: item.id },
-                                h('a', {
-                                    href: item.href,
-                                    className: `sidebar-nav-item ${currentPage === item.id ? 'active' : ''}`,
-                                    onClick: (e) => {
-                                        if (item.action === 'openHelp') {
-                                            e.preventDefault();
-                                            setHelpModalOpen(true);
-                                        }
-                                    }
-                                },
-                                    h('span', { className: 'sidebar-nav-icon', dangerouslySetInnerHTML: { __html: ICONS[item.icon] } }),
-                                    h('span', { className: 'sidebar-nav-label' }, item.label)
-                                )
+        useEffect(() => {
+            const handleClickOutside = (e) => {
+                if (accountRef.current && !accountRef.current.contains(e.target)) {
+                    setAccountMenuOpen(false);
+                }
+            };
+            document.addEventListener('mousedown', handleClickOutside);
+            return () => document.removeEventListener('mousedown', handleClickOutside);
+        }, []);
+        
+        useEffect(() => {
+            const handleEscape = (e) => {
+                if (e.key === 'Escape') setAccountMenuOpen(false);
+            };
+            document.addEventListener('keydown', handleEscape);
+            return () => document.removeEventListener('keydown', handleEscape);
+        }, []);
+
+        const handleMenuItemClick = (item) => {
+            if (item.action === 'logout') {
+                if (window.signOut) {
+                    window.signOut().then(() => {
+                        window.location.href = '/index.html';
+                    });
+                }
+            } else if (item.action === 'login') {
+                if (window.openAuthModal) {
+                    window.openAuthModal();
+                }
+            }
+            setAccountMenuOpen(false);
+        };
+
+        return h('aside', { className: 'sidebar', id: 'sa-sidebar' },
+            h('nav', { className: 'sidebar-nav sidebar-nav-main' },
+                h('ul', null,
+                    NAV_ITEMS.map(item =>
+                        h('li', { key: item.id },
+                            h('a', {
+                                href: item.href,
+                                className: `sidebar-nav-item ${currentPage === item.id ? 'active' : ''}`
+                            },
+                                h('span', { className: 'sidebar-nav-icon', dangerouslySetInnerHTML: { __html: ICONS[item.icon] } }),
+                                h('span', { className: 'sidebar-nav-label' }, item.label)
                             )
                         )
                     )
                 )
             ),
-            helpModalOpen && h(HelpModal, { isOpen: helpModalOpen, onClose: () => setHelpModalOpen(false) })
-        );
-    };
-
-    // Help Modal Component
-    const HelpModal = ({ isOpen, onClose }) => {
-        if (!isOpen) return null;
-
-        const helpItems = [
-            { icon: 'book', title: 'Documentation', desc: 'Learn how to use Society Arts', href: '/under-construction.html?feature=Documentation' },
-            { icon: 'video', title: 'Video Tutorials', desc: 'Watch step-by-step guides', href: '/tutorials.html' },
-            { icon: 'messageCircle', title: 'Community', desc: 'Join discussions with other artists', href: '/under-construction.html?feature=Community' },
-            { icon: 'mail', title: 'Contact Support', desc: 'Get help from our team', href: 'mailto:support@societyarts.com' }
-        ];
-
-        return h('div', { className: 'help-modal-overlay', onClick: onClose },
-            h('div', { className: 'help-modal', onClick: (e) => e.stopPropagation() },
-                h('div', { className: 'help-modal-header' },
-                    h('h3', null, 'Help & Resources'),
-                    h('button', { className: 'help-modal-close', onClick: onClose, dangerouslySetInnerHTML: { __html: ICONS.close } })
-                ),
-                h('div', { className: 'help-modal-content' },
-                    helpItems.map((item, i) =>
-                        h('a', { key: i, href: item.href, className: 'help-modal-item' },
-                            h('span', { className: 'help-modal-item-icon', dangerouslySetInnerHTML: { __html: ICONS[item.icon] } }),
-                            h('div', { className: 'help-modal-item-text' },
-                                h('span', { className: 'help-modal-item-title' }, item.title),
-                                h('span', { className: 'help-modal-item-desc' }, item.desc)
-                            )
+            h('div', { className: 'sidebar-account', ref: accountRef },
+                accountMenuOpen && h('div', { className: 'account-menu open' },
+                    user && h('div', { className: 'account-menu-header' },
+                        h('span', { className: 'account-menu-name' }, displayName)
+                    ),
+                    h('div', { className: 'account-menu-items' },
+                        menuItems.map((item, index) =>
+                            item.type === 'divider'
+                                ? h('div', { key: `divider-${index}`, className: 'account-menu-divider' })
+                                : h('a', {
+                                    key: item.id,
+                                    href: item.href || '#',
+                                    className: 'account-menu-item',
+                                    onClick: (e) => {
+                                        if (item.action) {
+                                            e.preventDefault();
+                                            handleMenuItemClick(item);
+                                        }
+                                    }
+                                },
+                                    h('span', { className: 'account-menu-item-icon', dangerouslySetInnerHTML: { __html: ICONS[item.icon] } }),
+                                    h('span', { className: 'account-menu-item-label' }, item.label)
+                                )
                         )
                     )
+                ),
+                h('button', {
+                    className: 'account-trigger',
+                    onClick: () => setAccountMenuOpen(!accountMenuOpen),
+                    title: user ? 'Account menu' : 'Help & Info'
+                },
+                    user
+                        ? h('span', { className: 'account-trigger-initials' }, initials)
+                        : h('span', { className: 'account-trigger-question', dangerouslySetInnerHTML: { __html: ICONS.questionMark } })
                 )
             )
         );
@@ -576,10 +644,9 @@ if (typeof React !== 'undefined') {
         Header,
         Sidebar,
         Footer,
-        HelpModal,
         Icons: ReactIcons,
-        useHeaderAuth,
-        useAuth: useHeaderAuth // Alias for compatibility
+        useHeaderAuth
+        // NOTE: Do NOT export useAuth here - auth.js already exports it
     });
 }
 
@@ -600,8 +667,9 @@ Object.assign(window.SocietyArts, {
     closeUserMenu,
     handleLogout,
     openAdminUtilities,
-    openHelpModal,
-    closeHelpModal,
+    toggleAccountMenu,
+    closeAccountMenu,
+    handleAccountMenuAction,
     getCurrentPageId,
     getInitials
 });
