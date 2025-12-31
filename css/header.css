@@ -972,7 +972,7 @@
 /* ========================================
    ACCOUNT MENU POPUP
    ======================================== */
-.account-menu .account-menu {
+.account-menu {
     position: fixed;
     bottom: 70px;
     left: 8px;
