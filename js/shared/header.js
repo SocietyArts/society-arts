@@ -210,7 +210,7 @@ function generateSidebarHTML() {
             <nav class="sidebar-nav sidebar-nav-main">
                 <ul>${mainNavItems}</ul>
             </nav>
-           <div class="sidebar-account" onmouseenter="window.SocietyArts.openAccountMenu()" onmouseleave="window.SocietyArts.closeAccountMenu()">
+               <div class="sidebar-account" onmouseenter="window.SocietyArts.openAccountMenu()">
                 <div class="account-menu" id="saAccountMenu">
                     ${isLoggedIn ? `<div class="account-menu-header"><span class="account-menu-name">${displayName}</span></div>` : ''}
                     <div class="account-menu-items">
@@ -593,8 +593,7 @@ if (typeof React !== 'undefined') {
             h('div', { 
                 className: 'sidebar-account', 
                 ref: accountRef,
-                onMouseEnter: () => setAccountMenuOpen(true),
-                onMouseLeave: () => setAccountMenuOpen(false)
+                onMouseEnter: () => setAccountMenuOpen(true)
             },
                 accountMenuOpen && h('div', { className: 'account-menu open' },
                     user && h('div', { className: 'account-menu-header' },
