@@ -3,19 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FAQ - Society Arts</title>
-  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <title>FAQ | Society Arts</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=Domine:wght@400;500;600;700&display=swap" rel="stylesheet">
-  
-  <!-- CSS -->
-  <link rel="stylesheet" href="/css/variables.css">
-  <link rel="stylesheet" href="/css/base.css">
-  <link rel="stylesheet" href="/css/components.css">
-  <link rel="stylesheet" href="/css/header.css">
   
   <!-- React -->
   <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
@@ -23,99 +17,212 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   
   <!-- Supabase -->
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- Shared CSS Variables -->
+  <link rel="stylesheet" href="/css/variables.css">
   
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: var(--font-primary, 'Familjen Grotesk', sans-serif);
+      background-color: var(--color-surface, #F5F3EF);
+      color: var(--color-text-primary, #2D2018);
+      line-height: 1.6;
+    }
+    
+    /* Page Layout */
     .page-container {
-      min-height: 100vh;
       display: flex;
-      flex-direction: column;
-      padding-left: var(--sidebar-width-collapsed, 50px);
-      padding-top: var(--logo-bar-height, 48px);
-      background: var(--color-background);
+      min-height: 100vh;
     }
     
     .faq-content {
       flex: 1;
-      padding: var(--space-3xl) var(--space-4xl);
-      max-width: 800px;
-      margin: 0 auto;
-      width: 100%;
+      margin-left: 72px;
+      padding: calc(60px + var(--space-2xl, 32px)) var(--space-2xl, 32px) var(--space-2xl, 32px);
+      max-width: 900px;
+      margin-right: auto;
     }
     
+    /* Page Header */
     .faq-header {
-      text-align: center;
-      margin-bottom: var(--space-3xl);
+      margin-bottom: var(--space-2xl, 32px);
     }
     
     .faq-title {
-      font-family: var(--font-serif);
-      font-size: var(--text-3xl);
-      font-weight: var(--weight-normal);
-      color: var(--color-text-primary);
-      margin: 0 0 var(--space-sm) 0;
+      font-family: var(--font-serif, 'Domine', serif);
+      font-size: var(--text-3xl, 30px);
+      font-weight: var(--weight-semibold, 600);
+      color: var(--color-text-primary, #2D2018);
+      margin: 0 0 var(--space-sm, 8px) 0;
     }
     
     .faq-subtitle {
-      font-size: var(--text-base);
-      color: var(--color-text-muted);
+      font-size: var(--text-base, 16px);
+      color: var(--color-text-secondary, #6B5D52);
       margin: 0;
     }
     
-    /* FAQ Categories */
+    /* Search Bar */
+    .faq-search {
+      margin-bottom: var(--space-2xl, 32px);
+    }
+    
+    .faq-search-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    
+    .faq-search-icon {
+      position: absolute;
+      left: 16px;
+      width: 20px;
+      height: 20px;
+      color: var(--color-text-light, #9C8E82);
+      pointer-events: none;
+    }
+    
+    .faq-search-input {
+      width: 100%;
+      padding: 14px 48px 14px 48px;
+      font-family: var(--font-primary, 'Familjen Grotesk', sans-serif);
+      font-size: var(--text-base, 16px);
+      border: 1px solid var(--color-border-light, #E5E0D8);
+      border-radius: var(--radius-lg, 12px);
+      background: white;
+      color: var(--color-text-primary, #2D2018);
+      transition: all 0.2s ease;
+    }
+    
+    .faq-search-input:focus {
+      outline: none;
+      border-color: var(--color-tan-40, #C4B5A5);
+      box-shadow: 0 0 0 3px rgba(196, 181, 165, 0.2);
+    }
+    
+    .faq-search-input::placeholder {
+      color: var(--color-text-light, #9C8E82);
+    }
+    
+    .faq-search-clear {
+      position: absolute;
+      right: 12px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-surface-alt, #EDE9E3);
+      border: none;
+      border-radius: var(--radius-full, 50%);
+      cursor: pointer;
+      color: var(--color-text-secondary, #6B5D52);
+      transition: all 0.15s ease;
+      opacity: 0;
+      pointer-events: none;
+    }
+    
+    .faq-search-clear.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    
+    .faq-search-clear:hover {
+      background: var(--color-tan-20, #E8E0D5);
+      color: var(--color-text-primary, #2D2018);
+    }
+    
+    /* Search Results Info */
+    .faq-search-info {
+      margin-top: var(--space-sm, 8px);
+      font-size: var(--text-sm, 14px);
+      color: var(--color-text-secondary, #6B5D52);
+    }
+    
+    .faq-search-info strong {
+      color: var(--color-text-primary, #2D2018);
+    }
+    
+    /* FAQ Sections */
+    .faq-sections {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2xl, 32px);
+    }
+    
     .faq-section {
-      margin-bottom: var(--space-3xl);
+      background: white;
+      border-radius: var(--radius-xl, 16px);
+      border: 1px solid var(--color-border-light, #E5E0D8);
+      overflow: hidden;
+    }
+    
+    .faq-section-header {
+      padding: var(--space-lg, 20px) var(--space-xl, 24px);
+      background: var(--color-surface-alt, #EDE9E3);
+      border-bottom: 1px solid var(--color-border-light, #E5E0D8);
     }
     
     .faq-section-title {
-      font-family: var(--font-primary);
-      font-size: var(--text-lg);
-      font-weight: var(--weight-semibold);
-      color: var(--color-text-primary);
-      margin: 0 0 var(--space-lg) 0;
-      padding-bottom: var(--space-sm);
-      border-bottom: 2px solid var(--color-tan-20);
+      font-family: var(--font-serif, 'Domine', serif);
+      font-size: var(--text-lg, 18px);
+      font-weight: var(--weight-semibold, 600);
+      color: var(--color-text-primary, #2D2018);
+      margin: 0;
+    }
+    
+    .faq-section-desc {
+      font-size: var(--text-sm, 14px);
+      color: var(--color-text-secondary, #6B5D52);
+      margin: var(--space-xs, 4px) 0 0 0;
     }
     
     /* FAQ Items */
     .faq-list {
       display: flex;
       flex-direction: column;
-      gap: var(--space-sm);
     }
     
     .faq-item {
-      background: white;
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--color-border-light);
-      overflow: hidden;
-      transition: all 0.15s ease;
+      border-bottom: 1px solid var(--color-border-light, #E5E0D8);
     }
     
-    .faq-item.open {
-      border-color: var(--color-tan-40);
+    .faq-item:last-child {
+      border-bottom: none;
     }
     
     .faq-question {
       width: 100%;
-      padding: var(--space-lg) var(--space-xl);
+      padding: var(--space-lg, 20px) var(--space-xl, 24px);
       background: none;
       border: none;
       text-align: left;
       cursor: pointer;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
-      gap: var(--space-md);
-      font-family: var(--font-primary);
-      font-size: var(--text-base);
-      font-weight: var(--weight-medium);
-      color: var(--color-text-primary);
+      gap: var(--space-md, 16px);
+      font-family: var(--font-primary, 'Familjen Grotesk', sans-serif);
+      font-size: var(--text-base, 16px);
+      font-weight: var(--weight-medium, 500);
+      color: var(--color-text-primary, #2D2018);
+      line-height: 1.5;
       transition: background 0.15s ease;
     }
     
     .faq-question:hover {
-      background: var(--color-surface-alt);
+      background: var(--color-surface-alt, #EDE9E3);
+    }
+    
+    .faq-question-text {
+      flex: 1;
     }
     
     .faq-icon {
@@ -124,80 +231,180 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--color-text-light);
-      transition: transform 0.2s ease;
+      color: var(--color-text-light, #9C8E82);
+      transition: transform 0.25s ease, color 0.15s ease;
       flex-shrink: 0;
+      margin-top: 2px;
     }
     
     .faq-item.open .faq-icon {
       transform: rotate(180deg);
-      color: var(--color-accent);
-    }
-    
-    .faq-icon svg {
-      width: 20px;
-      height: 20px;
+      color: var(--color-accent, #8B6914);
     }
     
     .faq-answer {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.3s ease;
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.3s ease;
     }
     
     .faq-item.open .faq-answer {
-      max-height: 500px;
+      grid-template-rows: 1fr;
+    }
+    
+    .faq-answer-inner {
+      overflow: hidden;
     }
     
     .faq-answer-content {
-      padding: 0 var(--space-xl) var(--space-xl);
-      color: var(--color-text-secondary);
+      padding: 0 var(--space-xl, 24px) var(--space-lg, 20px) var(--space-xl, 24px);
+      color: var(--color-text-secondary, #6B5D52);
       line-height: 1.7;
     }
     
-    .faq-answer-content p {
-      margin: 0 0 var(--space-md) 0;
+    .faq-answer-content strong {
+      color: var(--color-text-primary, #2D2018);
+      font-weight: var(--weight-semibold, 600);
     }
     
-    .faq-answer-content p:last-child {
-      margin-bottom: 0;
+    /* Highlight for search matches */
+    .faq-highlight {
+      background: rgba(139, 105, 20, 0.15);
+      padding: 1px 3px;
+      border-radius: 3px;
     }
     
-    .faq-answer-content ul {
+    /* No Results */
+    .faq-no-results {
+      text-align: center;
+      padding: var(--space-3xl, 48px) var(--space-xl, 24px);
+      background: white;
+      border-radius: var(--radius-xl, 16px);
+      border: 1px solid var(--color-border-light, #E5E0D8);
+    }
+    
+    .faq-no-results-icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto var(--space-lg, 20px);
+      color: var(--color-text-light, #9C8E82);
+    }
+    
+    .faq-no-results-title {
+      font-family: var(--font-serif, 'Domine', serif);
+      font-size: var(--text-lg, 18px);
+      font-weight: var(--weight-semibold, 600);
+      color: var(--color-text-primary, #2D2018);
+      margin: 0 0 var(--space-sm, 8px) 0;
+    }
+    
+    .faq-no-results-text {
+      color: var(--color-text-secondary, #6B5D52);
       margin: 0;
-      padding-left: var(--space-xl);
-    }
-    
-    .faq-answer-content li {
-      margin-bottom: var(--space-xs);
     }
     
     /* Contact CTA */
     .faq-cta {
       text-align: center;
-      padding: var(--space-2xl);
-      background: var(--color-tan-10);
-      border-radius: var(--radius-lg);
+      padding: var(--space-2xl, 32px);
+      background: var(--color-tan-10, #F5F0E8);
+      border-radius: var(--radius-xl, 16px);
+      margin-top: var(--space-2xl, 32px);
+    }
+    
+    .faq-cta-title {
+      font-family: var(--font-serif, 'Domine', serif);
+      font-size: var(--text-lg, 18px);
+      font-weight: var(--weight-semibold, 600);
+      color: var(--color-text-primary, #2D2018);
+      margin: 0 0 var(--space-sm, 8px) 0;
     }
     
     .faq-cta-text {
-      color: var(--color-text-secondary);
-      margin: 0 0 var(--space-md) 0;
+      color: var(--color-text-secondary, #6B5D52);
+      margin: 0 0 var(--space-lg, 20px) 0;
     }
     
     .faq-cta-link {
-      color: var(--color-accent);
-      font-weight: var(--weight-semibold);
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm, 8px);
+      color: var(--color-accent, #8B6914);
+      font-weight: var(--weight-semibold, 600);
       text-decoration: none;
+      transition: gap 0.2s ease;
     }
     
     .faq-cta-link:hover {
-      text-decoration: underline;
+      gap: var(--space-md, 16px);
     }
     
+    .faq-cta-link svg {
+      width: 18px;
+      height: 18px;
+    }
+    
+    /* Loading State */
+    .faq-loading {
+      text-align: center;
+      padding: var(--space-3xl, 48px);
+    }
+    
+    .faq-loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--color-border-light, #E5E0D8);
+      border-top-color: var(--color-accent, #8B6914);
+      border-radius: 50%;
+      margin: 0 auto var(--space-lg, 20px);
+      animation: spin 0.8s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .faq-loading-text {
+      color: var(--color-text-secondary, #6B5D52);
+    }
+    
+    /* Error State */
+    .faq-error {
+      text-align: center;
+      padding: var(--space-2xl, 32px);
+      background: #FEF2F2;
+      border: 1px solid #FECACA;
+      border-radius: var(--radius-xl, 16px);
+    }
+    
+    .faq-error-title {
+      font-weight: var(--weight-semibold, 600);
+      color: #991B1B;
+      margin: 0 0 var(--space-sm, 8px) 0;
+    }
+    
+    .faq-error-text {
+      color: #B91C1C;
+      margin: 0;
+    }
+    
+    /* Responsive */
     @media (max-width: 768px) {
       .faq-content {
-        padding: var(--space-xl);
+        margin-left: 0;
+        padding: calc(60px + var(--space-lg, 20px)) var(--space-lg, 20px) var(--space-lg, 20px);
+      }
+      
+      .faq-title {
+        font-size: var(--text-2xl, 24px);
+      }
+      
+      .faq-question {
+        padding: var(--space-md, 16px);
+      }
+      
+      .faq-answer-content {
+        padding: 0 var(--space-md, 16px) var(--space-md, 16px);
       }
     }
   </style>
@@ -205,12 +412,14 @@
 <body>
   <div id="root"></div>
   
+  <!-- Shared Components -->
   <script type="text/babel" src="/js/shared/api.js"></script>
   <script type="text/babel" src="/js/shared/header.js"></script>
   
   <script type="text/babel">
-    const { useState, useEffect } = React;
+    const { useState, useEffect, useMemo, useCallback } = React;
     
+    // Wait for shared components to load
     function waitForComponents() {
       return new Promise((resolve) => {
         const check = () => {
@@ -224,96 +433,192 @@
       });
     }
     
-    // FAQ Data
-    const FAQ_SECTIONS = [
-      {
-        title: 'Getting Started',
-        items: [
-          {
-            question: 'What is Society Arts?',
-            answer: 'Society Arts transforms your meaningful memories into beautiful, wall-worthy artwork. Simply share your story — by typing or speaking — choose an artistic style, and we create custom art that captures your memory.'
-          },
-          {
-            question: 'Do I need artistic skills to use Society Arts?',
-            answer: 'Not at all! Society Arts is designed for everyone. You just need to share your story and choose a style you like. Our AI handles the artistic creation, turning your words into visual art.'
-          },
-          {
-            question: 'How do I create my first piece of art?',
-            answer: 'Start by clicking "Story Builder" from the sidebar. Share your memory by typing in the chat or using voice mode. As you tell your story, it will appear in the "Your Story" panel. Then choose up to 4 artistic styles from the Style Finder, and generate your artwork.'
-          }
-        ]
-      },
-      {
-        title: 'Using the Platform',
-        items: [
-          {
-            question: 'What is Voice Mode?',
-            answer: 'Voice Mode lets you speak your story naturally instead of typing. Click the microphone icon to activate it. Our AI listens and captures your words, making it easy to share detailed memories conversationally.'
-          },
-          {
-            question: 'What are the Transform tools?',
-            answer: '<p>Transform tools help refine your story for better visual results:</p><ul><li><strong>Optimize</strong> — Cleans up your description for clearer AI interpretation</li><li><strong>Enrich</strong> — Adds vivid visual details to your story</li><li><strong>Simplify</strong> — Distills your story to its essential elements</li><li><strong>No People</strong> — Removes human figures for more symbolic artwork</li></ul>'
-          },
-          {
-            question: 'How many styles can I choose?',
-            answer: 'You can select up to 4 different artistic styles for each creation. This lets you see how your memory looks interpreted through different artistic lenses — from watercolors to bold oils, photography to illustration.'
-          }
-        ]
-      },
-      {
-        title: 'Account & Billing',
-        items: [
-          {
-            question: 'Is Society Arts free to use?',
-            answer: 'Society Arts offers both free and premium options. You can explore the platform and create a limited number of artworks for free. Premium plans provide unlimited creations, higher resolution outputs, and additional features.'
-          },
-          {
-            question: 'How do I save my artwork?',
-            answer: 'Once you generate artwork, you can save it to a Project for future access. You can also download the image directly to your device. Premium users get access to higher resolution downloads suitable for large prints.'
-          },
-          {
-            question: 'Can I print my artwork?',
-            answer: 'Yes! Your artwork is designed to be print-ready. You can download the image and print it yourself, or use our partner printing services for professional-quality prints on canvas, paper, or other materials.'
-          }
-        ]
-      }
-    ];
-    
     // Icons
+    const SearchIcon = () => (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+    );
+    
+    const XIcon = () => (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    );
+    
     const ChevronDownIcon = () => (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <polyline points="6 9 12 15 18 9"></polyline>
       </svg>
     );
     
-    // FAQ Item Component
-    function FAQItem({ question, answer }) {
-      const [isOpen, setIsOpen] = useState(false);
+    const SearchOffIcon = () => (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        <line x1="8" y1="8" x2="14" y2="14"></line>
+      </svg>
+    );
+    
+    const ArrowRightIcon = () => (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+        <polyline points="12 5 19 12 12 19"></polyline>
+      </svg>
+    );
+    
+    // Highlight text that matches search query
+    function highlightText(text, query) {
+      if (!query || query.length < 2) return text;
       
+      const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+      const parts = text.split(regex);
+      
+      return parts.map((part, i) => 
+        regex.test(part) 
+          ? <span key={i} className="faq-highlight">{part}</span>
+          : part
+      );
+    }
+    
+    // FAQ Item Component
+    function FAQItem({ faq, searchQuery, isOpen, onToggle }) {
       return (
         <div className={`faq-item ${isOpen ? 'open' : ''}`}>
-          <button className="faq-question" onClick={() => setIsOpen(!isOpen)}>
-            <span>{question}</span>
+          <button className="faq-question" onClick={onToggle}>
+            <span className="faq-question-text">
+              {highlightText(faq.question, searchQuery)}
+            </span>
             <span className="faq-icon"><ChevronDownIcon /></span>
           </button>
           <div className="faq-answer">
-            <div 
-              className="faq-answer-content"
-              dangerouslySetInnerHTML={{ __html: answer }}
-            />
+            <div className="faq-answer-inner">
+              <div 
+                className="faq-answer-content"
+                dangerouslySetInnerHTML={{ 
+                  __html: searchQuery && searchQuery.length >= 2
+                    ? faq.answer.replace(
+                        new RegExp(`(${searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'),
+                        '<span class="faq-highlight">$1</span>'
+                      )
+                    : faq.answer 
+                }}
+              />
+            </div>
           </div>
         </div>
       );
     }
     
+    // Main FAQ Page Component
     function FAQPage() {
-      const { Sidebar, Header } = window.SocietyArts || {};
+      const { Sidebar, Header, useAuth, supabase } = window.SocietyArts || {};
+      
+      const [categories, setCategories] = useState([]);
+      const [faqs, setFaqs] = useState([]);
+      const [loading, setLoading] = useState(true);
+      const [error, setError] = useState(null);
+      const [searchQuery, setSearchQuery] = useState('');
+      const [openItems, setOpenItems] = useState(new Set());
+      
+      // Get auth state if available
+      const auth = useAuth ? useAuth() : { user: null, profile: null, isLoading: false };
+      const { user, profile } = auth;
+      
+      // Fetch FAQ data from Supabase
+      useEffect(() => {
+        async function fetchFAQs() {
+          if (!supabase) {
+            setError('Database connection not available');
+            setLoading(false);
+            return;
+          }
+          
+          try {
+            // Fetch categories
+            const { data: categoriesData, error: categoriesError } = await supabase
+              .from('faq_categories')
+              .select('*')
+              .eq('is_active', true)
+              .order('sort_order');
+            
+            if (categoriesError) throw categoriesError;
+            
+            // Fetch FAQs
+            const { data: faqsData, error: faqsError } = await supabase
+              .from('faq')
+              .select('*')
+              .eq('is_published', true)
+              .order('priority');
+            
+            if (faqsError) throw faqsError;
+            
+            setCategories(categoriesData || []);
+            setFaqs(faqsData || []);
+          } catch (err) {
+            console.error('Error fetching FAQs:', err);
+            setError(err.message);
+          } finally {
+            setLoading(false);
+          }
+        }
+        
+        fetchFAQs();
+      }, [supabase]);
+      
+      // Filter FAQs based on search query
+      const filteredData = useMemo(() => {
+        const query = searchQuery.toLowerCase().trim();
+        
+        if (!query || query.length < 2) {
+          // Return all FAQs grouped by category
+          return categories.map(category => ({
+            category,
+            faqs: faqs.filter(faq => faq.category_id === category.id)
+          })).filter(group => group.faqs.length > 0);
+        }
+        
+        // Filter FAQs that match the search query
+        const matchingFaqs = faqs.filter(faq => 
+          faq.question.toLowerCase().includes(query) ||
+          faq.answer.toLowerCase().includes(query)
+        );
+        
+        // Group matching FAQs by category
+        return categories.map(category => ({
+          category,
+          faqs: matchingFaqs.filter(faq => faq.category_id === category.id)
+        })).filter(group => group.faqs.length > 0);
+      }, [categories, faqs, searchQuery]);
+      
+      // Count total matching FAQs
+      const totalMatches = useMemo(() => {
+        return filteredData.reduce((sum, group) => sum + group.faqs.length, 0);
+      }, [filteredData]);
+      
+      // Toggle FAQ item open/closed
+      const toggleItem = useCallback((faqId) => {
+        setOpenItems(prev => {
+          const next = new Set(prev);
+          if (next.has(faqId)) {
+            next.delete(faqId);
+          } else {
+            next.add(faqId);
+          }
+          return next;
+        });
+      }, []);
+      
+      // Clear search
+      const clearSearch = useCallback(() => {
+        setSearchQuery('');
+      }, []);
       
       if (!Sidebar || !Header) {
-        return <div className="loading-state">Loading...</div>;
+        return <div className="faq-loading"><div className="faq-loading-spinner"></div><p className="faq-loading-text">Loading...</p></div>;
       }
-      
-      const { user, profile, isLoading: authLoading } = window.SocietyArts.useAuth();
       
       return (
         <div className="page-container">
@@ -321,37 +626,108 @@
           <Header user={user} profile={profile} />
           
           <main className="faq-content">
+            {/* Page Header */}
             <div className="faq-header">
               <h1 className="faq-title">Frequently Asked Questions</h1>
               <p className="faq-subtitle">Find answers to common questions about Society Arts</p>
             </div>
             
-            {FAQ_SECTIONS.map((section, sectionIndex) => (
-              <div key={sectionIndex} className="faq-section">
-                <h2 className="faq-section-title">{section.title}</h2>
-                <div className="faq-list">
-                  {section.items.map((item, itemIndex) => (
-                    <FAQItem 
-                      key={itemIndex}
-                      question={item.question}
-                      answer={item.answer}
-                    />
-                  ))}
-                </div>
+            {/* Search Bar */}
+            <div className="faq-search">
+              <div className="faq-search-wrapper">
+                <span className="faq-search-icon"><SearchIcon /></span>
+                <input
+                  type="text"
+                  className="faq-search-input"
+                  placeholder="Search questions..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                <button 
+                  className={`faq-search-clear ${searchQuery ? 'visible' : ''}`}
+                  onClick={clearSearch}
+                  aria-label="Clear search"
+                >
+                  <XIcon />
+                </button>
               </div>
-            ))}
-            
-            <div className="faq-cta">
-              <p className="faq-cta-text">Still have questions? We're here to help.</p>
-              <a href="mailto:support@societyarts.com" className="faq-cta-link">
-                Contact Support →
-              </a>
+              {searchQuery && searchQuery.length >= 2 && (
+                <div className="faq-search-info">
+                  Found <strong>{totalMatches}</strong> result{totalMatches !== 1 ? 's' : ''} for "{searchQuery}"
+                </div>
+              )}
             </div>
+            
+            {/* Loading State */}
+            {loading && (
+              <div className="faq-loading">
+                <div className="faq-loading-spinner"></div>
+                <p className="faq-loading-text">Loading FAQs...</p>
+              </div>
+            )}
+            
+            {/* Error State */}
+            {error && !loading && (
+              <div className="faq-error">
+                <p className="faq-error-title">Unable to load FAQs</p>
+                <p className="faq-error-text">{error}</p>
+              </div>
+            )}
+            
+            {/* No Results */}
+            {!loading && !error && filteredData.length === 0 && (
+              <div className="faq-no-results">
+                <div className="faq-no-results-icon"><SearchOffIcon /></div>
+                <h3 className="faq-no-results-title">No results found</h3>
+                <p className="faq-no-results-text">
+                  Try searching with different keywords or browse all questions below.
+                </p>
+              </div>
+            )}
+            
+            {/* FAQ Sections */}
+            {!loading && !error && filteredData.length > 0 && (
+              <div className="faq-sections">
+                {filteredData.map(({ category, faqs: categoryFaqs }) => (
+                  <div key={category.id} className="faq-section">
+                    <div className="faq-section-header">
+                      <h2 className="faq-section-title">{category.name}</h2>
+                      {category.description && (
+                        <p className="faq-section-desc">{category.description}</p>
+                      )}
+                    </div>
+                    <div className="faq-list">
+                      {categoryFaqs.map(faq => (
+                        <FAQItem
+                          key={faq.id}
+                          faq={faq}
+                          searchQuery={searchQuery}
+                          isOpen={openItems.has(faq.id)}
+                          onToggle={() => toggleItem(faq.id)}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            
+            {/* Contact CTA */}
+            {!loading && !error && (
+              <div className="faq-cta">
+                <h3 className="faq-cta-title">Still have questions?</h3>
+                <p className="faq-cta-text">We're here to help you create beautiful art from your memories.</p>
+                <a href="mailto:support@societyarts.com" className="faq-cta-link">
+                  Contact Support <ArrowRightIcon />
+                </a>
+              </div>
+            )}
           </main>
         </div>
       );
     }
     
+    // Initialize the page
     waitForComponents().then(() => {
       const root = ReactDOM.createRoot(document.getElementById('root'));
       root.render(<FAQPage />);
