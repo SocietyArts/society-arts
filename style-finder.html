@@ -1291,135 +1291,7 @@
             max-width: 250px;
         }
         
-        /* Collection Modal */
-        .collection-modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 3000;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .collection-modal.active {
-            display: flex;
-        }
-        
-        .collection-modal-content {
-            background: white;
-            border-radius: 16px;
-            width: 90%;
-            max-width: 400px;
-            max-height: 70vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .collection-modal-header {
-            padding: 1.25rem;
-            border-bottom: 1px solid var(--color-border, #e5e5e5);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .collection-modal-header h3 {
-            margin: 0;
-            font-size: 1.125rem;
-        }
-        
-        .collection-modal-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--color-text-secondary, #666);
-        }
-        
-        .collection-modal-body {
-            padding: 1rem;
-            overflow-y: auto;
-            flex: 1;
-        }
-        
-        .collection-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-        
-        .collection-item {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem;
-            border: 1px solid var(--color-border, #ddd);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .collection-item:hover {
-            border-color: var(--color-accent, #C75B3F);
-            background: rgba(199, 91, 63, 0.05);
-        }
-        
-        .collection-item.selected {
-            border-color: var(--color-accent, #C75B3F);
-            background: rgba(199, 91, 63, 0.1);
-        }
-        
-        .collection-item-icon {
-            width: 40px;
-            height: 40px;
-            background: var(--color-surface, #f5f5f5);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .collection-item-info {
-            flex: 1;
-        }
-        
-        .collection-item-name {
-            font-weight: 500;
-        }
-        
-        .collection-item-count {
-            font-size: 0.75rem;
-            color: var(--color-text-secondary, #999);
-        }
-        
-        .create-collection-form {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--color-border, #e5e5e5);
-        }
-        
-        .create-collection-input {
-            flex: 1;
-            padding: 0.5rem 0.75rem;
-            border: 1px solid var(--color-border, #ddd);
-            border-radius: 6px;
-            font-size: 0.875rem;
-        }
-        
-        .create-collection-btn {
-            padding: 0.5rem 1rem;
-            background: var(--color-accent, #C75B3F);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.875rem;
-            white-space: nowrap;
-        }
+        /* Collection Modal - Now handled by add-to-collection-modal.js */
         
         /* Toast Notification */
         .toast {
@@ -1993,24 +1865,7 @@
         </button>
     </div>
     
-    <!-- Collection Modal -->
-    <div class="collection-modal" id="collectionModal">
-        <div class="collection-modal-content">
-            <div class="collection-modal-header">
-                <h3>Add to Collection</h3>
-                <button class="collection-modal-close" id="collectionModalClose">×</button>
-            </div>
-            <div class="collection-modal-body">
-                <div class="collection-list" id="collectionList">
-                    <!-- Collections inserted here -->
-                </div>
-                <div class="create-collection-form">
-                    <input type="text" class="create-collection-input" id="newCollectionName" placeholder="New collection name...">
-                    <button class="create-collection-btn" id="createCollectionBtn">Create</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Collection Modal - Now handled by add-to-collection-modal.js -->
     
     <!-- Toast -->
     <div class="toast" id="toast"></div>
@@ -2246,6 +2101,7 @@
     <script src="js/shared/header.js"></script>
     <script src="js/shared/projects.js"></script>
     <script src="js/style-finder/style-data.js"></script>
+    <script src="js/shared/add-to-collection-modal.js"></script>
     <script>
         // ============================================
         // DOM Elements
@@ -2269,7 +2125,7 @@
         const lightboxImage = document.getElementById('lightboxImage');
         const lightboxCounter = document.getElementById('lightboxCounter');
         const contextMenu = document.getElementById('contextMenu');
-        const collectionModal = document.getElementById('collectionModal');
+        // collectionModal - Now handled by add-to-collection-modal.js
         const toast = document.getElementById('toast');
         const activeFiltersDisplay = document.getElementById('activeFiltersDisplay');
         const sortSelect = document.getElementById('sortSelect');
@@ -3443,7 +3299,9 @@
         
         document.getElementById('menuAddToCollection').addEventListener('click', () => {
             if (!currentMenuStyleId) return;
-            openCollectionModal();
+            contextMenu.classList.remove('active');
+            const style = SocietyArts.getStyleById(currentMenuStyleId);
+            SocietyArts.openAddToCollectionModal(currentMenuStyleId, style?.name || currentMenuStyleId);
         });
         
         document.getElementById('menuReportSwap').addEventListener('click', async () => {
@@ -3493,86 +3351,8 @@
         });
         
         // ============================================
-        // Collection Modal
+        // Collection Modal - Now handled by add-to-collection-modal.js
         // ============================================
-        function openCollectionModal() {
-            renderCollectionList();
-            collectionModal.classList.add('active');
-        }
-        
-        function renderCollectionList() {
-            const collections = SocietyArts.getCollections();
-            const styleCollections = SocietyArts.getStyleCollections(currentMenuStyleId);
-            const styleCollectionIds = styleCollections.map(c => c.id);
-            
-            if (collections.length === 0) {
-                document.getElementById('collectionList').innerHTML = 
-                    '<p style="color:#999;text-align:center;padding:1rem;">No collections yet. Create one below!</p>';
-                return;
-            }
-            
-            document.getElementById('collectionList').innerHTML = collections.map(col => `
-                <div class="collection-item ${styleCollectionIds.includes(col.id) ? 'selected' : ''}" 
-                     onclick="toggleCollection('${col.id}')">
-                    <div class="collection-item-icon">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="3" width="7" height="7"></rect>
-                            <rect x="14" y="3" width="7" height="7"></rect>
-                            <rect x="14" y="14" width="7" height="7"></rect>
-                            <rect x="3" y="14" width="7" height="7"></rect>
-                        </svg>
-                    </div>
-                    <div class="collection-item-info">
-                        <div class="collection-item-name">${col.name}</div>
-                        <div class="collection-item-count">${col.styleIds.length} style${col.styleIds.length !== 1 ? 's' : ''}</div>
-                    </div>
-                </div>
-            `).join('');
-        }
-        
-        function toggleCollection(collectionId) {
-            const collections = SocietyArts.getStyleCollections(currentMenuStyleId);
-            const isInCollection = collections.some(c => c.id === collectionId);
-            
-            if (isInCollection) {
-                SocietyArts.removeFromCollection(collectionId, currentMenuStyleId);
-                showToast('Removed from collection');
-            } else {
-                SocietyArts.addToCollection(collectionId, currentMenuStyleId);
-                showToast('Added to collection');
-            }
-            
-            renderCollectionList();
-        }
-        
-        document.getElementById('collectionModalClose').addEventListener('click', () => {
-            collectionModal.classList.remove('active');
-        });
-        
-        collectionModal.addEventListener('click', (e) => {
-            if (e.target === collectionModal) collectionModal.classList.remove('active');
-        });
-        
-        document.getElementById('createCollectionBtn').addEventListener('click', () => {
-            const input = document.getElementById('newCollectionName');
-            const name = input.value.trim();
-            
-            if (!name) {
-                showToast('Please enter a collection name');
-                return;
-            }
-            
-            SocietyArts.createCollection(name);
-            input.value = '';
-            renderCollectionList();
-            showToast(`Collection "${name}" created`);
-        });
-        
-        document.getElementById('newCollectionName').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                document.getElementById('createCollectionBtn').click();
-            }
-        });
         
         // ============================================
         // Keyboard Navigation
@@ -3584,8 +3364,6 @@
                     confirmModal.classList.remove('active');
                 } else if (lightbox.classList.contains('active')) {
                     lightbox.classList.remove('active');
-                } else if (collectionModal.classList.contains('active')) {
-                    collectionModal.classList.remove('active');
                 } else if (styleModal.classList.contains('active')) {
                     styleModal.classList.remove('active');
                 }
