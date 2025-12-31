@@ -13,14 +13,10 @@
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   
-  <!-- Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="/js/shared/supabase-client.js"></script>
-  
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Domine:wght@400;500;600;700&family=Familjen+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=Domine:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <!-- CSS -->
   <link rel="stylesheet" href="/css/variables.css">
@@ -31,19 +27,18 @@
   <link rel="stylesheet" href="/css/help-modals.css">
   
   <style>
-    /* ===== Page Header (matching help.html) ===== */
+    /* ===== Page Layout (matching help.html) ===== */
     .collections-content {
       flex: 1;
-      max-width: 1000px;
-      margin: 0 auto;
       padding: var(--space-2xl);
-      width: 100%;
+      max-width: 900px;
+      overflow-y: auto;
     }
     
     .collections-breadcrumb {
       display: flex;
       align-items: center;
-      gap: var(--space-xs);
+      gap: var(--space-sm);
       font-size: var(--text-sm);
       color: var(--color-text-muted);
       margin-bottom: var(--space-md);
@@ -312,7 +307,9 @@
 <body>
   <div id="root"></div>
   
-  <!-- Shared Components -->
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/shared/supabase-client.js"></script>
   <script src="/js/shared/api.js"></script>
   <script src="/js/shared/auth.js"></script>
   <script src="/js/shared/header.js"></script>
@@ -329,7 +326,7 @@
     );
 
     function CollectionsPage() {
-      const { Header, Sidebar, Footer } = window.SocietyArts || {};
+      const { Header, Sidebar } = window.SocietyArts || {};
       
       if (!Sidebar || !Header) {
         return React.createElement('div', { className: 'loading-state' }, 'Loading...');
@@ -475,8 +472,6 @@
             )}
           </main>
           
-          <Footer />
-          
           {authModalOpen && (
             <AuthModal 
               isOpen={authModalOpen}
@@ -525,8 +520,26 @@
       );
     }
 
-    window.SocietyArts.initializeAuth().then(() => {
-      ReactDOM.createRoot(document.getElementById('root')).render(<CollectionsPage />);
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    
+    function waitForComponents(callback, maxAttempts = 50) {
+      let attempts = 0;
+      const check = () => {
+        attempts++;
+        if (window.SocietyArts?.Sidebar && window.SocietyArts?.Header && window.SocietyArts?.useAuth) {
+          callback();
+        } else if (attempts < maxAttempts) {
+          setTimeout(check, 100);
+        } else {
+          console.error('Components failed to load');
+          callback();
+        }
+      };
+      check();
+    }
+    
+    waitForComponents(() => {
+      root.render(<CollectionsPage />);
     });
   </script>
 </body>
