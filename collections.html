@@ -237,6 +237,17 @@
       gap: var(--space-lg);
     }
     
+    /* Grid for Compact View */
+    .collections-grid.view-compact {
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+    
+    /* Grid for Gallery View */
+    .collections-grid.view-gallery {
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: var(--space-xl);
+    }
+    
     /* === Collection Card (Spotify-Inspired) === */
     .collection-card {
       position: relative;
@@ -342,6 +353,64 @@
     
     .collection-card.text-dark .collection-card-description {
       color: rgba(62, 35, 24, 0.7);
+    }
+    
+    /* === COMPACT VIEW - Hide description === */
+    .collection-card.view-compact .collection-card-description {
+      display: none;
+    }
+    
+    .collection-card.view-compact .collection-card-name {
+      -webkit-line-clamp: 3;
+    }
+    
+    /* === GALLERY VIEW - Larger cards with thumbnails === */
+    .collection-card.view-gallery {
+      aspect-ratio: auto;
+      min-height: 280px;
+    }
+    
+    .collection-card.view-gallery .collection-card-name {
+      font-size: clamp(24px, 3.5vw, 28px);
+    }
+    
+    /* Gallery Thumbnail Strip */
+    .collection-card-thumbnails {
+      display: flex;
+      gap: 6px;
+      margin-top: auto;
+      padding-top: var(--space-md);
+    }
+    
+    .collection-card-thumbnail {
+      flex: 1;
+      aspect-ratio: 1;
+      border-radius: 4px;
+      overflow: hidden;
+      background: rgba(0, 0, 0, 0.15);
+    }
+    
+    .collection-card.text-dark .collection-card-thumbnail {
+      background: rgba(0, 0, 0, 0.08);
+    }
+    
+    .collection-card-thumbnail img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .collection-card-thumbnail-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255, 255, 255, 0.3);
+    }
+    
+    .collection-card.text-dark .collection-card-thumbnail-placeholder {
+      color: rgba(0, 0, 0, 0.15);
     }
     
     /* Collection Meta (count) - Bottom Left */
@@ -1472,7 +1541,7 @@
     // COLLECTION CARD COMPONENT
     // ==========================================
     
-    function CollectionCard({ collection, palette, onClick, onEdit, onDelete, onDuplicate, onShare }) {
+    function CollectionCard({ collection, palette, onClick, onEdit, onDelete, onDuplicate, onShare, viewMode = 'compact' }) {
       const [menuOpen, setMenuOpen] = useState(false);
       const menuRef = React.useRef(null);
       
@@ -1490,6 +1559,17 @@
       } else {
         metaText = `${styleCount} style${styleCount !== 1 ? 's' : ''}`;
       }
+      
+      // Get thumbnail URL for a style
+      const getStyleThumbnail = (styleId) => {
+        return window.SocietyArts?.getStyleThumbnailUrl?.(styleId, 0) || 
+               window.SocietyArts?.getAltStyleThumbnailUrl?.(styleId) ||
+               `https://pub-acb560f551f141db830964aed1fa005f.r2.dev/${styleId}/${styleId}-00.webp`;
+      };
+      
+      // Get up to 4 thumbnails for gallery view
+      const thumbnailStyles = (collection.styles || []).slice(0, 4);
+      const emptySlots = 4 - thumbnailStyles.length;
       
       // Close menu when clicking outside
       useEffect(() => {
@@ -1517,7 +1597,7 @@
       
       return (
         <div 
-          className={`collection-card ${textClass}`}
+          className={`collection-card ${textClass} view-${viewMode}`}
           style={{ backgroundColor: collection.color || paletteColor.hex }}
           onClick={() => onClick(collection)}
         >
@@ -1532,6 +1612,33 @@
               <p className="collection-card-description">{collection.description}</p>
             )}
           </div>
+          
+          {/* Thumbnail strip for gallery view */}
+          {viewMode === 'gallery' && (
+            <div className="collection-card-thumbnails">
+              {thumbnailStyles.map(styleId => (
+                <div key={styleId} className="collection-card-thumbnail">
+                  <img 
+                    src={getStyleThumbnail(styleId)} 
+                    alt=""
+                    onError={e => e.target.style.opacity = 0}
+                  />
+                </div>
+              ))}
+              {[...Array(emptySlots)].map((_, i) => (
+                <div key={`empty-${i}`} className="collection-card-thumbnail">
+                  <div className="collection-card-thumbnail-placeholder">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                      <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                      <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          
           <div className="collection-card-footer">
             <p className="collection-card-meta">{metaText}</p>
             <div ref={menuRef} style={{ position: 'relative', zIndex: menuOpen ? 1000 : 1 }}>
@@ -2163,7 +2270,7 @@
                 onViewChange={onViewModeChange}
               />
               {subCollections.length > 0 ? (
-                <div className="collections-grid">
+                <div className={`collections-grid view-${viewMode}`}>
                   {subCollections.map(sub => (
                     <CollectionCard 
                       key={sub.id}
@@ -2174,6 +2281,7 @@
                       onDelete={onDelete}
                       onDuplicate={onDuplicate}
                       onShare={onShare}
+                      viewMode={viewMode}
                     />
                   ))}
                 </div>
@@ -2663,7 +2771,7 @@
                   viewMode={viewMode}
                   onViewChange={handleViewModeChange}
                 />
-                <div className="collections-grid">
+                <div className={`collections-grid view-${viewMode}`}>
                   {rootCollections.map(collection => (
                     <CollectionCard 
                       key={collection.id}
@@ -2674,6 +2782,7 @@
                       onDelete={handleDeleteCollection}
                       onDuplicate={handleDuplicateCollection}
                       onShare={handleShareCollection}
+                      viewMode={viewMode}
                     />
                   ))}
                 </div>
