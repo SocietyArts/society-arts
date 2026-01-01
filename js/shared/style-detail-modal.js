@@ -24,7 +24,7 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(0, 0, 0, 0.6);
       z-index: 10000;
       align-items: center;
       justify-content: center;
@@ -36,15 +36,17 @@
       display: flex;
     }
     
-    /* Modal Container */
+    /* Modal Container - Two Column Layout */
     .sdm-content {
       background: white;
-      border-radius: 16px;
-      max-width: 900px;
+      border-radius: 20px;
+      max-width: 1000px;
       width: 100%;
       max-height: 90vh;
-      overflow-y: auto;
+      overflow: hidden;
       position: relative;
+      display: grid;
+      grid-template-columns: 320px 1fr;
       animation: sdmSlideUp 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
     
@@ -59,200 +61,165 @@
       }
     }
     
-    /* Close Button */
-    .sdm-close {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      width: 40px;
-      height: 40px;
-      border: none;
-      background: rgba(255, 255, 255, 0.9);
-      border-radius: 50%;
-      cursor: pointer;
-      font-size: 1.5rem;
+    /* Left Panel - Info */
+    .sdm-info {
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 500px;
+    }
+    
+    .sdm-info-content {
+      flex: 1;
+    }
+    
+    /* Title - Dark Brown */
+    .sdm-name {
+      font-family: 'Domine', Georgia, serif;
+      font-size: 2rem;
+      font-weight: 600;
+      font-style: italic;
+      margin: 0 0 1.25rem 0;
+      color: #3E2318;
+      line-height: 1.2;
+    }
+    
+    /* Description */
+    .sdm-description {
+      color: #5C5346;
+      line-height: 1.7;
+      margin: 0;
+      font-size: 0.95rem;
+    }
+    
+    /* Action Buttons - Bottom of Left Panel */
+    .sdm-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 2rem;
+    }
+    
+    .sdm-action-btn {
       display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 10;
-      color: #666;
-      transition: all 0.15s ease;
+      gap: 0.5rem;
+      padding: 16px 24px;
+      border-radius: 9999px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+      width: 100%;
     }
     
-    .sdm-close:hover {
+    .sdm-action-btn.primary {
+      background: #C0715B;
+      color: white;
+      border: none;
+    }
+    
+    .sdm-action-btn.primary:hover {
+      background: #A65D4A;
+    }
+    
+    .sdm-action-btn.secondary {
       background: white;
-      color: #333;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      color: #3E2318;
+      border: 1.5px solid #D4CEC4;
     }
     
-    /* Image Gallery */
+    .sdm-action-btn.secondary:hover {
+      border-color: #B5AA9A;
+      background: #FAF9F7;
+    }
+    
+    /* Right Panel - Image Grid */
+    .sdm-gallery-wrapper {
+      position: relative;
+      background: #FAF9F7;
+      padding: 20px;
+      overflow-y: auto;
+      max-height: 90vh;
+    }
+    
     .sdm-gallery {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 0.5rem;
-      padding: 1.5rem;
-      background: #f5f5f5;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
     }
     
     .sdm-gallery img {
       width: 100%;
       aspect-ratio: 1;
       object-fit: cover;
-      border-radius: 8px;
+      border-radius: 12px;
       cursor: pointer;
       transition: transform 0.2s, box-shadow 0.2s;
     }
     
     .sdm-gallery img:hover {
-      transform: scale(1.05);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      transform: scale(1.03);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
     }
     
-    /* Info Section */
-    .sdm-info {
-      padding: 1.5rem;
+    /* Style ID - Bottom Center of Gallery */
+    .sdm-id {
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      color: #8B7B75;
+      margin-top: 16px;
+      letter-spacing: 0.5px;
     }
     
-    /* Title */
-    .sdm-name {
-      font-family: 'Domine', Georgia, serif;
-      font-size: 1.75rem;
-      font-weight: 600;
-      margin: 0 0 0.25rem 0;
+    /* Top Right Controls */
+    .sdm-controls {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      display: flex;
+      gap: 8px;
+      z-index: 10;
+    }
+    
+    .sdm-control-btn {
+      width: 44px;
+      height: 44px;
+      border: none;
+      background: white;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: all 0.15s ease;
+      color: #8B7B75;
+    }
+    
+    .sdm-control-btn:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
       color: #3E2318;
     }
     
-    /* Tagline */
-    .sdm-tagline {
-      font-size: 1rem;
-      color: #C73314;
-      margin-bottom: 1rem;
-      font-style: italic;
-    }
-    
-    /* Description */
-    .sdm-description {
+    .sdm-control-btn.favorite {
       color: #8B7B75;
-      line-height: 1.6;
-      margin: 0 0 1rem 0;
     }
     
-    /* Style ID */
-    .sdm-id {
-      font-size: 12px;
-      font-weight: 600;
-      color: #8B7B75;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 1rem;
-    }
-    
-    /* Action Buttons */
-    .sdm-actions {
-      display: flex;
-      gap: 0.75rem;
-      margin-bottom: 1.5rem;
-      flex-wrap: wrap;
-    }
-    
-    .sdm-action-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.625rem 1.25rem;
-      border-radius: 25px;
-      font-size: 0.875rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-      border: 1px solid #e5e5e5;
-      background: white;
-      font-family: inherit;
-    }
-    
-    .sdm-action-btn:hover {
-      background: #f5f5f5;
-    }
-    
-    .sdm-action-btn.favorite {
+    .sdm-control-btn.favorite:hover {
       color: #dc2626;
     }
     
-    .sdm-action-btn.favorite.active {
-      background: #fee2e2;
-      border-color: #fca5a5;
+    .sdm-control-btn.favorite.active {
+      color: #dc2626;
     }
     
-    .sdm-action-btn.primary {
-      background: #3D3530;
-      color: white;
-      border-color: #3D3530;
-    }
-    
-    .sdm-action-btn.primary:hover {
-      opacity: 0.9;
-    }
-    
-    .sdm-action-btn.collection {
-      color: #C0715B;
-      border-color: #C0715B;
-    }
-    
-    .sdm-action-btn.collection:hover {
-      background: rgba(192, 113, 91, 0.1);
-    }
-    
-    /* Tags Section */
-    .sdm-tags-section {
-      margin-bottom: 1.5rem;
-    }
-    
-    .sdm-section-label {
-      font-size: 11px;
-      font-weight: 600;
-      color: #8B7B75;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 0.5rem;
-    }
-    
-    .sdm-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-    
-    .sdm-tag {
-      background: #f5f5f5;
-      padding: 0.25rem 0.75rem;
-      border-radius: 999px;
-      font-size: 0.8rem;
-      color: #666;
-    }
-    
-    /* Attributes Grid */
-    .sdm-attributes {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 1rem;
-    }
-    
-    .sdm-attribute {
-      background: #f5f5f5;
-      padding: 0.75rem 1rem;
-      border-radius: 8px;
-    }
-    
-    .sdm-attribute-label {
-      font-size: 0.75rem;
-      color: #999;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-    
-    .sdm-attribute-value {
-      font-weight: 500;
-      color: #333;
+    .sdm-control-btn.favorite.active svg {
+      fill: #dc2626;
     }
     
     /* Lightbox */
@@ -344,6 +311,7 @@
       justify-content: center;
       padding: 4rem;
       color: #8B7B75;
+      grid-column: 1 / -1;
     }
     
     .sdm-spinner {
@@ -361,27 +329,44 @@
     }
     
     /* Responsive */
-    @media (max-width: 768px) {
-      .sdm-overlay {
-        padding: 1rem;
+    @media (max-width: 900px) {
+      .sdm-content {
+        grid-template-columns: 1fr;
+        max-height: 95vh;
       }
       
-      .sdm-gallery {
-        grid-template-columns: repeat(3, 1fr);
+      .sdm-info {
+        padding: 24px;
+        min-height: auto;
+      }
+      
+      .sdm-gallery-wrapper {
+        max-height: 50vh;
       }
       
       .sdm-name {
         font-size: 1.5rem;
       }
       
-      .sdm-attributes {
-        grid-template-columns: 1fr;
+      .sdm-controls {
+        top: 12px;
+        right: 12px;
       }
     }
     
     @media (max-width: 480px) {
+      .sdm-overlay {
+        padding: 0;
+      }
+      
+      .sdm-content {
+        border-radius: 0;
+        max-height: 100vh;
+      }
+      
       .sdm-gallery {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
       }
     }
   `;
@@ -498,7 +483,6 @@
   
   function updateFavoriteButton() {
     const btn = modalElement?.querySelector('.sdm-favorite-btn');
-    const text = btn?.querySelector('.sdm-favorite-text');
     const svg = btn?.querySelector('svg');
     
     if (!btn) return;
@@ -509,16 +493,14 @@
       return;
     }
     
-    btn.style.display = 'inline-flex';
+    btn.style.display = 'flex';
     const isFavorited = isStyleFavorited(currentStyleId);
     
     if (isFavorited) {
       btn.classList.add('active');
-      if (text) text.textContent = 'Favorited';
       if (svg) svg.setAttribute('fill', 'currentColor');
     } else {
       btn.classList.remove('active');
-      if (text) text.textContent = 'Favorite';
       if (svg) svg.setAttribute('fill', 'none');
     }
   }
@@ -558,7 +540,6 @@
     return `
       <div class="sdm-overlay active" id="sdmOverlay">
         <div class="sdm-content">
-          <button class="sdm-close" id="sdmClose">×</button>
           <div class="sdm-loading">
             <div class="sdm-spinner"></div>
             <span>Loading style...</span>
@@ -569,101 +550,61 @@
   }
   
   function renderModal(style) {
-    const images = style.images || [];
-    const allTags = [
-      ...(style.artTypes || []),
-      ...(style.mediums || []),
-      ...(style.cultures || []),
-      ...(style.eras || []),
-      ...(style.palettes || []),
-      ...(style.lighting || []),
-      ...(style.compositions || [])
-    ];
-    
-    const attributes = [
-      ['Art Types', style.artTypes?.join(', ')],
-      ['Mediums', style.mediums?.join(', ')],
-      ['Cultures', style.cultures?.join(', ')],
-      ['Eras', style.eras?.join(', ')],
-      ['Palettes', style.palettes?.join(', ')],
-      ['Lighting', style.lighting?.join(', ')],
-      ['Compositions', style.compositions?.join(', ')],
-      ['Complexity', style.complexity ? `Level ${style.complexity}` : null],
-      ['Best Format', style.best_format],
-      ['Best Size', style.best_size]
-    ].filter(([_, value]) => value);
+    // Get images 1-9 (skip index 0 which is the thumbnail)
+    const allImages = style.images || [];
+    const images = allImages.slice(1, 10); // Images at indices 1-9
     
     const hasAddToCollection = !!window.SocietyArts?.openAddToCollectionModal;
     
     return `
       <div class="sdm-overlay active" id="sdmOverlay">
         <div class="sdm-content">
-          <button class="sdm-close" id="sdmClose">×</button>
-          
-          <div class="sdm-gallery">
-            ${images.map((url, i) => `
-              <img src="${url}" alt="${escapeHtml(style.name)} - Image ${i + 1}" 
-                   loading="lazy" 
-                   data-index="${i}"
-                   onerror="this.style.display='none'">
-            `).join('')}
-          </div>
-          
+          <!-- Left Panel - Info -->
           <div class="sdm-info">
-            <h2 class="sdm-name">${escapeHtml(style.name) || 'Untitled Style'}</h2>
-            
-            ${style.tagline ? `<div class="sdm-tagline">${escapeHtml(style.tagline)}</div>` : ''}
-            
-            <p class="sdm-description">${escapeHtml(style.description) || 'No description available.'}</p>
-            
-            <div class="sdm-id">Style #${escapeHtml(style.id)}</div>
+            <div class="sdm-info-content">
+              <h2 class="sdm-name">${escapeHtml(style.name) || 'Untitled Style'}</h2>
+              <p class="sdm-description">${escapeHtml(style.description) || 'No description available.'}</p>
+            </div>
             
             <div class="sdm-actions">
-              <button class="sdm-action-btn favorite sdm-favorite-btn">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                </svg>
-                <span class="sdm-favorite-text">Favorite</span>
-              </button>
               <button class="sdm-action-btn primary sdm-project-btn">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <line x1="12" y1="5" x2="12" y2="19"></line>
-                  <line x1="5" y1="12" x2="19" y2="12"></line>
-                </svg>
-                Add to Project
+                + Add to Project
               </button>
               ${hasAddToCollection ? `
-                <button class="sdm-action-btn collection sdm-collection-btn">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="3" width="7" height="7"></rect>
-                    <rect x="14" y="3" width="7" height="7"></rect>
-                    <rect x="14" y="14" width="7" height="7"></rect>
-                    <rect x="3" y="14" width="7" height="7"></rect>
-                  </svg>
+                <button class="sdm-action-btn secondary sdm-collection-btn">
                   Add to Collection
                 </button>
               ` : ''}
             </div>
+          </div>
+          
+          <!-- Right Panel - Gallery -->
+          <div class="sdm-gallery-wrapper">
+            <!-- Top Right Controls -->
+            <div class="sdm-controls">
+              <button class="sdm-control-btn favorite sdm-favorite-btn" title="Favorite">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                </svg>
+              </button>
+              <button class="sdm-control-btn sdm-close" title="Close">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
             
-            ${allTags.length > 0 ? `
-              <div class="sdm-tags-section">
-                <div class="sdm-section-label">Tags</div>
-                <div class="sdm-tags">
-                  ${allTags.map(tag => `<span class="sdm-tag">${escapeHtml(tag)}</span>`).join('')}
-                </div>
-              </div>
-            ` : ''}
+            <div class="sdm-gallery">
+              ${images.map((url, i) => `
+                <img src="${url}" alt="${escapeHtml(style.name)} - Image ${i + 1}" 
+                     loading="lazy" 
+                     data-index="${i}"
+                     onerror="this.style.opacity='0.3'">
+              `).join('')}
+            </div>
             
-            ${attributes.length > 0 ? `
-              <div class="sdm-attributes">
-                ${attributes.map(([label, value]) => `
-                  <div class="sdm-attribute">
-                    <div class="sdm-attribute-label">${escapeHtml(label)}</div>
-                    <div class="sdm-attribute-value">${escapeHtml(value)}</div>
-                  </div>
-                `).join('')}
-              </div>
-            ` : ''}
+            <div class="sdm-id">${escapeHtml(style.id)}</div>
           </div>
         </div>
       </div>
@@ -684,7 +625,7 @@
   
   function attachEventListeners() {
     // Close button
-    modalElement?.querySelector('#sdmClose')?.addEventListener('click', closeModal);
+    modalElement?.querySelector('.sdm-close')?.addEventListener('click', closeModal);
     
     // Click overlay to close
     modalElement?.addEventListener('click', (e) => {
@@ -752,7 +693,6 @@
     modalElement = document.getElementById('sdmOverlay');
     
     // Attach close handler for loading state
-    modalElement?.querySelector('#sdmClose')?.addEventListener('click', closeModal);
     modalElement?.addEventListener('click', (e) => {
       if (e.target.id === 'sdmOverlay') closeModal();
     });
@@ -778,7 +718,8 @@
       }
       
       currentStyle = style;
-      lightboxImages = style.images || [];
+      // Only use images 1-9 for the lightbox (same as displayed)
+      lightboxImages = (style.images || []).slice(1, 10);
       
       // Replace loading with full modal
       modalElement.outerHTML = renderModal(style);
