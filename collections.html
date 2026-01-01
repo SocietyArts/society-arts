@@ -172,6 +172,52 @@
       opacity: 0.6;
     }
     
+    .sort-dropdown-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      margin-top: 4px;
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      min-width: 200px;
+      z-index: 1000;
+      animation: menuDropDown 0.15s ease;
+      overflow: hidden;
+    }
+    
+    .sort-dropdown-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 10px 14px;
+      border: none;
+      background: none;
+      font-family: var(--font-sans);
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      text-align: left;
+      transition: background-color 0.1s ease;
+    }
+    
+    .sort-dropdown-item:hover {
+      background-color: var(--color-surface-alt);
+    }
+    
+    .sort-dropdown-item.active {
+      color: var(--color-accent);
+      font-weight: 500;
+    }
+    
+    .sort-dropdown-item svg {
+      width: 14px;
+      height: 14px;
+      color: var(--color-accent);
+    }
+    
     /* View Toggle */
     .view-toggle {
       display: flex;
@@ -1871,7 +1917,9 @@
       onEdit, 
       onDelete, 
       onDuplicate, 
-      onShare 
+      onShare,
+      sortOption = 'modified-desc',
+      onSortChange
     }) {
       const [openMenuId, setOpenMenuId] = useState(null);
       const menuRef = React.useRef(null);
@@ -1910,16 +1958,67 @@
         action(collection);
       };
       
+      // Handle header click for sorting
+      const handleHeaderSort = (field) => {
+        if (!onSortChange) return;
+        const [currentField, currentDirection] = sortOption.split('-');
+        if (currentField === field) {
+          // Toggle direction
+          const newDirection = currentDirection === 'asc' ? 'desc' : 'asc';
+          onSortChange(`${field}-${newDirection}`);
+        } else {
+          // New field, default to desc (except name defaults to asc)
+          const defaultDirection = field === 'name' ? 'asc' : 'desc';
+          onSortChange(`${field}-${defaultDirection}`);
+        }
+      };
+      
+      // Get sort indicator for a column
+      const getSortIndicator = (field) => {
+        const [currentField, currentDirection] = sortOption.split('-');
+        if (currentField !== field) return null;
+        return currentDirection === 'asc' ? '↑' : '↓';
+      };
+      
+      // Check if column is currently sorted
+      const isColumnSorted = (field) => {
+        return sortOption.startsWith(field + '-');
+      };
+      
       return (
         <table className="collections-table">
           <thead>
             <tr>
               <th className="table-col-color"></th>
-              <th className="table-col-title">Name</th>
+              <th 
+                className={`table-col-title sortable ${isColumnSorted('name') ? 'sorted' : ''}`}
+                onClick={() => handleHeaderSort('name')}
+              >
+                Name
+                <span className="sort-indicator">{getSortIndicator('name') || '↕'}</span>
+              </th>
               <th className="table-col-description">Description</th>
-              <th className="table-col-styles">Styles</th>
-              <th className="table-col-date created">Created</th>
-              <th className="table-col-date modified">Modified</th>
+              <th 
+                className={`table-col-styles sortable ${isColumnSorted('styles') ? 'sorted' : ''}`}
+                onClick={() => handleHeaderSort('styles')}
+              >
+                Styles
+                <span className="sort-indicator">{getSortIndicator('styles') || '↕'}</span>
+              </th>
+              <th 
+                className={`table-col-date created sortable ${isColumnSorted('created') ? 'sorted' : ''}`}
+                onClick={() => handleHeaderSort('created')}
+              >
+                Created
+                <span className="sort-indicator">{getSortIndicator('created') || '↕'}</span>
+              </th>
+              <th 
+                className={`table-col-date modified sortable ${isColumnSorted('modified') ? 'sorted' : ''}`}
+                onClick={() => handleHeaderSort('modified')}
+              >
+                Modified
+                <span className="sort-indicator">{getSortIndicator('modified') || '↕'}</span>
+              </th>
               <th className="table-col-actions"></th>
             </tr>
           </thead>
@@ -2026,7 +2125,58 @@
     // COLLECTIONS TOOLBAR COMPONENT
     // ==========================================
     
-    function CollectionsToolbar({ onAddCollection, viewMode, onViewChange, sortOption, onSortChange }) {
+    function CollectionsToolbar({ onAddCollection, viewMode, onViewChange, sortOption = 'modified-desc', onSortChange }) {
+      const [sortMenuOpen, setSortMenuOpen] = useState(false);
+      const sortMenuRef = React.useRef(null);
+      
+      // Sort options configuration
+      const sortOptions = [
+        { value: 'name-asc', label: 'Name (A-Z)' },
+        { value: 'name-desc', label: 'Name (Z-A)' },
+        { value: 'created-desc', label: 'Date Created (Newest)' },
+        { value: 'created-asc', label: 'Date Created (Oldest)' },
+        { value: 'modified-desc', label: 'Date Modified (Newest)' },
+        { value: 'modified-asc', label: 'Date Modified (Oldest)' },
+        { value: 'styles-desc', label: 'Style Count (Most)' },
+        { value: 'styles-asc', label: 'Style Count (Least)' },
+      ];
+      
+      // Get display label for current sort
+      const getCurrentSortLabel = () => {
+        const option = sortOptions.find(o => o.value === sortOption);
+        if (!option) return 'Modified';
+        // Shortened labels for button
+        const shortLabels = {
+          'name-asc': 'Name A-Z',
+          'name-desc': 'Name Z-A',
+          'created-desc': 'Created ↓',
+          'created-asc': 'Created ↑',
+          'modified-desc': 'Modified ↓',
+          'modified-asc': 'Modified ↑',
+          'styles-desc': 'Styles ↓',
+          'styles-asc': 'Styles ↑',
+        };
+        return shortLabels[sortOption] || 'Modified';
+      };
+      
+      // Close menu when clicking outside
+      useEffect(() => {
+        const handleClickOutside = (e) => {
+          if (sortMenuRef.current && !sortMenuRef.current.contains(e.target)) {
+            setSortMenuOpen(false);
+          }
+        };
+        if (sortMenuOpen) {
+          document.addEventListener('mousedown', handleClickOutside);
+        }
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+      }, [sortMenuOpen]);
+      
+      const handleSortSelect = (value) => {
+        onSortChange(value);
+        setSortMenuOpen(false);
+      };
+      
       return (
         <div className="collections-toolbar">
           <div className="collections-toolbar-left">
@@ -2037,12 +2187,33 @@
           </div>
           
           <div className="collections-toolbar-right">
-            {/* Sort Dropdown - placeholder for Phase 4 */}
-            <div className="sort-dropdown">
-              <button className="sort-dropdown-trigger">
-                Sort: Modified
+            {/* Sort Dropdown */}
+            <div className="sort-dropdown" ref={sortMenuRef}>
+              <button 
+                className="sort-dropdown-trigger"
+                onClick={() => setSortMenuOpen(!sortMenuOpen)}
+              >
+                Sort: {getCurrentSortLabel()}
                 <ChevronDownIcon />
               </button>
+              {sortMenuOpen && (
+                <div className="sort-dropdown-menu">
+                  {sortOptions.map(option => (
+                    <button
+                      key={option.value}
+                      className={`sort-dropdown-item ${sortOption === option.value ? 'active' : ''}`}
+                      onClick={() => handleSortSelect(option.value)}
+                    >
+                      {option.label}
+                      {sortOption === option.value && (
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
             
             {/* View Toggle */}
@@ -2523,12 +2694,18 @@
       onCreateSubCollection,
       onRemoveStyle,
       viewMode,
-      onViewModeChange
+      onViewModeChange,
+      sortOption,
+      onSortChange,
+      sortCollections
     }) {
       const paletteColor = palette.find(c => c.hex === collection.color) || palette[0];
       const styles = collection.styles || [];
       const styleCount = styles.length;
       const subCount = subCollections.length;
+      
+      // Sort sub-collections
+      const sortedSubCollections = sortCollections ? sortCollections(subCollections) : subCollections;
       
       let metaText = '';
       if (subCount > 0 && styleCount > 0) {
@@ -2603,21 +2780,25 @@
                 onAddCollection={onCreateSubCollection}
                 viewMode={viewMode}
                 onViewChange={onViewModeChange}
+                sortOption={sortOption}
+                onSortChange={onSortChange}
               />
-              {subCollections.length > 0 ? (
+              {sortedSubCollections.length > 0 ? (
                 viewMode === 'table' ? (
                   <CollectionsTable
-                    collections={subCollections}
+                    collections={sortedSubCollections}
                     palette={palette}
                     onClick={onCollectionClick}
                     onEdit={onEdit}
                     onDelete={onDelete}
                     onDuplicate={onDuplicate}
                     onShare={onShare}
+                    sortOption={sortOption}
+                    onSortChange={onSortChange}
                   />
                 ) : (
                   <div className={`collections-grid view-${viewMode}`}>
-                    {subCollections.map(sub => (
+                    {sortedSubCollections.map(sub => (
                       <CollectionCard 
                         key={sub.id}
                         collection={sub}
@@ -2707,6 +2888,52 @@
       const handleViewModeChange = (mode) => {
         setViewMode(mode);
         localStorage.setItem('collections-view-mode', mode);
+      };
+      
+      // Sort state - load from localStorage or default to 'modified-desc'
+      const [sortOption, setSortOption] = useState(() => {
+        const saved = localStorage.getItem('collections-sort-option');
+        return saved || 'modified-desc';
+      });
+      
+      // Handle sort change with persistence
+      const handleSortChange = (option) => {
+        setSortOption(option);
+        localStorage.setItem('collections-sort-option', option);
+      };
+      
+      // Sort collections based on current sort option
+      const sortCollections = (collectionsToSort) => {
+        if (!collectionsToSort || collectionsToSort.length === 0) return [];
+        
+        const sorted = [...collectionsToSort];
+        const [field, direction] = sortOption.split('-');
+        const isAsc = direction === 'asc';
+        
+        sorted.sort((a, b) => {
+          let comparison = 0;
+          
+          switch (field) {
+            case 'name':
+              comparison = (a.name || '').localeCompare(b.name || '');
+              break;
+            case 'created':
+              comparison = new Date(a.created_at || 0) - new Date(b.created_at || 0);
+              break;
+            case 'modified':
+              comparison = new Date(a.updated_at || 0) - new Date(b.updated_at || 0);
+              break;
+            case 'styles':
+              comparison = (a.styles?.length || 0) - (b.styles?.length || 0);
+              break;
+            default:
+              comparison = 0;
+          }
+          
+          return isAsc ? comparison : -comparison;
+        });
+        
+        return sorted;
       };
 
       // Get Supabase client
@@ -3092,6 +3319,9 @@
                 onRemoveStyle={handleRemoveStyle}
                 viewMode={viewMode}
                 onViewModeChange={handleViewModeChange}
+                sortOption={sortOption}
+                onSortChange={handleSortChange}
+                sortCollections={sortCollections}
               />
             ) : rootCollections.length === 0 ? (
               // Empty State
@@ -3117,20 +3347,24 @@
                   onAddCollection={() => setCreateModalOpen(true)}
                   viewMode={viewMode}
                   onViewChange={handleViewModeChange}
+                  sortOption={sortOption}
+                  onSortChange={handleSortChange}
                 />
                 {viewMode === 'table' ? (
                   <CollectionsTable
-                    collections={rootCollections}
+                    collections={sortCollections(rootCollections)}
                     palette={palette}
                     onClick={handleCollectionClick}
                     onEdit={handleEditCollection}
                     onDelete={handleDeleteCollection}
                     onDuplicate={handleDuplicateCollection}
                     onShare={handleShareCollection}
+                    sortOption={sortOption}
+                    onSortChange={handleSortChange}
                   />
                 ) : (
                   <div className={`collections-grid view-${viewMode}`}>
-                    {rootCollections.map(collection => (
+                    {sortCollections(rootCollections).map(collection => (
                       <CollectionCard 
                         key={collection.id}
                         collection={collection}
