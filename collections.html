@@ -2180,43 +2180,46 @@
       };
 
       // Handle duplicate collection
+      // Handle duplicate collection - deep copy including all contents
       const handleDuplicateCollection = async (collection) => {
         try {
           const supabase = getSupabase();
-          const user = window.AuthState?.user;
           
           if (!supabase?.from || !user) {
             throw new Error('Not authenticated');
           }
           
-          // Create new collection with "Copy of" prefix
-          const { data: newCollection, error: createError } = await supabase
-            .from('user_collections')
-            .insert({
-              user_id: user.id,
-              name: `Copy of ${collection.name}`,
-              description: collection.description,
-              color: collection.color,
-              parent_id: collection.parent_id
-            })
-            .select()
-            .single();
-          
-          if (createError) throw createError;
-          
-          // Copy all styles to the new collection
-          if (collection.styles && collection.styles.length > 0) {
-            const styleInserts = collection.styles.map(styleId => ({
-              collection_id: newCollection.id,
-              style_id: styleId
-            }));
+          // Recursive function to duplicate a collection and all its contents
+          const duplicateRecursive = async (sourceCollection, newParentId, isRoot = false) => {
+            // Create the new collection with styles copied directly
+            const { data: newCollection, error: createError } = await supabase
+              .from('user_collections')
+              .insert({
+                user_id: user.id,
+                name: isRoot ? `Copy of ${sourceCollection.name}` : sourceCollection.name,
+                description: sourceCollection.description,
+                color: sourceCollection.color,
+                parent_id: newParentId,
+                styles: sourceCollection.styles || [] // Copy styles array directly
+              })
+              .select()
+              .single();
             
-            const { error: stylesError } = await supabase
-              .from('collection_styles')
-              .insert(styleInserts);
+            if (createError) throw createError;
             
-            if (stylesError) console.error('Error copying styles:', stylesError);
-          }
+            // Find and duplicate all sub-collections (folders)
+            const subCollections = collections.filter(c => c.parent_id === sourceCollection.id);
+            
+            for (const subCollection of subCollections) {
+              // Recursively duplicate each sub-collection with the new parent
+              await duplicateRecursive(subCollection, newCollection.id, false);
+            }
+            
+            return newCollection;
+          };
+          
+          // Start the recursive duplication from the selected collection
+          await duplicateRecursive(collection, collection.parent_id, true);
           
           await loadCollections();
         } catch (err) {
