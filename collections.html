@@ -935,9 +935,16 @@
       };
       
       const handleStyleClick = (styleId) => {
-        // Open the shared style detail modal without leaving the page
+        // Open the shared style detail modal with collection context
         if (window.SocietyArts?.openStyleDetailModal) {
-          window.SocietyArts.openStyleDetailModal(styleId);
+          window.SocietyArts.openStyleDetailModal(styleId, {
+            collectionId: collection.id,
+            collectionName: collection.name,
+            onRemove: (removedStyleId) => {
+              // Refresh the page to show updated collection
+              window.location.reload();
+            }
+          });
         } else {
           console.error('Style Detail Modal not loaded');
         }
