@@ -273,7 +273,70 @@
       
       .collections-toolbar-right {
         justify-content: center;
+        flex-wrap: wrap;
       }
+      
+      .btn-add-collection {
+        width: 100%;
+        justify-content: center;
+      }
+      
+      .sort-dropdown {
+        flex: 1;
+        min-width: 140px;
+      }
+      
+      .sort-dropdown-trigger {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+    
+    /* === View Transition Animations === */
+    .collections-grid,
+    .collections-table {
+      animation: viewFadeIn 0.2s ease;
+    }
+    
+    @keyframes viewFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    /* === Focus States for Accessibility === */
+    .btn-add-collection:focus-visible,
+    .sort-dropdown-trigger:focus-visible,
+    .view-toggle-btn:focus-visible,
+    .collection-card:focus-visible,
+    .table-kebab-btn:focus-visible,
+    .collection-card-kebab:focus-visible {
+      outline: 2px solid var(--color-accent);
+      outline-offset: 2px;
+    }
+    
+    .sort-dropdown-item:focus-visible {
+      outline: none;
+      background-color: var(--color-surface-alt);
+    }
+    
+    .collections-table tbody tr:focus-visible {
+      outline: 2px solid var(--color-accent);
+      outline-offset: -2px;
+    }
+    
+    /* Make cards focusable */
+    .collection-card {
+      outline: none;
+    }
+    
+    .collection-card:focus-visible {
+      box-shadow: 0 0 0 3px var(--color-accent);
     }
     
     /* === Collection Grid === */
@@ -964,6 +1027,12 @@
       padding: var(--space-5xl);
       color: var(--color-text-muted);
       font-family: var(--font-sans);
+      animation: loadingPulse 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes loadingPulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
     }
     
     /* === Login Prompt === */
@@ -1591,6 +1660,12 @@
         gap: var(--space-md);
       }
       
+      /* Gallery view on tablet - 2 columns */
+      .collections-grid.view-gallery {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-md);
+      }
+      
       .collection-card {
         min-height: 150px;
         padding: var(--space-lg);
@@ -1598,6 +1673,11 @@
       
       .collection-card-name {
         font-size: 18px;
+      }
+      
+      /* Smaller thumbnails on tablet */
+      .collection-card-thumbnails {
+        gap: 4px;
       }
       
       .collection-header {
@@ -1608,6 +1688,39 @@
       .collection-header-color {
         width: 60px;
         height: 60px;
+      }
+    }
+    
+    @media (max-width: 540px) {
+      /* Single column for all views on small screens */
+      .collections-grid,
+      .collections-grid.view-compact,
+      .collections-grid.view-gallery {
+        grid-template-columns: 1fr;
+      }
+      
+      .collection-card.view-gallery {
+        min-height: 240px;
+      }
+      
+      /* Stack toolbar vertically */
+      .collections-toolbar-right {
+        width: 100%;
+        justify-content: space-between;
+      }
+      
+      /* Full width sort dropdown */
+      .sort-dropdown {
+        flex: 1;
+      }
+    }
+    
+    /* Print styles */
+    @media print {
+      .collections-toolbar,
+      .collection-card-kebab,
+      .table-kebab-wrapper {
+        display: none !important;
       }
     }
   </style>
@@ -1829,11 +1942,22 @@
         action(collection);
       };
       
+      const handleKeyDown = (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick(collection);
+        }
+      };
+      
       return (
         <div 
           className={`collection-card ${textClass} view-${viewMode}`}
           style={{ backgroundColor: collection.color || paletteColor.hex }}
           onClick={() => onClick(collection)}
+          onKeyDown={handleKeyDown}
+          tabIndex={0}
+          role="button"
+          aria-label={`${collection.name} collection with ${metaText}`}
         >
           {subCount > 0 && (
             <div className="collection-card-icon">
@@ -2027,8 +2151,22 @@
               const styleCount = collection.styles?.length || 0;
               const subCount = collection.subcollection_count || 0;
               
+              const handleRowKeyDown = (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onClick(collection);
+                }
+              };
+              
               return (
-                <tr key={collection.id} onClick={() => onClick(collection)}>
+                <tr 
+                  key={collection.id} 
+                  onClick={() => onClick(collection)}
+                  onKeyDown={handleRowKeyDown}
+                  tabIndex={0}
+                  role="button"
+                  aria-label={`${collection.name} collection with ${styleCount} styles`}
+                >
                   <td className="table-col-color">
                     <span 
                       className="table-color-dot" 
@@ -2172,6 +2310,17 @@
         return () => document.removeEventListener('mousedown', handleClickOutside);
       }, [sortMenuOpen]);
       
+      // Close menu on Escape key
+      useEffect(() => {
+        const handleKeyDown = (e) => {
+          if (e.key === 'Escape' && sortMenuOpen) {
+            setSortMenuOpen(false);
+          }
+        };
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+      }, [sortMenuOpen]);
+      
       const handleSortSelect = (value) => {
         onSortChange(value);
         setSortMenuOpen(false);
@@ -2180,7 +2329,11 @@
       return (
         <div className="collections-toolbar">
           <div className="collections-toolbar-left">
-            <button className="btn-add-collection" onClick={onAddCollection}>
+            <button 
+              className="btn-add-collection" 
+              onClick={onAddCollection}
+              aria-label="Add new collection"
+            >
               <SmallPlusIcon />
               Add Collection
             </button>
@@ -2192,17 +2345,22 @@
               <button 
                 className="sort-dropdown-trigger"
                 onClick={() => setSortMenuOpen(!sortMenuOpen)}
+                aria-haspopup="listbox"
+                aria-expanded={sortMenuOpen}
+                aria-label={`Sort collections. Currently sorted by ${getCurrentSortLabel()}`}
               >
                 Sort: {getCurrentSortLabel()}
                 <ChevronDownIcon />
               </button>
               {sortMenuOpen && (
-                <div className="sort-dropdown-menu">
+                <div className="sort-dropdown-menu" role="listbox" aria-label="Sort options">
                   {sortOptions.map(option => (
                     <button
                       key={option.value}
                       className={`sort-dropdown-item ${sortOption === option.value ? 'active' : ''}`}
                       onClick={() => handleSortSelect(option.value)}
+                      role="option"
+                      aria-selected={sortOption === option.value}
                     >
                       {option.label}
                       {sortOption === option.value && (
@@ -2217,12 +2375,13 @@
             </div>
             
             {/* View Toggle */}
-            <div className="view-toggle">
+            <div className="view-toggle" role="group" aria-label="View options">
               <button 
                 className={`view-toggle-btn ${viewMode === 'compact' ? 'active' : ''}`}
                 onClick={() => onViewChange('compact')}
                 title="Compact Cards"
                 aria-label="Compact Cards view"
+                aria-pressed={viewMode === 'compact'}
               >
                 <CompactViewIcon />
               </button>
@@ -2231,6 +2390,7 @@
                 onClick={() => onViewChange('table')}
                 title="Table View"
                 aria-label="Table view"
+                aria-pressed={viewMode === 'table'}
               >
                 <TableViewIcon />
               </button>
@@ -2239,6 +2399,7 @@
                 onClick={() => onViewChange('gallery')}
                 title="Gallery Cards"
                 aria-label="Gallery Cards view"
+                aria-pressed={viewMode === 'gallery'}
               >
                 <GalleryViewIcon />
               </button>
