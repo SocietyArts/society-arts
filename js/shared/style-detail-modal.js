@@ -761,17 +761,18 @@
             
             <div class="sdm-actions">
               <button class="sdm-action-btn primary sdm-project-btn">
-                + Add to Project
+                Add to Project
               </button>
+              ${hasAddToCollection ? `
+                <button class="sdm-action-btn secondary sdm-collection-btn">
+                  Add to Collection
+                </button>
+              ` : ''}
               ${inCollectionContext ? `
                 <button class="sdm-action-btn secondary sdm-remove-collection-btn">
                   Remove from Collection
                 </button>
-              ` : (hasAddToCollection ? `
-                <button class="sdm-action-btn secondary sdm-collection-btn">
-                  Add to Collection
-                </button>
-              ` : '')}
+              ` : ''}
             </div>
           </div>
           
