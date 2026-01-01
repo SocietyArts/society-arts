@@ -206,15 +206,105 @@
       color: rgba(62, 35, 24, 0.7);
     }
     
-    /* Collection Meta (count) */
+    /* Collection Meta (count) - Bottom Left */
     .collection-card-meta {
       font-family: var(--font-sans);
       font-size: 13px;
       font-weight: 500;
       letter-spacing: 0.02em;
-      text-align: right;
       margin: 0;
-      align-self: flex-end;
+    }
+    
+    /* Card Footer - holds meta and kebab */
+    .collection-card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    /* Kebab Menu Button */
+    .collection-card-kebab {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+      opacity: 0;
+      color: inherit;
+    }
+    
+    .collection-card:hover .collection-card-kebab {
+      opacity: 1;
+    }
+    
+    .collection-card-kebab:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .collection-card.text-dark .collection-card-kebab {
+      background: rgba(0, 0, 0, 0.08);
+    }
+    
+    .collection-card.text-dark .collection-card-kebab:hover {
+      background: rgba(0, 0, 0, 0.15);
+    }
+    
+    /* Kebab Dropdown Menu */
+    .collection-card-menu {
+      position: absolute;
+      bottom: 48px;
+      right: var(--space-xl);
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+      min-width: 160px;
+      z-index: 100;
+      overflow: hidden;
+      animation: menuFadeIn 0.15s ease;
+    }
+    
+    @keyframes menuFadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .collection-card-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      font-family: var(--font-sans);
+      font-size: 14px;
+      color: var(--color-text-primary);
+      cursor: pointer;
+      transition: background 0.1s;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+    }
+    
+    .collection-card-menu-item:hover {
+      background: #f5f5f5;
+    }
+    
+    .collection-card-menu-item.delete {
+      color: #dc2626;
+    }
+    
+    .collection-card-menu-item.delete:hover {
+      background: #fef2f2;
+    }
+    
+    .collection-card-menu-item svg {
+      width: 16px;
+      height: 16px;
+      opacity: 0.7;
     }
     
     /* Folder icon for collections with sub-collections */
@@ -703,6 +793,155 @@
       box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
     }
     
+    /* === Share Modal === */
+    .share-modal {
+      background: white;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.2);
+      animation: modalSlideUp 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .share-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--color-border);
+    }
+    
+    .share-modal-header h3 {
+      font-family: var(--font-sans);
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0;
+      color: var(--color-text-primary);
+    }
+    
+    .share-modal-body {
+      padding: 24px;
+    }
+    
+    .share-collection-name {
+      font-family: var(--font-serif);
+      font-size: 20px;
+      font-weight: 600;
+      font-style: italic;
+      color: var(--color-text-primary);
+      margin: 0 0 20px 0;
+    }
+    
+    .share-label {
+      display: block;
+      font-family: var(--font-sans);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--color-text-secondary);
+      margin-bottom: 8px;
+    }
+    
+    .share-link-section {
+      margin-bottom: 24px;
+    }
+    
+    .share-link-row {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .share-link-input {
+      flex: 1;
+      padding: 12px 14px;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      font-family: var(--font-sans);
+      font-size: 14px;
+      color: var(--color-text-primary);
+      background: #f9f9f9;
+    }
+    
+    .share-copy-btn {
+      padding: 12px 20px;
+      white-space: nowrap;
+    }
+    
+    .share-options-section {
+      margin-bottom: 8px;
+    }
+    
+    .share-options-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+    }
+    
+    .share-option {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 16px 8px;
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      background: white;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    
+    .share-option:hover {
+      border-color: #C0715B;
+      background: #FAF9F7;
+    }
+    
+    .share-option span {
+      font-family: var(--font-sans);
+      font-size: 12px;
+      color: var(--color-text-secondary);
+    }
+    
+    .share-option-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .share-option-icon.email {
+      background: #EA4335;
+      color: white;
+    }
+    
+    .share-option-icon.text {
+      background: #34C759;
+      color: white;
+    }
+    
+    .share-option-icon.twitter {
+      background: #000000;
+      color: white;
+    }
+    
+    .share-option-icon.facebook {
+      background: #1877F2;
+      color: white;
+    }
+    
+    .share-option-icon.pinterest {
+      background: #E60023;
+      color: white;
+    }
+    
+    @media (max-width: 480px) {
+      .share-options-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    
     .modal-label {
       display: block;
       font-family: var(--font-sans);
@@ -959,6 +1198,45 @@
         <line x1="6" y1="6" x2="18" y2="18"></line>
       </svg>
     );
+    
+    const KebabIcon = () => (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+        <circle cx="12" cy="5" r="2"></circle>
+        <circle cx="12" cy="12" r="2"></circle>
+        <circle cx="12" cy="19" r="2"></circle>
+      </svg>
+    );
+    
+    const DuplicateIcon = () => (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+      </svg>
+    );
+    
+    const EditIcon = () => (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+      </svg>
+    );
+    
+    const TrashIcon = () => (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <polyline points="3 6 5 6 21 6"></polyline>
+        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+      </svg>
+    );
+    
+    const ShareIcon = () => (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <circle cx="18" cy="5" r="3"></circle>
+        <circle cx="6" cy="12" r="3"></circle>
+        <circle cx="18" cy="19" r="3"></circle>
+        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+      </svg>
+    );
 
     // ==========================================
     // DEFAULT PALETTE (fallback)
@@ -983,7 +1261,10 @@
     // COLLECTION CARD COMPONENT
     // ==========================================
     
-    function CollectionCard({ collection, palette, onClick }) {
+    function CollectionCard({ collection, palette, onClick, onEdit, onDelete, onDuplicate, onShare }) {
+      const [menuOpen, setMenuOpen] = useState(false);
+      const menuRef = React.useRef(null);
+      
       const paletteColor = palette.find(c => c.hex === collection.color) || palette[0];
       const textClass = paletteColor.text === 'dark' ? 'text-dark' : 'text-light';
       
@@ -998,6 +1279,30 @@
       } else {
         metaText = `${styleCount} style${styleCount !== 1 ? 's' : ''}`;
       }
+      
+      // Close menu when clicking outside
+      useEffect(() => {
+        const handleClickOutside = (e) => {
+          if (menuRef.current && !menuRef.current.contains(e.target)) {
+            setMenuOpen(false);
+          }
+        };
+        if (menuOpen) {
+          document.addEventListener('mousedown', handleClickOutside);
+        }
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+      }, [menuOpen]);
+      
+      const handleKebabClick = (e) => {
+        e.stopPropagation();
+        setMenuOpen(!menuOpen);
+      };
+      
+      const handleMenuAction = (e, action) => {
+        e.stopPropagation();
+        setMenuOpen(false);
+        action(collection);
+      };
       
       return (
         <div 
@@ -1016,7 +1321,34 @@
               <p className="collection-card-description">{collection.description}</p>
             )}
           </div>
-          <p className="collection-card-meta">{metaText}</p>
+          <div className="collection-card-footer">
+            <p className="collection-card-meta">{metaText}</p>
+            <div ref={menuRef} style={{ position: 'relative' }}>
+              <button 
+                className="collection-card-kebab"
+                onClick={handleKebabClick}
+                title="More options"
+              >
+                <KebabIcon />
+              </button>
+              {menuOpen && (
+                <div className="collection-card-menu">
+                  <button className="collection-card-menu-item" onClick={(e) => handleMenuAction(e, onDuplicate)}>
+                    <DuplicateIcon /> Duplicate
+                  </button>
+                  <button className="collection-card-menu-item" onClick={(e) => handleMenuAction(e, onEdit)}>
+                    <EditIcon /> Edit
+                  </button>
+                  <button className="collection-card-menu-item" onClick={(e) => handleMenuAction(e, onShare)}>
+                    <ShareIcon /> Share
+                  </button>
+                  <button className="collection-card-menu-item delete" onClick={(e) => handleMenuAction(e, onDelete)}>
+                    <TrashIcon /> Delete
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       );
     }
@@ -1299,6 +1631,145 @@
     }
 
     // ==========================================
+    // SHARE MODAL COMPONENT
+    // ==========================================
+    
+    function ShareModal({ isOpen, onClose, collection }) {
+      if (!isOpen || !collection) return null;
+      
+      const shareUrl = `${window.location.origin}/collections.html?id=${collection.id}`;
+      const shareText = `Check out my collection "${collection.name}" on Society Arts`;
+      
+      const handleCopyLink = async () => {
+        try {
+          await navigator.clipboard.writeText(shareUrl);
+          alert('Link copied to clipboard!');
+        } catch (err) {
+          // Fallback for older browsers
+          const textarea = document.createElement('textarea');
+          textarea.value = shareUrl;
+          document.body.appendChild(textarea);
+          textarea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textarea);
+          alert('Link copied to clipboard!');
+        }
+      };
+      
+      const handleEmailShare = () => {
+        const subject = encodeURIComponent(`Check out my collection: ${collection.name}`);
+        const body = encodeURIComponent(`${shareText}\n\n${shareUrl}`);
+        window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
+      };
+      
+      const handleTextShare = () => {
+        // For mobile devices with SMS capability
+        const body = encodeURIComponent(`${shareText} ${shareUrl}`);
+        window.open(`sms:?body=${body}`, '_blank');
+      };
+      
+      const handleTwitterShare = () => {
+        const text = encodeURIComponent(shareText);
+        const url = encodeURIComponent(shareUrl);
+        window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank', 'width=550,height=420');
+      };
+      
+      const handleFacebookShare = () => {
+        const url = encodeURIComponent(shareUrl);
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank', 'width=550,height=420');
+      };
+      
+      const handlePinterestShare = () => {
+        const url = encodeURIComponent(shareUrl);
+        const description = encodeURIComponent(shareText);
+        window.open(`https://pinterest.com/pin/create/button/?url=${url}&description=${description}`, '_blank', 'width=550,height=420');
+      };
+      
+      return (
+        <div className="modal-overlay" onClick={onClose}>
+          <div className="share-modal" onClick={e => e.stopPropagation()}>
+            <div className="share-modal-header">
+              <h3>Share Collection</h3>
+              <button className="modal-close-btn" onClick={onClose}>
+                <XIcon />
+              </button>
+            </div>
+            
+            <div className="share-modal-body">
+              <p className="share-collection-name">{collection.name}</p>
+              
+              <div className="share-link-section">
+                <label className="share-label">Collection Link</label>
+                <div className="share-link-row">
+                  <input 
+                    type="text" 
+                    className="share-link-input" 
+                    value={shareUrl} 
+                    readOnly 
+                  />
+                  <button className="btn btn-primary share-copy-btn" onClick={handleCopyLink}>
+                    Copy
+                  </button>
+                </div>
+              </div>
+              
+              <div className="share-options-section">
+                <label className="share-label">Share via</label>
+                <div className="share-options-grid">
+                  <button className="share-option" onClick={handleEmailShare}>
+                    <div className="share-option-icon email">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                      </svg>
+                    </div>
+                    <span>Email</span>
+                  </button>
+                  
+                  <button className="share-option" onClick={handleTextShare}>
+                    <div className="share-option-icon text">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                      </svg>
+                    </div>
+                    <span>Text</span>
+                  </button>
+                  
+                  <button className="share-option" onClick={handleTwitterShare}>
+                    <div className="share-option-icon twitter">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                      </svg>
+                    </div>
+                    <span>X</span>
+                  </button>
+                  
+                  <button className="share-option" onClick={handleFacebookShare}>
+                    <div className="share-option-icon facebook">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                      </svg>
+                    </div>
+                    <span>Facebook</span>
+                  </button>
+                  
+                  <button className="share-option" onClick={handlePinterestShare}>
+                    <div className="share-option-icon pinterest">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0C5.373 0 0 5.372 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738.098.119.112.224.083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.632-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12 0-6.628-5.373-12-12-12z"/>
+                      </svg>
+                    </div>
+                    <span>Pinterest</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ==========================================
     // COLLECTION VIEW COMPONENT
     // ==========================================
     
@@ -1309,6 +1780,8 @@
       onBack, 
       onEdit, 
       onDelete,
+      onDuplicate,
+      onShare,
       onCollectionClick,
       onCreateSubCollection,
       onRemoveStyle
@@ -1395,6 +1868,10 @@
                     collection={sub}
                     palette={palette}
                     onClick={onCollectionClick}
+                    onEdit={onEdit}
+                    onDelete={onDelete}
+                    onDuplicate={onDuplicate}
+                    onShare={onShare}
                   />
                 ))}
               </div>
@@ -1455,6 +1932,8 @@
       const [createParentId, setCreateParentId] = useState(null);
       const [deleteModalOpen, setDeleteModalOpen] = useState(false);
       const [collectionToDelete, setCollectionToDelete] = useState(null);
+      const [shareModalOpen, setShareModalOpen] = useState(false);
+      const [collectionToShare, setCollectionToShare] = useState(null);
 
       // Get Supabase client
       const getSupabase = () => {
@@ -1638,6 +2117,64 @@
         return collections.filter(c => c.parent_id === collection.id).length;
       };
 
+      // Handle edit collection - opens edit modal
+      const handleEditCollection = (collection) => {
+        setEditingCollection(collection);
+        setCreateModalOpen(true);
+      };
+
+      // Handle duplicate collection
+      const handleDuplicateCollection = async (collection) => {
+        try {
+          const supabase = getSupabase();
+          const user = window.AuthState?.user;
+          
+          if (!supabase?.from || !user) {
+            throw new Error('Not authenticated');
+          }
+          
+          // Create new collection with "Copy of" prefix
+          const { data: newCollection, error: createError } = await supabase
+            .from('user_collections')
+            .insert({
+              user_id: user.id,
+              name: `Copy of ${collection.name}`,
+              description: collection.description,
+              color: collection.color,
+              parent_id: collection.parent_id
+            })
+            .select()
+            .single();
+          
+          if (createError) throw createError;
+          
+          // Copy all styles to the new collection
+          if (collection.styles && collection.styles.length > 0) {
+            const styleInserts = collection.styles.map(styleId => ({
+              collection_id: newCollection.id,
+              style_id: styleId
+            }));
+            
+            const { error: stylesError } = await supabase
+              .from('collection_styles')
+              .insert(styleInserts);
+            
+            if (stylesError) console.error('Error copying styles:', stylesError);
+          }
+          
+          await loadCollections();
+        } catch (err) {
+          console.error('Error duplicating collection:', err);
+          alert('Failed to duplicate collection. Please try again.');
+        }
+      };
+
+      // Handle share collection - opens share modal
+      const handleShareCollection = (collection) => {
+        setCollectionToShare(collection);
+        setShareModalOpen(true);
+      };
+
       // Handle collection click
       const handleCollectionClick = (collection) => {
         setBreadcrumbs(prev => [...prev, currentView].filter(Boolean));
@@ -1769,8 +2306,10 @@
                 subCollections={getSubCollections(currentView.id)}
                 palette={palette}
                 onBack={handleBack}
-                onEdit={setEditingCollection}
+                onEdit={handleEditCollection}
                 onDelete={handleDeleteCollection}
+                onDuplicate={handleDuplicateCollection}
+                onShare={handleShareCollection}
                 onCollectionClick={handleCollectionClick}
                 onCreateSubCollection={handleCreateSubCollection}
                 onRemoveStyle={handleRemoveStyle}
@@ -1802,6 +2341,10 @@
                     collection={collection}
                     palette={palette}
                     onClick={handleCollectionClick}
+                    onEdit={handleEditCollection}
+                    onDelete={handleDeleteCollection}
+                    onDuplicate={handleDuplicateCollection}
+                    onShare={handleShareCollection}
                   />
                 ))}
               </div>
@@ -1840,6 +2383,16 @@
             onConfirm={confirmDeleteCollection}
             collection={collectionToDelete}
             subCollectionCount={getSubCollectionCount(collectionToDelete)}
+          />
+          
+          {/* Share Modal */}
+          <ShareModal
+            isOpen={shareModalOpen}
+            onClose={() => {
+              setShareModalOpen(false);
+              setCollectionToShare(null);
+            }}
+            collection={collectionToShare}
           />
         </div>
       );
