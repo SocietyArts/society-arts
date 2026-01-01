@@ -112,13 +112,13 @@
       cursor: pointer;
       transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
                   box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-      overflow: hidden;
     }
     
     .collection-card::before {
       content: '';
       position: absolute;
       inset: 0;
+      border-radius: 8px;
       background: linear-gradient(
         180deg,
         transparent 0%,
@@ -213,13 +213,14 @@
       font-weight: 500;
       letter-spacing: 0.02em;
       margin: 0;
+      padding-bottom: 2px;
     }
     
     /* Card Footer - holds meta and kebab */
     .collection-card-footer {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-end;
     }
     
     /* Kebab Menu Button */
@@ -227,29 +228,28 @@
       width: 32px;
       height: 32px;
       border: none;
-      background: rgba(255, 255, 255, 0.2);
+      background: transparent;
       border-radius: 50%;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       transition: all 0.15s ease;
-      color: inherit;
-      opacity: 0.7;
+      color: white;
+      margin-right: -6px;
+      margin-bottom: -4px;
     }
     
     .collection-card-kebab:hover {
-      background: rgba(255, 255, 255, 0.4);
-      opacity: 1;
+      background: rgba(255, 255, 255, 0.25);
     }
     
     .collection-card.text-dark .collection-card-kebab {
-      background: rgba(0, 0, 0, 0.1);
+      color: var(--color-text-primary);
     }
     
     .collection-card.text-dark .collection-card-kebab:hover {
-      background: rgba(0, 0, 0, 0.2);
-      opacity: 1;
+      background: rgba(0, 0, 0, 0.1);
     }
     
     /* Kebab Dropdown Menu */
@@ -262,7 +262,7 @@
       border-radius: 8px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
       min-width: 160px;
-      z-index: 100;
+      z-index: 1000;
       overflow: hidden;
       animation: menuDropDown 0.15s ease;
     }
@@ -1322,7 +1322,7 @@
           </div>
           <div className="collection-card-footer">
             <p className="collection-card-meta">{metaText}</p>
-            <div ref={menuRef} style={{ position: 'relative' }}>
+            <div ref={menuRef} style={{ position: 'relative', zIndex: menuOpen ? 1000 : 1 }}>
               <button 
                 className="collection-card-kebab"
                 onClick={handleKebabClick}
