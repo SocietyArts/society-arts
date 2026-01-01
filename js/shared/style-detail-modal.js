@@ -369,6 +369,100 @@
         gap: 8px;
       }
     }
+    
+    /* Confirmation Modal */
+    .sdm-confirm-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 10002;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    
+    .sdm-confirm-overlay.active {
+      display: flex;
+    }
+    
+    .sdm-confirm-modal {
+      background: white;
+      border-radius: 16px;
+      max-width: 400px;
+      width: 100%;
+      padding: 32px;
+      text-align: center;
+      animation: sdmSlideUp 0.2s ease;
+    }
+    
+    .sdm-confirm-icon {
+      width: 48px;
+      height: 48px;
+      background: #FEF3F2;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      color: #DC2626;
+    }
+    
+    .sdm-confirm-title {
+      font-family: 'Domine', Georgia, serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #3E2318;
+      margin: 0 0 12px 0;
+    }
+    
+    .sdm-confirm-message {
+      color: #5C5346;
+      line-height: 1.6;
+      margin: 0 0 24px 0;
+      font-size: 0.95rem;
+    }
+    
+    .sdm-confirm-message strong {
+      color: #3E2318;
+    }
+    
+    .sdm-confirm-actions {
+      display: flex;
+      gap: 12px;
+    }
+    
+    .sdm-confirm-btn {
+      flex: 1;
+      padding: 12px 20px;
+      border-radius: 9999px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-family: inherit;
+    }
+    
+    .sdm-confirm-btn.cancel {
+      background: white;
+      color: #5C5346;
+      border: 1.5px solid #D4CEC4;
+    }
+    
+    .sdm-confirm-btn.cancel:hover {
+      border-color: #B5AA9A;
+      background: #FAF9F7;
+    }
+    
+    .sdm-confirm-btn.remove {
+      background: #DC2626;
+      color: white;
+      border: none;
+    }
+    
+    .sdm-confirm-btn.remove:hover {
+      background: #B91C1C;
+    }
   `;
 
   // ==========================================
@@ -377,11 +471,13 @@
   
   let modalElement = null;
   let lightboxElement = null;
+  let confirmElement = null;
   let stylesInjected = false;
   let currentStyleId = null;
   let currentStyle = null;
   let lightboxImages = [];
   let lightboxIndex = 0;
+  let collectionContext = null; // { collectionId, collectionName }
 
   // ==========================================
   // HELPERS
@@ -531,6 +627,102 @@
       window.SocietyArts.openAddToCollectionModal(currentStyleId, currentStyle?.name);
     }
   }
+  
+  function showRemoveConfirmation() {
+    if (!collectionContext) return;
+    
+    const styleName = currentStyle?.name || currentStyleId;
+    const collectionName = collectionContext.collectionName || 'this collection';
+    
+    const confirmHtml = `
+      <div class="sdm-confirm-overlay active" id="sdmConfirmOverlay">
+        <div class="sdm-confirm-modal">
+          <div class="sdm-confirm-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 6h18"></path>
+              <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+              <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+            </svg>
+          </div>
+          <h3 class="sdm-confirm-title">Remove from Collection?</h3>
+          <p class="sdm-confirm-message">
+            Are you sure you want to remove <strong>${escapeHtml(styleName)}</strong> from <strong>${escapeHtml(collectionName)}</strong>?
+          </p>
+          <div class="sdm-confirm-actions">
+            <button class="sdm-confirm-btn cancel" id="sdmConfirmCancel">Cancel</button>
+            <button class="sdm-confirm-btn remove" id="sdmConfirmRemove">Remove</button>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = confirmHtml;
+    document.body.appendChild(wrapper.firstElementChild);
+    confirmElement = document.getElementById('sdmConfirmOverlay');
+    
+    // Attach event listeners
+    confirmElement.querySelector('#sdmConfirmCancel')?.addEventListener('click', hideRemoveConfirmation);
+    confirmElement.querySelector('#sdmConfirmRemove')?.addEventListener('click', confirmRemoveFromCollection);
+    confirmElement.addEventListener('click', (e) => {
+      if (e.target.id === 'sdmConfirmOverlay') hideRemoveConfirmation();
+    });
+  }
+  
+  function hideRemoveConfirmation() {
+    if (confirmElement) {
+      confirmElement.remove();
+      confirmElement = null;
+    }
+  }
+  
+  async function confirmRemoveFromCollection() {
+    if (!collectionContext || !currentStyleId) return;
+    
+    try {
+      const supabase = getSupabase();
+      if (!supabase) {
+        console.error('Supabase not available');
+        return;
+      }
+      
+      // Get current collection data
+      const { data: collection, error: fetchError } = await supabase
+        .from('user_collections')
+        .select('styles')
+        .eq('id', collectionContext.collectionId)
+        .single();
+      
+      if (fetchError) throw fetchError;
+      
+      // Remove style from array
+      const currentStyles = collection.styles || [];
+      const updatedStyles = currentStyles.filter(id => id !== currentStyleId);
+      
+      // Update collection
+      const { error: updateError } = await supabase
+        .from('user_collections')
+        .update({ styles: updatedStyles })
+        .eq('id', collectionContext.collectionId);
+      
+      if (updateError) throw updateError;
+      
+      // Hide confirmation
+      hideRemoveConfirmation();
+      
+      // Close the style detail modal
+      closeModal();
+      
+      // Trigger a callback if provided (so collections page can refresh)
+      if (collectionContext.onRemove) {
+        collectionContext.onRemove(currentStyleId);
+      }
+      
+    } catch (err) {
+      console.error('Error removing style from collection:', err);
+      hideRemoveConfirmation();
+    }
+  }
 
   // ==========================================
   // MODAL RENDERING
@@ -555,6 +747,7 @@
     const images = allImages.slice(1, 10); // Images at indices 1-9
     
     const hasAddToCollection = !!window.SocietyArts?.openAddToCollectionModal;
+    const inCollectionContext = !!collectionContext;
     
     return `
       <div class="sdm-overlay active" id="sdmOverlay">
@@ -570,11 +763,15 @@
               <button class="sdm-action-btn primary sdm-project-btn">
                 + Add to Project
               </button>
-              ${hasAddToCollection ? `
+              ${inCollectionContext ? `
+                <button class="sdm-action-btn secondary sdm-remove-collection-btn">
+                  Remove from Collection
+                </button>
+              ` : (hasAddToCollection ? `
                 <button class="sdm-action-btn secondary sdm-collection-btn">
                   Add to Collection
                 </button>
-              ` : ''}
+              ` : '')}
             </div>
           </div>
           
@@ -644,6 +841,7 @@
     modalElement?.querySelector('.sdm-favorite-btn')?.addEventListener('click', toggleFavorite);
     modalElement?.querySelector('.sdm-project-btn')?.addEventListener('click', addToProject);
     modalElement?.querySelector('.sdm-collection-btn')?.addEventListener('click', addToCollection);
+    modalElement?.querySelector('.sdm-remove-collection-btn')?.addEventListener('click', showRemoveConfirmation);
     
     // Lightbox controls
     lightboxElement = document.getElementById('sdmLightbox');
@@ -679,12 +877,13 @@
   // MODAL LIFECYCLE
   // ==========================================
   
-  async function openModal(styleId) {
+  async function openModal(styleId, context = null) {
     // Inject styles
     injectStyles();
     
     // Store state
     currentStyleId = styleId;
+    collectionContext = context; // { collectionId, collectionName, onRemove }
     
     // Create loading modal
     const wrapper = document.createElement('div');
@@ -746,6 +945,10 @@
       lightboxElement.remove();
       lightboxElement = null;
     }
+    if (confirmElement) {
+      confirmElement.remove();
+      confirmElement = null;
+    }
     
     // Restore body scroll
     document.body.style.overflow = '';
@@ -756,6 +959,7 @@
     // Reset state
     currentStyleId = null;
     currentStyle = null;
+    collectionContext = null;
     lightboxImages = [];
     lightboxIndex = 0;
   }
