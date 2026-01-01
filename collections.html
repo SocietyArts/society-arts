@@ -1152,9 +1152,20 @@
                 color: collectionData.color,
                 updated_at: new Date().toISOString()
               })
-              .eq('id', collectionData.id);
+              .eq('id', collectionData.id)
+              .eq('user_id', user.id);
             
             if (error) throw error;
+            
+            // Update currentView if we're editing the currently viewed collection
+            if (currentView?.id === collectionData.id) {
+              setCurrentView(prev => ({
+                ...prev,
+                name: collectionData.name,
+                description: collectionData.description,
+                color: collectionData.color
+              }));
+            }
           } else {
             // Create new
             const { error } = await supabase
