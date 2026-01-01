@@ -765,7 +765,7 @@
               </button>
               ${hasAddToCollection ? `
                 <button class="sdm-action-btn secondary sdm-collection-btn">
-                  Add to Collection
+                  Save to Another Collection
                 </button>
               ` : ''}
               ${inCollectionContext ? `
