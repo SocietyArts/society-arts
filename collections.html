@@ -2377,6 +2377,15 @@
             {/* View Toggle */}
             <div className="view-toggle" role="group" aria-label="View options">
               <button 
+                className={`view-toggle-btn ${viewMode === 'gallery' ? 'active' : ''}`}
+                onClick={() => onViewChange('gallery')}
+                title="Gallery Cards"
+                aria-label="Gallery Cards view"
+                aria-pressed={viewMode === 'gallery'}
+              >
+                <GalleryViewIcon />
+              </button>
+              <button 
                 className={`view-toggle-btn ${viewMode === 'compact' ? 'active' : ''}`}
                 onClick={() => onViewChange('compact')}
                 title="Compact Cards"
@@ -2393,15 +2402,6 @@
                 aria-pressed={viewMode === 'table'}
               >
                 <TableViewIcon />
-              </button>
-              <button 
-                className={`view-toggle-btn ${viewMode === 'gallery' ? 'active' : ''}`}
-                onClick={() => onViewChange('gallery')}
-                title="Gallery Cards"
-                aria-label="Gallery Cards view"
-                aria-pressed={viewMode === 'gallery'}
-              >
-                <GalleryViewIcon />
               </button>
             </div>
           </div>
