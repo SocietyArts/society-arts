@@ -177,10 +177,20 @@
     }
     
     /* Top Right Controls */
-    .sdm-controls {
+    .sdm-controls-right {
       position: absolute;
       top: 16px;
       right: 16px;
+      display: flex;
+      gap: 8px;
+      z-index: 10;
+    }
+    
+    /* Top Left Controls */
+    .sdm-controls-left {
+      position: absolute;
+      top: 16px;
+      left: 16px;
       display: flex;
       gap: 8px;
       z-index: 10;
@@ -778,13 +788,17 @@
           
           <!-- Right Panel - Gallery -->
           <div class="sdm-gallery-wrapper">
-            <!-- Top Right Controls -->
-            <div class="sdm-controls">
+            <!-- Top Left - Favorite -->
+            <div class="sdm-controls-left">
               <button class="sdm-control-btn favorite sdm-favorite-btn" title="Favorite">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                 </svg>
               </button>
+            </div>
+            
+            <!-- Top Right - Close -->
+            <div class="sdm-controls-right">
               <button class="sdm-control-btn sdm-close" title="Close">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <line x1="18" y1="6" x2="6" y2="18"></line>
