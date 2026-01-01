@@ -134,6 +134,14 @@
         0 8px 16px rgba(0, 0, 0, 0.08);
     }
     
+    /* Card Content Wrapper (title + description) */
+    .collection-card-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+    
     /* Card Typography - Light text on dark backgrounds */
     .collection-card.text-light .collection-card-name,
     .collection-card.text-light .collection-card-meta {
@@ -168,11 +176,34 @@
       margin: 0;
       word-break: break-word;
       hyphens: auto;
-      /* Limit to 3 lines */
+      /* Limit to 2 lines when description present */
       display: -webkit-box;
-      -webkit-line-clamp: 3;
+      -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
+    }
+    
+    /* Collection Description (subtitle) */
+    .collection-card-description {
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 400;
+      line-height: 1.4;
+      margin: 6px 0 0 0;
+      opacity: 0.85;
+      /* Limit to 2 lines */
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    .collection-card.text-light .collection-card-description {
+      color: rgba(255, 255, 255, 0.8);
+    }
+    
+    .collection-card.text-dark .collection-card-description {
+      color: rgba(62, 35, 24, 0.7);
     }
     
     /* Collection Meta (count) */
@@ -979,7 +1010,12 @@
               <FolderIcon />
             </div>
           )}
-          <h3 className="collection-card-name">{collection.name}</h3>
+          <div className="collection-card-content">
+            <h3 className="collection-card-name">{collection.name}</h3>
+            {collection.description && (
+              <p className="collection-card-description">{collection.description}</p>
+            )}
+          </div>
           <p className="collection-card-meta">{metaText}</p>
         </div>
       );
