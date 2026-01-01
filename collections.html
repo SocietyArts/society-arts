@@ -559,6 +559,7 @@
     }
     
     .modal-content {
+      position: relative;
       background: white;
       border-radius: 12px;
       padding: var(--space-2xl);
@@ -567,6 +568,28 @@
       margin: var(--space-md);
       box-shadow: 0 24px 48px rgba(0, 0, 0, 0.2);
       animation: slideUp 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .modal-close-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: transparent;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-secondary);
+      transition: all 0.15s ease;
+    }
+    
+    .modal-close-btn:hover {
+      background: rgba(0, 0, 0, 0.08);
+      color: var(--color-text-primary);
     }
     
     @keyframes slideUp {
@@ -1002,11 +1025,17 @@
       transform: scale(1.1);
     }
     
+    .modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: var(--space-xl);
+    }
+    
     .modal-actions {
       display: flex;
       gap: var(--space-sm);
       justify-content: flex-end;
-      margin-top: var(--space-xl);
     }
     
     /* === Collection Header (inside view) === */
@@ -1382,6 +1411,7 @@
       const [name, setName] = useState(collection?.name || '');
       const [description, setDescription] = useState(collection?.description || '');
       const [selectedColor, setSelectedColor] = useState(collection?.color || palette[0]?.hex);
+      const mouseDownOnOverlay = React.useRef(false);
       
       useEffect(() => {
         if (collection) {
@@ -1408,24 +1438,38 @@
         onClose();
       };
       
+      // Only close if both mousedown and mouseup happened on overlay
+      const handleOverlayMouseDown = (e) => {
+        if (e.target.classList.contains('modal-overlay')) {
+          mouseDownOnOverlay.current = true;
+        }
+      };
+      
+      const handleOverlayMouseUp = (e) => {
+        if (e.target.classList.contains('modal-overlay') && mouseDownOnOverlay.current) {
+          onClose();
+        }
+        mouseDownOnOverlay.current = false;
+      };
+      
       if (!isOpen) return null;
       
       return (
-        <div className="modal-overlay" onClick={onClose}>
+        <div 
+          className="modal-overlay" 
+          onMouseDown={handleOverlayMouseDown}
+          onMouseUp={handleOverlayMouseUp}
+        >
           <div className="modal-content" onClick={e => e.stopPropagation()}>
+            {/* Close button - top right */}
+            <button className="modal-close-btn" onClick={onClose} title="Close">
+              <XIcon />
+            </button>
+            
             <div className="modal-header">
               <h2 className="modal-title">
                 {collection ? 'Edit Collection' : 'New Collection'}
               </h2>
-              <button 
-                className="modal-info-btn"
-                onClick={() => window.SocietyArts?.openInfoModal?.('collections-new')}
-                title="Help"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
-                </svg>
-              </button>
             </div>
             
             <label className="modal-label">Name</label>
@@ -1464,17 +1508,30 @@
               </div>
             </div>
             
-            <div className="modal-actions">
-              <button className="btn btn-ghost" onClick={onClose}>
-                Cancel
-              </button>
+            <div className="modal-footer">
+              {/* Info button - bottom left */}
               <button 
-                className="btn btn-primary" 
-                onClick={handleSave}
-                disabled={!name.trim()}
+                className="modal-info-btn"
+                onClick={() => window.SocietyArts?.openInfoModal?.('collections-new')}
+                title="Help"
               >
-                {collection ? 'Save Changes' : 'Create'}
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                </svg>
               </button>
+              
+              <div className="modal-actions">
+                <button className="btn btn-ghost" onClick={onClose}>
+                  Cancel
+                </button>
+                <button 
+                  className="btn btn-primary" 
+                  onClick={handleSave}
+                  disabled={!name.trim()}
+                >
+                  {collection ? 'Save Changes' : 'Create'}
+                </button>
+              </div>
             </div>
           </div>
         </div>
