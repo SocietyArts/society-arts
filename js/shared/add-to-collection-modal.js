@@ -464,9 +464,9 @@
   }
   
   function getStyleThumbnail(styleId) {
-    return window.SocietyArts?.getAltStyleThumbnailUrl?.(styleId) ||
-           window.SocietyArts?.getStyleImageUrl?.(styleId, 0) ||
-           `https://pub-acb560f551f141db830964aed1fa005f.r2.dev/styles/${styleId}/thumbnail.webp`;
+    return window.SocietyArts?.getStyleThumbnailUrl?.(styleId, 0) ||
+           window.SocietyArts?.getAltStyleThumbnailUrl?.(styleId) ||
+           `https://pub-acb560f551f141db830964aed1fa005f.r2.dev/${styleId}/${styleId}-00.webp`;
   }
   
   function injectStyles() {
