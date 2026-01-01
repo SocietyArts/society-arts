@@ -413,6 +413,194 @@
       color: rgba(0, 0, 0, 0.15);
     }
     
+    /* === TABLE VIEW === */
+    .collections-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-sans);
+    }
+    
+    .collections-table th {
+      text-align: left;
+      padding: 12px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+      border-bottom: 1px solid var(--color-border);
+      white-space: nowrap;
+    }
+    
+    .collections-table th.sortable {
+      cursor: pointer;
+      user-select: none;
+    }
+    
+    .collections-table th.sortable:hover {
+      color: var(--color-text-secondary);
+    }
+    
+    .collections-table th .sort-indicator {
+      margin-left: 4px;
+      opacity: 0.5;
+    }
+    
+    .collections-table th.sorted .sort-indicator {
+      opacity: 1;
+    }
+    
+    .collections-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--color-border);
+      vertical-align: middle;
+    }
+    
+    .collections-table tbody tr {
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+    }
+    
+    .collections-table tbody tr:hover {
+      background-color: var(--color-surface-alt);
+    }
+    
+    /* Table Columns */
+    .table-col-color {
+      width: 40px;
+      padding-right: 0 !important;
+    }
+    
+    .table-color-dot {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      display: inline-block;
+    }
+    
+    .table-col-title {
+      min-width: 180px;
+    }
+    
+    .table-title {
+      font-family: var(--font-serif);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .table-title svg {
+      width: 16px;
+      height: 16px;
+      opacity: 0.5;
+      flex-shrink: 0;
+    }
+    
+    .table-col-description {
+      max-width: 300px;
+    }
+    
+    .table-description {
+      font-size: 13px;
+      color: var(--color-text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 280px;
+    }
+    
+    .table-col-styles {
+      width: 80px;
+      text-align: center;
+    }
+    
+    .table-styles-count {
+      font-size: 13px;
+      color: var(--color-text-secondary);
+    }
+    
+    .table-col-date {
+      width: 120px;
+      white-space: nowrap;
+    }
+    
+    .table-date {
+      font-size: 13px;
+      color: var(--color-text-muted);
+    }
+    
+    .table-col-actions {
+      width: 50px;
+      text-align: right;
+      padding-right: 8px !important;
+    }
+    
+    /* Table Kebab Button */
+    .table-kebab-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+    
+    .table-kebab-btn {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: transparent;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-muted);
+      transition: all 0.15s ease;
+    }
+    
+    .table-kebab-btn:hover {
+      background: var(--color-surface-alt);
+      color: var(--color-text-secondary);
+    }
+    
+    .table-kebab-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      margin-top: 4px;
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      min-width: 150px;
+      z-index: 1000;
+      animation: menuDropDown 0.15s ease;
+    }
+    
+    /* Responsive Table */
+    @media (max-width: 900px) {
+      .table-col-description {
+        display: none;
+      }
+    }
+    
+    @media (max-width: 700px) {
+      .table-col-date.created {
+        display: none;
+      }
+    }
+    
+    @media (max-width: 550px) {
+      .table-col-date.modified {
+        display: none;
+      }
+      
+      .collections-table th,
+      .collections-table td {
+        padding: 10px 12px;
+      }
+    }
+    
     /* Collection Meta (count) - Bottom Left */
     .collection-card-meta {
       font-family: var(--font-sans);
@@ -1673,6 +1861,153 @@
     }
 
     // ==========================================
+    // COLLECTIONS TABLE COMPONENT
+    // ==========================================
+    
+    function CollectionsTable({ 
+      collections, 
+      palette, 
+      onClick, 
+      onEdit, 
+      onDelete, 
+      onDuplicate, 
+      onShare 
+    }) {
+      const [openMenuId, setOpenMenuId] = useState(null);
+      const menuRef = React.useRef(null);
+      
+      // Close menu when clicking outside
+      useEffect(() => {
+        const handleClickOutside = (e) => {
+          if (menuRef.current && !menuRef.current.contains(e.target)) {
+            setOpenMenuId(null);
+          }
+        };
+        if (openMenuId) {
+          document.addEventListener('mousedown', handleClickOutside);
+        }
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+      }, [openMenuId]);
+      
+      const formatDate = (dateString) => {
+        if (!dateString) return '—';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { 
+          month: 'short', 
+          day: 'numeric',
+          year: date.getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined
+        });
+      };
+      
+      const handleKebabClick = (e, collectionId) => {
+        e.stopPropagation();
+        setOpenMenuId(openMenuId === collectionId ? null : collectionId);
+      };
+      
+      const handleMenuAction = (e, action, collection) => {
+        e.stopPropagation();
+        setOpenMenuId(null);
+        action(collection);
+      };
+      
+      return (
+        <table className="collections-table">
+          <thead>
+            <tr>
+              <th className="table-col-color"></th>
+              <th className="table-col-title">Name</th>
+              <th className="table-col-description">Description</th>
+              <th className="table-col-styles">Styles</th>
+              <th className="table-col-date created">Created</th>
+              <th className="table-col-date modified">Modified</th>
+              <th className="table-col-actions"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {collections.map(collection => {
+              const styleCount = collection.styles?.length || 0;
+              const subCount = collection.subcollection_count || 0;
+              
+              return (
+                <tr key={collection.id} onClick={() => onClick(collection)}>
+                  <td className="table-col-color">
+                    <span 
+                      className="table-color-dot" 
+                      style={{ backgroundColor: collection.color }}
+                    />
+                  </td>
+                  <td className="table-col-title">
+                    <span className="table-title">
+                      {subCount > 0 && <FolderIcon />}
+                      {collection.name}
+                    </span>
+                  </td>
+                  <td className="table-col-description">
+                    <span className="table-description">
+                      {collection.description || '—'}
+                    </span>
+                  </td>
+                  <td className="table-col-styles">
+                    <span className="table-styles-count">{styleCount}</span>
+                  </td>
+                  <td className="table-col-date created">
+                    <span className="table-date">{formatDate(collection.created_at)}</span>
+                  </td>
+                  <td className="table-col-date modified">
+                    <span className="table-date">{formatDate(collection.updated_at)}</span>
+                  </td>
+                  <td className="table-col-actions">
+                    <div 
+                      className="table-kebab-wrapper" 
+                      ref={openMenuId === collection.id ? menuRef : null}
+                    >
+                      <button 
+                        className="table-kebab-btn"
+                        onClick={(e) => handleKebabClick(e, collection.id)}
+                        title="More options"
+                      >
+                        <KebabIcon />
+                      </button>
+                      {openMenuId === collection.id && (
+                        <div className="table-kebab-menu">
+                          <button 
+                            className="collection-card-menu-item" 
+                            onClick={(e) => handleMenuAction(e, onDuplicate, collection)}
+                          >
+                            <DuplicateIcon /> Duplicate
+                          </button>
+                          <button 
+                            className="collection-card-menu-item" 
+                            onClick={(e) => handleMenuAction(e, onEdit, collection)}
+                          >
+                            <EditIcon /> Edit
+                          </button>
+                          <button 
+                            className="collection-card-menu-item" 
+                            onClick={(e) => handleMenuAction(e, onShare, collection)}
+                          >
+                            <ShareIcon /> Share
+                          </button>
+                          <div className="collection-card-menu-divider"></div>
+                          <button 
+                            className="collection-card-menu-item delete" 
+                            onClick={(e) => handleMenuAction(e, onDelete, collection)}
+                          >
+                            <TrashIcon /> Delete
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      );
+    }
+
+    // ==========================================
     // NEW COLLECTION CARD COMPONENT
     // ==========================================
     
@@ -2270,21 +2605,33 @@
                 onViewChange={onViewModeChange}
               />
               {subCollections.length > 0 ? (
-                <div className={`collections-grid view-${viewMode}`}>
-                  {subCollections.map(sub => (
-                    <CollectionCard 
-                      key={sub.id}
-                      collection={sub}
-                      palette={palette}
-                      onClick={onCollectionClick}
-                      onEdit={onEdit}
-                      onDelete={onDelete}
-                      onDuplicate={onDuplicate}
-                      onShare={onShare}
-                      viewMode={viewMode}
-                    />
-                  ))}
-                </div>
+                viewMode === 'table' ? (
+                  <CollectionsTable
+                    collections={subCollections}
+                    palette={palette}
+                    onClick={onCollectionClick}
+                    onEdit={onEdit}
+                    onDelete={onDelete}
+                    onDuplicate={onDuplicate}
+                    onShare={onShare}
+                  />
+                ) : (
+                  <div className={`collections-grid view-${viewMode}`}>
+                    {subCollections.map(sub => (
+                      <CollectionCard 
+                        key={sub.id}
+                        collection={sub}
+                        palette={palette}
+                        onClick={onCollectionClick}
+                        onEdit={onEdit}
+                        onDelete={onDelete}
+                        onDuplicate={onDuplicate}
+                        onShare={onShare}
+                        viewMode={viewMode}
+                      />
+                    ))}
+                  </div>
+                )
               ) : (
                 <div className="empty-state" style={{ padding: 'var(--space-xl)' }}>
                   <p className="empty-text" style={{ margin: 0 }}>No sub-collections yet</p>
@@ -2771,21 +3118,33 @@
                   viewMode={viewMode}
                   onViewChange={handleViewModeChange}
                 />
-                <div className={`collections-grid view-${viewMode}`}>
-                  {rootCollections.map(collection => (
-                    <CollectionCard 
-                      key={collection.id}
-                      collection={collection}
-                      palette={palette}
-                      onClick={handleCollectionClick}
-                      onEdit={handleEditCollection}
-                      onDelete={handleDeleteCollection}
-                      onDuplicate={handleDuplicateCollection}
-                      onShare={handleShareCollection}
-                      viewMode={viewMode}
-                    />
-                  ))}
-                </div>
+                {viewMode === 'table' ? (
+                  <CollectionsTable
+                    collections={rootCollections}
+                    palette={palette}
+                    onClick={handleCollectionClick}
+                    onEdit={handleEditCollection}
+                    onDelete={handleDeleteCollection}
+                    onDuplicate={handleDuplicateCollection}
+                    onShare={handleShareCollection}
+                  />
+                ) : (
+                  <div className={`collections-grid view-${viewMode}`}>
+                    {rootCollections.map(collection => (
+                      <CollectionCard 
+                        key={collection.id}
+                        collection={collection}
+                        palette={palette}
+                        onClick={handleCollectionClick}
+                        onEdit={handleEditCollection}
+                        onDelete={handleDeleteCollection}
+                        onDuplicate={handleDuplicateCollection}
+                        onShare={handleShareCollection}
+                        viewMode={viewMode}
+                      />
+                    ))}
+                  </div>
+                )}
               </>
             )}
           </main>
