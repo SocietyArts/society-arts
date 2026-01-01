@@ -926,8 +926,15 @@
       }
       
       const getStyleThumbnail = (styleId) => {
-        return window.SocietyArts?.getAltStyleThumbnailUrl?.(styleId) || 
-          `https://pub-acb560f551f141db830964aed1fa005f.r2.dev/styles/${styleId}/thumbnail.webp`;
+        // Use the proper thumbnail URL helper or fallback to correct pattern
+        return window.SocietyArts?.getStyleThumbnailUrl?.(styleId, 0) || 
+               window.SocietyArts?.getAltStyleThumbnailUrl?.(styleId) ||
+               `https://pub-acb560f551f141db830964aed1fa005f.r2.dev/${styleId}/${styleId}-00.webp`;
+      };
+      
+      const handleStyleClick = (styleId) => {
+        // Navigate to style-finder with the style ID to open detail view
+        window.location.href = `/style-finder.html?style=${styleId}`;
       };
       
       return (
@@ -985,7 +992,7 @@
           <h4 className="collections-section-header">Styles in this collection</h4>
           <div className="styles-grid">
             {styles.map(styleId => (
-              <div key={styleId} className="style-thumbnail">
+              <div key={styleId} className="style-thumbnail" onClick={() => handleStyleClick(styleId)}>
                 <img 
                   src={getStyleThumbnail(styleId)} 
                   alt={styleId}
@@ -993,7 +1000,10 @@
                 />
                 <button 
                   className="style-thumbnail-remove"
-                  onClick={() => onRemoveStyle(collection.id, styleId)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onRemoveStyle(collection.id, styleId);
+                  }}
                   title="Remove from collection"
                 >
                   <XIcon />

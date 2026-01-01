@@ -2175,6 +2175,14 @@
                 renderStyles();
                 updateResultsCount();
                 updatePagination();
+                
+                // Check for style parameter in URL (from collections page)
+                const urlParams = new URLSearchParams(window.location.search);
+                const styleId = urlParams.get('style');
+                if (styleId) {
+                    // Small delay to ensure DOM is ready
+                    setTimeout(() => openStyleModal(styleId), 100);
+                }
             } catch (error) {
                 console.error('Initialization failed:', error);
                 stylesGrid.innerHTML = '<p style="text-align:center;color:#999;padding:2rem;">Failed to load styles. Please refresh the page.</p>';
