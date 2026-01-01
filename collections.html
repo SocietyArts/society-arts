@@ -673,6 +673,8 @@
   <script src="/js/shared/api.js"></script>
   <script src="/js/shared/auth.js"></script>
   <script src="/js/shared/header.js"></script>
+  <script src="/js/style-finder/style-data.js"></script>
+  <script src="/js/shared/style-detail-modal.js"></script>
   
   <!-- Collections App -->
   <script type="text/babel">
@@ -933,8 +935,12 @@
       };
       
       const handleStyleClick = (styleId) => {
-        // Navigate to style-finder with the style ID to open detail view
-        window.location.href = `/style-finder.html?style=${styleId}`;
+        // Open the shared style detail modal without leaving the page
+        if (window.SocietyArts?.openStyleDetailModal) {
+          window.SocietyArts.openStyleDetailModal(styleId);
+        } else {
+          console.error('Style Detail Modal not loaded');
+        }
       };
       
       return (
