@@ -292,6 +292,12 @@
       background: #f5f5f5;
     }
     
+    .collection-card-menu-divider {
+      height: 1px;
+      background: #e5e5e5;
+      margin: 4px 0;
+    }
+    
     .collection-card-menu-item.delete {
       color: #dc2626;
     }
@@ -1370,6 +1376,7 @@
                   <button className="collection-card-menu-item" onClick={(e) => handleMenuAction(e, onShare)}>
                     <ShareIcon /> Share
                   </button>
+                  <div className="collection-card-menu-divider"></div>
                   <button className="collection-card-menu-item delete" onClick={(e) => handleMenuAction(e, onDelete)}>
                     <TrashIcon /> Delete
                   </button>
