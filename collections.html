@@ -505,6 +505,110 @@
       fill: var(--color-text-secondary);
     }
     
+    /* === Delete Confirmation Modal === */
+    .delete-modal-content {
+      background: white;
+      border-radius: 16px;
+      padding: 0;
+      width: 100%;
+      max-width: 420px;
+      margin: var(--space-md);
+      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.2);
+      animation: slideUp 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+    }
+    
+    .delete-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-lg) var(--space-xl);
+      background: #FEF2F2;
+      border-bottom: 1px solid #FECACA;
+    }
+    
+    .delete-modal-icon {
+      width: 44px;
+      height: 44px;
+      background: #FEE2E2;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #DC2626;
+    }
+    
+    .delete-modal-body {
+      padding: var(--space-xl);
+    }
+    
+    .delete-modal-title {
+      font-family: var(--font-serif);
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin: 0 0 var(--space-md) 0;
+    }
+    
+    .delete-modal-message {
+      font-family: var(--font-sans);
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--color-text-secondary);
+      margin: 0 0 var(--space-lg) 0;
+    }
+    
+    .delete-modal-message strong {
+      color: var(--color-text-primary);
+      font-weight: 600;
+    }
+    
+    .delete-modal-warning {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-sm);
+      padding: var(--space-md);
+      background: #FFFBEB;
+      border: 1px solid #FDE68A;
+      border-radius: var(--radius-md);
+      margin-bottom: var(--space-lg);
+    }
+    
+    .delete-modal-warning svg {
+      flex-shrink: 0;
+      color: #D97706;
+    }
+    
+    .delete-modal-warning p {
+      font-size: 13px;
+      color: #92400E;
+      margin: 0;
+      line-height: 1.5;
+    }
+    
+    .delete-modal-actions {
+      display: flex;
+      gap: var(--space-sm);
+      justify-content: flex-end;
+    }
+    
+    .btn-delete {
+      padding: 12px 24px;
+      border: none;
+      background: #DC2626;
+      color: white;
+      border-radius: var(--radius-md);
+      font-family: var(--font-sans);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+    
+    .btn-delete:hover {
+      background: #B91C1C;
+    }
+    
     .modal-label {
       display: block;
       font-family: var(--font-sans);
@@ -947,6 +1051,76 @@
     }
 
     // ==========================================
+    // DELETE CONFIRMATION MODAL COMPONENT
+    // ==========================================
+    
+    function DeleteConfirmationModal({ 
+      isOpen, 
+      onClose, 
+      onConfirm, 
+      collection,
+      subCollectionCount = 0
+    }) {
+      if (!isOpen || !collection) return null;
+      
+      const hasSubCollections = subCollectionCount > 0;
+      
+      return (
+        <div className="modal-overlay" onClick={onClose}>
+          <div className="delete-modal-content" onClick={e => e.stopPropagation()}>
+            <div className="delete-modal-header">
+              <div className="delete-modal-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M3 6h18"></path>
+                  <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                  <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                </svg>
+              </div>
+              <button 
+                className="modal-info-btn"
+                onClick={() => window.SocietyArts?.openInfoModal?.('collections-delete')}
+                title="Help"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                </svg>
+              </button>
+            </div>
+            
+            <div className="delete-modal-body">
+              <h3 className="delete-modal-title">Delete Collection?</h3>
+              
+              <p className="delete-modal-message">
+                You're about to delete <strong>{collection.name}</strong>.
+                {hasSubCollections && (
+                  <> This will also remove {subCollectionCount} sub-collection{subCollectionCount !== 1 ? 's' : ''} inside it.</>
+                )}
+              </p>
+              
+              <div className="delete-modal-warning">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                  <line x1="12" y1="9" x2="12" y2="13"></line>
+                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                <p>This action cannot be undone. The styles saved in this collection will remain in your library, but the collection itself will be permanently removed.</p>
+              </div>
+              
+              <div className="delete-modal-actions">
+                <button className="btn btn-ghost" onClick={onClose}>
+                  Keep Collection
+                </button>
+                <button className="btn-delete" onClick={onConfirm}>
+                  Yes, Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ==========================================
     // COLLECTION VIEW COMPONENT
     // ==========================================
     
@@ -1101,6 +1275,8 @@
       const [currentView, setCurrentView] = useState(null); // null = root, or collection object
       const [breadcrumbs, setBreadcrumbs] = useState([]);
       const [createParentId, setCreateParentId] = useState(null);
+      const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+      const [collectionToDelete, setCollectionToDelete] = useState(null);
 
       // Get Supabase client
       const getSupabase = () => {
@@ -1239,14 +1415,15 @@
         }
       };
 
-      // Handle delete collection
-      const handleDeleteCollection = async (collection) => {
-        const subCount = collections.filter(c => c.parent_id === collection.id).length;
-        const message = subCount > 0 
-          ? `Delete "${collection.name}" and its ${subCount} sub-collection${subCount !== 1 ? 's' : ''}? This cannot be undone.`
-          : `Delete "${collection.name}"? This cannot be undone.`;
-        
-        if (!confirm(message)) return;
+      // Handle delete collection - opens confirmation modal
+      const handleDeleteCollection = (collection) => {
+        setCollectionToDelete(collection);
+        setDeleteModalOpen(true);
+      };
+
+      // Confirm delete - actually performs the deletion
+      const confirmDeleteCollection = async () => {
+        if (!collectionToDelete) return;
         
         try {
           const supabase = getSupabase();
@@ -1257,20 +1434,30 @@
           const { error } = await supabase
             .from('user_collections')
             .delete()
-            .eq('id', collection.id);
+            .eq('id', collectionToDelete.id);
           
           if (error) throw error;
           
           await loadCollections();
           
           // If we deleted the current view, go back
-          if (currentView?.id === collection.id) {
+          if (currentView?.id === collectionToDelete.id) {
             handleBack();
           }
+          
+          // Close modal and reset state
+          setDeleteModalOpen(false);
+          setCollectionToDelete(null);
         } catch (err) {
           console.error('Error deleting collection:', err);
           alert('Failed to delete collection. Please try again.');
         }
+      };
+
+      // Get sub-collection count for delete modal
+      const getSubCollectionCount = (collection) => {
+        if (!collection) return 0;
+        return collections.filter(c => c.parent_id === collection.id).length;
       };
 
       // Handle collection click
@@ -1463,6 +1650,18 @@
             collection={editingCollection}
             palette={palette}
             parentId={createParentId}
+          />
+          
+          {/* Delete Confirmation Modal */}
+          <DeleteConfirmationModal
+            isOpen={deleteModalOpen}
+            onClose={() => {
+              setDeleteModalOpen(false);
+              setCollectionToDelete(null);
+            }}
+            onConfirm={confirmDeleteCollection}
+            collection={collectionToDelete}
+            subCollectionCount={getSubCollectionCount(collectionToDelete)}
           />
         </div>
       );
