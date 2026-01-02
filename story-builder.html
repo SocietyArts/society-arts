@@ -999,11 +999,12 @@
         return () => document.removeEventListener('mousedown', handleClickOutside);
       }, [showChatInfo, showStylesInfo]);
 
-      // Load project from URL on mount OR handle ?style= parameter
+     // Load project from URL on mount OR handle ?style= / ?openStyleFinder= parameters
       useEffect(() => {
         const params = new URLSearchParams(window.location.search);
         const projectIdParam = params.get('project');
         const styleParam = params.get('style');
+        const openStyleFinderParam = params.get('openStyleFinder');
         
         if (projectIdParam && user) {
           loadProjectById(projectIdParam);
@@ -1011,6 +1012,13 @@
           // Handle ?style= parameter from Style Finder
           setSelectedStyles(prev => [...prev, styleParam].slice(0, 4));
           loadStyleDetails([styleParam]);
+          // Clear the URL parameter
+          window.history.replaceState({}, '', window.location.pathname);
+        }
+        
+        // Handle ?openStyleFinder=true - open the style picker modal automatically
+        if (openStyleFinderParam === 'true') {
+          setStyleFinderOpen(true);
           // Clear the URL parameter
           window.history.replaceState({}, '', window.location.pathname);
         }
