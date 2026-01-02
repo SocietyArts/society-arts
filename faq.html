@@ -33,8 +33,15 @@
     
     .faq-content {
       flex: 1;
-      padding: var(--space-2xl);
-      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    /* Top Section - Scrolls Away */
+    .faq-top-section {
+      padding: var(--space-2xl) var(--space-2xl) 0 var(--space-2xl);
+      flex-shrink: 0;
     }
     
     /* Breadcrumb */
@@ -59,7 +66,7 @@
     
     /* Page Header */
     .faq-page-header {
-      margin-bottom: var(--space-2xl);
+      margin-bottom: var(--space-xl);
       max-width: 800px;
     }
     
@@ -79,19 +86,27 @@
     }
     
     /* ========================================
-       FAQ LAYOUT - Two Column
+       FAQ LAYOUT - Two Column with Sticky
        ======================================== */
     
     .faq-layout {
       display: flex;
       gap: var(--space-2xl);
       max-width: 1200px;
+      flex: 1;
+      min-height: 0;
+      padding: 0 var(--space-2xl) var(--space-2xl) var(--space-2xl);
     }
     
-    /* Categories Sidebar */
+    /* Categories Sidebar - Sticky */
     .faq-categories {
       width: 240px;
       flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      align-self: flex-start;
+      max-height: 100%;
+      overflow-y: auto;
     }
     
     .faq-categories-title {
@@ -165,12 +180,45 @@
     .faq-main {
       flex: 1;
       min-width: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+    
+    /* Sticky Search Header */
+    .faq-main-sticky {
+      position: sticky;
+      top: 0;
+      background: var(--color-background);
+      padding-bottom: var(--space-md);
+      z-index: 10;
+    }
+    
+    /* Fade effect under sticky search */
+    .faq-main-sticky::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 20px;
+      background: linear-gradient(to bottom, var(--color-background), transparent);
+      pointer-events: none;
+      transform: translateY(100%);
+    }
+    
+    /* Scrollable FAQ List */
+    .faq-scrollable {
+      flex: 1;
+      overflow-y: auto;
+      padding-top: var(--space-sm);
+      padding-bottom: var(--space-2xl);
     }
     
     /* Search */
     .faq-search-wrapper {
       position: relative;
-      margin-bottom: var(--space-xl);
+      max-width: 400px;
     }
     
     .faq-search-icon {
@@ -186,7 +234,6 @@
     
     .faq-search-input {
       width: 100%;
-      max-width: 400px;
       padding: 12px 44px 12px 44px;
       font-family: var(--font-primary);
       font-size: var(--text-base);
@@ -209,7 +256,7 @@
     
     .faq-search-clear {
       position: absolute;
-      right: calc(100% - 400px + 10px);
+      right: 10px;
       top: 50%;
       transform: translateY(-50%);
       width: 28px;
@@ -401,12 +448,12 @@
     
     /* Top Questions Section */
     .faq-top-questions {
-      margin-bottom: var(--space-2xl);
+      margin-bottom: var(--space-xl);
     }
     
     /* Category Section */
     .faq-category-section {
-      margin-top: var(--space-xl);
+      margin-bottom: var(--space-md);
     }
     
     /* Empty State */
@@ -473,13 +520,24 @@
        ======================================== */
     
     @media (max-width: 900px) {
+      .faq-top-section {
+        padding: var(--space-lg) var(--space-lg) 0 var(--space-lg);
+      }
+      
       .faq-layout {
         flex-direction: column;
-        gap: var(--space-xl);
+        gap: 0;
+        padding: 0 var(--space-lg) var(--space-lg) var(--space-lg);
       }
       
       .faq-categories {
         width: 100%;
+        position: sticky;
+        top: 0;
+        background: var(--color-background);
+        padding: var(--space-md) 0;
+        z-index: 10;
+        margin-bottom: var(--space-md);
       }
       
       .faq-category-list {
@@ -503,11 +561,36 @@
       .faq-category-item.active .faq-category-count {
         color: rgba(255, 255, 255, 0.7);
       }
+      
+      .faq-main {
+        flex: none;
+      }
+      
+      .faq-main-sticky {
+        position: relative;
+        background: transparent;
+      }
+      
+      .faq-main-sticky::after {
+        display: none;
+      }
+      
+      .faq-scrollable {
+        overflow: visible;
+      }
     }
     
     @media (max-width: 480px) {
-      .faq-content {
-        padding: var(--space-lg);
+      .faq-top-section {
+        padding: var(--space-md) var(--space-md) 0 var(--space-md);
+      }
+      
+      .faq-layout {
+        padding: 0 var(--space-md) var(--space-md) var(--space-md);
+      }
+      
+      .faq-page-title {
+        font-size: var(--text-2xl);
       }
       
       .faq-card-header {
@@ -795,20 +878,23 @@
           <Header user={user} profile={profile} />
           
           <main className="faq-content">
-            {/* Breadcrumb */}
-            <div className="faq-breadcrumb">
-              <a href="index.html">Home</a>
-              <ChevronRightIcon />
-              <span>Frequently Asked Questions</span>
-            </div>
-            
-            {/* Page Header */}
-            <div className="faq-page-header">
-              <h1 className="faq-page-title">Frequently Asked Questions</h1>
-              <p className="faq-page-subtitle">
-                Find answers to common questions about Society Arts. Browse by category 
-                or search for specific topics to get the help you need.
-              </p>
+            {/* Top Section - Breadcrumb and Title */}
+            <div className="faq-top-section">
+              {/* Breadcrumb */}
+              <div className="faq-breadcrumb">
+                <a href="index.html">Home</a>
+                <ChevronRightIcon />
+                <span>Frequently Asked Questions</span>
+              </div>
+              
+              {/* Page Header */}
+              <div className="faq-page-header">
+                <h1 className="faq-page-title">Frequently Asked Questions</h1>
+                <p className="faq-page-subtitle">
+                  Find answers to common questions about Society Arts. Browse by category 
+                  or search for specific topics to get the help you need.
+                </p>
+              </div>
             </div>
             
             {loading ? (
@@ -824,7 +910,7 @@
               </div>
             ) : (
               <div className="faq-layout">
-                {/* Categories Sidebar */}
+                {/* Categories Sidebar - Sticky */}
                 <aside className="faq-categories">
                   <h2 className="faq-categories-title">Categories</h2>
                   <nav className="faq-category-list">
@@ -847,31 +933,35 @@
                 
                 {/* Main Content */}
                 <div className="faq-main">
-                  {/* Search */}
-                  <div className="faq-search-wrapper">
-                    <span className="faq-search-icon"><SearchIcon /></span>
-                    <input
-                      type="text"
-                      className="faq-search-input"
-                      placeholder="Search all questions..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                    <button 
-                      className={`faq-search-clear ${searchQuery.length > 0 ? 'visible' : ''}`}
-                      onClick={clearSearch}
-                      style={{ right: '10px', left: 'auto' }}
-                    >
-                      <XIcon />
-                    </button>
+                  {/* Sticky Search Header */}
+                  <div className="faq-main-sticky">
+                    <div className="faq-search-wrapper">
+                      <span className="faq-search-icon"><SearchIcon /></span>
+                      <input
+                        type="text"
+                        className="faq-search-input"
+                        placeholder="Search all questions..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                      />
+                      <button 
+                        className={`faq-search-clear ${searchQuery.length > 0 ? 'visible' : ''}`}
+                        onClick={clearSearch}
+                      >
+                        <XIcon />
+                      </button>
+                    </div>
+                    
+                    {/* Search Results Info */}
+                    {searchQuery.length >= 2 && (
+                      <p className="faq-search-results-info" style={{ marginTop: 'var(--space-md)', marginBottom: 0 }}>
+                        Found <strong>{filteredFaqs.length}</strong> result{filteredFaqs.length !== 1 ? 's' : ''} for "<strong>{searchQuery}</strong>"
+                      </p>
+                    )}
                   </div>
                   
-                  {/* Search Results Info */}
-                  {searchQuery.length >= 2 && (
-                    <p className="faq-search-results-info">
-                      Found <strong>{filteredFaqs.length}</strong> result{filteredFaqs.length !== 1 ? 's' : ''} for "<strong>{searchQuery}</strong>"
-                    </p>
-                  )}
+                  {/* Scrollable FAQ List */}
+                  <div className="faq-scrollable">
                   
                   {/* Top Questions */}
                   {showTopQuestions && (
@@ -920,8 +1010,9 @@
                       <p className="faq-empty-text">Try different keywords or browse by category</p>
                     </div>
                   ) : null}
-                </div>
-              </div>
+                  </div>{/* End faq-scrollable */}
+                </div>{/* End faq-main */}
+              </div>{/* End faq-layout */}
             )}
           </main>
         </div>
