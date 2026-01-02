@@ -112,12 +112,16 @@
     }
     
     .header-logo {
-      font-family: var(--font-sans);
-      font-size: 18px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      color: var(--color-cream);
+      display: flex;
+      align-items: center;
       text-decoration: none;
+    }
+    
+    .header-logo img {
+      height: 20px;
+      width: auto;
+      /* Filter to convert black SVG to cream #EAE4DA */
+      filter: invert(93%) sepia(6%) saturate(200%) hue-rotate(10deg) brightness(103%);
     }
     
     .header-divider {
@@ -1034,13 +1038,15 @@
     }
     
     .login-logo {
-      font-family: var(--font-sans);
-      font-size: 14px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      color: var(--color-tan);
       display: block;
       margin-bottom: var(--space-md);
+      text-align: center;
+    }
+    
+    .login-logo img {
+      height: 18px;
+      width: auto;
+      /* No filter needed - SVG is already dark/brown for light background */
     }
     
     .login-title {
@@ -1132,7 +1138,9 @@
     <!-- Header -->
     <header class="header">
       <div class="header-brand">
-        <span class="header-logo">SOCIETY ARTS</span>
+        <a href="/" class="header-logo">
+          <img src="https://pub-acb560f551f141db830964aed1fa005f.r2.dev/site-assets/SA%20Wordmark%20Horizontal.svg" alt="Society Arts">
+        </a>
         <div class="header-divider"></div>
         <span class="header-title">FAQ Admin</span>
       </div>
@@ -1152,7 +1160,9 @@
     <div class="login-screen" id="loginScreen">
       <div class="login-card">
         <div class="login-header">
-          <span class="login-logo">SOCIETY ARTS</span>
+          <div class="login-logo">
+            <img src="https://pub-acb560f551f141db830964aed1fa005f.r2.dev/site-assets/SA%20Wordmark%20Horizontal.svg" alt="Society Arts">
+          </div>
           <h1 class="login-title">FAQ Admin</h1>
           <p class="login-subtitle">Enter admin password to continue</p>
         </div>
