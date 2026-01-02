@@ -45,6 +45,55 @@
       flex-direction: column;
       overflow: hidden;
     }
+    
+    .loading-state {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-family: var(--font-sans);
+      color: var(--color-text-muted);
+    }
+    
+    .error-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-family: var(--font-sans);
+      color: var(--color-text-secondary);
+      text-align: center;
+      padding: 40px;
+    }
+    
+    .error-state h2 {
+      font-family: var(--font-serif);
+      font-size: 24px;
+      margin-bottom: 12px;
+      color: var(--color-text-primary);
+    }
+    
+    .error-state p {
+      margin-bottom: 20px;
+      max-width: 400px;
+    }
+    
+    .error-state button {
+      padding: 12px 24px;
+      background: var(--color-accent);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-family: var(--font-sans);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    
+    .error-state button:hover {
+      background: var(--color-accent-hover);
+    }
   </style>
 </head>
 <body>
@@ -68,63 +117,132 @@
     const { useState, useEffect } = React;
 
     function StyleFinderPage() {
-      const { Header, Sidebar, Footer, StylePickerModal } = window.SocietyArts || {};
+      const [loadError, setLoadError] = useState(null);
+      const [isReady, setIsReady] = useState(false);
+      
+      const { Header, Sidebar, StylePickerModal } = window.SocietyArts || {};
       const { user, profile } = window.SocietyArts?.useAuth ? 
         window.SocietyArts.useAuth() : { user: null, profile: null };
       
-      // Loading check
-      if (!Sidebar || !Header || !StylePickerModal) {
-        return React.createElement('div', { className: 'loading-state' }, 'Loading...');
-      }
+      // Check component availability
+      useEffect(() => {
+        const checkComponents = () => {
+          const missing = [];
+          if (!window.SocietyArts?.Sidebar) missing.push('Sidebar');
+          if (!window.SocietyArts?.Header) missing.push('Header');
+          if (!window.SocietyArts?.StylePickerModal) missing.push('StylePickerModal');
+          
+          if (missing.length > 0) {
+            console.warn('Missing components:', missing);
+          }
+          
+          // If we have Sidebar and Header, we can at least show the page shell
+          if (window.SocietyArts?.Sidebar && window.SocietyArts?.Header) {
+            setIsReady(true);
+          }
+        };
+        
+        // Initial check
+        checkComponents();
+        
+        // Recheck a few times in case components are still loading
+        const checks = [100, 300, 500, 1000, 2000];
+        checks.forEach(delay => {
+          setTimeout(checkComponents, delay);
+        });
+      }, []);
       
       // Handle starting a project with a selected style
       const handleStartProject = (styleId) => {
-        // Navigate to story builder with the style pre-selected
         window.location.href = `/story-builder.html?style=${styleId}`;
       };
       
       // Handle adding a style to a collection
       const handleAddToCollection = (styleId) => {
-        // For now, navigate to collections with the style to add
-        // In the future, this could open a collection picker modal
         if (!user) {
-          // Show auth modal or redirect to sign in
-          window.SocietyArts?.showAuthModal?.('signin');
+          window.SocietyArts?.openAuthModal?.();
           return;
         }
         window.location.href = `/collections.html?add=${styleId}`;
       };
+      
+      // Show error state if components never load
+      if (loadError) {
+        return (
+          <div className="error-state">
+            <h2>Unable to Load Style Finder</h2>
+            <p>{loadError}</p>
+            <button onClick={() => window.location.reload()}>
+              Try Again
+            </button>
+          </div>
+        );
+      }
+      
+      // Show loading until ready
+      if (!isReady) {
+        return <div className="loading-state">Loading Style Finder...</div>;
+      }
+      
+      // Get components (re-fetch in case they loaded after initial render)
+      const CurrentSidebar = window.SocietyArts?.Sidebar;
+      const CurrentHeader = window.SocietyArts?.Header;
+      const CurrentStylePicker = window.SocietyArts?.StylePickerModal;
 
       return (
         <div className="page-container">
-          <Sidebar activePage="style-finder" />
-          <Header title="Style Finder" />
+          {CurrentSidebar && <CurrentSidebar activePage="style-finder" />}
+          {CurrentHeader && <CurrentHeader title="Style Finder" user={user} profile={profile} />}
           
           <div className="style-finder-wrapper">
-            <StylePickerModal
-              mode="standalone"
-              context="browse"
-              onStartProject={handleStartProject}
-              onAddToCollection={handleAddToCollection}
-            />
+            {CurrentStylePicker ? (
+              <CurrentStylePicker
+                mode="standalone"
+                context="browse"
+                onStartProject={handleStartProject}
+                onAddToCollection={handleAddToCollection}
+              />
+            ) : (
+              <div className="error-state">
+                <h2>Style Finder Not Available</h2>
+                <p>The Style Finder component failed to load. Please check the console for errors.</p>
+                <button onClick={() => window.location.reload()}>
+                  Reload Page
+                </button>
+              </div>
+            )}
           </div>
-          
-          <Footer />
         </div>
       );
     }
 
-    // Wait for all scripts to load
-    window.addEventListener('DOMContentLoaded', () => {
-      const checkAndRender = () => {
-        if (window.SocietyArts?.Header && window.SocietyArts?.Sidebar && window.SocietyArts?.StylePickerModal) {
-          const root = ReactDOM.createRoot(document.getElementById('root'));
-          root.render(<StyleFinderPage />);
+    // Initialize the app
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    
+    function waitForComponents(callback, maxAttempts = 50) {
+      let attempts = 0;
+      const check = () => {
+        attempts++;
+        const hasCore = window.SocietyArts?.Sidebar && window.SocietyArts?.Header;
+        const hasSupabase = window.SocietyArts?.supabase?.from || window.supabaseClient?.from;
+        
+        console.log(`[StyleFinder] Check ${attempts}: Core=${!!hasCore}, Supabase=${!!hasSupabase}, StylePicker=${!!window.SocietyArts?.StylePickerModal}`);
+        
+        if (hasCore && hasSupabase) {
+          callback();
+        } else if (attempts < maxAttempts) {
+          setTimeout(check, 100);
         } else {
-          setTimeout(checkAndRender, 50);
+          console.error('[StyleFinder] Components failed to load after', attempts, 'attempts');
+          // Render anyway to show error state
+          callback();
         }
       };
-      checkAndRender();
+      check();
+    }
+    
+    waitForComponents(() => {
+      root.render(<StyleFinderPage />);
     });
   </script>
 </body>
