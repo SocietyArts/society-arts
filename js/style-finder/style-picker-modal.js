@@ -10,6 +10,7 @@
  * Required: 
  * - /css/style-finder.css
  * - /js/style-finder/style-data.js (for image URL helpers)
+ * - /js/shared/add-to-collection-modal.js (for Add to Collection functionality)
  * - window.SocietyArts.supabase
  */
 
@@ -354,12 +355,23 @@ function StylePickerModal({
     if (detailStyle) setDetailStyle(null);
   };
 
-  const handleAddToCollectionClick = (styleId, e) => {
+  // FIXED: Add to Collection handler - now properly opens the modal when no callback is provided
+  const handleAddToCollectionClick = (styleId, styleName, e) => {
     if (e) e.stopPropagation();
+    setOpenKebab(null);
+    
+    // If custom callback provided (e.g., from collections page), use it
     if (onAddToCollection) {
       onAddToCollection(styleId);
+      return;
     }
-    setOpenKebab(null);
+    
+    // Otherwise, open the Add to Collection modal (this is the fix!)
+    if (window.SocietyArts?.openAddToCollectionModal) {
+      window.SocietyArts.openAddToCollectionModal(styleId, styleName || null);
+    } else {
+      console.warn('[StylePickerModal] Add to Collection modal not available. Make sure /js/shared/add-to-collection-modal.js is loaded.');
+    }
   };
 
   const handleStartProjectClick = (styleId, e) => {
@@ -833,7 +845,7 @@ function StylePickerModal({
                           Start a Project
                         </button>
                       )}
-                      <button className="sp-kebab-menu-item" onClick={(e) => handleAddToCollectionClick(style.id, e)}>
+                      <button className="sp-kebab-menu-item" onClick={(e) => handleAddToCollectionClick(style.id, style.name, e)}>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                           <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
                         </svg>
@@ -957,7 +969,7 @@ function StylePickerModal({
                   )}
                   <button 
                     className="style-detail-btn-secondary"
-                    onClick={() => handleAddToCollectionClick(detailStyle.id)}
+                    onClick={() => handleAddToCollectionClick(detailStyle.id, detailStyle.name)}
                   >
                     Add to Collection
                   </button>
