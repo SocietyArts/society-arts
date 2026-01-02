@@ -53,6 +53,19 @@ password, reset password, forgot password, change password, can't log in, login 
 }
 
 exports.handler = async (event, context) => {
+  // Handle CORS preflight - must come first
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      },
+      body: '',
+    };
+  }
+
   // Only allow POST requests
   if (event.httpMethod !== 'POST') {
     return {
@@ -63,19 +76,6 @@ exports.handler = async (event, context) => {
         'Access-Control-Allow-Headers': 'Content-Type',
       },
       body: JSON.stringify({ error: 'Method not allowed' }),
-    };
-  }
-
-  // Handle CORS preflight
-  if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      },
-      body: '',
     };
   }
 
@@ -97,6 +97,20 @@ exports.handler = async (event, context) => {
       };
     }
 
+    // Check for API key
+    if (!process.env.ANTHROPIC_API_KEY) {
+      return {
+        statusCode: 500,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
+        body: JSON.stringify({ 
+          error: 'ANTHROPIC_API_KEY environment variable not set' 
+        }),
+      };
+    }
+
     // Initialize Anthropic client
     const client = new Anthropic({
       apiKey: process.env.ANTHROPIC_API_KEY,
@@ -107,7 +121,7 @@ exports.handler = async (event, context) => {
 
     // Call Claude API
     const response = await client.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-3-5-sonnet-20241022',
       max_tokens: 1000,
       messages: [
         {
