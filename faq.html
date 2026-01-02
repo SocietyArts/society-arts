@@ -564,10 +564,26 @@
           })).filter(group => group.faqs.length > 0);
         }
         
-        const matchingFaqs = faqs.filter(faq => 
-          faq.question.toLowerCase().includes(query) ||
-          faq.answer.toLowerCase().includes(query)
-        );
+// Search across question, answer, AND keywords
+const matchingFaqs = faqs.filter(faq => {
+  const questionMatch = faq.question.toLowerCase().includes(query);
+  const answerMatch = faq.answer.toLowerCase().includes(query);
+  const keywordMatch = faq.keywords && faq.keywords.toLowerCase().includes(query);
+  return questionMatch || answerMatch || keywordMatch;
+});
+
+// Sort by relevance: keyword matches first, then question, then answer
+matchingFaqs.sort((a, b) => {
+  const aKeyword = a.keywords && a.keywords.toLowerCase().includes(query) ? 0 : 1;
+  const bKeyword = b.keywords && b.keywords.toLowerCase().includes(query) ? 0 : 1;
+  if (aKeyword !== bKeyword) return aKeyword - bKeyword;
+  
+  const aQuestion = a.question.toLowerCase().includes(query) ? 0 : 1;
+  const bQuestion = b.question.toLowerCase().includes(query) ? 0 : 1;
+  if (aQuestion !== bQuestion) return aQuestion - bQuestion;
+  
+  return a.priority - b.priority;
+});
         
         return categories.map(category => ({
           category,
