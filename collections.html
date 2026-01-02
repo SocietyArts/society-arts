@@ -1947,7 +1947,7 @@
     }
     
     .modal-input::placeholder {
-      color: var(--color-text-light);
+      color: #aaa;
     }
     
     /* Color Picker Grid */
@@ -2870,6 +2870,7 @@
       const [description, setDescription] = useState(collection?.description || '');
       const [selectedColor, setSelectedColor] = useState(collection?.color || palette[0]?.hex);
       const mouseDownOnOverlay = React.useRef(false);
+      const nameInputRef = React.useRef(null);
       
       useEffect(() => {
         if (collection) {
@@ -2883,6 +2884,13 @@
           setSelectedColor(palette[0]?.hex);
         }
       }, [collection, palette]);
+      
+      // Focus name input when modal opens
+      useEffect(() => {
+        if (isOpen && nameInputRef.current) {
+          setTimeout(() => nameInputRef.current?.focus(), 50);
+        }
+      }, [isOpen]);
       
       const handleSave = () => {
         if (!name.trim()) return;
@@ -2932,12 +2940,12 @@
             
             <label className="modal-label">Name</label>
             <input 
+              ref={nameInputRef}
               type="text"
               className="modal-input"
-              placeholder="My Collection"
+              placeholder="Collection Name"
               value={name}
               onChange={e => setName(e.target.value)}
-              autoFocus
               maxLength={50}
             />
             
@@ -2945,7 +2953,7 @@
             <input 
               type="text"
               className="modal-input"
-              placeholder="A brief description..."
+              placeholder="Brief description of this collection..."
               value={description}
               onChange={e => setDescription(e.target.value)}
               maxLength={200}
