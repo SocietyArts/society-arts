@@ -1196,7 +1196,7 @@
     // ========================================
     // STATE
     // ========================================
-    let supabase = null;
+    let supabaseClient = null;
     let currentUser = null;
     let userProfile = null;
     let styles = [];
@@ -1258,12 +1258,12 @@
       try {
         // Initialize Supabase client
         console.log('[StyleAdmin] Creating Supabase client...');
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         console.log('[StyleAdmin] Supabase client created');
         
         // Test connection with a simple query
         console.log('[StyleAdmin] Testing database connection...');
-        const { data: testData, error: testError } = await supabase
+        const { data: testData, error: testError } = await supabaseClient
           .from('styles')
           .select('id')
           .limit(1);
@@ -1276,7 +1276,7 @@
         
         // Check for existing session
         console.log('[StyleAdmin] Checking auth session...');
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
         
         if (sessionError) {
           console.error('[StyleAdmin] Session error:', sessionError);
@@ -1314,7 +1314,7 @@
       loginError.textContent = '';
       
       try {
-        const { data, error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
           email,
           password
         });
@@ -1336,7 +1336,7 @@
       console.log('[StyleAdmin] Checking user role...');
       
       try {
-        const { data: profile, error } = await supabase
+        const { data: profile, error } = await supabaseClient
           .from('user_profiles')
           .select('role, display_name')
           .eq('id', user.id)
@@ -1356,7 +1356,7 @@
         } else if (profile?.role !== 'super_admin') {
           console.warn('[StyleAdmin] User is not super_admin:', profile?.role);
           showToast('Access denied. Super Admin role required.', 'error');
-          await supabase.auth.signOut();
+          await supabaseClient.auth.signOut();
           showLoginScreen();
           return;
         } else {
@@ -1375,7 +1375,7 @@
     }
     
     logoutBtn.addEventListener('click', async () => {
-      await supabase.auth.signOut();
+      await supabaseClient.auth.signOut();
       currentUser = null;
       userProfile = null;
       showLoginScreen();
@@ -1409,55 +1409,55 @@
       try {
         // Load lookup tables individually to identify failures
         console.log('[StyleAdmin] Loading art_types...');
-        const artTypesRes = await supabase.from('art_types').select('id, name').order('name');
+        const artTypesRes = await supabaseClient.from('art_types').select('id, name').order('name');
         if (artTypesRes.error) console.error('[StyleAdmin] art_types error:', artTypesRes.error);
         lookups.art_types = artTypesRes.data || [];
         console.log('[StyleAdmin] art_types loaded:', lookups.art_types.length);
         
         console.log('[StyleAdmin] Loading mediums...');
-        const mediumsRes = await supabase.from('mediums').select('id, name').order('name');
+        const mediumsRes = await supabaseClient.from('mediums').select('id, name').order('name');
         if (mediumsRes.error) console.error('[StyleAdmin] mediums error:', mediumsRes.error);
         lookups.mediums = mediumsRes.data || [];
         console.log('[StyleAdmin] mediums loaded:', lookups.mediums.length);
         
         console.log('[StyleAdmin] Loading palettes...');
-        const palettesRes = await supabase.from('palettes').select('id, name').order('name');
+        const palettesRes = await supabaseClient.from('palettes').select('id, name').order('name');
         if (palettesRes.error) console.error('[StyleAdmin] palettes error:', palettesRes.error);
         lookups.palettes = palettesRes.data || [];
         console.log('[StyleAdmin] palettes loaded:', lookups.palettes.length);
         
         console.log('[StyleAdmin] Loading lighting...');
-        const lightingRes = await supabase.from('lighting').select('id, name').order('name');
+        const lightingRes = await supabaseClient.from('lighting').select('id, name').order('name');
         if (lightingRes.error) console.error('[StyleAdmin] lighting error:', lightingRes.error);
         lookups.lighting = lightingRes.data || [];
         console.log('[StyleAdmin] lighting loaded:', lookups.lighting.length);
         
         console.log('[StyleAdmin] Loading compositions...');
-        const compositionsRes = await supabase.from('compositions').select('id, name').order('name');
+        const compositionsRes = await supabaseClient.from('compositions').select('id, name').order('name');
         if (compositionsRes.error) console.error('[StyleAdmin] compositions error:', compositionsRes.error);
         lookups.compositions = compositionsRes.data || [];
         console.log('[StyleAdmin] compositions loaded:', lookups.compositions.length);
         
         console.log('[StyleAdmin] Loading cultures...');
-        const culturesRes = await supabase.from('cultures').select('id, name').order('name');
+        const culturesRes = await supabaseClient.from('cultures').select('id, name').order('name');
         if (culturesRes.error) console.error('[StyleAdmin] cultures error:', culturesRes.error);
         lookups.cultures = culturesRes.data || [];
         console.log('[StyleAdmin] cultures loaded:', lookups.cultures.length);
         
         console.log('[StyleAdmin] Loading eras...');
-        const erasRes = await supabase.from('eras').select('id, name').order('name');
+        const erasRes = await supabaseClient.from('eras').select('id, name').order('name');
         if (erasRes.error) console.error('[StyleAdmin] eras error:', erasRes.error);
         lookups.eras = erasRes.data || [];
         console.log('[StyleAdmin] eras loaded:', lookups.eras.length);
         
         console.log('[StyleAdmin] Loading styles...');
-        const stylesRes = await supabase.from('styles').select('*').order('id');
+        const stylesRes = await supabaseClient.from('styles').select('*').order('id');
         if (stylesRes.error) console.error('[StyleAdmin] styles error:', stylesRes.error);
         styles = stylesRes.data || [];
         console.log('[StyleAdmin] styles loaded:', styles.length);
         
         console.log('[StyleAdmin] Counting active styles...');
-        const activeCountRes = await supabase.from('styles').select('id', { count: 'exact' }).eq('is_active', true);
+        const activeCountRes = await supabaseClient.from('styles').select('id', { count: 'exact' }).eq('is_active', true);
         if (activeCountRes.error) console.error('[StyleAdmin] active count error:', activeCountRes.error);
         
         // Update stats
@@ -1723,7 +1723,7 @@
         modalSave.disabled = true;
         modalSave.textContent = 'Saving...';
         
-        const { error } = await supabase
+        const { error } = await supabaseClient
           .from('styles')
           .update(updates)
           .eq('id', editingStyleId);
