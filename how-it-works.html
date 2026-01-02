@@ -34,17 +34,13 @@
     }
     
     .hiw-header {
-      text-align: center;
-      margin-bottom: var(--space-3xl);
-      max-width: 900px;
-      margin-left: auto;
-      margin-right: auto;
+      margin-bottom: var(--space-2xl);
+      max-width: 800px;
     }
     
     .hiw-breadcrumb {
       display: flex;
       align-items: center;
-      justify-content: center;
       gap: var(--space-sm);
       font-size: var(--text-sm);
       color: var(--color-text-muted);
@@ -64,15 +60,15 @@
     .hiw-title {
       font-family: var(--font-serif);
       font-size: var(--text-3xl);
-      font-weight: var(--weight-normal);
+      font-weight: var(--weight-medium);
       color: var(--color-text-primary);
-      margin: 0 0 var(--space-md) 0;
+      margin-bottom: var(--space-sm);
     }
     
     .hiw-subtitle {
-      font-size: var(--text-lg);
+      font-size: var(--text-base);
       color: var(--color-text-muted);
-      margin: 0;
+      line-height: var(--leading-relaxed);
     }
     
     /* Formula Section */
@@ -80,12 +76,9 @@
       background: white;
       border-radius: var(--radius-xl);
       padding: var(--space-3xl);
-      margin-bottom: var(--space-3xl);
+      margin-bottom: var(--space-2xl);
       border: 1px solid var(--color-border-light);
-      text-align: center;
       max-width: 900px;
-      margin-left: auto;
-      margin-right: auto;
     }
     
     .formula {
@@ -155,18 +148,16 @@
     
     /* Steps Section */
     .steps-section {
-      margin-bottom: var(--space-3xl);
+      margin-bottom: var(--space-2xl);
       max-width: 900px;
-      margin-left: auto;
-      margin-right: auto;
     }
     
     .steps-title {
       font-family: var(--font-serif);
-      font-size: var(--text-2xl);
+      font-size: var(--text-lg);
+      font-weight: var(--weight-semibold);
       color: var(--color-text-primary);
-      margin: 0 0 var(--space-2xl) 0;
-      text-align: center;
+      margin: 0 0 var(--space-lg) 0;
     }
     
     .steps {
@@ -215,12 +206,10 @@
     
     /* CTA */
     .cta-section {
-      text-align: center;
       padding: var(--space-3xl);
       background: var(--color-tan-10);
       border-radius: var(--radius-lg);
       max-width: 900px;
-      margin: 0 auto;
     }
     
     .cta-title {
@@ -365,12 +354,16 @@
               <span>How It Works</span>
             </div>
             
+            {/* Header - Left aligned like video-guides */}
             <div className="hiw-header">
               <h1 className="hiw-title">How It Works</h1>
-              <p className="hiw-subtitle">Transform your memories into beautiful art in minutes</p>
+              <p className="hiw-subtitle">
+                Transform your memories into beautiful art in minutes. 
+                Your story combined with our curated styles creates unique, wall-worthy artwork.
+              </p>
             </div>
             
-            {/* Formula */}
+            {/* Formula - Left aligned box, centered content inside */}
             <div className="formula-section">
               <div className="formula">
                 <div className="formula-item">
@@ -394,7 +387,7 @@
               </div>
             </div>
             
-            {/* Steps */}
+            {/* Steps - Left aligned */}
             <div className="steps-section">
               <h2 className="steps-title">Step by Step</h2>
               <div className="steps">
@@ -410,7 +403,7 @@
               </div>
             </div>
             
-            {/* CTA */}
+            {/* CTA - Left aligned */}
             <div className="cta-section">
               <h2 className="cta-title">Ready to Begin?</h2>
               <p className="cta-text">Create your first piece of art from a memory.</p>
