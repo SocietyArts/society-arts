@@ -1040,11 +1040,11 @@
       <!-- Toolbar -->
       <div class="toolbar">
         <div class="toolbar-left">
+          <select class="filter-select" id="artMediumFilter" style="min-width: 240px;">
+            <option value="">All Art Mediums (14 Categories)</option>
+          </select>
           <select class="filter-select" id="artTypeFilter">
             <option value="">All Art Types</option>
-          </select>
-          <select class="filter-select" id="mediumFilter">
-            <option value="">All Mediums</option>
           </select>
           <select class="filter-select" id="eraFilter">
             <option value="">All Eras</option>
@@ -1118,6 +1118,14 @@
             <div class="form-section">
               <div class="form-section-title">Primary Classifications</div>
               <div class="form-row">
+                <div class="form-group" style="grid-column: 1 / -1;">
+                  <label class="form-label" for="editArtMedium">Art Medium (14 Categories) <span style="color: var(--color-coral);">★</span></label>
+                  <select class="form-select" id="editArtMedium" style="border-color: var(--color-coral);">
+                    <option value="">Select Art Medium</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
                 <div class="form-group">
                   <label class="form-label" for="editArtType">Art Type</label>
                   <select class="form-select" id="editArtType">
@@ -1125,7 +1133,7 @@
                   </select>
                 </div>
                 <div class="form-group">
-                  <label class="form-label" for="editMedium">Medium</label>
+                  <label class="form-label" for="editMedium">Medium (Specific)</label>
                   <select class="form-select" id="editMedium">
                     <option value="">Select Medium</option>
                   </select>
@@ -1201,7 +1209,9 @@
     let userProfile = null;
     let styles = [];
     let filteredStyles = [];
+    let styleArtMediums = []; // Junction table data
     let lookups = {
+      art_mediums: [],  // The 14 Art Medium categories (AMD001-AMD014)
       art_types: [],
       mediums: [],
       palettes: [],
@@ -1232,8 +1242,8 @@
     const filteredCountEl = document.getElementById('filteredCount');
     const resultsCountEl = document.getElementById('resultsCount');
     
+    const artMediumFilter = document.getElementById('artMediumFilter');
     const artTypeFilter = document.getElementById('artTypeFilter');
-    const mediumFilter = document.getElementById('mediumFilter');
     const eraFilter = document.getElementById('eraFilter');
     const searchInput = document.getElementById('searchInput');
     const stylesGrid = document.getElementById('stylesGrid');
@@ -1407,7 +1417,21 @@
       console.log('[StyleAdmin] Loading data...');
       
       try {
-        // Load lookup tables individually to identify failures
+        // Load the 14 Art Mediums first (primary filter)
+        console.log('[StyleAdmin] Loading art_mediums (14 categories)...');
+        const artMediumsRes = await supabaseClient.from('art_mediums').select('id, name').order('id');
+        if (artMediumsRes.error) console.error('[StyleAdmin] art_mediums error:', artMediumsRes.error);
+        lookups.art_mediums = artMediumsRes.data || [];
+        console.log('[StyleAdmin] art_mediums loaded:', lookups.art_mediums.length);
+        
+        // Load style_art_mediums junction table
+        console.log('[StyleAdmin] Loading style_art_mediums junction table...');
+        const styleArtMediumsRes = await supabaseClient.from('style_art_mediums').select('style_id, art_medium_id, is_primary');
+        if (styleArtMediumsRes.error) console.error('[StyleAdmin] style_art_mediums error:', styleArtMediumsRes.error);
+        styleArtMediums = styleArtMediumsRes.data || [];
+        console.log('[StyleAdmin] style_art_mediums loaded:', styleArtMediums.length);
+        
+        // Load other lookup tables
         console.log('[StyleAdmin] Loading art_types...');
         const artTypesRes = await supabaseClient.from('art_types').select('id, name').order('name');
         if (artTypesRes.error) console.error('[StyleAdmin] art_types error:', artTypesRes.error);
@@ -1480,13 +1504,21 @@
     }
     
     function populateFilterDropdowns() {
+      // Art Mediums (14 categories) with counts
+      const artMediumCounts = {};
+      styleArtMediums.forEach(sam => {
+        artMediumCounts[sam.art_medium_id] = (artMediumCounts[sam.art_medium_id] || 0) + 1;
+      });
+      
+      artMediumFilter.innerHTML = '<option value="">All Art Mediums (14 Categories)</option>' +
+        lookups.art_mediums.map(am => {
+          const count = artMediumCounts[am.id] || 0;
+          return `<option value="${am.id}">${am.name} (${count})</option>`;
+        }).join('');
+      
       // Art Types
       artTypeFilter.innerHTML = '<option value="">All Art Types</option>' +
         lookups.art_types.map(at => `<option value="${at.id}">${at.name}</option>`).join('');
-      
-      // Mediums
-      mediumFilter.innerHTML = '<option value="">All Mediums</option>' +
-        lookups.mediums.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
       
       // Eras
       eraFilter.innerHTML = '<option value="">All Eras</option>' +
@@ -1494,6 +1526,10 @@
     }
     
     function populateEditDropdowns() {
+      // Art Mediums (14 categories)
+      document.getElementById('editArtMedium').innerHTML = '<option value="">Select Art Medium</option>' +
+        lookups.art_mediums.map(am => `<option value="${am.id}">${am.id} - ${am.name}</option>`).join('');
+      
       document.getElementById('editArtType').innerHTML = '<option value="">Select Art Type</option>' +
         lookups.art_types.map(at => `<option value="${at.id}">${at.name}</option>`).join('');
       
@@ -1519,8 +1555,8 @@
     // ========================================
     // FILTERING
     // ========================================
+    artMediumFilter.addEventListener('change', applyFilters);
     artTypeFilter.addEventListener('change', applyFilters);
-    mediumFilter.addEventListener('change', applyFilters);
     eraFilter.addEventListener('change', applyFilters);
     
     let searchTimeout;
@@ -1530,17 +1566,27 @@
     });
     
     function applyFilters() {
+      const artMediumId = artMediumFilter.value;
       const artTypeId = artTypeFilter.value;
-      const mediumId = mediumFilter.value;
       const eraId = eraFilter.value;
       const searchTerm = searchInput.value.toLowerCase().trim();
       
+      // Build set of style IDs that match Art Medium filter
+      let artMediumStyleIds = null;
+      if (artMediumId) {
+        artMediumStyleIds = new Set(
+          styleArtMediums
+            .filter(sam => sam.art_medium_id === artMediumId)
+            .map(sam => sam.style_id)
+        );
+      }
+      
       filteredStyles = styles.filter(style => {
+        // Art Medium filter (via junction table)
+        if (artMediumStyleIds && !artMediumStyleIds.has(style.id)) return false;
+        
         // Art Type filter
         if (artTypeId && style.art_type_id !== artTypeId) return false;
-        
-        // Medium filter
-        if (mediumId && style.primary_medium_id !== mediumId) return false;
         
         // Era filter
         if (eraId && style.era_id !== eraId) return false;
@@ -1597,7 +1643,9 @@
       }
       
       stylesGrid.innerHTML = pageStyles.map(style => {
-        const artType = lookups.art_types.find(at => at.id === style.art_type_id);
+        // Find Art Medium from junction table
+        const styleArtMedium = styleArtMediums.find(sam => sam.style_id === style.id);
+        const artMedium = styleArtMedium ? lookups.art_mediums.find(am => am.id === styleArtMedium.art_medium_id) : null;
         const imageUrl = `${R2_BASE_URL}/${style.id}/${style.id}-00.webp`;
         
         return `
@@ -1611,7 +1659,7 @@
               <div class="style-name">${style.name || 'Untitled'}</div>
               <div class="style-category">
                 <span class="style-category-dot"></span>
-                ${artType?.name || 'Uncategorized'}
+                ${artMedium?.name || 'No Art Medium'}
               </div>
             </div>
           </div>
@@ -1669,7 +1717,11 @@
       document.getElementById('editTagline').value = style.tagline || '';
       document.getElementById('editDescription').value = style.description || '';
       
-      // Set dropdowns
+      // Set Art Medium from junction table
+      const styleArtMedium = styleArtMediums.find(sam => sam.style_id === styleId);
+      document.getElementById('editArtMedium').value = styleArtMedium?.art_medium_id || '';
+      
+      // Set other dropdowns
       document.getElementById('editArtType').value = style.art_type_id || '';
       document.getElementById('editMedium').value = style.primary_medium_id || '';
       document.getElementById('editPalette').value = style.primary_palette_id || '';
@@ -1705,6 +1757,8 @@
     modalSave.addEventListener('click', async () => {
       if (!editingStyleId) return;
       
+      const newArtMediumId = document.getElementById('editArtMedium').value || null;
+      
       const updates = {
         name: document.getElementById('editName').value.trim(),
         tagline: document.getElementById('editTagline').value.trim() || null,
@@ -1723,18 +1777,66 @@
         modalSave.disabled = true;
         modalSave.textContent = 'Saving...';
         
-        const { error } = await supabaseClient
+        // Update styles table
+        const { error: styleError } = await supabaseClient
           .from('styles')
           .update(updates)
           .eq('id', editingStyleId);
         
-        if (error) throw error;
+        if (styleError) throw styleError;
         
-        // Update local state
+        // Update Art Medium in junction table
+        const currentArtMedium = styleArtMediums.find(sam => sam.style_id === editingStyleId);
+        
+        if (newArtMediumId && currentArtMedium) {
+          // Update existing record
+          if (currentArtMedium.art_medium_id !== newArtMediumId) {
+            const { error: junctionError } = await supabaseClient
+              .from('style_art_mediums')
+              .update({ art_medium_id: newArtMediumId })
+              .eq('style_id', editingStyleId)
+              .eq('is_primary', true);
+            
+            if (junctionError) {
+              console.error('Junction update error:', junctionError);
+              showToast('Style saved, but Art Medium update failed', 'warning');
+            } else {
+              // Update local state
+              currentArtMedium.art_medium_id = newArtMediumId;
+            }
+          }
+        } else if (newArtMediumId && !currentArtMedium) {
+          // Insert new record
+          const { error: insertError } = await supabaseClient
+            .from('style_art_mediums')
+            .insert({
+              style_id: editingStyleId,
+              art_medium_id: newArtMediumId,
+              is_primary: true,
+              confidence_score: 1.0
+            });
+          
+          if (insertError) {
+            console.error('Junction insert error:', insertError);
+            showToast('Style saved, but Art Medium insert failed', 'warning');
+          } else {
+            // Update local state
+            styleArtMediums.push({
+              style_id: editingStyleId,
+              art_medium_id: newArtMediumId,
+              is_primary: true
+            });
+          }
+        }
+        
+        // Update local styles state
         const styleIndex = styles.findIndex(s => s.id === editingStyleId);
         if (styleIndex !== -1) {
           styles[styleIndex] = { ...styles[styleIndex], ...updates };
         }
+        
+        // Refresh filter counts
+        populateFilterDropdowns();
         
         // Re-render
         applyFilters();
