@@ -3574,6 +3574,7 @@
       const [collections, setCollections] = useState([]);
       const [palette, setPalette] = useState(DEFAULT_PALETTE);
       const [isLoading, setIsLoading] = useState(true);
+      const [authChecked, setAuthChecked] = useState(false);
       const [authModalOpen, setAuthModalOpen] = useState(false);
       const [createModalOpen, setCreateModalOpen] = useState(false);
       const [editingCollection, setEditingCollection] = useState(null);
@@ -3648,6 +3649,33 @@
         return window.SocietyArts?.supabase || window.supabaseClient || window.supabase;
       };
 
+      // Wait for auth to properly initialize before showing login prompt
+      useEffect(() => {
+        const checkAuth = async () => {
+          // If authLoading is true, wait for it
+          if (authLoading) return;
+          
+          // Double-check session directly from Supabase
+          const supabase = getSupabase();
+          if (supabase) {
+            try {
+              const { data: { session } } = await supabase.auth.getSession();
+              // If there's a session but no user yet, wait a bit for useAuth to catch up
+              if (session && !user) {
+                setTimeout(() => setAuthChecked(true), 100);
+                return;
+              }
+            } catch (e) {
+              console.log('Session check error:', e);
+            }
+          }
+          
+          setAuthChecked(true);
+        };
+        
+        checkAuth();
+      }, [authLoading, user]);
+
       // Load palette from admin_settings
       useEffect(() => {
         const loadPalette = async () => {
@@ -3712,8 +3740,11 @@
       useEffect(() => {
         if (user) {
           loadCollections();
+        } else if (authChecked && !authLoading) {
+          // No user after auth check - stop loading
+          setIsLoading(false);
         }
-      }, [user, loadCollections]);
+      }, [user, authChecked, authLoading, loadCollections]);
 
       // Get root collections (no parent)
       const rootCollections = collections.filter(c => !c.parent_id);
@@ -3997,7 +4028,7 @@
             )}
             
             {/* Main Content */}
-            {authLoading || isLoading ? (
+            {authLoading || isLoading || !authChecked ? (
               <div className="loading-state">Loading...</div>
             ) : !user ? (
               <div className="login-prompt">
