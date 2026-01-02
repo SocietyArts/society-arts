@@ -4476,8 +4476,8 @@
               ))}
             </div>
             
-            {/* Page Header (only on root view) */}
-            {!currentView && (
+            {/* Page Header (only when viewing collections list) */}
+            {!currentView && user && rootCollections.length > 0 && (
               <div className="collections-header">
                 <h1 className="collections-title">Collections</h1>
                 <p className="collections-subtitle">Organize and save your favorite art styles</p>
