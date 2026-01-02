@@ -13,6 +13,8 @@
  * - window.SocietyArts.supabase
  */
 
+console.log('[StylePickerModal] Script starting...');
+
 // Medium categories for faceted navigation - uses AMD codes from art_mediums table
 const MEDIUM_CATEGORIES = {
   painting: {
@@ -68,6 +70,41 @@ const OVERLAYS = [
   { id: 'historic', name: 'Historic' }
 ];
 
+// Helper to safely get Supabase client
+const getSupabase = () => {
+  return window.SocietyArts?.supabase || window.supabaseClient || window.supabase;
+};
+
+// Helper to safely get style thumbnail URL
+const getStyleThumbnailUrl = (styleId, index = 0) => {
+  if (window.SocietyArts?.getStyleThumbnailUrl) {
+    return window.SocietyArts.getStyleThumbnailUrl(styleId, index);
+  }
+  // Fallback
+  const paddedIndex = String(index).padStart(2, '0');
+  return `https://pub-acb560f551f141db830964aed1fa005f.r2.dev/${styleId}/${styleId}-${paddedIndex}.webp`;
+};
+
+// Helper to safely get style preview URL
+const getStylePreviewUrl = (styleId, index) => {
+  if (window.SocietyArts?.getStylePreviewUrl) {
+    return window.SocietyArts.getStylePreviewUrl(styleId, index);
+  }
+  // Fallback
+  const paddedIndex = String(index).padStart(2, '0');
+  return `https://pub-acb560f551f141db830964aed1fa005f.r2.dev/${styleId}/${styleId}-${paddedIndex}.webp`;
+};
+
+// Helper to safely get style full URL
+const getStyleFullUrl = (styleId, index) => {
+  if (window.SocietyArts?.getStyleFullUrl) {
+    return window.SocietyArts.getStyleFullUrl(styleId, index);
+  }
+  // Fallback
+  const paddedIndex = String(index).padStart(2, '0');
+  return `https://pub-acb560f551f141db830964aed1fa005f.r2.dev/${styleId}/${styleId}-${paddedIndex}.webp`;
+};
+
 /**
  * StylePickerModal - The core style finder component
  * 
@@ -99,6 +136,7 @@ function StylePickerModal({
   const [allStyles, setAllStyles] = useState([]);
   const [filteredStyles, setFilteredStyles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedMediums, setSelectedMediums] = useState(new Set());
   const [selectedOverlays, setSelectedOverlays] = useState(new Set());
@@ -108,10 +146,18 @@ function StylePickerModal({
   
   // Enhanced states
   const [isMaximized, setIsMaximized] = useState(() => {
-    return localStorage.getItem('stylePickerMaximized') === 'true';
+    try {
+      return localStorage.getItem('stylePickerMaximized') === 'true';
+    } catch {
+      return false;
+    }
   });
   const [gridDensity, setGridDensity] = useState(() => {
-    return parseInt(localStorage.getItem('stylePickerDensity')) || 3;
+    try {
+      return parseInt(localStorage.getItem('stylePickerDensity')) || 3;
+    } catch {
+      return 3;
+    }
   });
   const [favorites, setFavorites] = useState(new Set());
   const [detailStyle, setDetailStyle] = useState(null);
@@ -136,11 +182,19 @@ function StylePickerModal({
 
   // Save preferences to localStorage
   useEffect(() => {
-    localStorage.setItem('stylePickerMaximized', isMaximized);
+    try {
+      localStorage.setItem('stylePickerMaximized', isMaximized);
+    } catch (e) {
+      console.warn('Could not save maximized preference:', e);
+    }
   }, [isMaximized]);
 
   useEffect(() => {
-    localStorage.setItem('stylePickerDensity', gridDensity);
+    try {
+      localStorage.setItem('stylePickerDensity', gridDensity);
+    } catch (e) {
+      console.warn('Could not save density preference:', e);
+    }
   }, [gridDensity]);
 
   // Close kebab menu when clicking outside
@@ -185,7 +239,9 @@ function StylePickerModal({
 
   const checkSuperAdmin = async () => {
     try {
-      const { supabase } = window.SocietyArts;
+      const supabase = getSupabase();
+      if (!supabase) return;
+      
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         const { data: profile } = await supabase
@@ -202,7 +258,9 @@ function StylePickerModal({
 
   const loadFavorites = async () => {
     try {
-      const { supabase } = window.SocietyArts;
+      const supabase = getSupabase();
+      if (!supabase) return;
+      
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         const { data } = await supabase
@@ -221,7 +279,9 @@ function StylePickerModal({
   const toggleFavorite = async (styleId, e) => {
     if (e) e.stopPropagation();
     try {
-      const { supabase } = window.SocietyArts;
+      const supabase = getSupabase();
+      if (!supabase) return;
+      
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
@@ -257,13 +317,17 @@ function StylePickerModal({
   const openStyleDetail = async (style, e) => {
     if (e) e.stopPropagation();
     try {
-      const { supabase } = window.SocietyArts;
-      const { data } = await supabase
-        .from('styles')
-        .select('*')
-        .eq('id', style.id)
-        .single();
-      setDetailStyle(data || style);
+      const supabase = getSupabase();
+      if (supabase) {
+        const { data } = await supabase
+          .from('styles')
+          .select('*')
+          .eq('id', style.id)
+          .single();
+        setDetailStyle(data || style);
+      } else {
+        setDetailStyle(style);
+      }
     } catch (error) {
       setDetailStyle(style);
     }
@@ -314,7 +378,9 @@ function StylePickerModal({
 
   const handleUnlist = async (styleId) => {
     try {
-      const { supabase } = window.SocietyArts;
+      const supabase = getSupabase();
+      if (!supabase) return;
+      
       await supabase
         .from('styles')
         .update({ is_active: false })
@@ -335,8 +401,13 @@ function StylePickerModal({
 
   const loadStyles = async () => {
     setLoading(true);
+    setLoadError(null);
+    
     try {
-      const { supabase } = window.SocietyArts;
+      const supabase = getSupabase();
+      if (!supabase) {
+        throw new Error('Database connection not available');
+      }
       
       const { data: stylesData, error } = await supabase
         .from('styles')
@@ -371,6 +442,7 @@ function StylePickerModal({
       setFilteredStyles(stylesWithAttrs);
     } catch (error) {
       console.error('Error loading styles:', error);
+      setLoadError(error.message || 'Failed to load styles');
     }
     setLoading(false);
   };
@@ -458,7 +530,7 @@ function StylePickerModal({
     if (style.thumbnail_url) {
       return style.thumbnail_url;
     }
-    return window.SocietyArts.getStyleThumbnailUrl(style.id, 0);
+    return getStyleThumbnailUrl(style.id, 0);
   };
 
   // Don't render if modal mode and not open
@@ -672,6 +744,11 @@ function StylePickerModal({
               <div className="sp-loading">
                 <div className="sp-spinner"></div>
               </div>
+            ) : loadError ? (
+              <div className="sp-error">
+                <p>Error: {loadError}</p>
+                <button onClick={loadStyles}>Try Again</button>
+              </div>
             ) : (
               filteredStyles.map(style => (
                 <div 
@@ -707,7 +784,7 @@ function StylePickerModal({
                       alt={style.name}
                       loading="lazy"
                       onError={(e) => {
-                        e.target.src = window.SocietyArts.getStyleThumbnailUrl(style.id, 0);
+                        e.target.src = getStyleThumbnailUrl(style.id, 0);
                       }}
                     />
                   </div>
@@ -716,7 +793,7 @@ function StylePickerModal({
                     alt={style.name}
                     loading="lazy"
                     onError={(e) => {
-                      e.target.src = window.SocietyArts.getStyleThumbnailUrl(style.id, 0);
+                      e.target.src = getStyleThumbnailUrl(style.id, 0);
                     }}
                   />
 
@@ -912,7 +989,7 @@ function StylePickerModal({
                       onClick={() => setViewerImage({ styleId: detailStyle.id, imageIndex: num })}
                     >
                       <img 
-                        src={window.SocietyArts.getStylePreviewUrl(detailStyle.id, num)}
+                        src={getStylePreviewUrl(detailStyle.id, num)}
                         alt={`${detailStyle.name} - Image ${num}`}
                         onError={(e) => { e.target.style.opacity = '0.3'; }}
                       />
@@ -945,7 +1022,7 @@ function StylePickerModal({
             
             <div className="image-viewer-container">
               <img 
-                src={window.SocietyArts.getStyleFullUrl(viewerImage.styleId, viewerImage.imageIndex)}
+                src={getStyleFullUrl(viewerImage.styleId, viewerImage.imageIndex)}
                 alt={`Image ${viewerImage.imageIndex}`}
                 draggable={false}
               />
@@ -998,4 +1075,5 @@ if (typeof window !== 'undefined') {
   window.SocietyArts.StylePickerModal = StylePickerModal;
   window.SocietyArts.MEDIUM_CATEGORIES = MEDIUM_CATEGORIES;
   window.SocietyArts.OVERLAYS = OVERLAYS;
+  console.log('✅ [StylePickerModal] Component registered successfully');
 }
