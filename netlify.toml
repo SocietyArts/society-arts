@@ -48,5 +48,19 @@
 # Cache optimized images for 1 year (they're immutable once generated)
 [[headers]]
   for = "/.netlify/images/*"
+
+
+[[plugins]]
+package = "@netlify/plugin-functions-install-core"
+```
+
+---
+
+## If You Don't Have netlify.toml
+
+Can you share the link to your `netlify.toml` file? It should be at:
+```
+https://raw.githubusercontent.com/SocietyArts/society-arts/refs/heads/main/netlify.toml
+  
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
