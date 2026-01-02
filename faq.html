@@ -686,37 +686,46 @@
       useEffect(() => {
         async function fetchFAQs() {
           if (!supabase) {
+            console.error('FAQ: No supabase client');
             setError('Database connection not available');
             setLoading(false);
             return;
           }
           
           try {
+            console.log('FAQ: Fetching categories...');
             const { data: categoriesData, error: categoriesError } = await supabase
               .from('faq_categories')
               .select('*')
-              .eq('is_active', true)
               .order('sort_order');
+            
+            console.log('FAQ: Categories result:', categoriesData, categoriesError);
             
             if (categoriesError) throw categoriesError;
             
+            // Filter active categories client-side if is_active column exists
+            const activeCategories = categoriesData?.filter(c => c.is_active !== false) || [];
+            
+            console.log('FAQ: Fetching FAQs...');
             const { data: faqsData, error: faqsError } = await supabase
               .from('faq')
               .select('*')
               .eq('is_published', true)
               .order('priority');
             
+            console.log('FAQ: FAQs result:', faqsData?.length, 'items', faqsError);
+            
             if (faqsError) throw faqsError;
             
-            setCategories(categoriesData || []);
+            setCategories(activeCategories);
             setFaqs(faqsData || []);
             
             // Select first category by default
-            if (categoriesData && categoriesData.length > 0) {
-              setSelectedCategory(categoriesData[0].id);
+            if (activeCategories.length > 0) {
+              setSelectedCategory(activeCategories[0].id);
             }
           } catch (err) {
-            console.error('Error fetching FAQs:', err);
+            console.error('FAQ: Error fetching data:', err);
             setError(err.message);
           } finally {
             setLoading(false);
@@ -797,6 +806,11 @@
                   <h2 className="faq-sidebar-title">Categories</h2>
                 </div>
                 <nav className="faq-category-list">
+                  {categories.length === 0 && !loading && (
+                    <div style={{ padding: '16px', color: 'var(--color-text-muted)', fontSize: '14px' }}>
+                      No categories found
+                    </div>
+                  )}
                   {categories.map(category => (
                     <button
                       key={category.id}
