@@ -383,11 +383,6 @@ function StylePickerModal({
     if (detailStyle) setDetailStyle(null);
   };
 
-  const handleFlagForReview = async (styleId) => {
-    console.log('Flag for review:', styleId);
-    setOpenKebab(null);
-  };
-
   const handleUnlist = async (styleId) => {
     try {
       const supabase = getSupabase();
@@ -406,8 +401,15 @@ function StylePickerModal({
     }
   };
 
+  const handleFlag = async (styleId) => {
+    console.log('Flag style:', styleId);
+    // TODO: Implement flagging logic
+    setOpenKebab(null);
+  };
+
   const handleEdit = (styleId) => {
     console.log('Edit style:', styleId);
+    // TODO: Implement edit logic
     setOpenKebab(null);
   };
 
@@ -854,19 +856,19 @@ function StylePickerModal({
                       {isSuperAdmin && (
                         <>
                           <div className="sp-kebab-menu-divider"></div>
-                          <button className="sp-kebab-menu-item" onClick={() => handleFlagForReview(style.id)}>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                              <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
-                              <line x1="4" y1="22" x2="4" y2="15"></line>
-                            </svg>
-                            Flag for Review
-                          </button>
                           <button className="sp-kebab-menu-item danger" onClick={() => handleUnlist(style.id)}>
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                               <circle cx="12" cy="12" r="10"></circle>
                               <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
                             </svg>
                             Unlist
+                          </button>
+                          <button className="sp-kebab-menu-item" onClick={() => handleFlag(style.id)}>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+                              <line x1="4" y1="22" x2="4" y2="15"></line>
+                            </svg>
+                            Flag
                           </button>
                           <button className="sp-kebab-menu-item" onClick={() => handleEdit(style.id)}>
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -977,11 +979,11 @@ function StylePickerModal({
                   {isSuperAdmin && (
                     <div className="style-detail-admin">
                       <div className="style-detail-admin-buttons">
-                        <button className="style-detail-admin-btn" onClick={() => handleFlagForReview(detailStyle.id)}>
-                          Flag for Review
-                        </button>
                         <button className="style-detail-admin-btn danger" onClick={() => handleUnlist(detailStyle.id)}>
                           Unlist
+                        </button>
+                        <button className="style-detail-admin-btn" onClick={() => handleFlag(detailStyle.id)}>
+                          Flag
                         </button>
                         <button className="style-detail-admin-btn" onClick={() => handleEdit(detailStyle.id)}>
                           Edit
