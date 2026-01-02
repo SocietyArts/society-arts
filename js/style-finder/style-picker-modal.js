@@ -241,19 +241,32 @@ function StylePickerModal({
   const checkSuperAdmin = async () => {
     try {
       const supabase = getSupabase();
-      if (!supabase) return;
+      if (!supabase) {
+        console.warn('[StylePickerModal] No Supabase client available for admin check');
+        return;
+      }
       
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        const { data: profile } = await supabase
+        const { data: profile, error } = await supabase
           .from('user_profiles')
           .select('role')
           .eq('id', user.id)
           .single();
-        setIsSuperAdmin(profile?.role === 'superadmin');
+        
+        if (error) {
+          console.error('[StylePickerModal] Error fetching profile:', error);
+          return;
+        }
+        
+        // Check for super_admin role (with underscore)
+        const isSuperAdminRole = profile?.role === 'super_admin';
+        
+        console.log('[StylePickerModal] User role:', profile?.role, '| Is Super Admin:', isSuperAdminRole);
+        setIsSuperAdmin(isSuperAdminRole);
       }
     } catch (error) {
-      console.error('Error checking admin status:', error);
+      console.error('[StylePickerModal] Error checking admin status:', error);
     }
   };
 
