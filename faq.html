@@ -23,22 +23,23 @@
   <link rel="stylesheet" href="/css/help-modals.css">
   
   <style>
-    /* Main content area - this is the scroll container */
+    /* ==============================================
+       MAIN SCROLL CONTAINER
+       ============================================== */
     .faq-content {
       flex: 1;
       overflow-y: auto;
-      display: flex;
-      flex-direction: column;
     }
     
-    /* Sticky header section - stays at top while scrolling */
-    .faq-sticky-header {
+    /* ==============================================
+       STICKY HEADER - Breadcrumb + Title + Subtitle
+       ============================================== */
+    .faq-header-sticky {
       position: sticky;
       top: 0;
       z-index: 20;
       background: var(--color-background);
       padding: var(--space-xl) var(--space-2xl) var(--space-lg) var(--space-2xl);
-      border-bottom: 1px solid var(--color-border-light);
     }
     
     .faq-breadcrumb {
@@ -60,11 +61,6 @@
       color: var(--color-accent);
     }
     
-    .faq-page-header {
-      margin-bottom: var(--space-lg);
-      max-width: 800px;
-    }
-    
     .faq-page-title {
       font-family: var(--font-serif);
       font-size: var(--text-3xl);
@@ -78,18 +74,30 @@
       color: var(--color-text-muted);
       line-height: var(--leading-relaxed);
       margin: 0;
+      max-width: 600px;
     }
     
-    /* Controls row: categories + search */
-    .faq-controls {
+    /* ==============================================
+       TWO-COLUMN BODY LAYOUT
+       ============================================== */
+    .faq-body {
       display: flex;
-      align-items: flex-start;
       gap: var(--space-2xl);
+      padding: 0 var(--space-2xl) var(--space-2xl) var(--space-2xl);
+      max-width: 1200px;
     }
     
-    /* Categories - horizontal in sticky header */
+    /* ==============================================
+       LEFT COLUMN - STICKY CATEGORIES
+       ============================================== */
     .faq-categories {
+      width: 220px;
       flex-shrink: 0;
+      position: sticky;
+      top: 140px;
+      align-self: flex-start;
+      max-height: calc(100vh - 200px);
+      overflow-y: auto;
     }
     
     .faq-categories-title {
@@ -104,63 +112,69 @@
     
     .faq-category-list {
       display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
+      flex-direction: column;
+      gap: 2px;
     }
     
     .faq-category-item {
-      display: inline-flex;
+      display: flex;
       align-items: center;
-      gap: 6px;
-      padding: 6px 12px;
+      justify-content: space-between;
+      padding: 10px var(--space-md);
       font-family: var(--font-primary);
       font-size: var(--text-sm);
       font-weight: var(--weight-medium);
       color: var(--color-text-secondary);
-      background: var(--color-surface);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-full);
+      background: none;
+      border: none;
+      border-radius: var(--radius-md);
       cursor: pointer;
       transition: all var(--transition-fast);
-      white-space: nowrap;
+      text-align: left;
+      width: 100%;
     }
     
     .faq-category-item:hover {
-      border-color: var(--color-tan-40);
+      background: var(--color-surface-hover);
       color: var(--color-text-primary);
     }
     
     .faq-category-item.active {
-      background: var(--color-brown);
-      border-color: var(--color-brown);
-      color: var(--color-white);
+      background: var(--color-surface);
+      color: var(--color-text-primary);
+      font-weight: var(--weight-semibold);
     }
     
     .faq-category-count {
-      font-size: 12px;
+      font-size: var(--text-sm);
       font-weight: var(--weight-regular);
-      opacity: 0.7;
-    }
-    
-    /* Search */
-    .faq-search-area {
-      flex: 1;
-      max-width: 400px;
-    }
-    
-    .faq-search-label {
-      font-family: var(--font-primary);
-      font-size: 11px;
-      font-weight: var(--weight-semibold);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
       color: var(--color-text-muted);
-      margin: 0 0 var(--space-sm) 0;
-      display: block;
+    }
+    
+    .faq-category-item.active .faq-category-count {
+      color: var(--color-text-secondary);
+    }
+    
+    /* ==============================================
+       RIGHT COLUMN - SEARCH + FAQ CARDS
+       ============================================== */
+    .faq-main {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    /* Sticky Search */
+    .faq-search-sticky {
+      position: sticky;
+      top: 140px;
+      z-index: 15;
+      background: var(--color-background);
+      padding-bottom: var(--space-lg);
     }
     
     .faq-search-wrapper {
       position: relative;
+      max-width: 400px;
     }
     
     .faq-search-icon {
@@ -176,9 +190,9 @@
     
     .faq-search-input {
       width: 100%;
-      padding: 10px 40px 10px 42px;
+      padding: 12px 44px 12px 44px;
       font-family: var(--font-primary);
-      font-size: var(--text-sm);
+      font-size: var(--text-base);
       border: 1px solid var(--color-border);
       border-radius: var(--radius-md);
       background: var(--color-surface);
@@ -198,11 +212,11 @@
     
     .faq-search-clear {
       position: absolute;
-      right: 8px;
+      right: 10px;
       top: 50%;
       transform: translateY(-50%);
-      width: 24px;
-      height: 24px;
+      width: 28px;
+      height: 28px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -226,21 +240,21 @@
       color: var(--color-text-primary);
     }
     
-    /* FAQ Cards Area - scrolls under sticky header */
-    .faq-cards-container {
-      flex: 1;
-      padding: var(--space-xl) var(--space-2xl) var(--space-2xl) var(--space-2xl);
-      max-width: 900px;
-    }
-    
     .faq-search-results-info {
       font-size: var(--text-sm);
       color: var(--color-text-muted);
-      margin: 0 0 var(--space-lg) 0;
+      margin: var(--space-md) 0 0 0;
     }
     
     .faq-search-results-info strong {
       color: var(--color-text-primary);
+    }
+    
+    /* ==============================================
+       FAQ CARDS - These scroll under search
+       ============================================== */
+    .faq-cards-area {
+      padding-bottom: var(--space-2xl);
     }
     
     .faq-section-title {
@@ -399,6 +413,9 @@
       margin-bottom: var(--space-md);
     }
     
+    /* ==============================================
+       STATES: Loading, Empty, Error
+       ============================================== */
     .faq-empty {
       display: flex;
       flex-direction: column;
@@ -435,7 +452,6 @@
       align-items: center;
       justify-content: center;
       padding: var(--space-4xl);
-      flex: 1;
     }
     
     .faq-loading-spinner {
@@ -457,47 +473,66 @@
       color: var(--color-text-muted);
     }
     
-    /* Mobile Responsive */
+    /* ==============================================
+       MOBILE RESPONSIVE
+       ============================================== */
     @media (max-width: 900px) {
-      .faq-sticky-header {
-        padding: var(--space-lg) var(--space-lg) var(--space-md) var(--space-lg);
-      }
-      
-      .faq-controls {
-        flex-direction: column;
-        gap: var(--space-md);
-      }
-      
-      .faq-search-area {
-        max-width: 100%;
-        width: 100%;
-      }
-      
-      .faq-cards-container {
+      .faq-header-sticky {
         padding: var(--space-lg);
+      }
+      
+      .faq-body {
+        flex-direction: column;
+        gap: var(--space-lg);
+        padding: 0 var(--space-lg) var(--space-lg) var(--space-lg);
+      }
+      
+      .faq-categories {
+        width: 100%;
+        position: relative;
+        top: 0;
+        max-height: none;
+      }
+      
+      .faq-category-list {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: var(--space-sm);
+      }
+      
+      .faq-category-item {
+        width: auto;
+        padding: 8px 14px;
+        border-radius: var(--radius-full);
+        background: var(--color-surface);
+      }
+      
+      .faq-category-item.active {
+        background: var(--color-brown);
+        color: var(--color-white);
+      }
+      
+      .faq-category-item.active .faq-category-count {
+        color: rgba(255, 255, 255, 0.7);
+      }
+      
+      .faq-search-sticky {
+        position: relative;
+        top: 0;
       }
     }
     
-    @media (max-width: 600px) {
-      .faq-sticky-header {
+    @media (max-width: 480px) {
+      .faq-header-sticky {
         padding: var(--space-md);
+      }
+      
+      .faq-body {
+        padding: 0 var(--space-md) var(--space-md) var(--space-md);
       }
       
       .faq-page-title {
         font-size: var(--text-2xl);
-      }
-      
-      .faq-page-subtitle {
-        font-size: var(--text-sm);
-      }
-      
-      .faq-category-item {
-        padding: 5px 10px;
-        font-size: 13px;
-      }
-      
-      .faq-cards-container {
-        padding: var(--space-md);
       }
       
       .faq-card-header {
@@ -539,7 +574,7 @@
     );
     
     const XIcon = () => (
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
         <line x1="18" y1="6" x2="6" y2="18"></line>
         <line x1="6" y1="6" x2="18" y2="18"></line>
       </svg>
@@ -761,22 +796,33 @@
           <Header user={user} profile={profile} />
           
           <main className="faq-content">
-            <div className="faq-sticky-header">
+            <div className="faq-header-sticky">
               <div className="faq-breadcrumb">
                 <a href="index.html">Home</a>
                 <ChevronRightIcon />
                 <span>Frequently Asked Questions</span>
               </div>
               
-              <div className="faq-page-header">
-                <h1 className="faq-page-title">Frequently Asked Questions</h1>
-                <p className="faq-page-subtitle">
-                  Find answers to common questions about Society Arts. Browse by category or search for specific topics.
-                </p>
+              <h1 className="faq-page-title">Frequently Asked Questions</h1>
+              <p className="faq-page-subtitle">
+                Find answers to common questions about Society Arts. Browse by category or search for specific topics to get the help you need.
+              </p>
+            </div>
+            
+            {loading ? (
+              <div className="faq-loading">
+                <div className="faq-loading-spinner"></div>
+                <p className="faq-loading-text">Loading FAQs...</p>
               </div>
-              
-              <div className="faq-controls">
-                <div className="faq-categories">
+            ) : error ? (
+              <div className="faq-empty">
+                <div className="faq-empty-icon"><SearchOffIcon /></div>
+                <h3 className="faq-empty-title">Unable to load FAQs</h3>
+                <p className="faq-empty-text">{error}</p>
+              </div>
+            ) : (
+              <div className="faq-body">
+                <aside className="faq-categories">
                   <h2 className="faq-categories-title">Categories</h2>
                   <nav className="faq-category-list">
                     {categories.map(category => (
@@ -794,93 +840,81 @@
                       </button>
                     ))}
                   </nav>
-                </div>
+                </aside>
                 
-                <div className="faq-search-area">
-                  <label className="faq-search-label">Search</label>
-                  <div className="faq-search-wrapper">
-                    <span className="faq-search-icon"><SearchIcon /></span>
-                    <input
-                      type="text"
-                      className="faq-search-input"
-                      placeholder="Search all questions..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                    <button 
-                      className={`faq-search-clear ${searchQuery.length > 0 ? 'visible' : ''}`}
-                      onClick={clearSearch}
-                    >
-                      <XIcon />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            {loading ? (
-              <div className="faq-loading">
-                <div className="faq-loading-spinner"></div>
-                <p className="faq-loading-text">Loading FAQs...</p>
-              </div>
-            ) : error ? (
-              <div className="faq-empty">
-                <div className="faq-empty-icon"><SearchOffIcon /></div>
-                <h3 className="faq-empty-title">Unable to load FAQs</h3>
-                <p className="faq-empty-text">{error}</p>
-              </div>
-            ) : (
-              <div className="faq-cards-container">
-                {searchQuery.length >= 2 && (
-                  <p className="faq-search-results-info">
-                    Found <strong>{filteredFaqs.length}</strong> result{filteredFaqs.length !== 1 ? 's' : ''} for "<strong>{searchQuery}</strong>"
-                  </p>
-                )}
-                
-                {showTopQuestions && (
-                  <div className="faq-top-questions">
-                    <h2 className="faq-section-title">Top Questions</h2>
-                    <div className="faq-cards">
-                      {topQuestions.map(faq => (
-                        <FAQCard
-                          key={faq.id}
-                          faq={faq}
-                          searchQuery={searchQuery}
-                          isOpen={openItems.has(faq.id)}
-                          onToggle={() => toggleItem(faq.id)}
-                          isTopQuestion={true}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
-                
-                {searchQuery.length < 2 && selectedCategoryName && (
-                  <div className="faq-category-section">
-                    <h2 className="faq-section-title">{selectedCategoryName}</h2>
-                  </div>
-                )}
-                
-                {filteredFaqs.length > 0 ? (
-                  <div className="faq-cards">
-                    {filteredFaqs.map(faq => (
-                      <FAQCard
-                        key={faq.id}
-                        faq={faq}
-                        searchQuery={searchQuery}
-                        isOpen={openItems.has(faq.id)}
-                        onToggle={() => toggleItem(faq.id)}
-                        isTopQuestion={false}
+                <div className="faq-main">
+                  <div className="faq-search-sticky">
+                    <div className="faq-search-wrapper">
+                      <span className="faq-search-icon"><SearchIcon /></span>
+                      <input
+                        type="text"
+                        className="faq-search-input"
+                        placeholder="Search all questions..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
                       />
-                    ))}
+                      <button 
+                        className={`faq-search-clear ${searchQuery.length > 0 ? 'visible' : ''}`}
+                        onClick={clearSearch}
+                      >
+                        <XIcon />
+                      </button>
+                    </div>
+                    
+                    {searchQuery.length >= 2 && (
+                      <p className="faq-search-results-info">
+                        Found <strong>{filteredFaqs.length}</strong> result{filteredFaqs.length !== 1 ? 's' : ''} for "<strong>{searchQuery}</strong>"
+                      </p>
+                    )}
                   </div>
-                ) : searchQuery.length >= 2 ? (
-                  <div className="faq-empty">
-                    <div className="faq-empty-icon"><SearchOffIcon /></div>
-                    <h3 className="faq-empty-title">No results found</h3>
-                    <p className="faq-empty-text">Try different keywords or browse by category</p>
+                  
+                  <div className="faq-cards-area">
+                    {showTopQuestions && (
+                      <div className="faq-top-questions">
+                        <h2 className="faq-section-title">Top Questions</h2>
+                        <div className="faq-cards">
+                          {topQuestions.map(faq => (
+                            <FAQCard
+                              key={faq.id}
+                              faq={faq}
+                              searchQuery={searchQuery}
+                              isOpen={openItems.has(faq.id)}
+                              onToggle={() => toggleItem(faq.id)}
+                              isTopQuestion={true}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {searchQuery.length < 2 && selectedCategoryName && (
+                      <div className="faq-category-section">
+                        <h2 className="faq-section-title">{selectedCategoryName}</h2>
+                      </div>
+                    )}
+                    
+                    {filteredFaqs.length > 0 ? (
+                      <div className="faq-cards">
+                        {filteredFaqs.map(faq => (
+                          <FAQCard
+                            key={faq.id}
+                            faq={faq}
+                            searchQuery={searchQuery}
+                            isOpen={openItems.has(faq.id)}
+                            onToggle={() => toggleItem(faq.id)}
+                            isTopQuestion={false}
+                          />
+                        ))}
+                      </div>
+                    ) : searchQuery.length >= 2 ? (
+                      <div className="faq-empty">
+                        <div className="faq-empty-icon"><SearchOffIcon /></div>
+                        <h3 className="faq-empty-title">No results found</h3>
+                        <p className="faq-empty-text">Try different keywords or browse by category</p>
+                      </div>
+                    ) : null}
                   </div>
-                ) : null}
+                </div>
               </div>
             )}
           </main>
