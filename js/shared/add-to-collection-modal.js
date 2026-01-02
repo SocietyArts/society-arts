@@ -1,23 +1,26 @@
-/* =====================================================
-   SOCIETY ARTS - ADD TO COLLECTION MODAL
-   Shared component for adding styles to collections
-   
-   Usage:
-   1. Include this script in your page
-   2. Call: SocietyArts.openAddToCollectionModal(styleId, styleName)
-   
-   Dependencies:
-   - supabase-client.js (window.SocietyArts.supabase)
-   - User must be authenticated
-   ===================================================== */
+/**
+ * Add to Collection Modal Component
+ * Society Arts - Shared Component
+ * 
+ * Usage:
+ * window.SocietyArts.openAddToCollectionModal(styleId, styleName)
+ * 
+ * This modal:
+ * - Fetches user's existing collections
+ * - Shows a list to pick from
+ * - Allows creating a new collection inline
+ * - Adds the style to the selected collection
+ */
 
 (function() {
   'use strict';
-
-  // ==========================================
-  // CONFIGURATION
-  // ==========================================
   
+  console.log('[AddToCollectionModal] Initializing...');
+  
+  // Ensure namespace exists
+  window.SocietyArts = window.SocietyArts || {};
+  
+  // Default color palette for new collections
   const DEFAULT_PALETTE = [
     { id: 1, name: "Coral", hex: "#E07A5F", text: "light" },
     { id: 2, name: "Sage", hex: "#81B29A", text: "light" },
@@ -32,13 +35,22 @@
     { id: 11, name: "Indigo", hex: "#5E60CE", text: "light" },
     { id: 12, name: "Copper", hex: "#B87333", text: "light" }
   ];
-
-  // ==========================================
-  // STYLES (injected once)
-  // ==========================================
   
-  const modalStyles = `
-    /* Add to Collection Modal Overlay */
+  // Helper to get Supabase client
+  const getSupabase = () => {
+    return window.SocietyArts?.supabase || window.supabaseClient || window.supabase;
+  };
+  
+  // Get style thumbnail URL
+  const getStyleThumbnail = (styleId) => {
+    if (window.SocietyArts?.getStyleThumbnailUrl) {
+      return window.SocietyArts.getStyleThumbnailUrl(styleId, 0);
+    }
+    return `https://pub-acb560f551f141db830964aed1fa005f.r2.dev/${styleId}/${styleId}-00.webp`;
+  };
+  
+  // CSS Styles for the modal
+  const styles = `
     .atc-modal-overlay {
       position: fixed;
       inset: 0;
@@ -49,7 +61,6 @@
       justify-content: center;
       z-index: 10000;
       animation: atcFadeIn 0.2s ease;
-      font-family: 'Familjen Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
     }
     
     @keyframes atcFadeIn {
@@ -57,7 +68,6 @@
       to { opacity: 1; }
     }
     
-    /* Modal Container */
     .atc-modal {
       background: white;
       border-radius: 16px;
@@ -83,40 +93,46 @@
       }
     }
     
-    /* Modal Header */
     .atc-modal-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 20px 24px;
-      border-bottom: 1px solid #E7E2DC;
+      border-bottom: 1px solid #e5e5e5;
+      flex-shrink: 0;
     }
     
     .atc-modal-title {
-      font-family: 'Domine', Georgia, serif;
+      font-family: var(--font-serif, 'Domine', Georgia, serif);
       font-size: 20px;
-      font-weight: 500;
+      font-weight: 600;
       color: #3E2318;
       margin: 0;
     }
     
-    .atc-modal-close {
+    .atc-close-btn {
       width: 32px;
       height: 32px;
       border: none;
-      background: #F5F3F0;
-      border-radius: 8px;
+      background: transparent;
+      border-radius: 50%;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #8B7355;
+      color: #666;
       transition: all 0.15s ease;
     }
     
-    .atc-modal-close:hover {
-      background: #E7E2DC;
-      color: #3E2318;
+    .atc-close-btn:hover {
+      background: rgba(0, 0, 0, 0.08);
+      color: #333;
+    }
+    
+    .atc-modal-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0;
     }
     
     /* Style Preview */
@@ -126,49 +142,130 @@
       gap: 12px;
       padding: 16px 24px;
       background: #FAF9F7;
-      border-bottom: 1px solid #E7E2DC;
+      border-bottom: 1px solid #e5e5e5;
     }
     
-    .atc-style-thumbnail {
+    .atc-style-thumb {
       width: 48px;
       height: 48px;
       border-radius: 8px;
       object-fit: cover;
-      background: #E7E2DC;
+      background: #eee;
+    }
+    
+    .atc-style-info {
+      flex: 1;
+      min-width: 0;
     }
     
     .atc-style-name {
-      font-size: 14px;
+      font-family: var(--font-serif, 'Domine', Georgia, serif);
+      font-size: 15px;
       font-weight: 600;
       color: #3E2318;
-      flex: 1;
+      margin: 0 0 2px 0;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
     
-    /* Modal Body */
-    .atc-modal-body {
-      flex: 1;
-      overflow-y: auto;
+    .atc-style-id {
+      font-family: var(--font-sans, 'Familjen Grotesk', sans-serif);
+      font-size: 12px;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    
+    /* Loading State */
+    .atc-loading {
+      padding: 48px 24px;
+      text-align: center;
+      color: #888;
+      font-family: var(--font-sans, 'Familjen Grotesk', sans-serif);
+    }
+    
+    .atc-loading-spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid #eee;
+      border-top-color: #C0715B;
+      border-radius: 50%;
+      animation: atcSpin 0.8s linear infinite;
+      margin: 0 auto 12px;
+    }
+    
+    @keyframes atcSpin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* Login Prompt */
+    .atc-login-prompt {
+      padding: 48px 24px;
+      text-align: center;
+    }
+    
+    .atc-login-icon {
+      width: 64px;
+      height: 64px;
+      background: #FAF9F7;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      color: #888;
+    }
+    
+    .atc-login-title {
+      font-family: var(--font-serif, 'Domine', Georgia, serif);
+      font-size: 18px;
+      font-weight: 600;
+      color: #3E2318;
+      margin: 0 0 8px 0;
+    }
+    
+    .atc-login-text {
+      font-family: var(--font-sans, 'Familjen Grotesk', sans-serif);
+      font-size: 14px;
+      color: #666;
+      margin: 0 0 20px 0;
+    }
+    
+    .atc-login-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: #C0715B;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-family: var(--font-sans, 'Familjen Grotesk', sans-serif);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+    
+    .atc-login-btn:hover {
+      background: #a85d45;
+    }
+    
+    /* Collections List */
+    .atc-collections-list {
       padding: 8px 0;
     }
     
-    /* Section Header */
-    .atc-section-header {
+    .atc-section-label {
+      font-family: var(--font-sans, 'Familjen Grotesk', sans-serif);
       font-size: 11px;
       font-weight: 600;
-      letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: #8B7355;
+      letter-spacing: 0.08em;
+      color: #888;
       padding: 12px 24px 8px;
-    }
-    
-    /* Collection List */
-    .atc-collection-list {
-      list-style: none;
       margin: 0;
-      padding: 0;
     }
     
     .atc-collection-item {
@@ -177,7 +274,7 @@
       gap: 12px;
       padding: 12px 24px;
       cursor: pointer;
-      transition: background 0.15s ease;
+      transition: background 0.1s ease;
       border: none;
       background: none;
       width: 100%;
@@ -197,7 +294,6 @@
       background: transparent;
     }
     
-    /* Collection Color Swatch */
     .atc-collection-color {
       width: 36px;
       height: 36px;
@@ -205,116 +301,159 @@
       flex-shrink: 0;
     }
     
-    /* Collection Info */
     .atc-collection-info {
       flex: 1;
       min-width: 0;
     }
     
     .atc-collection-name {
+      font-family: var(--font-serif, 'Domine', Georgia, serif);
       font-size: 15px;
-      font-weight: 500;
+      font-weight: 600;
       color: #3E2318;
+      margin: 0 0 2px 0;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
     
     .atc-collection-meta {
+      font-family: var(--font-sans, 'Familjen Grotesk', sans-serif);
       font-size: 12px;
-      color: #8B7355;
-      margin-top: 2px;
+      color: #888;
     }
     
-    /* Nested collection indicator */
-    .atc-collection-item.nested {
-      padding-left: 48px;
+    .atc-collection-badge {
+      font-family: var(--font-sans, 'Familjen Grotesk', sans-serif);
+      font-size: 11px;
+      font-weight: 600;
+      color: #16a34a;
+      background: #dcfce7;
+      padding: 4px 8px;
+      border-radius: 4px;
     }
     
-    .atc-collection-item.nested .atc-collection-color {
-      width: 28px;
-      height: 28px;
-    }
-    
-    /* Check icon for already added */
     .atc-collection-check {
-      color: #81B29A;
+      color: #C0715B;
       flex-shrink: 0;
-    }
-    
-    /* Folder expand/collapse */
-    .atc-folder-toggle {
-      width: 24px;
-      height: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #8B7355;
-      flex-shrink: 0;
-      transition: transform 0.2s ease;
-    }
-    
-    .atc-folder-toggle.expanded {
-      transform: rotate(90deg);
     }
     
     /* Create New Section */
     .atc-create-section {
-      padding: 16px 24px;
-      border-top: 1px solid #E7E2DC;
-      background: #FAF9F7;
+      border-top: 1px solid #e5e5e5;
+      margin-top: 8px;
     }
     
-    .atc-create-toggle {
+    .atc-create-btn {
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-size: 14px;
-      font-weight: 500;
-      color: #C0715B;
+      gap: 12px;
+      padding: 16px 24px;
       cursor: pointer;
-      padding: 8px 0;
+      transition: background 0.1s ease;
       border: none;
       background: none;
       width: 100%;
+      text-align: left;
     }
     
-    .atc-create-toggle:hover {
-      color: #A65D4A;
+    .atc-create-btn:hover {
+      background: #FAF9F7;
     }
     
+    .atc-create-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: #FAF9F7;
+      border: 2px dashed #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #888;
+      transition: all 0.15s ease;
+    }
+    
+    .atc-create-btn:hover .atc-create-icon {
+      border-color: #C0715B;
+      color: #C0715B;
+      background: rgba(192, 113, 91, 0.06);
+    }
+    
+    .atc-create-text {
+      font-family: var(--font-sans, 'Familjen Grotesk', sans-serif);
+      font-size: 14px;
+      font-weight: 600;
+      color: #666;
+    }
+    
+    .atc-create-btn:hover .atc-create-text {
+      color: #C0715B;
+    }
+    
+    /* Create Form */
     .atc-create-form {
-      display: none;
-      margin-top: 12px;
+      padding: 20px 24px;
+      border-top: 1px solid #e5e5e5;
+      background: #FAF9F7;
     }
     
-    .atc-create-form.visible {
+    .atc-form-label {
       display: block;
+      font-family: var(--font-sans, 'Familjen Grotesk', sans-serif);
+      font-size: 12px;
+      font-weight: 600;
+      color: #666;
+      margin-bottom: 6px;
     }
     
-    .atc-create-input {
+    .atc-form-input {
       width: 100%;
       padding: 12px 14px;
-      border: 1px solid #D4CEC4;
+      border: 1px solid #ddd;
       border-radius: 8px;
+      font-family: var(--font-sans, 'Familjen Grotesk', sans-serif);
       font-size: 14px;
-      font-family: inherit;
-      color: #3E2318;
-      margin-bottom: 12px;
+      color: #333;
+      margin-bottom: 16px;
       transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
     
-    .atc-create-input:focus {
+    .atc-form-input:focus {
       outline: none;
       border-color: #C0715B;
       box-shadow: 0 0 0 3px rgba(192, 113, 91, 0.15);
     }
     
-    .atc-create-input::placeholder {
-      color: #B5AA9A;
+    .atc-form-input::placeholder {
+      color: #aaa;
     }
     
-    .atc-create-actions {
+    .atc-color-picker {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    
+    .atc-color-swatch {
+      aspect-ratio: 1;
+      border-radius: 6px;
+      border: 3px solid transparent;
+      cursor: pointer;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+    }
+    
+    .atc-color-swatch:hover {
+      transform: scale(1.1);
+    }
+    
+    .atc-color-swatch.selected {
+      border-color: #3E2318;
+      transform: scale(1.1);
+    }
+    
+    .atc-form-actions {
       display: flex;
       gap: 8px;
       justify-content: flex-end;
@@ -322,715 +461,565 @@
     
     .atc-btn {
       padding: 10px 18px;
-      border-radius: 8px;
+      border-radius: 6px;
+      font-family: var(--font-sans, 'Familjen Grotesk', sans-serif);
       font-size: 14px;
-      font-weight: 500;
-      font-family: inherit;
+      font-weight: 600;
       cursor: pointer;
       transition: all 0.15s ease;
     }
     
     .atc-btn-ghost {
-      border: 1px solid #D4CEC4;
-      background: white;
-      color: #5C5346;
+      background: transparent;
+      border: 1px solid #ddd;
+      color: #666;
     }
     
     .atc-btn-ghost:hover {
-      border-color: #B5AA9A;
-      background: #FAF9F7;
+      border-color: #999;
+      color: #333;
     }
     
     .atc-btn-primary {
-      border: none;
       background: #C0715B;
+      border: none;
       color: white;
     }
     
     .atc-btn-primary:hover {
-      background: #A65D4A;
+      background: #a85d45;
     }
     
     .atc-btn-primary:disabled {
-      background: #D4CEC4;
+      background: #ccc;
       cursor: not-allowed;
     }
     
     /* Empty State */
-    .atc-empty-state {
-      text-align: center;
+    .atc-empty {
       padding: 32px 24px;
-      color: #8B7355;
+      text-align: center;
     }
     
     .atc-empty-icon {
-      width: 48px;
-      height: 48px;
-      margin: 0 auto 12px;
-      background: #F5F3F0;
+      width: 56px;
+      height: 56px;
+      background: #FAF9F7;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #B5AA9A;
+      margin: 0 auto 12px;
+      color: #888;
+    }
+    
+    .atc-empty-title {
+      font-family: var(--font-serif, 'Domine', Georgia, serif);
+      font-size: 16px;
+      font-weight: 600;
+      color: #3E2318;
+      margin: 0 0 6px 0;
     }
     
     .atc-empty-text {
-      font-size: 14px;
-      line-height: 1.5;
+      font-family: var(--font-sans, 'Familjen Grotesk', sans-serif);
+      font-size: 13px;
+      color: #888;
+      margin: 0;
     }
     
-    /* Toast Notification */
+    /* Success Toast */
     .atc-toast {
       position: fixed;
       bottom: 24px;
       left: 50%;
-      transform: translateX(-50%) translateY(100px);
+      transform: translateX(-50%);
       background: #3E2318;
       color: white;
       padding: 14px 24px;
-      border-radius: 10px;
+      border-radius: 8px;
+      font-family: var(--font-sans, 'Familjen Grotesk', sans-serif);
       font-size: 14px;
       font-weight: 500;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
       z-index: 10001;
-      opacity: 0;
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
-    }
-    
-    .atc-toast.visible {
-      transform: translateX(-50%) translateY(0);
-      opacity: 1;
+      animation: atcToastIn 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
     
     .atc-toast.success {
-      background: #588157;
+      background: #16a34a;
     }
     
     .atc-toast.error {
-      background: #C0392B;
+      background: #dc2626;
     }
     
-    /* Loading State */
-    .atc-loading {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 48px 24px;
-      color: #8B7355;
+    @keyframes atcToastIn {
+      from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
     }
     
-    .atc-spinner {
-      width: 24px;
-      height: 24px;
-      border: 2px solid #E7E2DC;
-      border-top-color: #C0715B;
-      border-radius: 50%;
-      animation: atcSpin 0.8s linear infinite;
-      margin-right: 12px;
+    .atc-toast-exit {
+      animation: atcToastOut 0.2s ease forwards;
     }
     
-    @keyframes atcSpin {
-      to { transform: rotate(360deg); }
+    @keyframes atcToastOut {
+      to {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+      }
     }
   `;
-
-  // ==========================================
-  // STATE
-  // ==========================================
   
-  let modalElement = null;
-  let toastElement = null;
-  let stylesInjected = false;
-  let currentStyleId = null;
-  let currentStyleName = null;
-  let collections = [];
-  let palette = DEFAULT_PALETTE;
-  let expandedFolders = new Set();
-
-  // ==========================================
-  // HELPERS
-  // ==========================================
-  
-  function getSupabase() {
-    return window.SocietyArts?.supabase || window.supabaseClient || window.supabase;
-  }
-  
-  function getCurrentUser() {
-    // Try multiple ways to get the current user
-    return window.AuthState?.user || 
-           window.SocietyArts?.AuthState?.user || 
-           window.SocietyArts?.currentUser;
-  }
-  
-  function getStyleThumbnail(styleId) {
-    return window.SocietyArts?.getStyleThumbnailUrl?.(styleId, 0) ||
-           window.SocietyArts?.getAltStyleThumbnailUrl?.(styleId) ||
-           `https://pub-acb560f551f141db830964aed1fa005f.r2.dev/${styleId}/${styleId}-00.webp`;
-  }
-  
+  // Inject styles
   function injectStyles() {
-    if (stylesInjected) return;
-    
+    if (document.getElementById('atc-modal-styles')) return;
     const styleEl = document.createElement('style');
     styleEl.id = 'atc-modal-styles';
-    styleEl.textContent = modalStyles;
+    styleEl.textContent = styles;
     document.head.appendChild(styleEl);
-    stylesInjected = true;
   }
-
-  // ==========================================
-  // TOAST NOTIFICATIONS
-  // ==========================================
   
+  // Show toast notification
   function showToast(message, type = 'success') {
-    if (!toastElement) {
-      toastElement = document.createElement('div');
-      toastElement.className = 'atc-toast';
-      document.body.appendChild(toastElement);
-    }
+    // Remove existing toast
+    const existing = document.querySelector('.atc-toast');
+    if (existing) existing.remove();
     
-    toastElement.textContent = message;
-    toastElement.className = `atc-toast ${type}`;
+    const toast = document.createElement('div');
+    toast.className = `atc-toast ${type}`;
+    toast.innerHTML = `
+      ${type === 'success' ? `
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      ` : `
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="15" y1="9" x2="9" y2="15"></line>
+          <line x1="9" y1="9" x2="15" y2="15"></line>
+        </svg>
+      `}
+      ${message}
+    `;
+    document.body.appendChild(toast);
     
-    // Trigger reflow
-    toastElement.offsetHeight;
-    
-    toastElement.classList.add('visible');
-    
+    // Auto-remove after delay
     setTimeout(() => {
-      toastElement.classList.remove('visible');
+      toast.classList.add('atc-toast-exit');
+      setTimeout(() => toast.remove(), 200);
     }, 3000);
   }
-
-  // ==========================================
-  // DATA LOADING
-  // ==========================================
   
-  async function loadCollections(userId) {
+  // Modal state
+  let modalContainer = null;
+  let currentStyleId = null;
+  let currentStyleName = null;
+  
+  // Create and show the modal
+  async function openAddToCollectionModal(styleId, styleName = null) {
+    injectStyles();
+    
+    currentStyleId = styleId;
+    currentStyleName = styleName;
+    
+    // Create modal container if doesn't exist
+    if (!modalContainer) {
+      modalContainer = document.createElement('div');
+      modalContainer.id = 'atc-modal-root';
+      document.body.appendChild(modalContainer);
+    }
+    
+    // Render modal
+    renderModal();
+  }
+  
+  // Close the modal
+  function closeModal() {
+    if (modalContainer) {
+      modalContainer.innerHTML = '';
+    }
+    currentStyleId = null;
+    currentStyleName = null;
+  }
+  
+  // Render the modal content
+  async function renderModal() {
     const supabase = getSupabase();
-    if (!supabase?.from) {
-      console.error('Supabase client not available');
-      return [];
+    
+    // Show loading state
+    modalContainer.innerHTML = `
+      <div class="atc-modal-overlay" onclick="if(event.target === this) window.SocietyArts.closeAddToCollectionModal()">
+        <div class="atc-modal">
+          <div class="atc-modal-header">
+            <h2 class="atc-modal-title">Add to Collection</h2>
+            <button class="atc-close-btn" onclick="window.SocietyArts.closeAddToCollectionModal()">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+          <div class="atc-modal-body">
+            <div class="atc-loading">
+              <div class="atc-loading-spinner"></div>
+              Loading collections...
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    // Check if user is logged in
+    if (!supabase) {
+      renderLoginPrompt();
+      return;
     }
     
     try {
-      const { data, error } = await supabase
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        renderLoginPrompt();
+        return;
+      }
+      
+      // Fetch user's collections (excluding subcollections - parent_id is null)
+      const { data: collections, error } = await supabase
         .from('user_collections')
         .select('*')
-        .eq('user_id', userId)
-        .order('sort_order', { ascending: true })
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      return data || [];
-    } catch (err) {
-      console.error('Error loading collections:', err);
-      return [];
-    }
-  }
-  
-  async function loadPalette() {
-    const supabase = getSupabase();
-    if (!supabase?.from) return DEFAULT_PALETTE;
-    
-    try {
-      const { data, error } = await supabase
-        .from('admin_settings')
-        .select('value')
-        .eq('key', 'collection_palette')
-        .single();
-      
-      if (data?.value?.colors) {
-        return data.value.colors;
-      }
-    } catch (err) {
-      console.log('Using default palette');
-    }
-    return DEFAULT_PALETTE;
-  }
-
-  // ==========================================
-  // COLLECTION OPERATIONS
-  // ==========================================
-  
-  async function addStyleToCollection(collectionId) {
-    const supabase = getSupabase();
-    if (!supabase?.from) {
-      showToast('Unable to save. Please try again.', 'error');
-      return false;
-    }
-    
-    try {
-      // Get current collection
-      const collection = collections.find(c => c.id === collectionId);
-      if (!collection) throw new Error('Collection not found');
-      
-      // Check if style already in collection
-      const currentStyles = collection.styles || [];
-      if (currentStyles.includes(currentStyleId)) {
-        showToast('Style already in this collection');
-        return false;
-      }
-      
-      // Check limit (25 styles max)
-      if (currentStyles.length >= 25) {
-        showToast('Collection is full (25 styles max)', 'error');
-        return false;
-      }
-      
-      // Add style
-      const updatedStyles = [...currentStyles, currentStyleId];
-      
-      const { error } = await supabase
-        .from('user_collections')
-        .update({
-          styles: updatedStyles,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', collectionId);
+        .eq('user_id', user.id)
+        .is('parent_id', null)
+        .order('updated_at', { ascending: false });
       
       if (error) throw error;
       
-      // Update local state
-      collection.styles = updatedStyles;
+      // Get style info if not provided
+      if (!currentStyleName && currentStyleId) {
+        const { data: styleData } = await supabase
+          .from('styles')
+          .select('name')
+          .eq('id', currentStyleId)
+          .single();
+        if (styleData) currentStyleName = styleData.name;
+      }
       
-      showToast(`Added to "${collection.name}"`, 'success');
+      renderCollectionsList(collections || [], user.id);
+      
+    } catch (error) {
+      console.error('[AddToCollectionModal] Error:', error);
+      showToast('Failed to load collections', 'error');
       closeModal();
-      return true;
-    } catch (err) {
-      console.error('Error adding style to collection:', err);
-      showToast('Failed to add style. Please try again.', 'error');
-      return false;
     }
   }
   
-  async function createCollectionAndAdd(name) {
-    const supabase = getSupabase();
-    const user = getCurrentUser();
+  // Render login prompt
+  function renderLoginPrompt() {
+    const modalBody = modalContainer.querySelector('.atc-modal-body');
+    if (!modalBody) return;
     
-    if (!supabase?.from || !user) {
-      showToast('Unable to create collection. Please try again.', 'error');
-      return false;
-    }
+    modalBody.innerHTML = `
+      <div class="atc-login-prompt">
+        <div class="atc-login-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        </div>
+        <h3 class="atc-login-title">Sign in to Save</h3>
+        <p class="atc-login-text">Create an account to save styles to your collections.</p>
+        <button class="atc-login-btn" onclick="window.SocietyArts?.openAuthModal?.('signin'); window.SocietyArts.closeAddToCollectionModal();">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+            <polyline points="10 17 15 12 10 7"></polyline>
+            <line x1="15" y1="12" x2="3" y2="12"></line>
+          </svg>
+          Sign In
+        </button>
+      </div>
+    `;
+  }
+  
+  // Render collections list
+  function renderCollectionsList(collections, userId) {
+    const modalBody = modalContainer.querySelector('.atc-modal-body');
+    if (!modalBody) return;
     
-    try {
-      // Get least used color
-      const colorCounts = {};
-      palette.forEach(c => colorCounts[c.hex] = 0);
-      collections.forEach(c => {
-        if (c.color && colorCounts[c.color] !== undefined) {
-          colorCounts[c.color]++;
-        }
+    // Check which collections already have this style
+    const collectionsWithStyle = collections.filter(c => 
+      c.styles && Array.isArray(c.styles) && c.styles.includes(currentStyleId)
+    );
+    const collectionsWithStyleIds = new Set(collectionsWithStyle.map(c => c.id));
+    
+    let html = '';
+    
+    // Style preview
+    html += `
+      <div class="atc-style-preview">
+        <img 
+          class="atc-style-thumb" 
+          src="${getStyleThumbnail(currentStyleId)}" 
+          alt="${currentStyleName || currentStyleId}"
+          onerror="this.style.opacity='0.5'"
+        />
+        <div class="atc-style-info">
+          <p class="atc-style-name">${currentStyleName || 'Art Style'}</p>
+          <p class="atc-style-id">${currentStyleId}</p>
+        </div>
+      </div>
+    `;
+    
+    if (collections.length > 0) {
+      html += `<div class="atc-collections-list">`;
+      html += `<p class="atc-section-label">Your Collections</p>`;
+      
+      collections.forEach(collection => {
+        const styleCount = collection.styles?.length || 0;
+        const alreadyAdded = collectionsWithStyleIds.has(collection.id);
+        
+        html += `
+          <button 
+            class="atc-collection-item ${alreadyAdded ? 'disabled' : ''}"
+            onclick="${alreadyAdded ? '' : `window.SocietyArts._addStyleToCollection('${collection.id}')`}"
+            ${alreadyAdded ? 'disabled' : ''}
+          >
+            <div class="atc-collection-color" style="background-color: ${collection.color || '#5C677D'}"></div>
+            <div class="atc-collection-info">
+              <p class="atc-collection-name">${escapeHtml(collection.name)}</p>
+              <p class="atc-collection-meta">${styleCount} style${styleCount !== 1 ? 's' : ''}</p>
+            </div>
+            ${alreadyAdded ? `
+              <span class="atc-collection-badge">Already added</span>
+            ` : `
+              <div class="atc-collection-check">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+              </div>
+            `}
+          </button>
+        `;
       });
       
-      let minCount = Infinity;
-      let selectedColor = palette[0].hex;
-      for (const [hex, count] of Object.entries(colorCounts)) {
-        if (count < minCount) {
-          minCount = count;
-          selectedColor = hex;
-        }
-      }
+      html += `</div>`;
+    } else {
+      html += `
+        <div class="atc-empty">
+          <div class="atc-empty-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="12" y1="8" x2="12" y2="16"></line>
+              <line x1="8" y1="12" x2="16" y2="12"></line>
+            </svg>
+          </div>
+          <h4 class="atc-empty-title">No collections yet</h4>
+          <p class="atc-empty-text">Create your first collection to start organizing styles.</p>
+        </div>
+      `;
+    }
+    
+    // Create new collection button
+    html += `
+      <div class="atc-create-section">
+        <button class="atc-create-btn" onclick="window.SocietyArts._showCreateCollectionForm()">
+          <div class="atc-create-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          </div>
+          <span class="atc-create-text">Create New Collection</span>
+        </button>
+      </div>
+    `;
+    
+    modalBody.innerHTML = html;
+  }
+  
+  // Show create collection form
+  function showCreateCollectionForm() {
+    const createSection = modalContainer.querySelector('.atc-create-section');
+    if (!createSection) return;
+    
+    // Get a random color from palette
+    const randomColor = DEFAULT_PALETTE[Math.floor(Math.random() * DEFAULT_PALETTE.length)];
+    
+    createSection.innerHTML = `
+      <div class="atc-create-form">
+        <label class="atc-form-label">Collection Name</label>
+        <input 
+          type="text" 
+          class="atc-form-input" 
+          id="atc-new-collection-name"
+          placeholder="My Collection"
+          maxlength="50"
+          autofocus
+        />
+        
+        <label class="atc-form-label">Color</label>
+        <div class="atc-color-picker">
+          ${DEFAULT_PALETTE.map(color => `
+            <div 
+              class="atc-color-swatch ${color.hex === randomColor.hex ? 'selected' : ''}"
+              style="background-color: ${color.hex}"
+              data-color="${color.hex}"
+              onclick="window.SocietyArts._selectColor(this, '${color.hex}')"
+              title="${color.name}"
+            ></div>
+          `).join('')}
+        </div>
+        
+        <div class="atc-form-actions">
+          <button class="atc-btn atc-btn-ghost" onclick="window.SocietyArts._cancelCreateCollection()">
+            Cancel
+          </button>
+          <button class="atc-btn atc-btn-primary" onclick="window.SocietyArts._createAndAddToCollection()">
+            Create & Add
+          </button>
+        </div>
+      </div>
+    `;
+    
+    // Store selected color
+    modalContainer.dataset.selectedColor = randomColor.hex;
+    
+    // Focus the input
+    setTimeout(() => {
+      const input = document.getElementById('atc-new-collection-name');
+      if (input) input.focus();
+    }, 50);
+  }
+  
+  // Select color in picker
+  function selectColor(element, colorHex) {
+    // Remove selected from all
+    modalContainer.querySelectorAll('.atc-color-swatch').forEach(swatch => {
+      swatch.classList.remove('selected');
+    });
+    // Add to clicked one
+    element.classList.add('selected');
+    // Store selection
+    modalContainer.dataset.selectedColor = colorHex;
+  }
+  
+  // Cancel create collection
+  function cancelCreateCollection() {
+    renderModal(); // Re-render to reset
+  }
+  
+  // Create new collection and add style
+  async function createAndAddToCollection() {
+    const nameInput = document.getElementById('atc-new-collection-name');
+    const name = nameInput?.value?.trim();
+    const color = modalContainer.dataset.selectedColor || DEFAULT_PALETTE[0].hex;
+    
+    if (!name) {
+      nameInput?.focus();
+      return;
+    }
+    
+    const supabase = getSupabase();
+    if (!supabase) return;
+    
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
       
-      // Create collection with style
-      const { data, error } = await supabase
+      // Create the collection with the style already in it
+      const { data: newCollection, error } = await supabase
         .from('user_collections')
         .insert({
           user_id: user.id,
-          name: name.trim(),
-          color: selectedColor,
-          styles: [currentStyleId]
+          name: name,
+          color: color,
+          styles: [currentStyleId],
+          parent_id: null
         })
         .select()
         .single();
       
       if (error) throw error;
       
-      showToast(`Created "${name}" and added style`, 'success');
+      showToast(`Added to "${name}"`, 'success');
       closeModal();
-      return true;
-    } catch (err) {
-      console.error('Error creating collection:', err);
-      showToast('Failed to create collection. Please try again.', 'error');
-      return false;
+      
+    } catch (error) {
+      console.error('[AddToCollectionModal] Error creating collection:', error);
+      showToast('Failed to create collection', 'error');
     }
   }
-
-  // ==========================================
-  // MODAL RENDERING
-  // ==========================================
   
-  function buildCollectionTree(collections) {
-    // Separate root and nested collections
-    const roots = collections.filter(c => !c.parent_id);
-    const children = collections.filter(c => c.parent_id);
+  // Add style to existing collection
+  async function addStyleToCollection(collectionId) {
+    const supabase = getSupabase();
+    if (!supabase) return;
     
-    // Build tree structure
-    const tree = [];
-    
-    roots.forEach(root => {
-      tree.push({ ...root, level: 0 });
+    try {
+      // Get current collection
+      const { data: collection, error: fetchError } = await supabase
+        .from('user_collections')
+        .select('*')
+        .eq('id', collectionId)
+        .single();
       
-      // Find children
-      const findChildren = (parentId, level) => {
-        children
-          .filter(c => c.parent_id === parentId)
-          .forEach(child => {
-            tree.push({ ...child, level });
-            findChildren(child.id, level + 1);
-          });
-      };
+      if (fetchError) throw fetchError;
       
-      if (expandedFolders.has(root.id)) {
-        findChildren(root.id, 1);
+      // Add style to the array
+      const currentStyles = collection.styles || [];
+      if (currentStyles.includes(currentStyleId)) {
+        showToast('Style already in collection', 'error');
+        return;
       }
-    });
-    
-    return tree;
+      
+      const updatedStyles = [...currentStyles, currentStyleId];
+      
+      // Update the collection
+      const { error: updateError } = await supabase
+        .from('user_collections')
+        .update({ 
+          styles: updatedStyles,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', collectionId);
+      
+      if (updateError) throw updateError;
+      
+      showToast(`Added to "${collection.name}"`, 'success');
+      closeModal();
+      
+    } catch (error) {
+      console.error('[AddToCollectionModal] Error adding to collection:', error);
+      showToast('Failed to add to collection', 'error');
+    }
   }
   
-  function renderCollectionItem(collection) {
-    const hasChildren = collections.some(c => c.parent_id === collection.id);
-    const isExpanded = expandedFolders.has(collection.id);
-    const styleCount = (collection.styles || []).length;
-    const hasStyle = (collection.styles || []).includes(currentStyleId);
-    const isNested = collection.level > 0;
-    const paletteColor = palette.find(c => c.hex === collection.color) || palette[0];
-    
-    return `
-      <button class="atc-collection-item ${isNested ? 'nested' : ''} ${hasStyle ? 'disabled' : ''}"
-              data-collection-id="${collection.id}"
-              data-has-children="${hasChildren}"
-              ${hasStyle ? 'disabled' : ''}>
-        ${hasChildren ? `
-          <span class="atc-folder-toggle ${isExpanded ? 'expanded' : ''}">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
-          </span>
-        ` : ''}
-        <div class="atc-collection-color" style="background-color: ${collection.color || paletteColor.hex}"></div>
-        <div class="atc-collection-info">
-          <div class="atc-collection-name">${escapeHtml(collection.name)}</div>
-          <div class="atc-collection-meta">${styleCount} style${styleCount !== 1 ? 's' : ''}</div>
-        </div>
-        ${hasStyle ? `
-          <span class="atc-collection-check">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-          </span>
-        ` : ''}
-      </button>
-    `;
-  }
-  
+  // Helper to escape HTML
   function escapeHtml(str) {
+    if (!str) return '';
     const div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
   }
   
-  function renderModal() {
-    const tree = buildCollectionTree(collections);
-    const thumbnail = getStyleThumbnail(currentStyleId);
-    
-    const collectionsHtml = tree.length > 0 
-      ? tree.map(renderCollectionItem).join('')
-      : `
-        <div class="atc-empty-state">
-          <div class="atc-empty-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-              <polyline points="2 17 12 22 22 17"></polyline>
-              <polyline points="2 12 12 17 22 12"></polyline>
-            </svg>
-          </div>
-          <div class="atc-empty-text">No collections yet.<br>Create one below to get started.</div>
-        </div>
-      `;
-    
-    return `
-      <div class="atc-modal-overlay" id="atcModalOverlay">
-        <div class="atc-modal">
-          <div class="atc-modal-header">
-            <h3 class="atc-modal-title">Add to Collection</h3>
-            <button class="atc-modal-close" id="atcModalClose">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
-            </button>
-          </div>
-          
-          <div class="atc-style-preview">
-            <img class="atc-style-thumbnail" src="${thumbnail}" alt="" onerror="this.style.opacity=0.3">
-            <span class="atc-style-name">${escapeHtml(currentStyleName || currentStyleId)}</span>
-          </div>
-          
-          <div class="atc-modal-body">
-            ${tree.length > 0 ? '<div class="atc-section-header">Your Collections</div>' : ''}
-            <div class="atc-collection-list" id="atcCollectionList">
-              ${collectionsHtml}
-            </div>
-          </div>
-          
-          <div class="atc-create-section">
-            <button class="atc-create-toggle" id="atcCreateToggle">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="12" y1="5" x2="12" y2="19"></line>
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-              </svg>
-              Create New Collection
-            </button>
-            <div class="atc-create-form" id="atcCreateForm">
-              <input type="text" 
-                     class="atc-create-input" 
-                     id="atcNewCollectionName" 
-                     placeholder="Collection name..."
-                     maxlength="50">
-              <div class="atc-create-actions">
-                <button class="atc-btn atc-btn-ghost" id="atcCreateCancel">Cancel</button>
-                <button class="atc-btn atc-btn-primary" id="atcCreateSave" disabled>Create & Add</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-  }
+  // Export functions to global namespace
+  window.SocietyArts.openAddToCollectionModal = openAddToCollectionModal;
+  window.SocietyArts.closeAddToCollectionModal = closeModal;
+  window.SocietyArts._addStyleToCollection = addStyleToCollection;
+  window.SocietyArts._showCreateCollectionForm = showCreateCollectionForm;
+  window.SocietyArts._selectColor = selectColor;
+  window.SocietyArts._cancelCreateCollection = cancelCreateCollection;
+  window.SocietyArts._createAndAddToCollection = createAndAddToCollection;
   
-  function renderLoading() {
-    return `
-      <div class="atc-modal-overlay" id="atcModalOverlay">
-        <div class="atc-modal">
-          <div class="atc-modal-header">
-            <h3 class="atc-modal-title">Add to Collection</h3>
-            <button class="atc-modal-close" id="atcModalClose">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
-            </button>
-          </div>
-          <div class="atc-loading">
-            <div class="atc-spinner"></div>
-            <span>Loading collections...</span>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  // ==========================================
-  // EVENT HANDLERS
-  // ==========================================
-  
-  function attachEventListeners() {
-    // Close button
-    document.getElementById('atcModalClose')?.addEventListener('click', closeModal);
-    
-    // Overlay click to close
-    document.getElementById('atcModalOverlay')?.addEventListener('click', (e) => {
-      if (e.target.id === 'atcModalOverlay') closeModal();
-    });
-    
-    // Collection items
-    document.getElementById('atcCollectionList')?.addEventListener('click', async (e) => {
-      const item = e.target.closest('.atc-collection-item');
-      if (!item || item.disabled) return;
-      
-      const collectionId = item.dataset.collectionId;
-      const hasChildren = item.dataset.hasChildren === 'true';
-      
-      // If folder, toggle expand
-      if (hasChildren && e.target.closest('.atc-folder-toggle')) {
-        if (expandedFolders.has(collectionId)) {
-          expandedFolders.delete(collectionId);
-        } else {
-          expandedFolders.add(collectionId);
-        }
-        updateModalContent();
-        return;
-      }
-      
-      // Add to collection
-      await addStyleToCollection(collectionId);
-    });
-    
-    // Create toggle
-    document.getElementById('atcCreateToggle')?.addEventListener('click', () => {
-      const form = document.getElementById('atcCreateForm');
-      form?.classList.toggle('visible');
-      if (form?.classList.contains('visible')) {
-        document.getElementById('atcNewCollectionName')?.focus();
-      }
-    });
-    
-    // Create cancel
-    document.getElementById('atcCreateCancel')?.addEventListener('click', () => {
-      document.getElementById('atcCreateForm')?.classList.remove('visible');
-      document.getElementById('atcNewCollectionName').value = '';
-    });
-    
-    // Create input
-    document.getElementById('atcNewCollectionName')?.addEventListener('input', (e) => {
-      const saveBtn = document.getElementById('atcCreateSave');
-      if (saveBtn) {
-        saveBtn.disabled = !e.target.value.trim();
-      }
-    });
-    
-    // Create save
-    document.getElementById('atcCreateSave')?.addEventListener('click', async () => {
-      const input = document.getElementById('atcNewCollectionName');
-      const name = input?.value?.trim();
-      if (name) {
-        await createCollectionAndAdd(name);
-      }
-    });
-    
-    // Enter key in input
-    document.getElementById('atcNewCollectionName')?.addEventListener('keydown', async (e) => {
-      if (e.key === 'Enter') {
-        const name = e.target.value.trim();
-        if (name) {
-          await createCollectionAndAdd(name);
-        }
-      }
-    });
-    
-    // Escape key to close
-    document.addEventListener('keydown', handleEscapeKey);
-  }
-  
-  function handleEscapeKey(e) {
-    if (e.key === 'Escape' && modalElement) {
-      closeModal();
-    }
-  }
-  
-  function updateModalContent() {
-    if (!modalElement) return;
-    
-    const newContent = renderModal();
-    const temp = document.createElement('div');
-    temp.innerHTML = newContent;
-    
-    const newBody = temp.querySelector('.atc-modal-body');
-    const currentBody = modalElement.querySelector('.atc-modal-body');
-    
-    if (newBody && currentBody) {
-      currentBody.innerHTML = newBody.innerHTML;
-    }
-    
-    // Re-attach collection list events
-    document.getElementById('atcCollectionList')?.addEventListener('click', async (e) => {
-      const item = e.target.closest('.atc-collection-item');
-      if (!item || item.disabled) return;
-      
-      const collectionId = item.dataset.collectionId;
-      const hasChildren = item.dataset.hasChildren === 'true';
-      
-      if (hasChildren && e.target.closest('.atc-folder-toggle')) {
-        if (expandedFolders.has(collectionId)) {
-          expandedFolders.delete(collectionId);
-        } else {
-          expandedFolders.add(collectionId);
-        }
-        updateModalContent();
-        return;
-      }
-      
-      await addStyleToCollection(collectionId);
-    });
-  }
-
-  // ==========================================
-  // MODAL LIFECYCLE
-  // ==========================================
-  
-  async function openModal(styleId, styleName) {
-    // Check auth
-    const user = getCurrentUser();
-    if (!user) {
-      // Try to open auth modal
-      if (window.SocietyArts?.openAuthModal) {
-        window.SocietyArts.openAuthModal();
-      } else {
-        showToast('Please sign in to add to collections', 'error');
-      }
-      return;
-    }
-    
-    // Inject styles
-    injectStyles();
-    
-    // Store current style
-    currentStyleId = styleId;
-    currentStyleName = styleName || styleId;
-    
-    // Create and show loading modal
-    modalElement = document.createElement('div');
-    modalElement.innerHTML = renderLoading();
-    document.body.appendChild(modalElement.firstElementChild);
-    modalElement = document.getElementById('atcModalOverlay');
-    
-    // Attach close handlers
-    document.getElementById('atcModalClose')?.addEventListener('click', closeModal);
-    modalElement?.addEventListener('click', (e) => {
-      if (e.target.id === 'atcModalOverlay') closeModal();
-    });
-    document.addEventListener('keydown', handleEscapeKey);
-    
-    // Prevent body scroll
-    document.body.style.overflow = 'hidden';
-    
-    // Load data
-    [collections, palette] = await Promise.all([
-      loadCollections(user.id),
-      loadPalette()
-    ]);
-    
-    // Update modal with content
-    modalElement.outerHTML = renderModal();
-    modalElement = document.getElementById('atcModalOverlay');
-    
-    // Attach all event listeners
-    attachEventListeners();
-  }
-  
-  function closeModal() {
-    if (modalElement) {
-      modalElement.remove();
-      modalElement = null;
-    }
-    
-    // Restore body scroll
-    document.body.style.overflow = '';
-    
-    // Remove escape listener
-    document.removeEventListener('keydown', handleEscapeKey);
-    
-    // Reset state
-    currentStyleId = null;
-    currentStyleName = null;
-    expandedFolders.clear();
-  }
-
-  // ==========================================
-  // PUBLIC API
-  // ==========================================
-  
-  window.SocietyArts = window.SocietyArts || {};
-  
-  // Main entry point
-  window.SocietyArts.openAddToCollectionModal = openModal;
-  
-  // Also expose as standalone function
-  window.openAddToCollectionModal = openModal;
-  
-  console.log('Add to Collection modal loaded');
+  console.log('✅ [AddToCollectionModal] Component registered successfully');
   
 })();
