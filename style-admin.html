@@ -1,0 +1,1700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Style Admin | Society Arts</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="https://pub-acb560f551f141db830964aed1fa005f.r2.dev/site-assets/SA_Monogram_Black_1x1.svg">
+  
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <style>
+    /* ========================================
+       CSS VARIABLES - SOCIETY ARTS BRAND
+       ======================================== */
+    :root {
+      /* Brand Colors */
+      --color-brown: #3E2318;
+      --color-brown-60: #8B7B75;
+      --color-brown-40: #B2A7A3;
+      --color-beige: #EAE4DA;
+      --color-cream: #FAF8F5;
+      --color-tan-10: #F3F1EE;
+      --color-tan-20: #E7E2DC;
+      --color-tan-40: #CFC5B9;
+      --color-orange: #C73314;
+      --color-orange-light: rgba(199, 51, 20, 0.1);
+      --color-coral: #D4836D;
+      --color-white: #FFFFFF;
+      
+      /* Semantic Colors */
+      --color-success: #4A9D6E;
+      --color-warning: #D4A84B;
+      --color-error: #C73314;
+      
+      /* Typography */
+      --font-sans: 'Familjen Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-serif: 'Libre Baskerville', Georgia, serif;
+      
+      /* Spacing */
+      --space-xs: 4px;
+      --space-sm: 8px;
+      --space-md: 12px;
+      --space-lg: 16px;
+      --space-xl: 24px;
+      --space-2xl: 32px;
+      --space-3xl: 48px;
+      
+      /* Border Radius */
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      
+      /* Shadows */
+      --shadow-sm: 0 1px 2px rgba(62, 35, 24, 0.05);
+      --shadow-md: 0 4px 12px rgba(62, 35, 24, 0.08);
+      --shadow-lg: 0 8px 24px rgba(62, 35, 24, 0.12);
+      
+      /* Transitions */
+      --transition-fast: 150ms ease;
+      --transition-base: 250ms ease;
+    }
+    
+    /* ========================================
+       RESET & BASE
+       ======================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    html, body {
+      height: 100%;
+    }
+    
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-beige);
+      color: var(--color-brown);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    
+    /* ========================================
+       LAYOUT
+       ======================================== */
+    .app-container {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    
+    /* ========================================
+       HEADER
+       ======================================== */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-lg) var(--space-2xl);
+      background: var(--color-brown);
+      color: var(--color-cream);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+    }
+    
+    .header-logo {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+    }
+    
+    .header-logo img {
+      height: 20px;
+      width: auto;
+    }
+    
+    .header-divider {
+      width: 1px;
+      height: 24px;
+      background: rgba(250, 248, 245, 0.3);
+    }
+    
+    .header-title {
+      font-family: var(--font-serif);
+      font-size: 16px;
+      font-weight: 400;
+      color: var(--color-cream);
+      opacity: 0.9;
+    }
+    
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xl);
+    }
+    
+    .header-status {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      font-size: 13px;
+      color: var(--color-cream);
+      opacity: 0.8;
+    }
+    
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--color-tan-40);
+    }
+    
+    .status-dot.connected {
+      background: var(--color-success);
+    }
+    
+    .status-dot.error {
+      background: var(--color-error);
+    }
+    
+    .header-user {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      padding-left: var(--space-xl);
+      border-left: 1px solid rgba(250, 248, 245, 0.2);
+    }
+    
+    .user-email {
+      font-size: 13px;
+      color: var(--color-cream);
+      opacity: 0.9;
+    }
+    
+    .btn-logout {
+      background: rgba(250, 248, 245, 0.15);
+      border: 1px solid rgba(250, 248, 245, 0.3);
+      color: var(--color-cream);
+      padding: var(--space-xs) var(--space-md);
+      font-family: var(--font-sans);
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    
+    .btn-logout:hover {
+      background: rgba(250, 248, 245, 0.25);
+      border-color: rgba(250, 248, 245, 0.5);
+    }
+    
+    /* ========================================
+       LOGIN SCREEN
+       ======================================== */
+    .login-screen {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-2xl);
+    }
+    
+    .login-card {
+      background: var(--color-white);
+      border-radius: var(--radius-xl);
+      padding: var(--space-3xl);
+      width: 100%;
+      max-width: 400px;
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .login-header {
+      text-align: center;
+      margin-bottom: var(--space-2xl);
+    }
+    
+    .login-logo {
+      margin-bottom: var(--space-xl);
+    }
+    
+    .login-logo img {
+      height: 32px;
+    }
+    
+    .login-title {
+      font-family: var(--font-serif);
+      font-size: 24px;
+      font-weight: 400;
+      color: var(--color-brown);
+      margin-bottom: var(--space-sm);
+    }
+    
+    .login-subtitle {
+      font-size: 14px;
+      color: var(--color-brown-60);
+    }
+    
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-lg);
+    }
+    
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+    
+    .form-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-brown);
+    }
+    
+    .form-input {
+      padding: var(--space-md) var(--space-lg);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      color: var(--color-brown);
+      background: var(--color-tan-10);
+      border: 1px solid var(--color-tan-20);
+      border-radius: var(--radius-md);
+      transition: all var(--transition-fast);
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: var(--color-coral);
+      box-shadow: 0 0 0 3px var(--color-orange-light);
+    }
+    
+    .login-error {
+      color: var(--color-error);
+      font-size: 13px;
+      text-align: center;
+      min-height: 20px;
+    }
+    
+    /* ========================================
+       BUTTONS
+       ======================================== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-sm);
+      padding: var(--space-md) var(--space-xl);
+      font-family: var(--font-sans);
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      border: none;
+      text-decoration: none;
+    }
+    
+    .btn-primary {
+      background: var(--color-brown);
+      color: var(--color-cream);
+    }
+    
+    .btn-primary:hover {
+      background: rgba(62, 35, 24, 0.85);
+    }
+    
+    .btn-secondary {
+      background: var(--color-white);
+      color: var(--color-brown);
+      border: 1px solid var(--color-tan-40);
+    }
+    
+    .btn-secondary:hover {
+      background: var(--color-tan-10);
+      border-color: var(--color-brown-40);
+    }
+    
+    .btn-danger {
+      background: var(--color-error);
+      color: var(--color-white);
+    }
+    
+    .btn-danger:hover {
+      background: #a82a10;
+    }
+    
+    .btn-full {
+      width: 100%;
+    }
+    
+    .btn-sm {
+      padding: var(--space-sm) var(--space-md);
+      font-size: 13px;
+    }
+    
+    .btn svg {
+      width: 16px;
+      height: 16px;
+    }
+    
+    /* ========================================
+       MAIN CONTENT
+       ======================================== */
+    .main-content {
+      flex: 1;
+      padding: var(--space-2xl);
+      max-width: 1600px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    
+    .admin-content {
+      display: none;
+    }
+    
+    .admin-content.visible {
+      display: block;
+    }
+    
+    /* ========================================
+       STATS BAR
+       ======================================== */
+    .stats-bar {
+      display: flex;
+      gap: var(--space-lg);
+      margin-bottom: var(--space-2xl);
+      flex-wrap: wrap;
+    }
+    
+    .stat-card {
+      background: var(--color-white);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg) var(--space-xl);
+      box-shadow: var(--shadow-sm);
+      min-width: 140px;
+    }
+    
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--color-brown);
+      line-height: 1.2;
+    }
+    
+    .stat-label {
+      font-size: 12px;
+      color: var(--color-brown-60);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: var(--space-xs);
+    }
+    
+    /* ========================================
+       TOOLBAR
+       ======================================== */
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-lg);
+      margin-bottom: var(--space-xl);
+      flex-wrap: wrap;
+    }
+    
+    .toolbar-left {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      flex-wrap: wrap;
+    }
+    
+    .toolbar-right {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+    
+    .filter-select {
+      padding: var(--space-sm) var(--space-lg);
+      padding-right: var(--space-3xl);
+      font-family: var(--font-sans);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--color-brown);
+      background: var(--color-white);
+      border: 1px solid var(--color-tan-40);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B5A4F' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      min-width: 180px;
+    }
+    
+    .filter-select:focus {
+      outline: none;
+      border-color: var(--color-coral);
+      box-shadow: 0 0 0 3px var(--color-orange-light);
+    }
+    
+    .search-input {
+      padding: var(--space-sm) var(--space-lg);
+      font-family: var(--font-sans);
+      font-size: 14px;
+      color: var(--color-brown);
+      background: var(--color-white);
+      border: 1px solid var(--color-tan-40);
+      border-radius: var(--radius-md);
+      width: 280px;
+    }
+    
+    .search-input:focus {
+      outline: none;
+      border-color: var(--color-coral);
+      box-shadow: 0 0 0 3px var(--color-orange-light);
+    }
+    
+    .search-input::placeholder {
+      color: var(--color-brown-40);
+    }
+    
+    .results-count {
+      font-size: 14px;
+      color: var(--color-brown-60);
+    }
+    
+    .results-count strong {
+      color: var(--color-brown);
+    }
+    
+    /* ========================================
+       STYLES GRID
+       ======================================== */
+    .styles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--space-xl);
+    }
+    
+    .style-card {
+      background: var(--color-white);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: all var(--transition-base);
+      cursor: pointer;
+    }
+    
+    .style-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+    
+    .style-thumbnail {
+      aspect-ratio: 1;
+      overflow: hidden;
+      background: var(--color-tan-10);
+      position: relative;
+    }
+    
+    .style-thumbnail img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform var(--transition-base);
+    }
+    
+    .style-card:hover .style-thumbnail img {
+      transform: scale(1.05);
+    }
+    
+    .style-id-badge {
+      position: absolute;
+      top: var(--space-sm);
+      left: var(--space-sm);
+      background: rgba(62, 35, 24, 0.85);
+      color: var(--color-cream);
+      font-size: 11px;
+      font-weight: 600;
+      padding: var(--space-xs) var(--space-sm);
+      border-radius: var(--radius-sm);
+      font-family: monospace;
+    }
+    
+    .style-info {
+      padding: var(--space-lg);
+    }
+    
+    .style-name {
+      font-family: var(--font-serif);
+      font-size: 16px;
+      font-weight: 400;
+      color: var(--color-brown);
+      margin-bottom: var(--space-xs);
+      line-height: 1.3;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    .style-category {
+      font-size: 12px;
+      color: var(--color-brown-60);
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+    
+    .style-category-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--color-coral);
+    }
+    
+    /* ========================================
+       PAGINATION
+       ======================================== */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-sm);
+      margin-top: var(--space-2xl);
+      padding-top: var(--space-2xl);
+      border-top: 1px solid var(--color-tan-20);
+    }
+    
+    .pagination-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      background: var(--color-white);
+      border: 1px solid var(--color-tan-40);
+      border-radius: var(--radius-md);
+      color: var(--color-brown);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    
+    .pagination-btn:hover:not(:disabled) {
+      background: var(--color-tan-10);
+      border-color: var(--color-brown-40);
+    }
+    
+    .pagination-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    
+    .pagination-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+    
+    .pagination-info {
+      font-size: 14px;
+      color: var(--color-brown-60);
+      min-width: 120px;
+      text-align: center;
+    }
+    
+    /* ========================================
+       EDIT MODAL
+       ======================================== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(62, 35, 24, 0.4);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-2xl);
+      z-index: 1000;
+    }
+    
+    .modal-overlay.visible {
+      display: flex;
+    }
+    
+    .modal {
+      background: var(--color-white);
+      border-radius: var(--radius-xl);
+      width: 100%;
+      max-width: 800px;
+      max-height: 90vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-xl);
+      border-bottom: 1px solid var(--color-tan-20);
+    }
+    
+    .modal-title {
+      font-family: var(--font-serif);
+      font-size: 20px;
+      font-weight: 400;
+      color: var(--color-brown);
+    }
+    
+    .modal-close {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      background: transparent;
+      border: none;
+      border-radius: var(--radius-md);
+      color: var(--color-brown-60);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    
+    .modal-close:hover {
+      background: var(--color-tan-10);
+      color: var(--color-brown);
+    }
+    
+    .modal-close svg {
+      width: 20px;
+      height: 20px;
+    }
+    
+    .modal-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--space-xl);
+    }
+    
+    .modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: var(--space-md);
+      padding: var(--space-xl);
+      border-top: 1px solid var(--color-tan-20);
+    }
+    
+    /* ========================================
+       EDIT FORM
+       ======================================== */
+    .edit-layout {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: var(--space-2xl);
+    }
+    
+    .edit-preview {
+      text-align: center;
+    }
+    
+    .edit-preview-image {
+      width: 200px;
+      height: 200px;
+      border-radius: var(--radius-lg);
+      object-fit: cover;
+      background: var(--color-tan-10);
+      margin-bottom: var(--space-md);
+    }
+    
+    .edit-preview-id {
+      font-family: monospace;
+      font-size: 14px;
+      color: var(--color-brown-60);
+      background: var(--color-tan-10);
+      padding: var(--space-xs) var(--space-sm);
+      border-radius: var(--radius-sm);
+      display: inline-block;
+    }
+    
+    .edit-form {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xl);
+    }
+    
+    .form-section {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-lg);
+    }
+    
+    .form-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--color-brown-60);
+      padding-bottom: var(--space-sm);
+      border-bottom: 1px solid var(--color-tan-20);
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-lg);
+    }
+    
+    .form-textarea {
+      padding: var(--space-md) var(--space-lg);
+      font-family: var(--font-sans);
+      font-size: 14px;
+      color: var(--color-brown);
+      background: var(--color-tan-10);
+      border: 1px solid var(--color-tan-20);
+      border-radius: var(--radius-md);
+      resize: vertical;
+      min-height: 100px;
+      transition: all var(--transition-fast);
+    }
+    
+    .form-textarea:focus {
+      outline: none;
+      border-color: var(--color-coral);
+      box-shadow: 0 0 0 3px var(--color-orange-light);
+    }
+    
+    .form-select {
+      padding: var(--space-md) var(--space-lg);
+      padding-right: var(--space-3xl);
+      font-family: var(--font-sans);
+      font-size: 14px;
+      color: var(--color-brown);
+      background: var(--color-tan-10);
+      border: 1px solid var(--color-tan-20);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B5A4F' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      transition: all var(--transition-fast);
+    }
+    
+    .form-select:focus {
+      outline: none;
+      border-color: var(--color-coral);
+      box-shadow: 0 0 0 3px var(--color-orange-light);
+    }
+    
+    /* ========================================
+       LOADING & EMPTY STATES
+       ======================================== */
+    .loading-screen {
+      position: fixed;
+      inset: 0;
+      background: var(--color-beige);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-lg);
+      z-index: 2000;
+    }
+    
+    .loading-screen.hidden {
+      display: none;
+    }
+    
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--color-tan-20);
+      border-top-color: var(--color-brown);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .loading-text {
+      font-size: 14px;
+      color: var(--color-brown-60);
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: var(--space-3xl);
+      color: var(--color-brown-60);
+    }
+    
+    .empty-state svg {
+      width: 48px;
+      height: 48px;
+      margin-bottom: var(--space-lg);
+      opacity: 0.5;
+    }
+    
+    .empty-state-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--color-brown);
+      margin-bottom: var(--space-sm);
+    }
+    
+    /* ========================================
+       TOAST NOTIFICATIONS
+       ======================================== */
+    .toast-container {
+      position: fixed;
+      bottom: var(--space-2xl);
+      right: var(--space-2xl);
+      z-index: 3000;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+    
+    .toast {
+      background: var(--color-brown);
+      color: var(--color-cream);
+      padding: var(--space-md) var(--space-xl);
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      animation: slideIn 0.3s ease;
+    }
+    
+    .toast.success {
+      background: var(--color-success);
+    }
+    
+    .toast.error {
+      background: var(--color-error);
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    
+    /* ========================================
+       RESPONSIVE
+       ======================================== */
+    @media (max-width: 768px) {
+      .header {
+        padding: var(--space-md) var(--space-lg);
+        flex-wrap: wrap;
+        gap: var(--space-md);
+      }
+      
+      .header-user {
+        display: none;
+      }
+      
+      .main-content {
+        padding: var(--space-lg);
+      }
+      
+      .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .toolbar-left, .toolbar-right {
+        flex-direction: column;
+      }
+      
+      .filter-select, .search-input {
+        width: 100%;
+      }
+      
+      .styles-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: var(--space-md);
+      }
+      
+      .edit-layout {
+        grid-template-columns: 1fr;
+      }
+      
+      .edit-preview {
+        display: flex;
+        align-items: center;
+        gap: var(--space-lg);
+      }
+      
+      .edit-preview-image {
+        width: 100px;
+        height: 100px;
+      }
+      
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading Screen -->
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Loading Style Admin...</div>
+  </div>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-brand">
+        <a href="/" class="header-logo">
+          <img src="https://pub-acb560f551f141db830964aed1fa005f.r2.dev/site-assets/SA%20Wordmark%20Horizontal%20beige%20EAE4DA.svg" alt="Society Arts">
+        </a>
+        <div class="header-divider"></div>
+        <span class="header-title">Style Admin</span>
+      </div>
+      <div class="header-right">
+        <div class="header-status">
+          <span class="status-dot" id="connectionStatus"></span>
+          <span id="connectionText">Connecting...</span>
+        </div>
+        <div class="header-user" id="headerUser" style="display: none;">
+          <span class="user-email" id="userEmail"></span>
+          <button class="btn-logout" id="logoutBtn">Sign Out</button>
+        </div>
+      </div>
+    </header>
+    
+    <!-- Login Screen -->
+    <div class="login-screen" id="loginScreen">
+      <div class="login-card">
+        <div class="login-header">
+          <div class="login-logo">
+            <img src="https://pub-acb560f551f141db830964aed1fa005f.r2.dev/site-assets/SA%20Wordmark%20Horizontal.svg" alt="Society Arts">
+          </div>
+          <h1 class="login-title">Style Admin</h1>
+          <p class="login-subtitle">Super Admin access required</p>
+        </div>
+        <form class="login-form" id="loginForm">
+          <div class="form-group">
+            <label class="form-label" for="loginEmail">Email</label>
+            <input type="email" class="form-input" id="loginEmail" required placeholder="Enter your email" autocomplete="email">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="loginPassword">Password</label>
+            <input type="password" class="form-input" id="loginPassword" required placeholder="Enter your password" autocomplete="current-password">
+          </div>
+          <div class="login-error" id="loginError"></div>
+          <button type="submit" class="btn btn-primary btn-full" id="loginBtn">Sign In</button>
+        </form>
+      </div>
+    </div>
+    
+    <!-- Admin Content -->
+    <main class="main-content admin-content" id="adminContent">
+      <!-- Stats Bar -->
+      <div class="stats-bar">
+        <div class="stat-card">
+          <div class="stat-value" id="totalStyles">-</div>
+          <div class="stat-label">Total Styles</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="activeStyles">-</div>
+          <div class="stat-label">Active</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="filteredCount">-</div>
+          <div class="stat-label">Showing</div>
+        </div>
+      </div>
+      
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <select class="filter-select" id="artTypeFilter">
+            <option value="">All Art Types</option>
+          </select>
+          <select class="filter-select" id="mediumFilter">
+            <option value="">All Mediums</option>
+          </select>
+          <select class="filter-select" id="eraFilter">
+            <option value="">All Eras</option>
+          </select>
+          <input type="text" class="search-input" id="searchInput" placeholder="Search by name or ID...">
+        </div>
+        <div class="toolbar-right">
+          <span class="results-count" id="resultsCount"></span>
+        </div>
+      </div>
+      
+      <!-- Styles Grid -->
+      <div class="styles-grid" id="stylesGrid">
+        <!-- Cards will be inserted here -->
+      </div>
+      
+      <!-- Pagination -->
+      <div class="pagination" id="pagination">
+        <button class="pagination-btn" id="prevBtn" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+        <span class="pagination-info" id="paginationInfo">Page 1 of 1</span>
+        <button class="pagination-btn" id="nextBtn" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      </div>
+    </main>
+  </div>
+  
+  <!-- Edit Modal -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">Edit Style</h2>
+        <button class="modal-close" id="modalClose">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="edit-layout">
+          <div class="edit-preview">
+            <img class="edit-preview-image" id="editPreviewImage" src="" alt="">
+            <span class="edit-preview-id" id="editPreviewId"></span>
+          </div>
+          <form class="edit-form" id="editForm">
+            <!-- Text Fields Section -->
+            <div class="form-section">
+              <div class="form-section-title">Text Fields</div>
+              <div class="form-group">
+                <label class="form-label" for="editName">Title</label>
+                <input type="text" class="form-input" id="editName" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="editTagline">Tagline</label>
+                <input type="text" class="form-input" id="editTagline">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="editDescription">Description</label>
+                <textarea class="form-textarea" id="editDescription" rows="4"></textarea>
+              </div>
+            </div>
+            
+            <!-- Primary Classifications Section -->
+            <div class="form-section">
+              <div class="form-section-title">Primary Classifications</div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="editArtType">Art Type</label>
+                  <select class="form-select" id="editArtType">
+                    <option value="">Select Art Type</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="editMedium">Medium</label>
+                  <select class="form-select" id="editMedium">
+                    <option value="">Select Medium</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="editPalette">Palette</label>
+                  <select class="form-select" id="editPalette">
+                    <option value="">Select Palette</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="editLighting">Lighting</label>
+                  <select class="form-select" id="editLighting">
+                    <option value="">Select Lighting</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="editComposition">Composition</label>
+                  <select class="form-select" id="editComposition">
+                    <option value="">Select Composition</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="editCulture">Culture</label>
+                  <select class="form-select" id="editCulture">
+                    <option value="">Select Culture</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="editEra">Era</label>
+                  <select class="form-select" id="editEra">
+                    <option value="">Select Era</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <!-- Placeholder for alignment -->
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="modalCancel">Cancel</button>
+        <button class="btn btn-primary" id="modalSave">Save Changes</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+  
+  <script>
+    // ========================================
+    // CONFIGURATION
+    // ========================================
+    const SUPABASE_URL = 'https://yspxlhcebcijeuemkaed.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlzcHhsaGNlYmNpamV1ZW1rYWVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYzMTczMTQsImV4cCI6MjA4MTg5MzMxNH0.MD0xQGkLnNdQ4hebC06lijU96AbPHPULhW_vjXuiGGE';
+    const R2_BASE_URL = 'https://pub-acb560f551f141db830964aed1fa005f.r2.dev';
+    const STYLES_PER_PAGE = 24;
+    
+    // ========================================
+    // STATE
+    // ========================================
+    let supabase = null;
+    let currentUser = null;
+    let userProfile = null;
+    let styles = [];
+    let filteredStyles = [];
+    let lookups = {
+      art_types: [],
+      mediums: [],
+      palettes: [],
+      lighting: [],
+      compositions: [],
+      cultures: [],
+      eras: []
+    };
+    let currentPage = 1;
+    let editingStyleId = null;
+    
+    // ========================================
+    // DOM ELEMENTS
+    // ========================================
+    const loadingScreen = document.getElementById('loadingScreen');
+    const loginScreen = document.getElementById('loginScreen');
+    const adminContent = document.getElementById('adminContent');
+    const loginForm = document.getElementById('loginForm');
+    const loginError = document.getElementById('loginError');
+    const connectionStatus = document.getElementById('connectionStatus');
+    const connectionText = document.getElementById('connectionText');
+    const headerUser = document.getElementById('headerUser');
+    const userEmail = document.getElementById('userEmail');
+    const logoutBtn = document.getElementById('logoutBtn');
+    
+    const totalStylesEl = document.getElementById('totalStyles');
+    const activeStylesEl = document.getElementById('activeStyles');
+    const filteredCountEl = document.getElementById('filteredCount');
+    const resultsCountEl = document.getElementById('resultsCount');
+    
+    const artTypeFilter = document.getElementById('artTypeFilter');
+    const mediumFilter = document.getElementById('mediumFilter');
+    const eraFilter = document.getElementById('eraFilter');
+    const searchInput = document.getElementById('searchInput');
+    const stylesGrid = document.getElementById('stylesGrid');
+    
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const paginationInfo = document.getElementById('paginationInfo');
+    
+    const editModal = document.getElementById('editModal');
+    const modalClose = document.getElementById('modalClose');
+    const modalCancel = document.getElementById('modalCancel');
+    const modalSave = document.getElementById('modalSave');
+    
+    const toastContainer = document.getElementById('toastContainer');
+    
+    // ========================================
+    // INITIALIZATION
+    // ========================================
+    async function init() {
+      try {
+        // Initialize Supabase client
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // Check for existing session
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session) {
+          await handleAuthSuccess(session.user);
+        } else {
+          showLoginScreen();
+        }
+        
+        setConnectionStatus('connected');
+      } catch (error) {
+        console.error('Initialization error:', error);
+        setConnectionStatus('error');
+        showToast('Failed to connect to database', 'error');
+      } finally {
+        loadingScreen.classList.add('hidden');
+      }
+    }
+    
+    // ========================================
+    // AUTHENTICATION
+    // ========================================
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      
+      loginError.textContent = '';
+      
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+        
+        if (error) throw error;
+        
+        await handleAuthSuccess(data.user);
+      } catch (error) {
+        console.error('Login error:', error);
+        loginError.textContent = error.message || 'Invalid email or password';
+      }
+    });
+    
+    async function handleAuthSuccess(user) {
+      currentUser = user;
+      
+      // Check if user is super_admin
+      const { data: profile, error } = await supabase
+        .from('user_profiles')
+        .select('role, display_name')
+        .eq('id', user.id)
+        .single();
+      
+      if (error || profile?.role !== 'super_admin') {
+        showToast('Access denied. Super Admin role required.', 'error');
+        await supabase.auth.signOut();
+        showLoginScreen();
+        return;
+      }
+      
+      userProfile = profile;
+      showAdminContent();
+      await loadData();
+    }
+    
+    logoutBtn.addEventListener('click', async () => {
+      await supabase.auth.signOut();
+      currentUser = null;
+      userProfile = null;
+      showLoginScreen();
+    });
+    
+    function showLoginScreen() {
+      loginScreen.style.display = 'flex';
+      adminContent.classList.remove('visible');
+      headerUser.style.display = 'none';
+    }
+    
+    function showAdminContent() {
+      loginScreen.style.display = 'none';
+      adminContent.classList.add('visible');
+      headerUser.style.display = 'flex';
+      userEmail.textContent = currentUser.email;
+    }
+    
+    function setConnectionStatus(status) {
+      connectionStatus.className = 'status-dot ' + status;
+      connectionText.textContent = status === 'connected' ? 'Connected' : 
+                                   status === 'error' ? 'Connection Error' : 'Connecting...';
+    }
+    
+    // ========================================
+    // DATA LOADING
+    // ========================================
+    async function loadData() {
+      try {
+        // Load lookup tables in parallel
+        const [
+          artTypesRes,
+          mediumsRes,
+          palettesRes,
+          lightingRes,
+          compositionsRes,
+          culturesRes,
+          erasRes,
+          stylesRes,
+          activeCountRes
+        ] = await Promise.all([
+          supabase.from('art_types').select('id, name').order('name'),
+          supabase.from('mediums').select('id, name').order('name'),
+          supabase.from('palettes').select('id, name').order('name'),
+          supabase.from('lighting').select('id, name').order('name'),
+          supabase.from('compositions').select('id, name').order('name'),
+          supabase.from('cultures').select('id, name').order('name'),
+          supabase.from('eras').select('id, name').order('name'),
+          supabase.from('styles').select('*').order('id'),
+          supabase.from('styles').select('id', { count: 'exact' }).eq('is_active', true)
+        ]);
+        
+        lookups.art_types = artTypesRes.data || [];
+        lookups.mediums = mediumsRes.data || [];
+        lookups.palettes = palettesRes.data || [];
+        lookups.lighting = lightingRes.data || [];
+        lookups.compositions = compositionsRes.data || [];
+        lookups.cultures = culturesRes.data || [];
+        lookups.eras = erasRes.data || [];
+        styles = stylesRes.data || [];
+        
+        // Update stats
+        totalStylesEl.textContent = styles.length.toLocaleString();
+        activeStylesEl.textContent = (activeCountRes.count || 0).toLocaleString();
+        
+        // Populate filter dropdowns
+        populateFilterDropdowns();
+        populateEditDropdowns();
+        
+        // Apply filters and render
+        applyFilters();
+        
+      } catch (error) {
+        console.error('Error loading data:', error);
+        showToast('Failed to load data', 'error');
+      }
+    }
+    
+    function populateFilterDropdowns() {
+      // Art Types
+      artTypeFilter.innerHTML = '<option value="">All Art Types</option>' +
+        lookups.art_types.map(at => `<option value="${at.id}">${at.name}</option>`).join('');
+      
+      // Mediums
+      mediumFilter.innerHTML = '<option value="">All Mediums</option>' +
+        lookups.mediums.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+      
+      // Eras
+      eraFilter.innerHTML = '<option value="">All Eras</option>' +
+        lookups.eras.map(e => `<option value="${e.id}">${e.name}</option>`).join('');
+    }
+    
+    function populateEditDropdowns() {
+      document.getElementById('editArtType').innerHTML = '<option value="">Select Art Type</option>' +
+        lookups.art_types.map(at => `<option value="${at.id}">${at.name}</option>`).join('');
+      
+      document.getElementById('editMedium').innerHTML = '<option value="">Select Medium</option>' +
+        lookups.mediums.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+      
+      document.getElementById('editPalette').innerHTML = '<option value="">Select Palette</option>' +
+        lookups.palettes.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+      
+      document.getElementById('editLighting').innerHTML = '<option value="">Select Lighting</option>' +
+        lookups.lighting.map(l => `<option value="${l.id}">${l.name}</option>`).join('');
+      
+      document.getElementById('editComposition').innerHTML = '<option value="">Select Composition</option>' +
+        lookups.compositions.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+      
+      document.getElementById('editCulture').innerHTML = '<option value="">Select Culture</option>' +
+        lookups.cultures.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+      
+      document.getElementById('editEra').innerHTML = '<option value="">Select Era</option>' +
+        lookups.eras.map(e => `<option value="${e.id}">${e.name}</option>`).join('');
+    }
+    
+    // ========================================
+    // FILTERING
+    // ========================================
+    artTypeFilter.addEventListener('change', applyFilters);
+    mediumFilter.addEventListener('change', applyFilters);
+    eraFilter.addEventListener('change', applyFilters);
+    
+    let searchTimeout;
+    searchInput.addEventListener('input', () => {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(applyFilters, 300);
+    });
+    
+    function applyFilters() {
+      const artTypeId = artTypeFilter.value;
+      const mediumId = mediumFilter.value;
+      const eraId = eraFilter.value;
+      const searchTerm = searchInput.value.toLowerCase().trim();
+      
+      filteredStyles = styles.filter(style => {
+        // Art Type filter
+        if (artTypeId && style.art_type_id !== artTypeId) return false;
+        
+        // Medium filter
+        if (mediumId && style.primary_medium_id !== mediumId) return false;
+        
+        // Era filter
+        if (eraId && style.era_id !== eraId) return false;
+        
+        // Search filter
+        if (searchTerm) {
+          const nameMatch = (style.name || '').toLowerCase().includes(searchTerm);
+          const idMatch = (style.id || '').toLowerCase().includes(searchTerm);
+          if (!nameMatch && !idMatch) return false;
+        }
+        
+        return true;
+      });
+      
+      currentPage = 1;
+      renderStyles();
+      updatePagination();
+      updateResultsCount();
+    }
+    
+    function updateResultsCount() {
+      filteredCountEl.textContent = filteredStyles.length.toLocaleString();
+      
+      const start = (currentPage - 1) * STYLES_PER_PAGE + 1;
+      const end = Math.min(currentPage * STYLES_PER_PAGE, filteredStyles.length);
+      
+      if (filteredStyles.length === 0) {
+        resultsCountEl.textContent = 'No results';
+      } else {
+        resultsCountEl.innerHTML = `Showing <strong>${start}-${end}</strong> of <strong>${filteredStyles.length}</strong>`;
+      }
+    }
+    
+    // ========================================
+    // RENDERING
+    // ========================================
+    function renderStyles() {
+      const start = (currentPage - 1) * STYLES_PER_PAGE;
+      const end = start + STYLES_PER_PAGE;
+      const pageStyles = filteredStyles.slice(start, end);
+      
+      if (pageStyles.length === 0) {
+        stylesGrid.innerHTML = `
+          <div class="empty-state" style="grid-column: 1 / -1;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <div class="empty-state-title">No styles found</div>
+            <p>Try adjusting your filters or search term.</p>
+          </div>
+        `;
+        return;
+      }
+      
+      stylesGrid.innerHTML = pageStyles.map(style => {
+        const artType = lookups.art_types.find(at => at.id === style.art_type_id);
+        const imageUrl = `${R2_BASE_URL}/${style.id}/${style.id}-00.webp`;
+        
+        return `
+          <div class="style-card" data-id="${style.id}" onclick="openEditModal('${style.id}')">
+            <div class="style-thumbnail">
+              <img src="${imageUrl}" alt="${style.name || style.id}" loading="lazy" 
+                   onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect fill=%22%23E7E2DC%22 width=%22100%22 height=%22100%22/%3E%3Ctext x=%2250%22 y=%2250%22 font-family=%22sans-serif%22 font-size=%2210%22 fill=%22%238B7B75%22 text-anchor=%22middle%22 dy=%22.3em%22%3ENo Image%3C/text%3E%3C/svg%3E'">
+              <span class="style-id-badge">${style.id}</span>
+            </div>
+            <div class="style-info">
+              <div class="style-name">${style.name || 'Untitled'}</div>
+              <div class="style-category">
+                <span class="style-category-dot"></span>
+                ${artType?.name || 'Uncategorized'}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    // ========================================
+    // PAGINATION
+    // ========================================
+    prevBtn.addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage--;
+        renderStyles();
+        updatePagination();
+        updateResultsCount();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    });
+    
+    nextBtn.addEventListener('click', () => {
+      const totalPages = Math.ceil(filteredStyles.length / STYLES_PER_PAGE);
+      if (currentPage < totalPages) {
+        currentPage++;
+        renderStyles();
+        updatePagination();
+        updateResultsCount();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    });
+    
+    function updatePagination() {
+      const totalPages = Math.ceil(filteredStyles.length / STYLES_PER_PAGE) || 1;
+      
+      prevBtn.disabled = currentPage <= 1;
+      nextBtn.disabled = currentPage >= totalPages;
+      paginationInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+    }
+    
+    // ========================================
+    // EDIT MODAL
+    // ========================================
+    function openEditModal(styleId) {
+      const style = styles.find(s => s.id === styleId);
+      if (!style) return;
+      
+      editingStyleId = styleId;
+      
+      // Set preview
+      document.getElementById('editPreviewImage').src = `${R2_BASE_URL}/${styleId}/${styleId}-00.webp`;
+      document.getElementById('editPreviewId').textContent = styleId;
+      
+      // Set text fields
+      document.getElementById('editName').value = style.name || '';
+      document.getElementById('editTagline').value = style.tagline || '';
+      document.getElementById('editDescription').value = style.description || '';
+      
+      // Set dropdowns
+      document.getElementById('editArtType').value = style.art_type_id || '';
+      document.getElementById('editMedium').value = style.primary_medium_id || '';
+      document.getElementById('editPalette').value = style.primary_palette_id || '';
+      document.getElementById('editLighting').value = style.primary_lighting_id || '';
+      document.getElementById('editComposition').value = style.primary_composition_id || '';
+      document.getElementById('editCulture').value = style.culture_id || '';
+      document.getElementById('editEra').value = style.era_id || '';
+      
+      editModal.classList.add('visible');
+    }
+    
+    function closeEditModal() {
+      editModal.classList.remove('visible');
+      editingStyleId = null;
+    }
+    
+    modalClose.addEventListener('click', closeEditModal);
+    modalCancel.addEventListener('click', closeEditModal);
+    
+    editModal.addEventListener('click', (e) => {
+      if (e.target === editModal) closeEditModal();
+    });
+    
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && editModal.classList.contains('visible')) {
+        closeEditModal();
+      }
+    });
+    
+    // ========================================
+    // SAVE CHANGES
+    // ========================================
+    modalSave.addEventListener('click', async () => {
+      if (!editingStyleId) return;
+      
+      const updates = {
+        name: document.getElementById('editName').value.trim(),
+        tagline: document.getElementById('editTagline').value.trim() || null,
+        description: document.getElementById('editDescription').value.trim() || null,
+        art_type_id: document.getElementById('editArtType').value || null,
+        primary_medium_id: document.getElementById('editMedium').value || null,
+        primary_palette_id: document.getElementById('editPalette').value || null,
+        primary_lighting_id: document.getElementById('editLighting').value || null,
+        primary_composition_id: document.getElementById('editComposition').value || null,
+        culture_id: document.getElementById('editCulture').value || null,
+        era_id: document.getElementById('editEra').value || null,
+        updated_at: new Date().toISOString()
+      };
+      
+      try {
+        modalSave.disabled = true;
+        modalSave.textContent = 'Saving...';
+        
+        const { error } = await supabase
+          .from('styles')
+          .update(updates)
+          .eq('id', editingStyleId);
+        
+        if (error) throw error;
+        
+        // Update local state
+        const styleIndex = styles.findIndex(s => s.id === editingStyleId);
+        if (styleIndex !== -1) {
+          styles[styleIndex] = { ...styles[styleIndex], ...updates };
+        }
+        
+        // Re-render
+        applyFilters();
+        
+        showToast('Style updated successfully', 'success');
+        closeEditModal();
+        
+      } catch (error) {
+        console.error('Save error:', error);
+        showToast('Failed to save changes: ' + error.message, 'error');
+      } finally {
+        modalSave.disabled = false;
+        modalSave.textContent = 'Save Changes';
+      }
+    });
+    
+    // ========================================
+    // TOAST NOTIFICATIONS
+    // ========================================
+    function showToast(message, type = 'info') {
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.textContent = message;
+      toastContainer.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.style.animation = 'slideIn 0.3s ease reverse';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+    
+    // ========================================
+    // START
+    // ========================================
+    init();
+  </script>
+</body>
+</html>
