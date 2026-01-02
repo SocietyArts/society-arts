@@ -23,7 +23,7 @@ const SITE_CONFIG = {
 const NAV_ITEMS = [
     { id: 'home', label: 'Home', href: '/index.html', icon: 'home' },
     { id: 'story-builder', label: 'Story Builder', href: '/story-builder.html', icon: 'edit' },
-    { id: 'style-finder', label: 'Style Finder', href: '/style-finder.html', icon: 'grid' },
+    { id: 'style-finder', label: 'Style Finder', href: '/story-builder.html?openStyleFinder=true', icon: 'grid' },
     { id: 'favorites', label: 'Favorites', href: '/favorites.html', icon: 'heart' },
     { id: 'collections', label: 'Collections', href: '/collections.html', icon: 'layers' }
 ];
