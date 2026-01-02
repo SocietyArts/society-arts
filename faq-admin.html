@@ -303,6 +303,15 @@
       background: #B54D4D;
     }
     
+    .btn-warning {
+      background: var(--color-warning);
+      color: white;
+    }
+    
+    .btn-warning:hover {
+      background: #c99560;
+    }
+    
     .btn:disabled {
       opacity: 0.5;
       cursor: not-allowed;
@@ -311,6 +320,16 @@
     .btn svg {
       width: 16px;
       height: 16px;
+    }
+    
+    .btn-sm {
+      padding: var(--space-xs) var(--space-sm);
+      font-size: 12px;
+    }
+    
+    .btn-sm svg {
+      width: 14px;
+      height: 14px;
     }
     
     /* ========================================
@@ -498,6 +517,42 @@
       overflow: hidden;
     }
     
+    /* Keywords indicator in FAQ item */
+    .faq-keywords-indicator {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+      margin-top: var(--space-sm);
+      font-size: 12px;
+    }
+    
+    .keywords-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    
+    .keywords-dot.has-keywords {
+      background: var(--color-success);
+    }
+    
+    .keywords-dot.no-keywords {
+      background: var(--color-warning);
+    }
+    
+    .keywords-text {
+      color: var(--color-text-muted);
+    }
+    
+    .keywords-preview {
+      color: var(--color-text-muted);
+      font-style: italic;
+      max-width: 300px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
     .faq-actions {
       display: flex;
       align-items: center;
@@ -570,6 +625,99 @@
     }
     
     /* ========================================
+       KEYWORDS SECTION IN MODAL
+       ======================================== */
+    .keywords-section {
+      background: var(--color-cream-dark);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      margin-top: var(--space-md);
+      border: 1px solid var(--color-border);
+    }
+    
+    .keywords-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-md);
+    }
+    
+    .keywords-title {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--color-text-muted);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    
+    .keywords-title svg {
+      width: 16px;
+      height: 16px;
+      color: var(--color-warning);
+    }
+    
+    .keywords-actions {
+      display: flex;
+      gap: var(--space-sm);
+    }
+    
+    .keywords-textarea {
+      min-height: 80px;
+      font-size: 13px;
+      background: white;
+    }
+    
+    .keywords-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: var(--space-sm);
+    }
+    
+    .keywords-count {
+      font-size: 12px;
+      color: var(--color-text-muted);
+    }
+    
+    .keywords-help {
+      font-size: 11px;
+      color: var(--color-text-muted);
+      font-style: italic;
+    }
+    
+    .generating-indicator {
+      display: none;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-sm) var(--space-md);
+      background: rgba(74, 140, 93, 0.1);
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      color: var(--color-success);
+      margin-bottom: var(--space-md);
+    }
+    
+    .generating-indicator.active {
+      display: flex;
+    }
+    
+    .generating-spinner {
+      width: 14px;
+      height: 14px;
+      border: 2px solid currentColor;
+      border-right-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* ========================================
        EMPTY STATE
        ======================================== */
     .empty-state {
@@ -618,10 +766,6 @@
       border-top-color: var(--color-coral);
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
-    }
-    
-    @keyframes spin {
-      to { transform: rotate(360deg); }
     }
     
     .loading-text {
@@ -710,7 +854,9 @@
       background: white;
       border-radius: var(--radius-xl);
       width: 100%;
-      max-width: 500px;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
       box-shadow: var(--shadow-lg);
       animation: modalIn 0.2s ease;
     }
@@ -795,6 +941,14 @@
       font-size: 24px;
       font-weight: 700;
       color: var(--color-brown);
+    }
+    
+    .stat-value.success {
+      color: var(--color-success);
+    }
+    
+    .stat-value.warning {
+      color: var(--color-warning);
     }
     
     .stat-label {
@@ -1035,6 +1189,14 @@
           <span class="stat-value" id="draftFaqs">-</span>
           <span class="stat-label">Drafts</span>
         </div>
+        <div class="stat-item">
+          <span class="stat-value success" id="withKeywords">-</span>
+          <span class="stat-label">With Keywords</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value warning" id="needKeywords">-</span>
+          <span class="stat-label">Need Keywords</span>
+        </div>
       </div>
       
       <!-- Toolbar -->
@@ -1051,6 +1213,12 @@
           >
         </div>
         <div class="toolbar-right">
+          <button class="btn btn-warning" id="generateAllBtn" title="Generate keywords for all FAQs missing them">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+            Generate All Missing
+          </button>
           <button class="btn btn-secondary" id="refreshBtn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="23 4 23 10 17 10"></polyline>
@@ -1124,6 +1292,36 @@
               <span style="font-size: 14px; color: var(--color-text-secondary);">Published</span>
             </label>
           </div>
+          
+          <!-- Keywords Section -->
+          <div class="keywords-section">
+            <div class="keywords-header">
+              <div class="keywords-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                </svg>
+                AI-Generated Keywords
+              </div>
+              <div class="keywords-actions">
+                <button type="button" class="btn btn-sm btn-success" id="generateKeywordsBtn">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                  </svg>
+                  <span id="generateBtnText">Generate</span>
+                </button>
+                <button type="button" class="btn btn-sm btn-secondary" id="clearKeywordsBtn">Clear</button>
+              </div>
+            </div>
+            <div class="generating-indicator" id="generatingIndicator">
+              <div class="generating-spinner"></div>
+              <span>Generating keywords with AI...</span>
+            </div>
+            <textarea class="form-input keywords-textarea" id="faqKeywords" placeholder="Keywords will appear here after generation, or enter manually..."></textarea>
+            <div class="keywords-meta">
+              <span class="keywords-count"><span id="keywordCount">0</span> keywords</span>
+              <span class="keywords-help">Click Generate to create, or Update to add to existing</span>
+            </div>
+          </div>
         </form>
       </div>
       <div class="modal-footer">
@@ -1165,6 +1363,7 @@
     // ========================================
     const SUPABASE_URL = 'https://yspxlhcebcijeuemkaed.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlzcHhsaGNlYmNpamV1ZW1rYWVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYzMTczMTQsImV4cCI6MjA4MTg5MzMxNH0.MD0xQGkLnNdQ4hebC06lijU96AbPHPULhW_vjXuiGGE';
+    const KEYWORDS_FUNCTION_URL = '/.netlify/functions/generate-faq-keywords';
     
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     
@@ -1208,6 +1407,8 @@
     const totalFaqs = document.getElementById('totalFaqs');
     const publishedFaqs = document.getElementById('publishedFaqs');
     const draftFaqs = document.getElementById('draftFaqs');
+    const withKeywords = document.getElementById('withKeywords');
+    const needKeywords = document.getElementById('needKeywords');
     
     // FAQ Modal
     const faqModal = document.getElementById('faqModal');
@@ -1219,6 +1420,12 @@
     const faqAnswerInput = document.getElementById('faqAnswer');
     const faqPriorityInput = document.getElementById('faqPriority');
     const faqPublishedInput = document.getElementById('faqPublished');
+    const faqKeywordsInput = document.getElementById('faqKeywords');
+    const keywordCountEl = document.getElementById('keywordCount');
+    const generateKeywordsBtn = document.getElementById('generateKeywordsBtn');
+    const generateBtnText = document.getElementById('generateBtnText');
+    const clearKeywordsBtn = document.getElementById('clearKeywordsBtn');
+    const generatingIndicator = document.getElementById('generatingIndicator');
     
     // Delete Modal
     const deleteModal = document.getElementById('deleteModal');
@@ -1370,6 +1577,23 @@
       return stripped.length > length ? stripped.substring(0, length) + '...' : stripped;
     }
     
+    function countKeywords(keywords) {
+      if (!keywords || keywords.trim() === '') return 0;
+      return keywords.split(',').filter(k => k.trim()).length;
+    }
+    
+    function updateKeywordCount() {
+      const count = countKeywords(faqKeywordsInput.value);
+      keywordCountEl.textContent = count;
+      
+      // Update button text based on whether keywords exist
+      if (faqKeywordsInput.value.trim()) {
+        generateBtnText.textContent = 'Update';
+      } else {
+        generateBtnText.textContent = 'Generate';
+      }
+    }
+    
     // ========================================
     // DATA FETCHING
     // ========================================
@@ -1414,6 +1638,11 @@
       totalFaqs.textContent = faqs.length;
       publishedFaqs.textContent = faqs.filter(f => f.is_published).length;
       draftFaqs.textContent = faqs.filter(f => !f.is_published).length;
+      
+      const withKw = faqs.filter(f => f.keywords && f.keywords.trim()).length;
+      const needKw = faqs.length - withKw;
+      withKeywords.textContent = withKw;
+      needKeywords.textContent = needKw;
     }
     
     // ========================================
@@ -1436,7 +1665,8 @@
       return faqs.filter(faq => {
         const matchesSearch = !searchTerm || 
           faq.question.toLowerCase().includes(searchTerm) ||
-          stripHtml(faq.answer).toLowerCase().includes(searchTerm);
+          stripHtml(faq.answer).toLowerCase().includes(searchTerm) ||
+          (faq.keywords && faq.keywords.toLowerCase().includes(searchTerm));
         
         const matchesCategory = selectedCategory === 'all' || 
           faq.category_id === selectedCategory;
@@ -1535,6 +1765,10 @@
         btn.addEventListener('click', () => openDeleteModal(btn.dataset.faqId));
       });
       
+      document.querySelectorAll('.faq-generate-btn').forEach(btn => {
+        btn.addEventListener('click', () => quickGenerateKeywords(btn.dataset.faqId));
+      });
+      
       document.querySelectorAll('.priority-up').forEach(btn => {
         btn.addEventListener('click', () => adjustPriority(btn.dataset.faqId, -1));
       });
@@ -1548,6 +1782,12 @@
       const publishedBadge = faq.is_published 
         ? '' 
         : '<span style="font-size: 11px; background: var(--color-warning); color: white; padding: 2px 8px; border-radius: 4px; margin-left: 8px;">Draft</span>';
+      
+      const hasKeywords = faq.keywords && faq.keywords.trim();
+      const keywordCount = countKeywords(faq.keywords);
+      const keywordPreview = hasKeywords 
+        ? faq.keywords.split(',').slice(0, 4).map(k => k.trim()).join(', ') + (keywordCount > 4 ? '...' : '')
+        : '';
       
       return `
         <div class="faq-item" id="faq-${faq.id}">
@@ -1570,8 +1810,18 @@
                 <span class="faq-question">${faq.question}${publishedBadge}</span>
               </div>
               <p class="faq-answer-preview">${truncate(faq.answer, 200)}</p>
+              <div class="faq-keywords-indicator">
+                <span class="keywords-dot ${hasKeywords ? 'has-keywords' : 'no-keywords'}"></span>
+                <span class="keywords-text">${hasKeywords ? `${keywordCount} keywords` : 'No keywords'}</span>
+                ${hasKeywords ? `<span class="keywords-preview">· ${keywordPreview}</span>` : ''}
+              </div>
             </div>
             <div class="faq-actions">
+              <button class="btn btn-ghost faq-generate-btn" data-faq-id="${faq.id}" title="${hasKeywords ? 'Update Keywords' : 'Generate Keywords'}" style="color: ${hasKeywords ? 'var(--color-success)' : 'var(--color-warning)'};">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                </svg>
+              </button>
               <button class="btn btn-ghost faq-edit-btn" data-faq-id="${faq.id}" title="Edit">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
@@ -1591,6 +1841,127 @@
     }
     
     // ========================================
+    // KEYWORD GENERATION
+    // ========================================
+    async function generateKeywords(question, answer, existingKeywords = null) {
+      try {
+        const response = await fetch(KEYWORDS_FUNCTION_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            question,
+            answer: stripHtml(answer),
+            existingKeywords,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to generate keywords');
+        }
+
+        const data = await response.json();
+        return data.keywords;
+
+      } catch (error) {
+        console.error('Error generating keywords:', error);
+        throw error;
+      }
+    }
+
+    async function handleGenerateKeywords() {
+      const question = faqQuestionInput.value.trim();
+      const answer = faqAnswerInput.value.trim();
+      const existingKeywords = faqKeywordsInput.value.trim() || null;
+
+      if (!question || !answer) {
+        showToast('Please enter both question and answer first', 'warning');
+        return;
+      }
+
+      generateKeywordsBtn.disabled = true;
+      generatingIndicator.classList.add('active');
+
+      try {
+        const keywords = await generateKeywords(question, answer, existingKeywords);
+        faqKeywordsInput.value = keywords;
+        updateKeywordCount();
+        showToast(`Generated ${countKeywords(keywords)} keywords`, 'success');
+      } catch (error) {
+        showToast('Failed to generate keywords: ' + error.message, 'error');
+      } finally {
+        generateKeywordsBtn.disabled = false;
+        generatingIndicator.classList.remove('active');
+      }
+    }
+
+    async function quickGenerateKeywords(faqId) {
+      const faq = faqs.find(f => f.id === faqId);
+      if (!faq) return;
+
+      showToast('Generating keywords...', 'info');
+
+      try {
+        const keywords = await generateKeywords(faq.question, faq.answer, faq.keywords || null);
+        
+        // Save directly to database
+        const { error } = await supabaseClient
+          .from('faq')
+          .update({ keywords })
+          .eq('id', faqId);
+
+        if (error) throw error;
+
+        showToast(`Generated ${countKeywords(keywords)} keywords`, 'success');
+        await fetchData(); // Refresh the list
+
+      } catch (error) {
+        showToast('Failed to generate keywords: ' + error.message, 'error');
+      }
+    }
+
+    async function generateAllMissingKeywords() {
+      const faqsNeedingKeywords = faqs.filter(f => !f.keywords || !f.keywords.trim());
+      
+      if (faqsNeedingKeywords.length === 0) {
+        showToast('All FAQs already have keywords!', 'info');
+        return;
+      }
+
+      if (!confirm(`Generate keywords for ${faqsNeedingKeywords.length} FAQs? This may take a moment.`)) {
+        return;
+      }
+
+      showToast(`Generating keywords for ${faqsNeedingKeywords.length} FAQs...`, 'info');
+
+      let successCount = 0;
+      let errorCount = 0;
+
+      for (const faq of faqsNeedingKeywords) {
+        try {
+          const keywords = await generateKeywords(faq.question, faq.answer, null);
+          
+          const { error } = await supabaseClient
+            .from('faq')
+            .update({ keywords })
+            .eq('id', faq.id);
+
+          if (error) throw error;
+          successCount++;
+          
+        } catch (error) {
+          console.error(`Error generating keywords for FAQ ${faq.id}:`, error);
+          errorCount++;
+        }
+      }
+
+      showToast(`Generated keywords: ${successCount} success, ${errorCount} failed`, successCount > 0 ? 'success' : 'error');
+      await fetchData();
+    }
+    
+    // ========================================
     // CRUD OPERATIONS
     // ========================================
     async function saveFaq() {
@@ -1600,7 +1971,8 @@
         question: faqQuestionInput.value.trim(),
         answer: faqAnswerInput.value.trim(),
         priority: parseInt(faqPriorityInput.value) || 0,
-        is_published: faqPublishedInput.checked
+        is_published: faqPublishedInput.checked,
+        keywords: faqKeywordsInput.value.trim() || null
       };
       
       if (!data.question || !data.answer) {
@@ -1696,6 +2068,8 @@
       faqAnswerInput.value = '';
       faqPriorityInput.value = '0';
       faqPublishedInput.checked = true;
+      faqKeywordsInput.value = '';
+      updateKeywordCount();
       faqModal.classList.add('active');
       faqQuestionInput.focus();
     }
@@ -1711,6 +2085,8 @@
       faqAnswerInput.value = faq.answer;
       faqPriorityInput.value = faq.priority;
       faqPublishedInput.checked = faq.is_published;
+      faqKeywordsInput.value = faq.keywords || '';
+      updateKeywordCount();
       faqModal.classList.add('active');
       faqQuestionInput.focus();
     }
@@ -1741,10 +2117,18 @@
     
     document.getElementById('addFaqBtn').addEventListener('click', openAddModal);
     document.getElementById('refreshBtn').addEventListener('click', fetchData);
+    document.getElementById('generateAllBtn').addEventListener('click', generateAllMissingKeywords);
     
     document.getElementById('modalClose').addEventListener('click', closeFaqModal);
     document.getElementById('modalCancel').addEventListener('click', closeFaqModal);
     document.getElementById('modalSave').addEventListener('click', saveFaq);
+    
+    generateKeywordsBtn.addEventListener('click', handleGenerateKeywords);
+    clearKeywordsBtn.addEventListener('click', () => {
+      faqKeywordsInput.value = '';
+      updateKeywordCount();
+    });
+    faqKeywordsInput.addEventListener('input', updateKeywordCount);
     
     document.getElementById('deleteModalClose').addEventListener('click', closeDeleteModal);
     document.getElementById('deleteModalCancel').addEventListener('click', closeDeleteModal);
