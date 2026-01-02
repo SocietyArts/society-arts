@@ -5,20 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FAQ - Society Arts</title>
   
-  <!-- Favicon -->
   <link rel="icon" type="image/png" href="https://pub-acb560f551f141db830964aed1fa005f.r2.dev/site-assets/SA_Monogram_Black%401x%201x1.png">
   
-  <!-- React -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Domine:wght@400;500;600;700&family=Familjen+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   
-  <!-- CSS -->
   <link rel="stylesheet" href="/css/variables.css">
   <link rel="stylesheet" href="/css/base.css">
   <link rel="stylesheet" href="/css/components.css">
@@ -27,10 +23,6 @@
   <link rel="stylesheet" href="/css/help-modals.css">
   
   <style>
-    /* ========================================
-       FAQ PAGE LAYOUT
-       ======================================== */
-    
     .faq-content {
       flex: 1;
       display: flex;
@@ -38,13 +30,11 @@
       overflow: hidden;
     }
     
-    /* Top Section - Scrolls Away */
     .faq-top-section {
       padding: var(--space-2xl) var(--space-2xl) 0 var(--space-2xl);
       flex-shrink: 0;
     }
     
-    /* Breadcrumb */
     .faq-breadcrumb {
       display: flex;
       align-items: center;
@@ -64,7 +54,6 @@
       color: var(--color-accent);
     }
     
-    /* Page Header */
     .faq-page-header {
       margin-bottom: var(--space-xl);
       max-width: 800px;
@@ -85,10 +74,6 @@
       margin: 0;
     }
     
-    /* ========================================
-       FAQ LAYOUT - Two Column with Sticky
-       ======================================== */
-    
     .faq-layout {
       display: flex;
       gap: var(--space-2xl);
@@ -98,7 +83,6 @@
       padding: 0 var(--space-2xl) var(--space-2xl) var(--space-2xl);
     }
     
-    /* Categories Sidebar - Sticky */
     .faq-categories {
       width: 240px;
       flex-shrink: 0;
@@ -173,10 +157,6 @@
       color: var(--color-text-secondary);
     }
     
-    /* ========================================
-       FAQ MAIN CONTENT
-       ======================================== */
-    
     .faq-main {
       flex: 1;
       min-width: 0;
@@ -185,7 +165,6 @@
       min-height: 0;
     }
     
-    /* Sticky Search Header */
     .faq-main-sticky {
       position: sticky;
       top: 0;
@@ -194,7 +173,6 @@
       z-index: 10;
     }
     
-    /* Fade effect under sticky search */
     .faq-main-sticky::after {
       content: '';
       position: absolute;
@@ -207,7 +185,6 @@
       transform: translateY(100%);
     }
     
-    /* Scrollable FAQ List */
     .faq-scrollable {
       flex: 1;
       overflow-y: auto;
@@ -215,7 +192,6 @@
       padding-bottom: var(--space-2xl);
     }
     
-    /* Search */
     .faq-search-wrapper {
       position: relative;
       max-width: 400px;
@@ -287,14 +263,14 @@
     .faq-search-results-info {
       font-size: var(--text-sm);
       color: var(--color-text-muted);
-      margin-bottom: var(--space-lg);
+      margin-top: var(--space-md);
+      margin-bottom: 0;
     }
     
     .faq-search-results-info strong {
       color: var(--color-text-primary);
     }
     
-    /* Section Title */
     .faq-section-title {
       font-family: var(--font-primary);
       font-size: 12px;
@@ -305,7 +281,6 @@
       margin: 0 0 var(--space-md) 0;
     }
     
-    /* FAQ Cards */
     .faq-cards {
       display: flex;
       flex-direction: column;
@@ -394,7 +369,6 @@
       color: var(--color-brown);
     }
     
-    /* FAQ Answer (Expandable) */
     .faq-card-answer {
       display: grid;
       grid-template-rows: 0fr;
@@ -439,24 +413,20 @@
       margin-bottom: 8px;
     }
     
-    /* Search Highlight */
     .faq-highlight {
       background: rgba(212, 165, 116, 0.3);
       padding: 1px 2px;
       border-radius: 2px;
     }
     
-    /* Top Questions Section */
     .faq-top-questions {
       margin-bottom: var(--space-xl);
     }
     
-    /* Category Section */
     .faq-category-section {
       margin-bottom: var(--space-md);
     }
     
-    /* Empty State */
     .faq-empty {
       display: flex;
       flex-direction: column;
@@ -487,7 +457,6 @@
       margin: 0;
     }
     
-    /* Loading State */
     .faq-loading {
       display: flex;
       flex-direction: column;
@@ -514,10 +483,6 @@
       font-size: var(--text-sm);
       color: var(--color-text-muted);
     }
-    
-    /* ========================================
-       Mobile Responsive
-       ======================================== */
     
     @media (max-width: 900px) {
       .faq-top-section {
@@ -615,18 +580,15 @@
 <body>
   <div id="root"></div>
   
-  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/js/shared/supabase-client.js"></script>
   <script src="/js/shared/api.js"></script>
   <script src="/js/shared/auth.js"></script>
   <script src="/js/shared/header.js"></script>
   
-  <!-- FAQ Page -->
   <script type="text/babel">
     const { useState, useEffect, useMemo, useCallback } = React;
     
-    // Icons
     const SearchIcon = () => (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
         <circle cx="11" cy="11" r="8"></circle>
@@ -677,14 +639,12 @@
       </svg>
     );
     
-    // Strip HTML for preview
     function stripHtml(html) {
       const tmp = document.createElement('div');
       tmp.innerHTML = html;
       return tmp.textContent || tmp.innerText || '';
     }
     
-    // Highlight text for search
     function highlightText(text, query) {
       if (!query || query.length < 2) return text;
       const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
@@ -694,7 +654,6 @@
       );
     }
     
-    // FAQ Card Component
     function FAQCard({ faq, searchQuery, isOpen, onToggle, isTopQuestion }) {
       const answerPreview = stripHtml(faq.answer).slice(0, 150) + (stripHtml(faq.answer).length > 150 ? '...' : '');
       
@@ -730,23 +689,22 @@
                       )
                     : faq.answer 
                 }}
-              />
+              ></div>
             </div>
           </div>
         </div>
       );
     }
     
-    // Main FAQ Page
     function FAQPage() {
       const { Header, Sidebar } = window.SocietyArts || {};
       const supabase = window.SocietyArts?.supabase;
       
       if (!Sidebar || !Header) {
-        return React.createElement('div', { className: 'loading-state' }, 'Loading...');
+        return <div className="loading-state">Loading...</div>;
       }
       
-      const { user, profile, isLoading: authLoading } = window.SocietyArts.useAuth();
+      const { user, profile } = window.SocietyArts.useAuth();
       
       const [categories, setCategories] = useState([]);
       const [faqs, setFaqs] = useState([]);
@@ -756,50 +714,40 @@
       const [searchQuery, setSearchQuery] = useState('');
       const [openItems, setOpenItems] = useState(new Set());
       
-      // Fetch FAQ data
       useEffect(() => {
         async function fetchFAQs() {
           if (!supabase) {
-            console.error('FAQ: No supabase client');
             setError('Database connection not available');
             setLoading(false);
             return;
           }
           
           try {
-            console.log('FAQ: Fetching categories...');
             const { data: categoriesData, error: categoriesError } = await supabase
               .from('faq_categories')
               .select('*')
               .order('sort_order');
             
-            console.log('FAQ: Categories result:', categoriesData, categoriesError);
-            
             if (categoriesError) throw categoriesError;
             
-            // Filter active categories client-side if is_active column exists
             const activeCategories = categoriesData?.filter(c => c.is_active !== false) || [];
             
-            console.log('FAQ: Fetching FAQs...');
             const { data: faqsData, error: faqsError } = await supabase
               .from('faq')
               .select('*')
               .eq('is_published', true)
               .order('priority');
             
-            console.log('FAQ: FAQs result:', faqsData?.length, 'items', faqsError);
-            
             if (faqsError) throw faqsError;
             
             setCategories(activeCategories);
             setFaqs(faqsData || []);
             
-            // Select first category by default
             if (activeCategories.length > 0) {
               setSelectedCategory(activeCategories[0].id);
             }
           } catch (err) {
-            console.error('FAQ: Error fetching data:', err);
+            console.error('FAQ error:', err);
             setError(err.message);
           } finally {
             setLoading(false);
@@ -809,14 +757,12 @@
         fetchFAQs();
       }, [supabase]);
       
-      // Get top questions (global_priority not null)
       const topQuestions = useMemo(() => {
         return faqs
           .filter(f => f.global_priority !== null && f.global_priority !== undefined)
           .sort((a, b) => a.global_priority - b.global_priority);
       }, [faqs]);
       
-      // Filter FAQs by selected category or search
       const filteredFaqs = useMemo(() => {
         if (searchQuery.length >= 2) {
           const query = searchQuery.toLowerCase();
@@ -834,7 +780,6 @@
         return [];
       }, [faqs, selectedCategory, searchQuery]);
       
-      // Get FAQ count per category
       const categoryCounts = useMemo(() => {
         const counts = {};
         faqs.forEach(faq => {
@@ -843,7 +788,6 @@
         return counts;
       }, [faqs]);
       
-      // Toggle FAQ open/closed
       const toggleItem = useCallback((id) => {
         setOpenItems(prev => {
           const next = new Set(prev);
@@ -856,18 +800,15 @@
         });
       }, []);
       
-      // Clear search
       const clearSearch = useCallback(() => {
         setSearchQuery('');
       }, []);
       
-      // Get selected category name
       const selectedCategoryName = useMemo(() => {
         const cat = categories.find(c => c.id === selectedCategory);
         return cat ? cat.name : '';
       }, [categories, selectedCategory]);
       
-      // Check if we should show top questions (first category selected, no search)
       const showTopQuestions = searchQuery.length < 2 && 
         selectedCategory === categories[0]?.id && 
         topQuestions.length > 0;
@@ -878,16 +819,13 @@
           <Header user={user} profile={profile} />
           
           <main className="faq-content">
-            {/* Top Section - Breadcrumb and Title */}
             <div className="faq-top-section">
-              {/* Breadcrumb */}
               <div className="faq-breadcrumb">
                 <a href="index.html">Home</a>
                 <ChevronRightIcon />
                 <span>Frequently Asked Questions</span>
               </div>
               
-              {/* Page Header */}
               <div className="faq-page-header">
                 <h1 className="faq-page-title">Frequently Asked Questions</h1>
                 <p className="faq-page-subtitle">
@@ -910,7 +848,6 @@
               </div>
             ) : (
               <div className="faq-layout">
-                {/* Categories Sidebar - Sticky */}
                 <aside className="faq-categories">
                   <h2 className="faq-categories-title">Categories</h2>
                   <nav className="faq-category-list">
@@ -931,9 +868,7 @@
                   </nav>
                 </aside>
                 
-                {/* Main Content */}
                 <div className="faq-main">
-                  {/* Sticky Search Header */}
                   <div className="faq-main-sticky">
                     <div className="faq-search-wrapper">
                       <span className="faq-search-icon"><SearchIcon /></span>
@@ -952,74 +887,67 @@
                       </button>
                     </div>
                     
-                    {/* Search Results Info */}
                     {searchQuery.length >= 2 && (
-                      <p className="faq-search-results-info" style={{ marginTop: 'var(--space-md)', marginBottom: 0 }}>
+                      <p className="faq-search-results-info">
                         Found <strong>{filteredFaqs.length}</strong> result{filteredFaqs.length !== 1 ? 's' : ''} for "<strong>{searchQuery}</strong>"
                       </p>
                     )}
                   </div>
                   
-                  {/* Scrollable FAQ List */}
                   <div className="faq-scrollable">
-                  
-                  {/* Top Questions */}
-                  {showTopQuestions && (
-                    <div className="faq-top-questions">
-                      <h2 className="faq-section-title">Top Questions</h2>
+                    {showTopQuestions && (
+                      <div className="faq-top-questions">
+                        <h2 className="faq-section-title">Top Questions</h2>
+                        <div className="faq-cards">
+                          {topQuestions.map(faq => (
+                            <FAQCard
+                              key={faq.id}
+                              faq={faq}
+                              searchQuery={searchQuery}
+                              isOpen={openItems.has(faq.id)}
+                              onToggle={() => toggleItem(faq.id)}
+                              isTopQuestion={true}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {searchQuery.length < 2 && selectedCategoryName && (
+                      <div className="faq-category-section">
+                        <h2 className="faq-section-title">{selectedCategoryName}</h2>
+                      </div>
+                    )}
+                    
+                    {filteredFaqs.length > 0 ? (
                       <div className="faq-cards">
-                        {topQuestions.map(faq => (
+                        {filteredFaqs.map(faq => (
                           <FAQCard
                             key={faq.id}
                             faq={faq}
                             searchQuery={searchQuery}
                             isOpen={openItems.has(faq.id)}
                             onToggle={() => toggleItem(faq.id)}
-                            isTopQuestion={true}
+                            isTopQuestion={false}
                           />
                         ))}
                       </div>
-                    </div>
-                  )}
-                  
-                  {/* Category Questions */}
-                  {searchQuery.length < 2 && selectedCategoryName && (
-                    <div className="faq-category-section">
-                      <h2 className="faq-section-title">{selectedCategoryName}</h2>
-                    </div>
-                  )}
-                  
-                  {/* FAQ Cards */}
-                  {filteredFaqs.length > 0 ? (
-                    <div className="faq-cards">
-                      {filteredFaqs.map(faq => (
-                        <FAQCard
-                          key={faq.id}
-                          faq={faq}
-                          searchQuery={searchQuery}
-                          isOpen={openItems.has(faq.id)}
-                          onToggle={() => toggleItem(faq.id)}
-                          isTopQuestion={false}
-                        />
-                      ))}
-                    </div>
-                  ) : searchQuery.length >= 2 ? (
-                    <div className="faq-empty">
-                      <div className="faq-empty-icon"><SearchOffIcon /></div>
-                      <h3 className="faq-empty-title">No results found</h3>
-                      <p className="faq-empty-text">Try different keywords or browse by category</p>
-                    </div>
-                  ) : null}
-                  </div>{/* End faq-scrollable */}
-                </div>{/* End faq-main */}
-              </div>{/* End faq-layout */}
+                    ) : searchQuery.length >= 2 ? (
+                      <div className="faq-empty">
+                        <div className="faq-empty-icon"><SearchOffIcon /></div>
+                        <h3 className="faq-empty-title">No results found</h3>
+                        <p className="faq-empty-text">Try different keywords or browse by category</p>
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
+              </div>
             )}
           </main>
         </div>
       );
     }
     
-    // Wait for components then render
     function waitForComponents() {
       if (window.SocietyArts?.Header && window.SocietyArts?.Sidebar && window.SocietyArts?.useAuth) {
         const root = ReactDOM.createRoot(document.getElementById('root'));
