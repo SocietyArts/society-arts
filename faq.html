@@ -27,108 +27,181 @@
   <link rel="stylesheet" href="/css/help-modals.css">
   
   <style>
-    .faq-content {
-      flex: 1;
-      padding: var(--space-2xl);
-      max-width: 900px;
-      overflow-y: auto;
-    }
+    /* ========================================
+       FAQ PAGE - Category Sidebar Layout
+       ======================================== */
     
-    .faq-header {
-      margin-bottom: var(--space-2xl);
-    }
-    
-    .faq-breadcrumb {
+    .faq-page-container {
       display: flex;
-      align-items: center;
-      gap: var(--space-sm);
-      font-size: var(--text-sm);
-      color: var(--color-text-muted);
-      margin-bottom: var(--space-md);
+      flex: 1;
+      overflow: hidden;
+      background: var(--color-background);
     }
     
-    .faq-breadcrumb a {
-      color: var(--color-text-muted);
-      text-decoration: none;
-      transition: color 0.2s;
+    /* ========================================
+       FAQ Sidebar (Categories)
+       ======================================== */
+    
+    .faq-sidebar {
+      width: 280px;
+      background: var(--color-surface);
+      border-right: 1px solid var(--color-border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      overflow: hidden;
     }
     
-    .faq-breadcrumb a:hover {
-      color: var(--color-accent);
+    .faq-sidebar-header {
+      padding: var(--space-xl) var(--space-lg);
+      border-bottom: 1px solid var(--color-border);
     }
     
-    .faq-title {
-      font-family: var(--font-serif);
-      font-size: var(--text-3xl);
-      font-weight: var(--weight-medium);
-      color: var(--color-text-primary);
-      margin: 0 0 var(--space-sm) 0;
-    }
-    
-    .faq-subtitle {
-      font-size: var(--text-base);
+    .faq-sidebar-title {
+      font-family: var(--font-primary);
+      font-size: 12px;
+      font-weight: var(--weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
       color: var(--color-text-muted);
       margin: 0;
     }
     
-    /* Search */
-    .faq-search {
-      margin-bottom: var(--space-2xl);
+    .faq-category-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--space-sm) 0;
     }
     
-    .faq-search-wrapper {
-      position: relative;
+    .faq-category-item {
       display: flex;
       align-items: center;
+      padding: 12px var(--space-lg) 12px 14px;
+      margin: 2px 0;
+      font-family: var(--font-primary);
+      font-size: var(--text-base);
+      font-weight: var(--weight-medium);
+      color: var(--color-text-secondary);
+      background: none;
+      border: none;
+      border-left: 3px solid transparent;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      text-align: left;
+      width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .faq-category-item:hover {
+      background: var(--color-surface-hover);
+      color: var(--color-text-primary);
+    }
+    
+    .faq-category-item.active {
+      background: rgba(62, 35, 24, 0.06);
+      border-left-color: var(--color-brown);
+      color: var(--color-text-primary);
+      font-weight: var(--weight-semibold);
+    }
+    
+    .faq-category-count {
+      margin-left: auto;
+      padding-left: 12px;
+      font-size: var(--text-sm);
+      font-weight: var(--weight-regular);
+      color: var(--color-text-muted);
+    }
+    
+    .faq-category-item.active .faq-category-count {
+      color: var(--color-text-secondary);
+    }
+    
+    /* ========================================
+       FAQ Main Content
+       ======================================== */
+    
+    .faq-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-width: 0;
+    }
+    
+    .faq-main-header {
+      padding: var(--space-xl) var(--space-2xl);
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+    }
+    
+    .faq-main-title {
+      font-family: var(--font-serif);
+      font-size: var(--text-xl);
+      font-weight: var(--weight-regular);
+      color: var(--color-text-primary);
+      margin: 0 0 var(--space-md) 0;
+    }
+    
+    /* Search */
+    .faq-search-wrapper {
+      position: relative;
+      max-width: 500px;
     }
     
     .faq-search-icon {
       position: absolute;
-      left: 16px;
-      width: 20px;
-      height: 20px;
-      color: var(--color-text-light);
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      color: var(--color-text-muted);
       pointer-events: none;
     }
     
     .faq-search-input {
       width: 100%;
-      padding: 14px 48px 14px 48px;
+      padding: 12px 44px 12px 44px;
       font-family: var(--font-primary);
       font-size: var(--text-base);
-      border: 1px solid var(--color-border-light);
-      border-radius: var(--radius-lg);
-      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      background: var(--color-surface-alt);
       color: var(--color-text-primary);
-      transition: all 0.2s ease;
+      transition: all var(--transition-normal);
     }
     
     .faq-search-input:focus {
       outline: none;
       border-color: var(--color-tan-40);
-      box-shadow: 0 0 0 3px rgba(196, 181, 165, 0.2);
+      background: var(--color-white);
+      box-shadow: 0 0 0 3px rgba(62, 35, 24, 0.08);
     }
     
     .faq-search-input::placeholder {
-      color: var(--color-text-light);
+      color: var(--color-text-placeholder);
     }
     
     .faq-search-clear {
       position: absolute;
-      right: 12px;
-      width: 32px;
-      height: 32px;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 28px;
+      height: 28px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--color-surface-alt);
+      background: var(--color-tan-20);
       border: none;
-      border-radius: 50%;
+      border-radius: var(--radius-full);
       cursor: pointer;
       color: var(--color-text-secondary);
-      transition: all 0.15s ease;
       opacity: 0;
       pointer-events: none;
+      transition: all var(--transition-fast);
     }
     
     .faq-search-clear.visible {
@@ -137,219 +210,232 @@
     }
     
     .faq-search-clear:hover {
-      background: var(--color-tan-20);
+      background: var(--color-tan-40);
       color: var(--color-text-primary);
     }
     
-    .faq-search-info {
-      margin-top: var(--space-sm);
+    /* FAQ Content Area */
+    .faq-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--space-xl) var(--space-2xl);
+    }
+    
+    .faq-search-results-info {
       font-size: var(--text-sm);
       color: var(--color-text-muted);
+      margin-bottom: var(--space-lg);
     }
     
-    .faq-search-info strong {
+    .faq-search-results-info strong {
       color: var(--color-text-primary);
     }
     
-    /* FAQ Sections */
-    .faq-sections {
+    /* FAQ Cards */
+    .faq-cards {
       display: flex;
       flex-direction: column;
-      gap: var(--space-2xl);
+      gap: var(--space-md);
     }
     
-    .faq-section {
-      background: white;
-      border-radius: var(--radius-xl);
-      border: 1px solid var(--color-border-light);
+    .faq-card {
+      background: var(--color-surface);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--color-border);
       overflow: hidden;
+      transition: all var(--transition-normal);
     }
     
-    .faq-section-header {
-      padding: var(--space-lg) var(--space-xl);
-      background: var(--color-surface-alt);
-      border-bottom: 1px solid var(--color-border-light);
+    .faq-card:hover {
+      border-color: var(--color-tan-40);
+      box-shadow: var(--shadow-card);
     }
     
-    .faq-section-title {
-      font-family: var(--font-serif);
-      font-size: var(--text-lg);
-      font-weight: var(--weight-semibold);
-      color: var(--color-text-primary);
-      margin: 0;
-    }
-    
-    .faq-section-desc {
-      font-size: var(--text-sm);
-      color: var(--color-text-muted);
-      margin: var(--space-xs) 0 0 0;
-    }
-    
-    /* FAQ Items */
-    .faq-list {
-      display: flex;
-      flex-direction: column;
-    }
-    
-    .faq-item {
-      border-bottom: 1px solid var(--color-border-light);
-    }
-    
-    .faq-item:last-child {
-      border-bottom: none;
-    }
-    
-    .faq-question {
-      width: 100%;
-      padding: var(--space-lg) var(--space-xl);
-      background: none;
-      border: none;
-      text-align: left;
-      cursor: pointer;
+    .faq-card-header {
       display: flex;
       align-items: flex-start;
-      justify-content: space-between;
       gap: var(--space-md);
-      font-family: var(--font-primary);
-      font-size: var(--text-base);
-      font-weight: var(--weight-medium);
-      color: var(--color-text-primary);
-      line-height: 1.5;
-      transition: background 0.15s ease;
+      padding: var(--space-lg) var(--space-xl);
+      cursor: pointer;
+      transition: background var(--transition-fast);
     }
     
-    .faq-question:hover {
+    .faq-card-header:hover {
       background: var(--color-surface-alt);
     }
     
-    .faq-question-text {
-      flex: 1;
-    }
-    
-    .faq-icon {
-      width: 24px;
-      height: 24px;
+    .faq-card-icon {
+      width: 32px;
+      height: 32px;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--color-text-light);
-      transition: transform 0.25s ease, color 0.15s ease;
+      background: rgba(62, 35, 24, 0.08);
+      border-radius: var(--radius-sm);
+      color: var(--color-brown);
       flex-shrink: 0;
       margin-top: 2px;
     }
     
-    .faq-item.open .faq-icon {
-      transform: rotate(180deg);
-      color: var(--color-accent);
+    .faq-card-icon svg {
+      width: 18px;
+      height: 18px;
     }
     
-    .faq-answer {
-      display: grid;
-      grid-template-rows: 0fr;
-      transition: grid-template-rows 0.3s ease;
+    .faq-card-content {
+      flex: 1;
+      min-width: 0;
     }
     
-    .faq-item.open .faq-answer {
-      grid-template-rows: 1fr;
+    .faq-card-question {
+      font-family: var(--font-primary);
+      font-size: var(--text-md);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-primary);
+      margin: 0 0 6px 0;
+      line-height: var(--leading-snug);
     }
     
-    .faq-answer-inner {
+    .faq-card-preview {
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      line-height: var(--leading-snug);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
       overflow: hidden;
     }
     
-    .faq-answer-content {
-      padding: 0 var(--space-xl) var(--space-lg) var(--space-xl);
+    .faq-card-chevron {
+      width: 24px;
+      height: 24px;
       color: var(--color-text-muted);
-      line-height: 1.7;
+      flex-shrink: 0;
+      margin-top: 4px;
+      transition: transform var(--transition-slow);
     }
     
-    .faq-answer-content strong {
+    .faq-card.open .faq-card-chevron {
+      transform: rotate(180deg);
+      color: var(--color-brown);
+    }
+    
+    /* FAQ Answer (Expandable) */
+    .faq-card-answer {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows var(--transition-slow);
+    }
+    
+    .faq-card.open .faq-card-answer {
+      grid-template-rows: 1fr;
+    }
+    
+    .faq-card-answer-inner {
+      overflow: hidden;
+    }
+    
+    .faq-card-answer-content {
+      padding: 0 var(--space-xl) var(--space-lg) 64px;
+      font-size: var(--text-base);
+      color: var(--color-text-secondary);
+      line-height: var(--leading-relaxed);
+    }
+    
+    .faq-card-answer-content p {
+      margin: 0 0 12px 0;
+    }
+    
+    .faq-card-answer-content p:last-child {
+      margin-bottom: 0;
+    }
+    
+    .faq-card-answer-content strong {
       color: var(--color-text-primary);
       font-weight: var(--weight-semibold);
     }
     
-    /* Highlight */
-    .faq-highlight {
-      background: rgba(199, 51, 20, 0.15);
-      padding: 1px 3px;
-      border-radius: 3px;
+    .faq-card-answer-content ul,
+    .faq-card-answer-content ol {
+      margin: 12px 0;
+      padding-left: 24px;
     }
     
-    /* No Results */
-    .faq-no-results {
-      text-align: center;
-      padding: var(--space-3xl);
+    .faq-card-answer-content li {
+      margin-bottom: 8px;
+    }
+    
+    .faq-card-answer-content code {
       background: var(--color-surface-alt);
-      border-radius: var(--radius-xl);
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      font-size: var(--text-sm);
     }
     
-    .faq-no-results-icon {
+    .faq-card-answer-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+    }
+    
+    .faq-card-answer-content td {
+      padding: 8px;
+      border: 1px solid var(--color-border);
+    }
+    
+    /* Search Highlight */
+    .faq-highlight {
+      background: rgba(212, 165, 116, 0.3);
+      padding: 1px 2px;
+      border-radius: 2px;
+    }
+    
+    /* Empty State */
+    .faq-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-4xl);
+      text-align: center;
+    }
+    
+    .faq-empty-icon {
       width: 64px;
       height: 64px;
-      margin: 0 auto var(--space-lg);
-      color: var(--color-text-light);
+      color: var(--color-tan-40);
+      margin-bottom: var(--space-lg);
     }
     
-    .faq-no-results-title {
+    .faq-empty-title {
       font-family: var(--font-serif);
-      font-size: var(--text-xl);
+      font-size: var(--text-lg);
+      font-weight: var(--weight-medium);
       color: var(--color-text-primary);
       margin: 0 0 var(--space-sm) 0;
     }
     
-    .faq-no-results-text {
+    .faq-empty-text {
+      font-size: var(--text-sm);
       color: var(--color-text-muted);
       margin: 0;
     }
     
-    /* CTA */
-    .faq-cta {
-      text-align: center;
-      padding: var(--space-3xl);
-      background: var(--color-tan-10);
-      border-radius: var(--radius-xl);
-      margin-top: var(--space-3xl);
-    }
-    
-    .faq-cta-title {
-      font-family: var(--font-serif);
-      font-size: var(--text-xl);
-      color: var(--color-text-primary);
-      margin: 0 0 var(--space-sm) 0;
-    }
-    
-    .faq-cta-text {
-      color: var(--color-text-muted);
-      margin: 0 0 var(--space-lg) 0;
-    }
-    
-    .faq-cta-link {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--space-sm);
-      color: var(--color-accent);
-      font-weight: var(--weight-semibold);
-      text-decoration: none;
-      transition: gap 0.2s ease;
-    }
-    
-    .faq-cta-link:hover {
-      gap: var(--space-md);
-    }
-    
-    /* Loading */
+    /* Loading State */
     .faq-loading {
-      text-align: center;
-      padding: var(--space-3xl);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-4xl);
     }
     
     .faq-loading-spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid var(--color-border-light);
-      border-top-color: var(--color-accent);
-      border-radius: 50%;
-      margin: 0 auto var(--space-lg);
+      width: 32px;
+      height: 32px;
+      border: 3px solid var(--color-border);
+      border-top-color: var(--color-brown);
+      border-radius: var(--radius-full);
       animation: spin 0.8s linear infinite;
     }
     
@@ -358,44 +444,102 @@
     }
     
     .faq-loading-text {
+      margin-top: var(--space-md);
+      font-size: var(--text-sm);
       color: var(--color-text-muted);
     }
     
-    /* Error */
-    .faq-error {
-      text-align: center;
-      padding: var(--space-2xl);
-      background: #FEF2F2;
-      border: 1px solid #FECACA;
-      border-radius: var(--radius-xl);
+    /* ========================================
+       Top Questions Section
+       ======================================== */
+    
+    .faq-top-questions {
+      margin-bottom: var(--space-2xl);
+      padding-bottom: var(--space-xl);
+      border-bottom: 1px solid var(--color-border);
     }
     
-    .faq-error-title {
+    .faq-top-questions-title {
+      font-family: var(--font-primary);
+      font-size: 12px;
       font-weight: var(--weight-semibold);
-      color: #991B1B;
-      margin: 0 0 var(--space-sm) 0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--color-text-muted);
+      margin: 0 0 var(--space-md) 0;
     }
     
-    .faq-error-text {
-      color: #B91C1C;
-      margin: 0;
-    }
+    /* ========================================
+       Mobile Responsive
+       ======================================== */
     
     @media (max-width: 768px) {
+      .faq-page-container {
+        flex-direction: column;
+      }
+      
+      .faq-sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--color-border);
+        max-height: none;
+      }
+      
+      .faq-category-list {
+        display: flex;
+        flex-wrap: wrap;
+        padding: var(--space-sm) var(--space-md);
+        gap: var(--space-sm);
+      }
+      
+      .faq-category-item {
+        padding: 8px 14px;
+        border-radius: var(--radius-full);
+        border-left: none;
+        background: var(--color-surface-alt);
+        white-space: nowrap;
+        width: auto;
+      }
+      
+      .faq-category-item.active {
+        background: var(--color-brown);
+        color: var(--color-white);
+        border-left: none;
+      }
+      
+      .faq-category-item.active .faq-category-count {
+        color: rgba(255, 255, 255, 0.7);
+      }
+      
+      .faq-category-count {
+        display: none;
+      }
+      
+      .faq-card-answer-content {
+        padding-left: var(--space-xl);
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .faq-main-header {
+        padding: var(--space-lg);
+      }
+      
       .faq-content {
         padding: var(--space-lg);
       }
       
-      .faq-title {
-        font-size: var(--text-2xl);
+      .faq-card-header {
+        padding: var(--space-md) var(--space-lg);
       }
       
-      .faq-question {
-        padding: var(--space-md);
+      .faq-card-icon {
+        width: 28px;
+        height: 28px;
       }
       
-      .faq-answer-content {
-        padding: 0 var(--space-md) var(--space-md);
+      .faq-card-question {
+        font-size: var(--text-base);
       }
     }
   </style>
@@ -423,7 +567,7 @@
     );
     
     const XIcon = () => (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
         <line x1="18" y1="6" x2="6" y2="18"></line>
         <line x1="6" y1="6" x2="18" y2="18"></line>
       </svg>
@@ -435,9 +579,12 @@
       </svg>
     );
     
-    const ChevronIcon = () => (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        <polyline points="9 18 15 12 9 6"></polyline>
+    const DocumentIcon = () => (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+        <line x1="16" y1="13" x2="8" y2="13"></line>
+        <line x1="16" y1="17" x2="8" y2="17"></line>
       </svg>
     );
     
@@ -450,14 +597,20 @@
       </svg>
     );
     
-    const ArrowRightIcon = () => (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        <line x1="5" y1="12" x2="19" y2="12"></line>
-        <polyline points="12 5 19 12 12 19"></polyline>
+    const StarIcon = () => (
+      <svg viewBox="0 0 24 24" fill="currentColor" stroke="none">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
       </svg>
     );
     
-    // Highlight helper
+    // Strip HTML for preview
+    function stripHtml(html) {
+      const tmp = document.createElement('div');
+      tmp.innerHTML = html;
+      return tmp.textContent || tmp.innerText || '';
+    }
+    
+    // Highlight text for search
     function highlightText(text, query) {
       if (!query || query.length < 2) return text;
       const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
@@ -467,20 +620,34 @@
       );
     }
     
-    // FAQ Item Component
-    function FAQItem({ faq, searchQuery, isOpen, onToggle }) {
+    // FAQ Card Component
+    function FAQCard({ faq, searchQuery, isOpen, onToggle, isTopQuestion }) {
+      const answerPreview = stripHtml(faq.answer).slice(0, 150) + (stripHtml(faq.answer).length > 150 ? '...' : '');
+      
       return (
-        <div className={`faq-item ${isOpen ? 'open' : ''}`}>
-          <button className="faq-question" onClick={onToggle}>
-            <span className="faq-question-text">
-              {highlightText(faq.question, searchQuery)}
-            </span>
-            <span className="faq-icon"><ChevronDownIcon /></span>
-          </button>
-          <div className="faq-answer">
-            <div className="faq-answer-inner">
+        <div className={`faq-card ${isOpen ? 'open' : ''}`}>
+          <div className="faq-card-header" onClick={onToggle}>
+            <div className="faq-card-icon">
+              {isTopQuestion ? <StarIcon /> : <DocumentIcon />}
+            </div>
+            <div className="faq-card-content">
+              <h3 className="faq-card-question">
+                {highlightText(faq.question, searchQuery)}
+              </h3>
+              {!isOpen && (
+                <p className="faq-card-preview">
+                  {highlightText(answerPreview, searchQuery)}
+                </p>
+              )}
+            </div>
+            <div className="faq-card-chevron">
+              <ChevronDownIcon />
+            </div>
+          </div>
+          <div className="faq-card-answer">
+            <div className="faq-card-answer-inner">
               <div 
-                className="faq-answer-content"
+                className="faq-card-answer-content"
                 dangerouslySetInnerHTML={{ 
                   __html: searchQuery && searchQuery.length >= 2
                     ? faq.answer.replace(
@@ -511,6 +678,7 @@
       const [faqs, setFaqs] = useState([]);
       const [loading, setLoading] = useState(true);
       const [error, setError] = useState(null);
+      const [selectedCategory, setSelectedCategory] = useState(null);
       const [searchQuery, setSearchQuery] = useState('');
       const [openItems, setOpenItems] = useState(new Set());
       
@@ -542,6 +710,11 @@
             
             setCategories(categoriesData || []);
             setFaqs(faqsData || []);
+            
+            // Select first category by default
+            if (categoriesData && categoriesData.length > 0) {
+              setSelectedCategory(categoriesData[0].id);
+            }
           } catch (err) {
             console.error('Error fetching FAQs:', err);
             setError(err.message);
@@ -553,192 +726,198 @@
         fetchFAQs();
       }, [supabase]);
       
-      // Filter FAQs
-      const filteredData = useMemo(() => {
-        const query = searchQuery.toLowerCase().trim();
-        
-        if (!query || query.length < 2) {
-          return categories.map(category => ({
-            category,
-            faqs: faqs.filter(faq => faq.category_id === category.id)
-          })).filter(group => group.faqs.length > 0);
+      // Get top questions (global_priority not null)
+      const topQuestions = useMemo(() => {
+        return faqs
+          .filter(f => f.global_priority !== null)
+          .sort((a, b) => a.global_priority - b.global_priority);
+      }, [faqs]);
+      
+      // Filter FAQs by selected category or search
+      const filteredFaqs = useMemo(() => {
+        if (searchQuery.length >= 2) {
+          const query = searchQuery.toLowerCase();
+          return faqs.filter(faq => 
+            faq.question.toLowerCase().includes(query) ||
+            stripHtml(faq.answer).toLowerCase().includes(query) ||
+            (faq.keywords && faq.keywords.toLowerCase().includes(query))
+          );
         }
         
-// Search across question, answer, AND keywords
-const matchingFaqs = faqs.filter(faq => {
-  const questionMatch = faq.question.toLowerCase().includes(query);
-  const answerMatch = faq.answer.toLowerCase().includes(query);
-  const keywordMatch = faq.keywords && faq.keywords.toLowerCase().includes(query);
-  return questionMatch || answerMatch || keywordMatch;
-});
-
-// Sort by relevance: keyword matches first, then question, then answer
-matchingFaqs.sort((a, b) => {
-  const aKeyword = a.keywords && a.keywords.toLowerCase().includes(query) ? 0 : 1;
-  const bKeyword = b.keywords && b.keywords.toLowerCase().includes(query) ? 0 : 1;
-  if (aKeyword !== bKeyword) return aKeyword - bKeyword;
-  
-  const aQuestion = a.question.toLowerCase().includes(query) ? 0 : 1;
-  const bQuestion = b.question.toLowerCase().includes(query) ? 0 : 1;
-  if (aQuestion !== bQuestion) return aQuestion - bQuestion;
-  
-  return a.priority - b.priority;
-});
+        if (selectedCategory) {
+          return faqs.filter(faq => faq.category_id === selectedCategory);
+        }
         
-        return categories.map(category => ({
-          category,
-          faqs: matchingFaqs.filter(faq => faq.category_id === category.id)
-        })).filter(group => group.faqs.length > 0);
-      }, [categories, faqs, searchQuery]);
+        return [];
+      }, [faqs, selectedCategory, searchQuery]);
       
-      const totalMatches = useMemo(() => {
-        return filteredData.reduce((sum, group) => sum + group.faqs.length, 0);
-      }, [filteredData]);
+      // Get FAQ count per category
+      const categoryCounts = useMemo(() => {
+        const counts = {};
+        faqs.forEach(faq => {
+          counts[faq.category_id] = (counts[faq.category_id] || 0) + 1;
+        });
+        return counts;
+      }, [faqs]);
       
-      const toggleItem = useCallback((faqId) => {
+      // Toggle FAQ open/closed
+      const toggleItem = useCallback((id) => {
         setOpenItems(prev => {
           const next = new Set(prev);
-          if (next.has(faqId)) {
-            next.delete(faqId);
+          if (next.has(id)) {
+            next.delete(id);
           } else {
-            next.add(faqId);
+            next.add(id);
           }
           return next;
         });
       }, []);
       
+      // Clear search
       const clearSearch = useCallback(() => {
         setSearchQuery('');
       }, []);
       
+      // Get selected category name
+      const selectedCategoryName = useMemo(() => {
+        if (searchQuery.length >= 2) return 'Search Results';
+        const cat = categories.find(c => c.id === selectedCategory);
+        return cat ? cat.name : 'FAQ';
+      }, [categories, selectedCategory, searchQuery]);
+      
       return (
-        <div className="page-container">
-          <Sidebar />
-          <Header user={user} profile={profile} />
-          
-          <main className="faq-content">
-            {/* Breadcrumb */}
-            <div className="faq-breadcrumb">
-              <a href="index.html">Home</a>
-              <ChevronIcon />
-              <span>FAQ</span>
-            </div>
-            
-            <div className="faq-header">
-              <h1 className="faq-title">Frequently Asked Questions</h1>
-              <p className="faq-subtitle">Find answers to common questions about Society Arts</p>
-            </div>
-            
-            <div className="faq-search">
-              <div className="faq-search-wrapper">
-                <span className="faq-search-icon"><SearchIcon /></span>
-                <input
-                  type="text"
-                  className="faq-search-input"
-                  placeholder="Search questions..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <button 
-                  className={`faq-search-clear ${searchQuery ? 'visible' : ''}`}
-                  onClick={clearSearch}
-                  aria-label="Clear search"
-                >
-                  <XIcon />
-                </button>
-              </div>
-              {searchQuery && searchQuery.length >= 2 && (
-                <div className="faq-search-info">
-                  Found <strong>{totalMatches}</strong> result{totalMatches !== 1 ? 's' : ''} for "{searchQuery}"
+        <div className="app-layout">
+          <Sidebar user={user} profile={profile} currentPage="faq" />
+          <div className="main-container">
+            <Header user={user} profile={profile} />
+            <div className="faq-page-container">
+              {/* Categories Sidebar */}
+              <aside className="faq-sidebar">
+                <div className="faq-sidebar-header">
+                  <h2 className="faq-sidebar-title">Categories</h2>
                 </div>
-              )}
-            </div>
-            
-            {loading && (
-              <div className="faq-loading">
-                <div className="faq-loading-spinner"></div>
-                <p className="faq-loading-text">Loading FAQs...</p>
-              </div>
-            )}
-            
-            {error && !loading && (
-              <div className="faq-error">
-                <p className="faq-error-title">Unable to load FAQs</p>
-                <p className="faq-error-text">{error}</p>
-              </div>
-            )}
-            
-            {!loading && !error && filteredData.length === 0 && (
-              <div className="faq-no-results">
-                <div className="faq-no-results-icon"><SearchOffIcon /></div>
-                <h3 className="faq-no-results-title">No results found</h3>
-                <p className="faq-no-results-text">
-                  Try searching with different keywords or browse all questions below.
-                </p>
-              </div>
-            )}
-            
-            {!loading && !error && filteredData.length > 0 && (
-              <div className="faq-sections">
-                {filteredData.map(({ category, faqs: categoryFaqs }) => (
-                  <div key={category.id} className="faq-section">
-                    <div className="faq-section-header">
-                      <h2 className="faq-section-title">{category.name}</h2>
-                      {category.description && (
-                        <p className="faq-section-desc">{category.description}</p>
-                      )}
-                    </div>
-                    <div className="faq-list">
-                      {categoryFaqs.map(faq => (
-                        <FAQItem
-                          key={faq.id}
-                          faq={faq}
-                          searchQuery={searchQuery}
-                          isOpen={openItems.has(faq.id)}
-                          onToggle={() => toggleItem(faq.id)}
-                        />
-                      ))}
-                    </div>
+                <nav className="faq-category-list">
+                  {categories.map(category => (
+                    <button
+                      key={category.id}
+                      className={`faq-category-item ${selectedCategory === category.id && searchQuery.length < 2 ? 'active' : ''}`}
+                      onClick={() => {
+                        setSelectedCategory(category.id);
+                        setSearchQuery('');
+                        setOpenItems(new Set());
+                      }}
+                    >
+                      {category.name}
+                      <span className="faq-category-count">{categoryCounts[category.id] || 0}</span>
+                    </button>
+                  ))}
+                </nav>
+              </aside>
+              
+              {/* Main Content */}
+              <main className="faq-main">
+                <div className="faq-main-header">
+                  <h1 className="faq-main-title">{selectedCategoryName}</h1>
+                  <div className="faq-search-wrapper">
+                    <span className="faq-search-icon"><SearchIcon /></span>
+                    <input
+                      type="text"
+                      className="faq-search-input"
+                      placeholder="Search all questions..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                    <button 
+                      className={`faq-search-clear ${searchQuery.length > 0 ? 'visible' : ''}`}
+                      onClick={clearSearch}
+                    >
+                      <XIcon />
+                    </button>
                   </div>
-                ))}
-              </div>
-            )}
-            
-            {!loading && !error && (
-              <div className="faq-cta">
-                <h3 className="faq-cta-title">Still have questions?</h3>
-                <p className="faq-cta-text">We're here to help you create beautiful art from your memories.</p>
-                <a href="mailto:support@societyarts.com" className="faq-cta-link">
-                  Contact Support <ArrowRightIcon />
-                </a>
-              </div>
-            )}
-          </main>
+                </div>
+                
+                <div className="faq-content">
+                  {loading ? (
+                    <div className="faq-loading">
+                      <div className="faq-loading-spinner"></div>
+                      <p className="faq-loading-text">Loading FAQs...</p>
+                    </div>
+                  ) : error ? (
+                    <div className="faq-empty">
+                      <div className="faq-empty-icon"><SearchOffIcon /></div>
+                      <h3 className="faq-empty-title">Unable to load FAQs</h3>
+                      <p className="faq-empty-text">{error}</p>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Top Questions (only show when not searching and on first category) */}
+                      {searchQuery.length < 2 && selectedCategory === categories[0]?.id && topQuestions.length > 0 && (
+                        <div className="faq-top-questions">
+                          <h2 className="faq-top-questions-title">Top Questions</h2>
+                          <div className="faq-cards">
+                            {topQuestions.map(faq => (
+                              <FAQCard
+                                key={faq.id}
+                                faq={faq}
+                                searchQuery={searchQuery}
+                                isOpen={openItems.has(faq.id)}
+                                onToggle={() => toggleItem(faq.id)}
+                                isTopQuestion={true}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Search Results Info */}
+                      {searchQuery.length >= 2 && (
+                        <p className="faq-search-results-info">
+                          Found <strong>{filteredFaqs.length}</strong> result{filteredFaqs.length !== 1 ? 's' : ''} for "<strong>{searchQuery}</strong>"
+                        </p>
+                      )}
+                      
+                      {/* FAQ Cards */}
+                      {filteredFaqs.length > 0 ? (
+                        <div className="faq-cards">
+                          {filteredFaqs.map(faq => (
+                            <FAQCard
+                              key={faq.id}
+                              faq={faq}
+                              searchQuery={searchQuery}
+                              isOpen={openItems.has(faq.id)}
+                              onToggle={() => toggleItem(faq.id)}
+                              isTopQuestion={false}
+                            />
+                          ))}
+                        </div>
+                      ) : searchQuery.length >= 2 ? (
+                        <div className="faq-empty">
+                          <div className="faq-empty-icon"><SearchOffIcon /></div>
+                          <h3 className="faq-empty-title">No results found</h3>
+                          <p className="faq-empty-text">Try different keywords or browse by category</p>
+                        </div>
+                      ) : null}
+                    </>
+                  )}
+                </div>
+              </main>
+            </div>
+          </div>
         </div>
       );
     }
-
-    const root = ReactDOM.createRoot(document.getElementById('root'));
     
-    function waitForComponents(callback, maxAttempts = 50) {
-      let attempts = 0;
-      const check = () => {
-        attempts++;
-        if (window.SocietyArts?.Sidebar && window.SocietyArts?.Header && window.SocietyArts?.useAuth) {
-          callback();
-        } else if (attempts < maxAttempts) {
-          setTimeout(check, 100);
-        } else {
-          console.error('Components failed to load');
-          callback();
-        }
-      };
-      check();
+    // Wait for components then render
+    function waitForComponents() {
+      if (window.SocietyArts?.Header && window.SocietyArts?.Sidebar && window.SocietyArts?.useAuth) {
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<FAQPage />);
+      } else {
+        setTimeout(waitForComponents, 50);
+      }
     }
     
-    waitForComponents(() => {
-      root.render(<FAQPage />);
-    });
+    waitForComponents();
   </script>
 </body>
 </html>
