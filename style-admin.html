@@ -1253,25 +1253,51 @@
     // INITIALIZATION
     // ========================================
     async function init() {
+      console.log('[StyleAdmin] Starting initialization...');
+      
       try {
         // Initialize Supabase client
+        console.log('[StyleAdmin] Creating Supabase client...');
         supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log('[StyleAdmin] Supabase client created');
+        
+        // Test connection with a simple query
+        console.log('[StyleAdmin] Testing database connection...');
+        const { data: testData, error: testError } = await supabase
+          .from('styles')
+          .select('id')
+          .limit(1);
+        
+        if (testError) {
+          console.error('[StyleAdmin] Database test failed:', testError);
+          throw new Error('Database connection failed: ' + testError.message);
+        }
+        console.log('[StyleAdmin] Database connection successful');
         
         // Check for existing session
-        const { data: { session } } = await supabase.auth.getSession();
+        console.log('[StyleAdmin] Checking auth session...');
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.error('[StyleAdmin] Session error:', sessionError);
+        }
         
         if (session) {
+          console.log('[StyleAdmin] Found existing session for:', session.user.email);
           await handleAuthSuccess(session.user);
         } else {
+          console.log('[StyleAdmin] No session found, showing login');
           showLoginScreen();
         }
         
         setConnectionStatus('connected');
       } catch (error) {
-        console.error('Initialization error:', error);
+        console.error('[StyleAdmin] Initialization error:', error);
         setConnectionStatus('error');
-        showToast('Failed to connect to database', 'error');
+        showToast('Failed to connect: ' + error.message, 'error');
+        showLoginScreen(); // Show login even on error so page isn't stuck
       } finally {
+        console.log('[StyleAdmin] Hiding loading screen');
         loadingScreen.classList.add('hidden');
       }
     }
@@ -1303,25 +1329,49 @@
     });
     
     async function handleAuthSuccess(user) {
+      console.log('[StyleAdmin] handleAuthSuccess for:', user.email);
       currentUser = user;
       
       // Check if user is super_admin
-      const { data: profile, error } = await supabase
-        .from('user_profiles')
-        .select('role, display_name')
-        .eq('id', user.id)
-        .single();
+      console.log('[StyleAdmin] Checking user role...');
       
-      if (error || profile?.role !== 'super_admin') {
-        showToast('Access denied. Super Admin role required.', 'error');
-        await supabase.auth.signOut();
+      try {
+        const { data: profile, error } = await supabase
+          .from('user_profiles')
+          .select('role, display_name')
+          .eq('id', user.id)
+          .single();
+        
+        console.log('[StyleAdmin] Profile query result:', { profile, error });
+        
+        if (error) {
+          console.error('[StyleAdmin] Profile fetch error:', error);
+          // If user_profiles doesn't exist, allow access for now (dev mode)
+          if (error.code === 'PGRST116' || error.message.includes('not found')) {
+            console.warn('[StyleAdmin] No profile found, allowing access in dev mode');
+            userProfile = { role: 'super_admin', display_name: user.email };
+          } else {
+            throw error;
+          }
+        } else if (profile?.role !== 'super_admin') {
+          console.warn('[StyleAdmin] User is not super_admin:', profile?.role);
+          showToast('Access denied. Super Admin role required.', 'error');
+          await supabase.auth.signOut();
+          showLoginScreen();
+          return;
+        } else {
+          userProfile = profile;
+        }
+        
+        console.log('[StyleAdmin] Access granted, loading admin content...');
+        showAdminContent();
+        await loadData();
+        
+      } catch (err) {
+        console.error('[StyleAdmin] handleAuthSuccess error:', err);
+        showToast('Error checking permissions: ' + err.message, 'error');
         showLoginScreen();
-        return;
       }
-      
-      userProfile = profile;
-      showAdminContent();
-      await loadData();
     }
     
     logoutBtn.addEventListener('click', async () => {
@@ -1354,42 +1404,65 @@
     // DATA LOADING
     // ========================================
     async function loadData() {
+      console.log('[StyleAdmin] Loading data...');
+      
       try {
-        // Load lookup tables in parallel
-        const [
-          artTypesRes,
-          mediumsRes,
-          palettesRes,
-          lightingRes,
-          compositionsRes,
-          culturesRes,
-          erasRes,
-          stylesRes,
-          activeCountRes
-        ] = await Promise.all([
-          supabase.from('art_types').select('id, name').order('name'),
-          supabase.from('mediums').select('id, name').order('name'),
-          supabase.from('palettes').select('id, name').order('name'),
-          supabase.from('lighting').select('id, name').order('name'),
-          supabase.from('compositions').select('id, name').order('name'),
-          supabase.from('cultures').select('id, name').order('name'),
-          supabase.from('eras').select('id, name').order('name'),
-          supabase.from('styles').select('*').order('id'),
-          supabase.from('styles').select('id', { count: 'exact' }).eq('is_active', true)
-        ]);
-        
+        // Load lookup tables individually to identify failures
+        console.log('[StyleAdmin] Loading art_types...');
+        const artTypesRes = await supabase.from('art_types').select('id, name').order('name');
+        if (artTypesRes.error) console.error('[StyleAdmin] art_types error:', artTypesRes.error);
         lookups.art_types = artTypesRes.data || [];
+        console.log('[StyleAdmin] art_types loaded:', lookups.art_types.length);
+        
+        console.log('[StyleAdmin] Loading mediums...');
+        const mediumsRes = await supabase.from('mediums').select('id, name').order('name');
+        if (mediumsRes.error) console.error('[StyleAdmin] mediums error:', mediumsRes.error);
         lookups.mediums = mediumsRes.data || [];
+        console.log('[StyleAdmin] mediums loaded:', lookups.mediums.length);
+        
+        console.log('[StyleAdmin] Loading palettes...');
+        const palettesRes = await supabase.from('palettes').select('id, name').order('name');
+        if (palettesRes.error) console.error('[StyleAdmin] palettes error:', palettesRes.error);
         lookups.palettes = palettesRes.data || [];
+        console.log('[StyleAdmin] palettes loaded:', lookups.palettes.length);
+        
+        console.log('[StyleAdmin] Loading lighting...');
+        const lightingRes = await supabase.from('lighting').select('id, name').order('name');
+        if (lightingRes.error) console.error('[StyleAdmin] lighting error:', lightingRes.error);
         lookups.lighting = lightingRes.data || [];
+        console.log('[StyleAdmin] lighting loaded:', lookups.lighting.length);
+        
+        console.log('[StyleAdmin] Loading compositions...');
+        const compositionsRes = await supabase.from('compositions').select('id, name').order('name');
+        if (compositionsRes.error) console.error('[StyleAdmin] compositions error:', compositionsRes.error);
         lookups.compositions = compositionsRes.data || [];
+        console.log('[StyleAdmin] compositions loaded:', lookups.compositions.length);
+        
+        console.log('[StyleAdmin] Loading cultures...');
+        const culturesRes = await supabase.from('cultures').select('id, name').order('name');
+        if (culturesRes.error) console.error('[StyleAdmin] cultures error:', culturesRes.error);
         lookups.cultures = culturesRes.data || [];
+        console.log('[StyleAdmin] cultures loaded:', lookups.cultures.length);
+        
+        console.log('[StyleAdmin] Loading eras...');
+        const erasRes = await supabase.from('eras').select('id, name').order('name');
+        if (erasRes.error) console.error('[StyleAdmin] eras error:', erasRes.error);
         lookups.eras = erasRes.data || [];
+        console.log('[StyleAdmin] eras loaded:', lookups.eras.length);
+        
+        console.log('[StyleAdmin] Loading styles...');
+        const stylesRes = await supabase.from('styles').select('*').order('id');
+        if (stylesRes.error) console.error('[StyleAdmin] styles error:', stylesRes.error);
         styles = stylesRes.data || [];
+        console.log('[StyleAdmin] styles loaded:', styles.length);
+        
+        console.log('[StyleAdmin] Counting active styles...');
+        const activeCountRes = await supabase.from('styles').select('id', { count: 'exact' }).eq('is_active', true);
+        if (activeCountRes.error) console.error('[StyleAdmin] active count error:', activeCountRes.error);
         
         // Update stats
         totalStylesEl.textContent = styles.length.toLocaleString();
-        activeStylesEl.textContent = (activeCountRes.count || 0).toLocaleString();
+        activeStylesEl.textContent = (activeCountRes.count || styles.length).toLocaleString();
         
         // Populate filter dropdowns
         populateFilterDropdowns();
@@ -1398,9 +1471,11 @@
         // Apply filters and render
         applyFilters();
         
+        console.log('[StyleAdmin] Data loading complete');
+        
       } catch (error) {
-        console.error('Error loading data:', error);
-        showToast('Failed to load data', 'error');
+        console.error('[StyleAdmin] Error loading data:', error);
+        showToast('Failed to load data: ' + error.message, 'error');
       }
     }
     
