@@ -698,10 +698,70 @@
     .modal-footer {
       display: flex;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: space-between;
       gap: var(--space-md);
       padding: var(--space-xl);
       border-top: 1px solid var(--color-tan-20);
+    }
+    
+    .modal-footer-left {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    
+    .modal-footer-right {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+    
+    /* Action Buttons */
+    .btn-feature {
+      background: transparent;
+      color: var(--color-warning);
+      border: 1px solid var(--color-warning);
+    }
+    
+    .btn-feature:hover {
+      background: rgba(212, 168, 75, 0.1);
+    }
+    
+    .btn-feature.active {
+      background: var(--color-warning);
+      color: white;
+    }
+    
+    .btn-unlist {
+      background: transparent;
+      color: var(--color-brown-60);
+      border: 1px solid var(--color-tan-40);
+    }
+    
+    .btn-unlist:hover {
+      background: var(--color-tan-10);
+      border-color: var(--color-brown-40);
+    }
+    
+    .btn-unlist.active {
+      background: var(--color-brown-60);
+      color: white;
+      border-color: var(--color-brown-60);
+    }
+    
+    .btn-flag {
+      background: transparent;
+      color: var(--color-error);
+      border: 1px solid var(--color-error);
+    }
+    
+    .btn-flag:hover {
+      background: rgba(199, 51, 20, 0.1);
+    }
+    
+    .btn-flag.active {
+      background: var(--color-error);
+      color: white;
     }
     
     /* ========================================
@@ -1406,8 +1466,32 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-secondary" id="modalCancel">Cancel</button>
-        <button class="btn btn-primary" id="modalSave">Save Changes</button>
+        <div class="modal-footer-left">
+          <button type="button" class="btn btn-sm btn-feature" id="btnFeature" title="Mark as Featured">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+            Feature
+          </button>
+          <button type="button" class="btn btn-sm btn-unlist" id="btnUnlist" title="Unlist (set inactive)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+              <line x1="1" y1="1" x2="23" y2="23"></line>
+            </svg>
+            Unlist
+          </button>
+          <button type="button" class="btn btn-sm btn-flag" id="btnFlag" title="Flag for review">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+              <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+              <line x1="4" y1="22" x2="4" y2="15"></line>
+            </svg>
+            Flag
+          </button>
+        </div>
+        <div class="modal-footer-right">
+          <button class="btn btn-secondary" id="modalCancel">Cancel</button>
+          <button class="btn btn-primary" id="modalSave">Save Changes</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1953,6 +2037,9 @@
       document.getElementById('editCulture').value = style.culture_id || '';
       document.getElementById('editEra').value = style.era_id || '';
       
+      // Update action button states (Feature, Unlist, Flag)
+      updateActionButtonStates();
+      
       editModal.classList.add('visible');
     }
     
@@ -1972,6 +2059,133 @@
     
     modalClose.addEventListener('click', closeEditModal);
     modalCancel.addEventListener('click', closeEditModal);
+    
+    // ========================================
+    // FEATURE, UNLIST, FLAG BUTTONS
+    // ========================================
+    const btnFeature = document.getElementById('btnFeature');
+    const btnUnlist = document.getElementById('btnUnlist');
+    const btnFlag = document.getElementById('btnFlag');
+    
+    btnFeature.addEventListener('click', async () => {
+      if (!editingStyleId) return;
+      await toggleStyleField('is_featured', true, btnFeature, 'Featured');
+    });
+    
+    btnUnlist.addEventListener('click', async () => {
+      if (!editingStyleId) return;
+      await toggleStyleField('is_active', false, btnUnlist, 'Unlisted');
+    });
+    
+    btnFlag.addEventListener('click', async () => {
+      if (!editingStyleId) return;
+      await toggleStyleField('is_flagged', true, btnFlag, 'Flagged');
+    });
+    
+    async function toggleStyleField(field, targetValue, button, actionName) {
+      const style = styles.find(s => s.id === editingStyleId);
+      if (!style) return;
+      
+      // Determine new value (toggle if already at target, or set to target)
+      const currentValue = style[field];
+      const newValue = currentValue === targetValue ? !targetValue : targetValue;
+      
+      try {
+        button.disabled = true;
+        
+        const { error } = await supabaseClient
+          .from('styles')
+          .update({ [field]: newValue, updated_at: new Date().toISOString() })
+          .eq('id', editingStyleId);
+        
+        if (error) throw error;
+        
+        // Update local state
+        style[field] = newValue;
+        
+        // Update button appearance
+        updateActionButtonStates();
+        
+        // Show feedback
+        if (newValue === targetValue) {
+          showToast(`Style ${actionName.toLowerCase()}`, 'success');
+        } else {
+          showToast(`Style un-${actionName.toLowerCase()}`, 'success');
+        }
+        
+        // Update stats if relevant
+        if (field === 'is_active') {
+          const activeCount = styles.filter(s => s.is_active).length;
+          activeStylesEl.textContent = activeCount.toLocaleString();
+        }
+        
+      } catch (error) {
+        console.error(`Error updating ${field}:`, error);
+        showToast(`Failed to update: ${error.message}`, 'error');
+      } finally {
+        button.disabled = false;
+      }
+    }
+    
+    function updateActionButtonStates() {
+      const style = styles.find(s => s.id === editingStyleId);
+      if (!style) return;
+      
+      // Feature button
+      if (style.is_featured) {
+        btnFeature.classList.add('active');
+        btnFeature.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" width="14" height="14">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
+          Featured`;
+      } else {
+        btnFeature.classList.remove('active');
+        btnFeature.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
+          Feature`;
+      }
+      
+      // Unlist button (note: is_active=false means unlisted)
+      if (!style.is_active) {
+        btnUnlist.classList.add('active');
+        btnUnlist.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+            <line x1="1" y1="1" x2="23" y2="23"></line>
+          </svg>
+          Unlisted`;
+      } else {
+        btnUnlist.classList.remove('active');
+        btnUnlist.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+            <line x1="1" y1="1" x2="23" y2="23"></line>
+          </svg>
+          Unlist`;
+      }
+      
+      // Flag button
+      if (style.is_flagged) {
+        btnFlag.classList.add('active');
+        btnFlag.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" width="14" height="14">
+            <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+            <line x1="4" y1="22" x2="4" y2="15"></line>
+          </svg>
+          Flagged`;
+      } else {
+        btnFlag.classList.remove('active');
+        btnFlag.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+            <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+            <line x1="4" y1="22" x2="4" y2="15"></line>
+          </svg>
+          Flag`;
+      }
+    }
     
     editModal.addEventListener('click', (e) => {
       if (e.target === editModal) closeEditModal();
