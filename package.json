@@ -8,17 +8,11 @@
     "build": "echo 'No build step required'"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.24.0",
     "@aws-sdk/client-s3": "^3.490.0",
     "@supabase/supabase-js": "^2.39.0"
   },
   "engines": {
     "node": ">=18.0.0"
-  }
-}
-{
-  "name": "society-arts",
-  "version": "1.0.0",
-  "dependencies": {
-    "@anthropic-ai/sdk": "^0.24.0"
   }
 }
