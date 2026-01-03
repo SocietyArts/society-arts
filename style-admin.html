@@ -764,35 +764,45 @@
       left: var(--space-sm);
       width: 24px;
       height: 24px;
-      background: rgba(62, 35, 24, 0.85);
+      background: rgba(255, 255, 255, 0.9);
+      border: 2px solid rgba(62, 35, 24, 0.4);
       border-radius: var(--radius-sm);
       display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 5;
+      z-index: 10;
       transition: all var(--transition-fast);
+      cursor: pointer;
+    }
+    
+    .selection-checkbox:hover {
+      background: rgba(99, 102, 241, 0.2);
+      border-color: #6366f1;
+      transform: scale(1.1);
     }
     
     .style-card.selected .selection-checkbox {
       background: #6366f1;
+      border-color: #6366f1;
     }
     
     .selection-checkbox svg {
       width: 14px;
       height: 14px;
-      stroke: white;
+      stroke: #6366f1;
       opacity: 0;
     }
     
     .style-card.selected .selection-checkbox svg {
+      stroke: white;
       opacity: 1;
     }
     
-    .style-card:hover .selection-checkbox svg {
+    .selection-checkbox:hover svg {
       opacity: 0.5;
     }
     
-    .style-card.selected:hover .selection-checkbox svg {
+    .style-card.selected .selection-checkbox:hover svg {
       opacity: 1;
     }
     
@@ -1871,8 +1881,8 @@
       </div>
       
       <!-- Selection hint -->
-      <div class="selection-hint" id="selectionHint" style="display: none; padding: 8px 16px; background: rgba(99, 102, 241, 0.1); border-radius: 8px; margin-bottom: 16px; font-size: 13px; color: #6366f1;">
-        💡 <strong>Shift+Click</strong> to select range • <strong>Ctrl+Shift+Click</strong> to toggle individual • <strong>Click</strong> to edit
+      <div class="selection-hint" id="selectionHint" style="padding: 8px 16px; background: rgba(99, 102, 241, 0.1); border-radius: 8px; margin-bottom: 16px; font-size: 13px; color: #6366f1;">
+        💡 <strong>Click checkbox</strong> or <strong>Ctrl+Click</strong> to select • <strong>Shift+Click</strong> to select range • <strong>Click</strong> to edit
       </div>
       
       <!-- Styles Container with View Toggle -->
@@ -2905,8 +2915,17 @@
     // SELECTION HANDLING
     // ========================================
     function handleCardClick(event, styleId, index) {
-      // Ctrl+Shift+Click: Toggle individual selection
-      if (event.ctrlKey && event.shiftKey) {
+      // Check if click was on the checkbox area
+      if (event.target.closest('.selection-checkbox')) {
+        event.preventDefault();
+        event.stopPropagation();
+        toggleSelection(styleId);
+        lastSelectedIndex = index;
+        return;
+      }
+      
+      // Ctrl+Click (with or without Shift): Toggle individual selection
+      if (event.ctrlKey || event.metaKey) {
         event.preventDefault();
         toggleSelection(styleId);
         lastSelectedIndex = index;
@@ -2937,6 +2956,7 @@
       }
       updateSelectionUI();
       updateCardSelectionState(styleId);
+      updateSelectAllCheckbox();
     }
     
     function selectRange(fromIndex, toIndex) {
@@ -2969,7 +2989,6 @@
       const bulkSelectionCount = document.getElementById('bulkSelectionCount');
       const btnSelectAll = document.getElementById('btnSelectAll');
       const btnClearAll = document.getElementById('btnClearAll');
-      const selectionHint = document.getElementById('selectionHint');
       
       // Update count display
       bulkSelectionCount.textContent = `${count} selected`;
@@ -2979,12 +2998,10 @@
         bulkActionBar.classList.add('visible');
         btnSelectAll.style.display = 'none';
         btnClearAll.style.display = 'inline-flex';
-        selectionHint.style.display = 'block';
       } else {
         bulkActionBar.classList.remove('visible');
         btnSelectAll.style.display = 'inline-flex';
         btnClearAll.style.display = 'none';
-        selectionHint.style.display = 'none';
       }
     }
     
