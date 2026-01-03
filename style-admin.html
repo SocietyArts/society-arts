@@ -2219,45 +2219,73 @@
         updated_at: new Date().toISOString()
       };
       
+      console.log('[SAVE] Starting save for style:', editingStyleId);
+      console.log('[SAVE] Updates to apply:', updates);
+      console.log('[SAVE] New Art Medium ID:', newArtMediumId);
+      
       try {
         modalSave.disabled = true;
         modalSave.textContent = 'Saving...';
         
         // Update styles table
-        const { error: styleError } = await supabaseClient
+        console.log('[SAVE] Updating styles table...');
+        const { data: styleData, error: styleError } = await supabaseClient
           .from('styles')
           .update(updates)
-          .eq('id', editingStyleId);
+          .eq('id', editingStyleId)
+          .select();
         
-        if (styleError) throw styleError;
+        console.log('[SAVE] Styles update result - data:', styleData, 'error:', styleError);
+        
+        if (styleError) {
+          console.error('[SAVE] Styles update FAILED:', styleError);
+          throw styleError;
+        }
+        
+        if (!styleData || styleData.length === 0) {
+          console.warn('[SAVE] WARNING: No rows updated in styles table. Check RLS policies.');
+        } else {
+          console.log('[SAVE] Styles table updated successfully:', styleData);
+        }
         
         // Update Art Medium in junction table using delete-then-insert approach
         if (newArtMediumId) {
+          console.log('[SAVE] Updating junction table for Art Medium...');
+          
           // First, delete any existing primary art medium for this style
-          const { error: deleteError } = await supabaseClient
+          console.log('[SAVE] Deleting existing primary art medium...');
+          const { data: deleteData, error: deleteError } = await supabaseClient
             .from('style_art_mediums')
             .delete()
             .eq('style_id', editingStyleId)
-            .eq('is_primary', true);
+            .eq('is_primary', true)
+            .select();
+          
+          console.log('[SAVE] Delete result - data:', deleteData, 'error:', deleteError);
           
           if (deleteError) {
-            console.error('Junction delete error:', deleteError);
+            console.error('[SAVE] Junction delete FAILED:', deleteError);
           }
           
           // Then insert the new one
-          const { error: insertError } = await supabaseClient
+          console.log('[SAVE] Inserting new art medium:', newArtMediumId);
+          const { data: insertData, error: insertError } = await supabaseClient
             .from('style_art_mediums')
             .insert({
               style_id: editingStyleId,
               art_medium_id: newArtMediumId,
               is_primary: true,
               confidence_score: 1.0
-            });
+            })
+            .select();
+          
+          console.log('[SAVE] Insert result - data:', insertData, 'error:', insertError);
           
           if (insertError) {
-            console.error('Junction insert error:', insertError);
-            showToast('Style saved, but Art Medium update failed', 'warning');
+            console.error('[SAVE] Junction insert FAILED:', insertError);
+            showToast('Style saved, but Art Medium update failed: ' + insertError.message, 'warning');
           } else {
+            console.log('[SAVE] Junction table updated successfully');
             // Update local state - remove old and add new
             const existingIndex = styleArtMediums.findIndex(sam => sam.style_id === editingStyleId && sam.is_primary);
             if (existingIndex !== -1) {
@@ -2283,11 +2311,12 @@
         // Re-render
         applyFilters();
         
+        console.log('[SAVE] Save completed successfully');
         showToast('Style updated successfully', 'success');
         closeEditModal();
         
       } catch (error) {
-        console.error('Save error:', error);
+        console.error('[SAVE] CRITICAL ERROR:', error);
         showToast('Failed to save changes: ' + error.message, 'error');
       } finally {
         modalSave.disabled = false;
