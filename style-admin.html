@@ -501,6 +501,7 @@
       transition: all var(--transition-base);
       cursor: pointer;
       border: 3px solid transparent;
+      position: relative;
     }
     
     .style-card:hover {
@@ -516,6 +517,305 @@
     
     .style-card.featured:hover {
       box-shadow: 0 0 0 1px var(--color-coral), var(--shadow-md);
+    }
+    
+    /* Selected styles */
+    .style-card.selected {
+      border-color: #6366f1;
+      box-shadow: 0 0 0 2px #6366f1, var(--shadow-md);
+    }
+    
+    .style-card.selected .style-thumbnail::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(99, 102, 241, 0.15);
+      pointer-events: none;
+    }
+    
+    .style-card.selected.featured {
+      border-color: #6366f1;
+      box-shadow: 0 0 0 2px #6366f1, var(--shadow-md);
+    }
+    
+    .selection-checkbox {
+      position: absolute;
+      top: var(--space-sm);
+      left: var(--space-sm);
+      width: 24px;
+      height: 24px;
+      background: rgba(62, 35, 24, 0.85);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
+      transition: all var(--transition-fast);
+    }
+    
+    .style-card.selected .selection-checkbox {
+      background: #6366f1;
+    }
+    
+    .selection-checkbox svg {
+      width: 14px;
+      height: 14px;
+      stroke: white;
+      opacity: 0;
+    }
+    
+    .style-card.selected .selection-checkbox svg {
+      opacity: 1;
+    }
+    
+    .style-card:hover .selection-checkbox svg {
+      opacity: 0.5;
+    }
+    
+    .style-card.selected:hover .selection-checkbox svg {
+      opacity: 1;
+    }
+    
+    /* Bulk Action Bar */
+    .bulk-action-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--color-brown);
+      color: var(--color-cream);
+      padding: var(--space-md) var(--space-xl);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 100;
+      transform: translateY(100%);
+      transition: transform var(--transition-base);
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
+    }
+    
+    .bulk-action-bar.visible {
+      transform: translateY(0);
+    }
+    
+    .bulk-action-bar-left {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+    }
+    
+    .bulk-selection-count {
+      font-weight: 600;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    
+    .bulk-selection-count svg {
+      width: 18px;
+      height: 18px;
+    }
+    
+    .bulk-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    
+    .bulk-action-bar .btn {
+      padding: var(--space-sm) var(--space-md);
+      font-size: 13px;
+      border-radius: var(--radius-md);
+    }
+    
+    .btn-bulk {
+      background: rgba(255, 255, 255, 0.15);
+      color: var(--color-cream);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .btn-bulk:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+    
+    .btn-bulk-ai {
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      border: none;
+    }
+    
+    .btn-bulk-ai:hover {
+      box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4);
+    }
+    
+    .bulk-action-bar-right {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+    
+    .btn-clear-selection {
+      background: transparent;
+      color: var(--color-cream);
+      border: none;
+      opacity: 0.7;
+    }
+    
+    .btn-clear-selection:hover {
+      opacity: 1;
+    }
+    
+    /* Selection mode toolbar additions */
+    .selection-controls {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      margin-left: var(--space-md);
+      padding-left: var(--space-md);
+      border-left: 1px solid var(--color-tan-20);
+    }
+    
+    .btn-select-all {
+      font-size: 12px;
+      padding: var(--space-xs) var(--space-sm);
+      background: var(--color-tan-10);
+      border: 1px solid var(--color-tan-20);
+      color: var(--color-brown-60);
+    }
+    
+    .btn-select-all:hover {
+      background: var(--color-tan-20);
+      color: var(--color-brown);
+    }
+    
+    /* Confirmation Modal */
+    .confirm-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(62, 35, 24, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      opacity: 0;
+      visibility: hidden;
+      transition: all var(--transition-base);
+    }
+    
+    .confirm-modal-overlay.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .confirm-modal {
+      background: var(--color-white);
+      border-radius: var(--radius-xl);
+      padding: var(--space-2xl);
+      max-width: 420px;
+      width: 90%;
+      text-align: center;
+      transform: scale(0.9);
+      transition: transform var(--transition-base);
+    }
+    
+    .confirm-modal-overlay.visible .confirm-modal {
+      transform: scale(1);
+    }
+    
+    .confirm-modal-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto var(--space-lg);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .confirm-modal-icon.warning {
+      background: rgba(212, 168, 75, 0.15);
+      color: var(--color-warning);
+    }
+    
+    .confirm-modal-icon.danger {
+      background: rgba(199, 51, 20, 0.15);
+      color: var(--color-error);
+    }
+    
+    .confirm-modal-icon.info {
+      background: rgba(99, 102, 241, 0.15);
+      color: #6366f1;
+    }
+    
+    .confirm-modal-icon svg {
+      width: 24px;
+      height: 24px;
+    }
+    
+    .confirm-modal-title {
+      font-family: var(--font-serif);
+      font-size: 20px;
+      color: var(--color-brown);
+      margin-bottom: var(--space-sm);
+    }
+    
+    .confirm-modal-message {
+      color: var(--color-brown-60);
+      font-size: 14px;
+      margin-bottom: var(--space-xl);
+      line-height: 1.5;
+    }
+    
+    .confirm-modal-actions {
+      display: flex;
+      gap: var(--space-md);
+      justify-content: center;
+    }
+    
+    .confirm-modal-actions .btn {
+      min-width: 100px;
+    }
+    
+    /* Progress Modal */
+    .progress-modal {
+      background: var(--color-white);
+      border-radius: var(--radius-xl);
+      padding: var(--space-2xl);
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+    }
+    
+    .progress-modal-title {
+      font-family: var(--font-serif);
+      font-size: 18px;
+      color: var(--color-brown);
+      margin-bottom: var(--space-lg);
+    }
+    
+    .progress-bar-container {
+      background: var(--color-tan-10);
+      border-radius: var(--radius-full);
+      height: 8px;
+      overflow: hidden;
+      margin-bottom: var(--space-md);
+    }
+    
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      border-radius: var(--radius-full);
+      transition: width 0.3s ease;
+    }
+    
+    .progress-status {
+      color: var(--color-brown-60);
+      font-size: 13px;
+    }
+    
+    .progress-current {
+      font-weight: 600;
+      color: var(--color-brown);
     }
     
     .featured-badge {
@@ -554,7 +854,7 @@
     
     .style-id-badge {
       position: absolute;
-      top: var(--space-sm);
+      bottom: var(--space-sm);
       left: var(--space-sm);
       background: rgba(62, 35, 24, 0.85);
       color: var(--color-cream);
@@ -563,6 +863,7 @@
       padding: var(--space-xs) var(--space-sm);
       border-radius: var(--radius-sm);
       font-family: monospace;
+      z-index: 2;
     }
     
     .style-info {
@@ -1318,7 +1619,16 @@
         </div>
         <div class="toolbar-right">
           <span class="results-count" id="resultsCount"></span>
+          <div class="selection-controls">
+            <button class="btn btn-select-all" id="btnSelectAll">Select All</button>
+            <button class="btn btn-select-all" id="btnClearAll" style="display: none;">Clear All</button>
+          </div>
         </div>
+      </div>
+      
+      <!-- Selection hint -->
+      <div class="selection-hint" id="selectionHint" style="display: none; padding: 8px 16px; background: rgba(99, 102, 241, 0.1); border-radius: 8px; margin-bottom: 16px; font-size: 13px; color: #6366f1;">
+        💡 <strong>Shift+Click</strong> to select range • <strong>Ctrl+Shift+Click</strong> to toggle individual • <strong>Click</strong> to edit
       </div>
       
       <!-- Styles Grid -->
@@ -1530,6 +1840,90 @@
   <!-- Toast Container -->
   <div class="toast-container" id="toastContainer"></div>
   
+  <!-- Bulk Action Bar -->
+  <div class="bulk-action-bar" id="bulkActionBar">
+    <div class="bulk-action-bar-left">
+      <div class="bulk-selection-count">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9 11 12 14 22 4"></polyline>
+          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+        </svg>
+        <span id="bulkSelectionCount">0 selected</span>
+      </div>
+      <div class="bulk-actions">
+        <button class="btn btn-bulk" id="btnBulkFeature">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
+          Feature
+        </button>
+        <button class="btn btn-bulk" id="btnBulkUnlist">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+            <line x1="1" y1="1" x2="23" y2="23"></line>
+          </svg>
+          Unlist
+        </button>
+        <button class="btn btn-bulk" id="btnBulkFlag">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+            <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+            <line x1="4" y1="22" x2="4" y2="15"></line>
+          </svg>
+          Flag
+        </button>
+        <button class="btn btn-bulk btn-bulk-ai" id="btnBulkAiEvaluate">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 8v8"></path>
+            <path d="M8 12h8"></path>
+          </svg>
+          AI Evaluate
+        </button>
+      </div>
+    </div>
+    <div class="bulk-action-bar-right">
+      <button class="btn btn-clear-selection" id="btnClearSelection">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+        Clear Selection
+      </button>
+    </div>
+  </div>
+  
+  <!-- Confirmation Modal -->
+  <div class="confirm-modal-overlay" id="confirmModal">
+    <div class="confirm-modal">
+      <div class="confirm-modal-icon" id="confirmModalIcon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+      </div>
+      <h3 class="confirm-modal-title" id="confirmModalTitle">Confirm Action</h3>
+      <p class="confirm-modal-message" id="confirmModalMessage">Are you sure you want to perform this action?</p>
+      <div class="confirm-modal-actions">
+        <button class="btn btn-secondary" id="confirmModalCancel">Cancel</button>
+        <button class="btn btn-primary" id="confirmModalConfirm">Confirm</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Progress Modal -->
+  <div class="confirm-modal-overlay" id="progressModal">
+    <div class="progress-modal">
+      <h3 class="progress-modal-title" id="progressModalTitle">Processing...</h3>
+      <div class="progress-bar-container">
+        <div class="progress-bar-fill" id="progressBarFill" style="width: 0%"></div>
+      </div>
+      <div class="progress-status">
+        <span class="progress-current" id="progressCurrent">0</span> of <span id="progressTotal">0</span> completed
+      </div>
+    </div>
+  </div>
+  
   <script>
     // ========================================
     // CONFIGURATION
@@ -1560,6 +1954,11 @@
     };
     let currentPage = 1;
     let editingStyleId = null;
+    
+    // Selection state
+    let selectedStyleIds = new Set();
+    let lastSelectedIndex = null;
+    let confirmCallback = null;
     
     // ========================================
     // DOM ELEMENTS
@@ -1993,16 +2392,23 @@
         return;
       }
       
-      stylesGrid.innerHTML = pageStyles.map(style => {
+      stylesGrid.innerHTML = pageStyles.map((style, index) => {
         // Find Art Medium from junction table
         const styleArtMedium = styleArtMediums.find(sam => sam.style_id === style.id);
         const artMedium = styleArtMedium ? lookups.art_mediums.find(am => am.id === styleArtMedium.art_medium_id) : null;
         const imageUrl = `${R2_BASE_URL}/${style.id}/${style.id}-00.webp`;
         const featuredClass = style.is_featured ? ' featured' : '';
+        const selectedClass = selectedStyleIds.has(style.id) ? ' selected' : '';
+        const globalIndex = start + index; // Index in filteredStyles array
         
         return `
-          <div class="style-card${featuredClass}" data-id="${style.id}" onclick="openEditModal('${style.id}')">
+          <div class="style-card${featuredClass}${selectedClass}" data-id="${style.id}" data-index="${globalIndex}" onclick="handleCardClick(event, '${style.id}', ${globalIndex})">
             <div class="style-thumbnail">
+              <div class="selection-checkbox">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </div>
               <img src="${imageUrl}" alt="${style.name || style.id}" loading="lazy" 
                    onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect fill=%22%23E7E2DC%22 width=%22100%22 height=%22100%22/%3E%3Ctext x=%2250%22 y=%2250%22 font-family=%22sans-serif%22 font-size=%2210%22 fill=%22%238B7B75%22 text-anchor=%22middle%22 dy=%22.3em%22%3ENo Image%3C/text%3E%3C/svg%3E'">
               <span class="style-id-badge">${style.id}</span>
@@ -2018,7 +2424,114 @@
           </div>
         `;
       }).join('');
+      
+      updateSelectionUI();
     }
+    
+    // ========================================
+    // SELECTION HANDLING
+    // ========================================
+    function handleCardClick(event, styleId, index) {
+      // Ctrl+Shift+Click: Toggle individual selection
+      if (event.ctrlKey && event.shiftKey) {
+        event.preventDefault();
+        toggleSelection(styleId);
+        lastSelectedIndex = index;
+        return;
+      }
+      
+      // Shift+Click: Range selection
+      if (event.shiftKey) {
+        event.preventDefault();
+        if (lastSelectedIndex !== null) {
+          selectRange(lastSelectedIndex, index);
+        } else {
+          toggleSelection(styleId);
+        }
+        lastSelectedIndex = index;
+        return;
+      }
+      
+      // Normal click: Open edit modal
+      openEditModal(styleId);
+    }
+    
+    function toggleSelection(styleId) {
+      if (selectedStyleIds.has(styleId)) {
+        selectedStyleIds.delete(styleId);
+      } else {
+        selectedStyleIds.add(styleId);
+      }
+      updateSelectionUI();
+      updateCardSelectionState(styleId);
+    }
+    
+    function selectRange(fromIndex, toIndex) {
+      const start = Math.min(fromIndex, toIndex);
+      const end = Math.max(fromIndex, toIndex);
+      
+      for (let i = start; i <= end; i++) {
+        if (filteredStyles[i]) {
+          selectedStyleIds.add(filteredStyles[i].id);
+        }
+      }
+      
+      renderStyles(); // Re-render to show all selected
+    }
+    
+    function updateCardSelectionState(styleId) {
+      const card = document.querySelector(`.style-card[data-id="${styleId}"]`);
+      if (card) {
+        if (selectedStyleIds.has(styleId)) {
+          card.classList.add('selected');
+        } else {
+          card.classList.remove('selected');
+        }
+      }
+    }
+    
+    function updateSelectionUI() {
+      const count = selectedStyleIds.size;
+      const bulkActionBar = document.getElementById('bulkActionBar');
+      const bulkSelectionCount = document.getElementById('bulkSelectionCount');
+      const btnSelectAll = document.getElementById('btnSelectAll');
+      const btnClearAll = document.getElementById('btnClearAll');
+      const selectionHint = document.getElementById('selectionHint');
+      
+      // Update count display
+      bulkSelectionCount.textContent = `${count} selected`;
+      
+      // Show/hide bulk action bar
+      if (count > 0) {
+        bulkActionBar.classList.add('visible');
+        btnSelectAll.style.display = 'none';
+        btnClearAll.style.display = 'inline-flex';
+        selectionHint.style.display = 'block';
+      } else {
+        bulkActionBar.classList.remove('visible');
+        btnSelectAll.style.display = 'inline-flex';
+        btnClearAll.style.display = 'none';
+        selectionHint.style.display = 'none';
+      }
+    }
+    
+    function selectAllVisible() {
+      filteredStyles.forEach(style => {
+        selectedStyleIds.add(style.id);
+      });
+      renderStyles();
+    }
+    
+    function clearAllSelections() {
+      selectedStyleIds.clear();
+      lastSelectedIndex = null;
+      renderStyles();
+    }
+    
+    // Selection control buttons
+    document.getElementById('btnSelectAll').addEventListener('click', selectAllVisible);
+    document.getElementById('btnClearAll').addEventListener('click', clearAllSelections);
+    document.getElementById('btnClearSelection').addEventListener('click', clearAllSelections);
     
     // ========================================
     // PAGINATION
@@ -2539,6 +3052,266 @@
       const currentArtMedium = document.getElementById('editArtMedium').value;
       if (currentArtMedium === evaluation.art_medium_id) {
         showToast('AI agrees with current classification', 'success');
+      }
+    }
+    
+    // ========================================
+    // CONFIRMATION MODAL
+    // ========================================
+    const confirmModal = document.getElementById('confirmModal');
+    const confirmModalIcon = document.getElementById('confirmModalIcon');
+    const confirmModalTitle = document.getElementById('confirmModalTitle');
+    const confirmModalMessage = document.getElementById('confirmModalMessage');
+    const confirmModalCancel = document.getElementById('confirmModalCancel');
+    const confirmModalConfirm = document.getElementById('confirmModalConfirm');
+    
+    function showConfirmModal(options) {
+      const { title, message, iconType = 'warning', confirmText = 'Confirm', onConfirm } = options;
+      
+      confirmModalTitle.textContent = title;
+      confirmModalMessage.textContent = message;
+      confirmModalConfirm.textContent = confirmText;
+      
+      // Set icon type
+      confirmModalIcon.className = 'confirm-modal-icon ' + iconType;
+      
+      confirmCallback = onConfirm;
+      confirmModal.classList.add('visible');
+    }
+    
+    function hideConfirmModal() {
+      confirmModal.classList.remove('visible');
+      confirmCallback = null;
+    }
+    
+    confirmModalCancel.addEventListener('click', hideConfirmModal);
+    confirmModalConfirm.addEventListener('click', () => {
+      if (confirmCallback) {
+        confirmCallback();
+      }
+      hideConfirmModal();
+    });
+    
+    confirmModal.addEventListener('click', (e) => {
+      if (e.target === confirmModal) hideConfirmModal();
+    });
+    
+    // ========================================
+    // PROGRESS MODAL
+    // ========================================
+    const progressModal = document.getElementById('progressModal');
+    const progressModalTitle = document.getElementById('progressModalTitle');
+    const progressBarFill = document.getElementById('progressBarFill');
+    const progressCurrent = document.getElementById('progressCurrent');
+    const progressTotal = document.getElementById('progressTotal');
+    
+    function showProgressModal(title, total) {
+      progressModalTitle.textContent = title;
+      progressTotal.textContent = total;
+      progressCurrent.textContent = '0';
+      progressBarFill.style.width = '0%';
+      progressModal.classList.add('visible');
+    }
+    
+    function updateProgress(current, total) {
+      progressCurrent.textContent = current;
+      progressBarFill.style.width = `${(current / total) * 100}%`;
+    }
+    
+    function hideProgressModal() {
+      progressModal.classList.remove('visible');
+    }
+    
+    // ========================================
+    // BULK ACTIONS
+    // ========================================
+    document.getElementById('btnBulkFeature').addEventListener('click', () => {
+      const count = selectedStyleIds.size;
+      showConfirmModal({
+        title: `Feature ${count} Styles?`,
+        message: `This will mark ${count} style${count > 1 ? 's' : ''} as featured. Featured styles will appear with a star badge.`,
+        iconType: 'warning',
+        confirmText: 'Feature All',
+        onConfirm: () => bulkSetField('is_featured', true, 'Featured')
+      });
+    });
+    
+    document.getElementById('btnBulkUnlist').addEventListener('click', () => {
+      const count = selectedStyleIds.size;
+      showConfirmModal({
+        title: `Unlist ${count} Styles?`,
+        message: `This will hide ${count} style${count > 1 ? 's' : ''} from the website. They will no longer appear in the style gallery.`,
+        iconType: 'danger',
+        confirmText: 'Unlist All',
+        onConfirm: () => bulkSetField('is_active', false, 'Unlisted')
+      });
+    });
+    
+    document.getElementById('btnBulkFlag').addEventListener('click', () => {
+      const count = selectedStyleIds.size;
+      showConfirmModal({
+        title: `Flag ${count} Styles?`,
+        message: `This will flag ${count} style${count > 1 ? 's' : ''} for review. Flagged styles are hidden from the website.`,
+        iconType: 'danger',
+        confirmText: 'Flag All',
+        onConfirm: () => bulkSetField('is_flagged', true, 'Flagged')
+      });
+    });
+    
+    document.getElementById('btnBulkAiEvaluate').addEventListener('click', () => {
+      const count = selectedStyleIds.size;
+      showConfirmModal({
+        title: `AI Evaluate ${count} Styles?`,
+        message: `This will send ${count} style${count > 1 ? 's' : ''} to Claude for Art Medium classification. Results will be auto-applied without verification.`,
+        iconType: 'info',
+        confirmText: 'Start Evaluation',
+        onConfirm: bulkAiEvaluate
+      });
+    });
+    
+    async function bulkSetField(field, value, actionName) {
+      const ids = Array.from(selectedStyleIds);
+      const total = ids.length;
+      
+      showProgressModal(`${actionName} styles...`, total);
+      
+      let successCount = 0;
+      let errorCount = 0;
+      
+      for (let i = 0; i < ids.length; i++) {
+        const styleId = ids[i];
+        
+        try {
+          const { error } = await supabaseClient
+            .from('styles')
+            .update({ [field]: value, updated_at: new Date().toISOString() })
+            .eq('id', styleId);
+          
+          if (error) {
+            errorCount++;
+            console.error(`Error updating ${styleId}:`, error);
+          } else {
+            successCount++;
+            // Update local state
+            const style = styles.find(s => s.id === styleId);
+            if (style) style[field] = value;
+          }
+        } catch (err) {
+          errorCount++;
+          console.error(`Error updating ${styleId}:`, err);
+        }
+        
+        updateProgress(i + 1, total);
+      }
+      
+      hideProgressModal();
+      
+      // Update stats
+      const listedCount = styles.filter(s => s.is_active !== false && s.is_flagged !== true).length;
+      const featuredCount = styles.filter(s => s.is_featured === true).length;
+      activeStylesEl.textContent = listedCount.toLocaleString();
+      featuredStylesEl.textContent = featuredCount.toLocaleString();
+      
+      // Clear selection and re-render
+      clearAllSelections();
+      
+      // Show result
+      if (errorCount === 0) {
+        showToast(`${successCount} styles ${actionName.toLowerCase()} successfully`, 'success');
+      } else {
+        showToast(`${successCount} succeeded, ${errorCount} failed`, 'warning');
+      }
+    }
+    
+    async function bulkAiEvaluate() {
+      const ids = Array.from(selectedStyleIds);
+      const total = ids.length;
+      
+      showProgressModal('Evaluating with AI...', total);
+      
+      let successCount = 0;
+      let errorCount = 0;
+      
+      for (let i = 0; i < ids.length; i++) {
+        const styleId = ids[i];
+        
+        try {
+          const imageUrl = `${R2_BASE_URL}/${styleId}/${styleId}-00.webp`;
+          
+          const response = await fetch(NETLIFY_FUNCTION_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ style_id: styleId, image_url: imageUrl })
+          });
+          
+          const data = await response.json();
+          
+          if (!response.ok || !data.success) {
+            throw new Error(data.error || 'Evaluation failed');
+          }
+          
+          const evaluation = data.evaluation;
+          console.log(`[BulkAI] ${styleId}: ${evaluation.art_medium_id} (${evaluation.confidence})`);
+          
+          // Auto-apply: Delete existing and insert new
+          await supabaseClient
+            .from('style_art_mediums')
+            .delete()
+            .eq('style_id', styleId)
+            .eq('is_primary', true);
+          
+          const { error: insertError } = await supabaseClient
+            .from('style_art_mediums')
+            .insert({
+              style_id: styleId,
+              art_medium_id: evaluation.art_medium_id,
+              is_primary: true,
+              confidence_score: evaluation.confidence
+            });
+          
+          if (insertError) {
+            console.error(`Insert error for ${styleId}:`, insertError);
+            errorCount++;
+          } else {
+            successCount++;
+            // Update local state
+            const existingIndex = styleArtMediums.findIndex(sam => sam.style_id === styleId && sam.is_primary);
+            if (existingIndex !== -1) {
+              styleArtMediums.splice(existingIndex, 1);
+            }
+            styleArtMediums.push({
+              style_id: styleId,
+              art_medium_id: evaluation.art_medium_id,
+              is_primary: true
+            });
+          }
+          
+        } catch (err) {
+          errorCount++;
+          console.error(`AI evaluation error for ${styleId}:`, err);
+        }
+        
+        updateProgress(i + 1, total);
+        
+        // Small delay between requests to avoid rate limiting
+        if (i < ids.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+      }
+      
+      hideProgressModal();
+      
+      // Refresh filter counts
+      populateFilterDropdowns();
+      
+      // Clear selection and re-render
+      clearAllSelections();
+      
+      // Show result
+      if (errorCount === 0) {
+        showToast(`${successCount} styles evaluated and updated`, 'success');
+      } else {
+        showToast(`${successCount} succeeded, ${errorCount} failed`, 'warning');
       }
     }
     
