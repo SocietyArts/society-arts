@@ -2231,28 +2231,20 @@
         
         if (styleError) throw styleError;
         
-        // Update Art Medium in junction table
-        const currentArtMedium = styleArtMediums.find(sam => sam.style_id === editingStyleId);
-        
-        if (newArtMediumId && currentArtMedium) {
-          // Update existing record
-          if (currentArtMedium.art_medium_id !== newArtMediumId) {
-            const { error: junctionError } = await supabaseClient
-              .from('style_art_mediums')
-              .update({ art_medium_id: newArtMediumId })
-              .eq('style_id', editingStyleId)
-              .eq('is_primary', true);
-            
-            if (junctionError) {
-              console.error('Junction update error:', junctionError);
-              showToast('Style saved, but Art Medium update failed', 'warning');
-            } else {
-              // Update local state
-              currentArtMedium.art_medium_id = newArtMediumId;
-            }
+        // Update Art Medium in junction table using delete-then-insert approach
+        if (newArtMediumId) {
+          // First, delete any existing primary art medium for this style
+          const { error: deleteError } = await supabaseClient
+            .from('style_art_mediums')
+            .delete()
+            .eq('style_id', editingStyleId)
+            .eq('is_primary', true);
+          
+          if (deleteError) {
+            console.error('Junction delete error:', deleteError);
           }
-        } else if (newArtMediumId && !currentArtMedium) {
-          // Insert new record
+          
+          // Then insert the new one
           const { error: insertError } = await supabaseClient
             .from('style_art_mediums')
             .insert({
@@ -2264,9 +2256,13 @@
           
           if (insertError) {
             console.error('Junction insert error:', insertError);
-            showToast('Style saved, but Art Medium insert failed', 'warning');
+            showToast('Style saved, but Art Medium update failed', 'warning');
           } else {
-            // Update local state
+            // Update local state - remove old and add new
+            const existingIndex = styleArtMediums.findIndex(sam => sam.style_id === editingStyleId && sam.is_primary);
+            if (existingIndex !== -1) {
+              styleArtMediums.splice(existingIndex, 1);
+            }
             styleArtMediums.push({
               style_id: editingStyleId,
               art_medium_id: newArtMediumId,
