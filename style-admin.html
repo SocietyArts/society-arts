@@ -1731,9 +1731,12 @@
         lookups.art_mediums = artMediumsRes.data || [];
         console.log('[StyleAdmin] art_mediums loaded:', lookups.art_mediums.length);
         
-        // Load style_art_mediums junction table
+        // Load style_art_mediums junction table (remove default 1000 row limit)
         console.log('[StyleAdmin] Loading style_art_mediums junction table...');
-        const styleArtMediumsRes = await supabaseClient.from('style_art_mediums').select('style_id, art_medium_id, is_primary');
+        const styleArtMediumsRes = await supabaseClient
+          .from('style_art_mediums')
+          .select('style_id, art_medium_id, is_primary')
+          .range(0, 9999);
         if (styleArtMediumsRes.error) console.error('[StyleAdmin] style_art_mediums error:', styleArtMediumsRes.error);
         styleArtMediums = styleArtMediumsRes.data || [];
         console.log('[StyleAdmin] style_art_mediums loaded:', styleArtMediums.length);
@@ -1782,7 +1785,11 @@
         console.log('[StyleAdmin] eras loaded:', lookups.eras.length);
         
         console.log('[StyleAdmin] Loading styles...');
-        const stylesRes = await supabaseClient.from('styles').select('*').order('id');
+        const stylesRes = await supabaseClient
+          .from('styles')
+          .select('*')
+          .order('id')
+          .range(0, 9999);
         if (stylesRes.error) console.error('[StyleAdmin] styles error:', stylesRes.error);
         styles = stylesRes.data || [];
         console.log('[StyleAdmin] styles loaded:', styles.length);
