@@ -1715,7 +1715,162 @@
       font-size: 13px;
       color: var(--color-error);
     }
+     /* ========================================
+       AI EVALUATION - 3 STEP CASCADE (NEW)
+       ======================================== */
     
+    /* 3-Step Results Layout */
+    .ai-results-grid {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+    
+    .ai-result-step {
+      background: var(--color-cream);
+      border-radius: var(--radius-md);
+      padding: var(--space-sm) var(--space-md);
+      border-left: 3px solid var(--color-tan-30);
+    }
+    
+    .ai-result-step.step-1 { border-left-color: #6366f1; }
+    .ai-result-step.step-2 { border-left-color: #8b5cf6; }
+    .ai-result-step.step-3 { border-left-color: #a855f7; }
+    
+    .ai-result-step-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--color-brown-40);
+      margin-bottom: 4px;
+    }
+    
+    .ai-result-step-value {
+      font-family: var(--font-serif);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-brown);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+    
+    .ai-result-step-id {
+      font-family: monospace;
+      font-size: 11px;
+      color: var(--color-brown-40);
+      background: var(--color-tan-10);
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+    }
+    
+    .ai-result-confidence {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      margin-left: var(--space-xs);
+    }
+    
+    .confidence-badge {
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 11px;
+    }
+    
+    .confidence-badge.high {
+      background: rgba(74, 157, 110, 0.15);
+      color: var(--color-success);
+    }
+    
+    .confidence-badge.medium {
+      background: rgba(212, 168, 75, 0.15);
+      color: #b8860b;
+    }
+    
+    .confidence-badge.low {
+      background: rgba(199, 51, 20, 0.15);
+      color: var(--color-error);
+    }
+    
+    .ai-reasoning-text {
+      font-size: 12px;
+      color: var(--color-brown-60);
+      line-height: 1.5;
+      margin-top: var(--space-md);
+      padding: var(--space-sm);
+      background: var(--color-tan-10);
+      border-radius: var(--radius-md);
+      max-height: 100px;
+      overflow-y: auto;
+    }
+    
+    .btn-accept-all {
+      flex: 1;
+      background: var(--color-success);
+      color: white;
+      border: none;
+      padding: var(--space-sm) var(--space-md);
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-xs);
+    }
+    
+    .btn-accept-all:hover {
+      background: #3d8a5e;
+    }
+    
+    /* Medium Display in Edit Form */
+    .form-group-medium {
+      margin-top: var(--space-md);
+      padding-top: var(--space-md);
+      border-top: 1px dashed var(--color-tan-20);
+    }
+    
+    .medium-display {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-sm) var(--space-md);
+      background: var(--color-tan-10);
+      border-radius: var(--radius-md);
+      font-size: 13px;
+    }
+    
+    .medium-display-id {
+      font-family: monospace;
+      font-size: 11px;
+      color: var(--color-brown-40);
+      background: white;
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      flex-shrink: 0;
+    }
+    
+    .medium-display-name {
+      font-weight: 500;
+      color: var(--color-brown);
+    }
+    
+    .medium-display-hierarchy {
+      font-size: 11px;
+      color: var(--color-brown-40);
+      margin-top: 4px;
+    }
+    
+    .medium-not-assigned {
+      color: var(--color-brown-40);
+      font-style: italic;
+    }
     /* ========================================
        IMAGE LIGHTBOX
        ======================================== */
@@ -2140,30 +2295,66 @@
             </button>
             
             <!-- AI Suggestion Panel (hidden by default) -->
+   <!-- AI Suggestion Panel (hidden by default) - 3-STEP VERSION -->
             <div class="ai-suggestion-panel" id="aiSuggestionPanel" style="display: none;">
               <div class="ai-suggestion-header">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
                   <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
                 </svg>
-                AI Suggestion
+                AI Classification (3-Step)
               </div>
-              <div class="ai-suggestion-content">
-                <div class="ai-suggestion-category" id="aiSuggestedCategory">--</div>
-                <div class="ai-suggestion-confidence">
-                  <span>Confidence:</span>
-                  <span class="confidence-value" id="aiConfidence">--</span>
+              
+              <div class="ai-results-grid">
+                <!-- Step 1: Art Medium -->
+                <div class="ai-result-step step-1">
+                  <div class="ai-result-step-label">Step 1: Art Medium</div>
+                  <div class="ai-result-step-value">
+                    <span>
+                      <span id="aiArtMediumName">--</span>
+                      <span class="ai-result-confidence">
+                        <span class="confidence-badge" id="aiArtMediumConfBadge">--</span>
+                      </span>
+                    </span>
+                    <span class="ai-result-step-id" id="aiArtMediumId">--</span>
+                  </div>
                 </div>
-                <div class="ai-suggestion-reasoning" id="aiReasoning">--</div>
-                <div class="ai-suggestion-evidence" id="aiEvidence"></div>
+                
+                <!-- Step 2: Subcategory -->
+                <div class="ai-result-step step-2">
+                  <div class="ai-result-step-label">Step 2: Subcategory</div>
+                  <div class="ai-result-step-value">
+                    <span id="aiSubcategory">--</span>
+                    <span class="ai-result-confidence">
+                      <span class="confidence-badge" id="aiSubcategoryConfBadge">--</span>
+                    </span>
+                  </div>
+                </div>
+                
+                <!-- Step 3: Specific Technique -->
+                <div class="ai-result-step step-3">
+                  <div class="ai-result-step-label">Step 3: Technique</div>
+                  <div class="ai-result-step-value">
+                    <span>
+                      <span id="aiMediumName">--</span>
+                      <span class="ai-result-confidence">
+                        <span class="confidence-badge" id="aiMediumConfBadge">--</span>
+                      </span>
+                    </span>
+                    <span class="ai-result-step-id" id="aiMediumId">--</span>
+                  </div>
+                </div>
               </div>
+              
+              <div class="ai-reasoning-text" id="aiReasoning">--</div>
+              
               <div class="ai-suggestion-actions">
-                <button type="button" class="btn btn-sm btn-accept" id="btnAcceptSuggestion">
+                <button type="button" class="btn btn-accept-all" id="btnAcceptAll">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
                     <polyline points="20 6 9 17 4 12"></polyline>
                   </svg>
-                  Accept
+                  Accept All
                 </button>
-                <button type="button" class="btn btn-sm btn-secondary" id="btnIgnoreSuggestion">Ignore</button>
+                <button type="button" class="btn btn-secondary" id="btnIgnoreSuggestion">Ignore</button>
               </div>
             </div>
             
@@ -2207,6 +2398,21 @@
                     <option value="">Select Art Medium</option>
                   </select>
                 </div>
+
+                  <!-- Medium (Specific Technique) Display - NEW -->
+              <div class="form-group form-group-medium" id="mediumGroup">
+                <label class="form-label">Specific Technique (from AI)</label>
+                <div class="medium-display" id="mediumDisplay">
+                  <span class="medium-display-id" id="displayMediumId">--</span>
+                  <span class="medium-display-name" id="displayMediumName">Not assigned</span>
+                </div>
+                <div class="medium-display-hierarchy" id="displayMediumHierarchy">
+                  <span class="medium-not-assigned">Use AI evaluation to assign</span>
+                </div>
+                <input type="hidden" id="editMediumId" name="medium_id">
+              </div>
+
+                
               </div>
               <div class="form-row">
                 <div class="form-group">
@@ -2486,6 +2692,233 @@
     const modalSave = document.getElementById('modalSave');
     
     const toastContainer = document.getElementById('toastContainer');
+
+ // ========================================
+    // AI EVALUATION - 3 STEP CASCADE (NEW)
+    // ========================================
+    
+    // Cache for techniques data (fetched once)
+    let techniquesCache = null;
+    
+    // Fetch techniques data from Supabase (with caching)
+    async function fetchTechniquesData() {
+      if (techniquesCache) return techniquesCache;
+      
+      try {
+        const { data, error } = await supabaseClient
+          .from('mediums')
+          .select('id, category, subcategory, name, art_medium_id, d_feature')
+          .eq('is_active', true)
+          .order('art_medium_id')
+          .order('subcategory')
+          .order('id');
+        
+        if (error) throw error;
+        
+        techniquesCache = data;
+        console.log(`[AI] Cached ${data.length} techniques`);
+        return data;
+      } catch (error) {
+        console.error('[AI] Failed to fetch techniques:', error);
+        return [];
+      }
+    }
+    
+    // Call the 3-step evaluation API
+    async function evaluateStyleWithAI(styleId, imageUrl) {
+      const techniques = await fetchTechniquesData();
+      
+      const response = await fetch('/.netlify/functions/evaluate-style-v2', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          style_id: styleId,
+          image_url: imageUrl,
+          techniques_data: techniques
+        })
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `API error: ${response.status}`);
+      }
+      
+      return response.json();
+    }
+    
+    // Get confidence badge class based on value
+    function getConfidenceClass(confidence) {
+      if (confidence === null || confidence === undefined) return '';
+      if (confidence >= 0.8) return 'high';
+      if (confidence >= 0.6) return 'medium';
+      return 'low';
+    }
+    
+    // Format confidence as percentage
+    function formatConfidence(confidence) {
+      if (confidence === null || confidence === undefined) return '--';
+      return Math.round(confidence * 100) + '%';
+    }
+    
+    // Display AI evaluation results in the panel
+    function displayAIResults(evaluation) {
+      const panel = document.getElementById('aiSuggestionPanel');
+      
+      // Step 1: Art Medium
+      document.getElementById('aiArtMediumId').textContent = evaluation.art_medium_id || '--';
+      document.getElementById('aiArtMediumName').textContent = evaluation.art_medium_name || '--';
+      const artMediumBadge = document.getElementById('aiArtMediumConfBadge');
+      artMediumBadge.textContent = formatConfidence(evaluation.confidence_art_medium);
+      artMediumBadge.className = 'confidence-badge ' + getConfidenceClass(evaluation.confidence_art_medium);
+      
+      // Step 2: Subcategory
+      document.getElementById('aiSubcategory').textContent = evaluation.subcategory || '--';
+      const subcatBadge = document.getElementById('aiSubcategoryConfBadge');
+      subcatBadge.textContent = formatConfidence(evaluation.confidence_subcategory);
+      subcatBadge.className = 'confidence-badge ' + getConfidenceClass(evaluation.confidence_subcategory);
+      
+      // Step 3: Specific Technique
+      document.getElementById('aiMediumId').textContent = evaluation.medium_id || '--';
+      document.getElementById('aiMediumName').textContent = evaluation.medium_name || 'Not determined';
+      const mediumBadge = document.getElementById('aiMediumConfBadge');
+      mediumBadge.textContent = formatConfidence(evaluation.confidence_medium);
+      mediumBadge.className = 'confidence-badge ' + getConfidenceClass(evaluation.confidence_medium);
+      
+      // Reasoning
+      document.getElementById('aiReasoning').textContent = evaluation.ai_reasoning || 'No reasoning provided';
+      
+      // Show the panel
+      panel.style.display = 'block';
+      
+      // Store evaluation for accept action
+      panel.dataset.evaluation = JSON.stringify(evaluation);
+    }
+    
+    // Update medium display when opening edit modal
+    function updateMediumDisplay(style) {
+      const mediumId = style.medium_id;
+      
+      if (mediumId) {
+        document.getElementById('editMediumId').value = mediumId;
+        document.getElementById('displayMediumId').textContent = mediumId;
+        
+        // Find the medium name from cache
+        const medium = techniquesCache?.find(t => t.id === mediumId);
+        if (medium) {
+          document.getElementById('displayMediumName').textContent = medium.name;
+          document.getElementById('displayMediumHierarchy').innerHTML = 
+            `<strong>${medium.category}</strong> → ${medium.subcategory}`;
+        } else {
+          document.getElementById('displayMediumName').textContent = mediumId;
+          document.getElementById('displayMediumHierarchy').innerHTML = 
+            '<span class="medium-not-assigned">Details not found</span>';
+        }
+      } else {
+        document.getElementById('editMediumId').value = '';
+        document.getElementById('displayMediumId').textContent = '--';
+        document.getElementById('displayMediumName').textContent = 'Not assigned';
+        document.getElementById('displayMediumHierarchy').innerHTML = 
+          '<span class="medium-not-assigned">Use AI evaluation to assign</span>';
+      }
+      
+      // Reset AI panel
+      const panel = document.getElementById('aiSuggestionPanel');
+      if (panel) panel.style.display = 'none';
+    }
+    
+    // Initialize AI evaluation handlers
+    function initAIEvaluationHandlers() {
+      // Re-evaluate button
+      const btnRevaluate = document.getElementById('btnRevaluate');
+      if (btnRevaluate) {
+        btnRevaluate.addEventListener('click', async () => {
+          const styleId = editingStyleId;
+          const imageUrl = document.getElementById('editPreviewImage')?.src;
+          
+          if (!styleId || !imageUrl) {
+            showToast('Missing style ID or image', 'error');
+            return;
+          }
+          
+          const btn = btnRevaluate;
+          const loadingEl = document.getElementById('aiLoading');
+          const errorEl = document.getElementById('aiError');
+          const panel = document.getElementById('aiSuggestionPanel');
+          
+          // Reset states
+          btn.disabled = true;
+          if (loadingEl) loadingEl.style.display = 'flex';
+          if (errorEl) errorEl.style.display = 'none';
+          if (panel) panel.style.display = 'none';
+          
+          try {
+            const result = await evaluateStyleWithAI(styleId, imageUrl);
+            
+            if (result.success) {
+              displayAIResults(result.evaluation);
+            } else {
+              throw new Error(result.error || 'Evaluation failed');
+            }
+          } catch (error) {
+            console.error('[AI] Evaluation error:', error);
+            if (errorEl) {
+              document.getElementById('aiErrorMessage').textContent = error.message;
+              errorEl.style.display = 'flex';
+            }
+            showToast('AI evaluation failed: ' + error.message, 'error');
+          } finally {
+            btn.disabled = false;
+            if (loadingEl) loadingEl.style.display = 'none';
+          }
+        });
+      }
+      
+      // Accept All button
+      const btnAcceptAll = document.getElementById('btnAcceptAll');
+      if (btnAcceptAll) {
+        btnAcceptAll.addEventListener('click', () => {
+          const panel = document.getElementById('aiSuggestionPanel');
+          const evaluation = JSON.parse(panel?.dataset.evaluation || '{}');
+          
+          // Update Art Medium select
+          if (evaluation.art_medium_id) {
+            const artMediumSelect = document.getElementById('editArtMedium');
+            if (artMediumSelect) {
+              artMediumSelect.value = evaluation.art_medium_id;
+              artMediumSelect.dispatchEvent(new Event('change'));
+            }
+          }
+          
+          // Update Medium ID hidden field and display
+          if (evaluation.medium_id) {
+            document.getElementById('editMediumId').value = evaluation.medium_id;
+            document.getElementById('displayMediumId').textContent = evaluation.medium_id;
+            document.getElementById('displayMediumName').textContent = evaluation.medium_name || 'Unknown';
+            document.getElementById('displayMediumHierarchy').innerHTML = 
+              `<strong>${evaluation.art_medium_name}</strong> → ${evaluation.subcategory}`;
+          }
+          
+          showToast('AI suggestions applied', 'success');
+          if (panel) panel.style.display = 'none';
+        });
+      }
+      
+      // Ignore button
+      const btnIgnore = document.getElementById('btnIgnoreSuggestion');
+      if (btnIgnore) {
+        btnIgnore.addEventListener('click', () => {
+          document.getElementById('aiSuggestionPanel').style.display = 'none';
+        });
+      }
+      
+      // Retry button
+      const btnRetry = document.getElementById('btnRetryAi');
+      if (btnRetry) {
+        btnRetry.addEventListener('click', () => {
+          document.getElementById('btnRevaluate')?.click();
+        });
+      }
+    }
     
     // ========================================
     // INITIALIZATION
@@ -2604,6 +3037,11 @@
         console.log('[StyleAdmin] Access granted, loading admin content...');
         showAdminContent();
         await loadData();
+
+  // Initialize AI evaluation handlers
+        initAIEvaluationHandlers();
+        fetchTechniquesData(); // Pre-warm cache
+
         
       } catch (err) {
         console.error('[StyleAdmin] handleAuthSuccess error:', err);
@@ -3295,6 +3733,10 @@
       
       editingStyleId = styleId;
       populateEditForm(style);
+
+// Update medium display
+      updateMediumDisplay(style);
+
       
       editModal.classList.add('visible');
     }
@@ -3573,6 +4015,7 @@
       
       const updates = {
         name: document.getElementById('editName').value.trim(),
+        medium_id: document.getElementById('editMediumId')?.value || null,
         tagline: document.getElementById('editTagline').value.trim() || null,
         description: document.getElementById('editDescription').value.trim() || null,
         art_type_id: document.getElementById('editArtType').value || null,
@@ -3588,6 +4031,20 @@
       console.log('[SAVE] Starting save for style:', editingStyleId);
       console.log('[SAVE] Updates to apply:', updates);
       console.log('[SAVE] New Art Medium ID:', newArtMediumId);
+
+       // Save AI evaluation metadata if available
+        const aiPanel = document.getElementById('aiSuggestionPanel');
+        if (aiPanel?.dataset.evaluation) {
+          const evaluation = JSON.parse(aiPanel.dataset.evaluation);
+          const mediumIdField = document.getElementById('editMediumId');
+          if (mediumIdField?.value === evaluation.medium_id) {
+            updates.confidence_art_medium = evaluation.confidence_art_medium;
+            updates.confidence_subcategory = evaluation.confidence_subcategory;
+            updates.confidence_medium = evaluation.confidence_medium;
+            updates.ai_evaluated_at = evaluation.evaluated_at;
+            updates.ai_reasoning = evaluation.ai_reasoning;
+          }
+        }
       
       try {
         modalSave.disabled = true;
