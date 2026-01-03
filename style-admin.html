@@ -485,6 +485,226 @@
     }
     
     /* ========================================
+       VIEW TOGGLE & CONTAINER
+       ======================================== */
+    .styles-container {
+      position: relative;
+    }
+    
+    .view-toggle-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-lg);
+      padding: var(--space-sm) var(--space-md);
+      background: var(--color-tan-10);
+      border-radius: var(--radius-md);
+    }
+    
+    .view-toggle-left {
+      display: flex;
+      align-items: center;
+    }
+    
+    .select-all-checkbox {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      font-size: 13px;
+      color: var(--color-brown-60);
+      cursor: pointer;
+    }
+    
+    .select-all-checkbox input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: #6366f1;
+    }
+    
+    .view-toggle-right {
+      display: flex;
+      gap: var(--space-xs);
+    }
+    
+    .view-toggle-btn {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: 1px solid var(--color-tan-20);
+      border-radius: var(--radius-md);
+      color: var(--color-brown-60);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    
+    .view-toggle-btn:hover {
+      background: var(--color-white);
+      color: var(--color-brown);
+    }
+    
+    .view-toggle-btn.active {
+      background: var(--color-brown);
+      border-color: var(--color-brown);
+      color: var(--color-cream);
+    }
+    
+    .view-toggle-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+    
+    /* ========================================
+       STYLES LIST VIEW
+       ======================================== */
+    .styles-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+      background: var(--color-white);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .list-header {
+      display: grid;
+      grid-template-columns: 40px 60px 100px 1fr 180px 140px 100px;
+      gap: var(--space-md);
+      padding: var(--space-md) var(--space-lg);
+      background: var(--color-tan-10);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--color-brown-60);
+      border-bottom: 1px solid var(--color-tan-20);
+    }
+    
+    .list-row {
+      display: grid;
+      grid-template-columns: 40px 60px 100px 1fr 180px 140px 100px;
+      gap: var(--space-md);
+      padding: var(--space-sm) var(--space-lg);
+      align-items: center;
+      border-bottom: 1px solid var(--color-tan-10);
+      transition: background var(--transition-fast);
+      cursor: pointer;
+    }
+    
+    .list-row:hover {
+      background: var(--color-tan-10);
+    }
+    
+    .list-row.selected {
+      background: rgba(99, 102, 241, 0.08);
+    }
+    
+    .list-row.featured {
+      border-left: 3px solid var(--color-coral);
+    }
+    
+    .list-row:last-child {
+      border-bottom: none;
+    }
+    
+    .list-checkbox {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .list-checkbox input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: #6366f1;
+    }
+    
+    .list-thumbnail {
+      width: 50px;
+      height: 50px;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      background: var(--color-tan-10);
+    }
+    
+    .list-thumbnail img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .list-id {
+      font-family: monospace;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--color-brown);
+    }
+    
+    .list-title {
+      font-family: var(--font-serif);
+      font-size: 14px;
+      color: var(--color-brown);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .list-art-medium {
+      font-size: 12px;
+      color: var(--color-brown-60);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .list-art-type {
+      font-size: 12px;
+      color: var(--color-brown-60);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .list-status {
+      display: flex;
+      gap: var(--space-xs);
+    }
+    
+    .status-badge {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+    }
+    
+    .status-badge.featured {
+      background: rgba(199, 114, 76, 0.15);
+      color: var(--color-coral);
+    }
+    
+    .status-badge.unlisted {
+      background: rgba(139, 123, 117, 0.15);
+      color: var(--color-brown-60);
+    }
+    
+    .status-badge.flagged {
+      background: rgba(199, 51, 20, 0.15);
+      color: var(--color-error);
+    }
+    
+    /* Empty state in list view */
+    .list-empty {
+      padding: var(--space-2xl);
+      text-align: center;
+      color: var(--color-brown-60);
+    }
+    
+    /* ========================================
        STYLES GRID
        ======================================== */
     .styles-grid {
@@ -1506,6 +1726,30 @@
         gap: var(--space-md);
       }
       
+      /* List view responsive */
+      .list-header {
+        display: none;
+      }
+      
+      .list-row {
+        grid-template-columns: 40px 50px 1fr;
+        gap: var(--space-sm);
+        padding: var(--space-md);
+      }
+      
+      .list-id, .list-art-medium, .list-art-type, .list-status {
+        display: none;
+      }
+      
+      .list-title {
+        font-size: 13px;
+      }
+      
+      .view-toggle-bar {
+        flex-wrap: wrap;
+        gap: var(--space-sm);
+      }
+      
       .edit-layout {
         grid-template-columns: 1fr;
       }
@@ -1631,9 +1875,46 @@
         💡 <strong>Shift+Click</strong> to select range • <strong>Ctrl+Shift+Click</strong> to toggle individual • <strong>Click</strong> to edit
       </div>
       
-      <!-- Styles Grid -->
-      <div class="styles-grid" id="stylesGrid">
-        <!-- Cards will be inserted here -->
+      <!-- Styles Container with View Toggle -->
+      <div class="styles-container">
+        <div class="view-toggle-bar">
+          <div class="view-toggle-left">
+            <label class="select-all-checkbox">
+              <input type="checkbox" id="listSelectAll">
+              <span>Select All on Page</span>
+            </label>
+          </div>
+          <div class="view-toggle-right">
+            <button class="view-toggle-btn active" id="btnGridView" title="Grid View">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+              </svg>
+            </button>
+            <button class="view-toggle-btn" id="btnListView" title="List View">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="8" y1="6" x2="21" y2="6"></line>
+                <line x1="8" y1="12" x2="21" y2="12"></line>
+                <line x1="8" y1="18" x2="21" y2="18"></line>
+                <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                <line x1="3" y1="18" x2="3.01" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Styles Grid -->
+        <div class="styles-grid" id="stylesGrid">
+          <!-- Cards will be inserted here -->
+        </div>
+        
+        <!-- Styles List -->
+        <div class="styles-list" id="stylesList" style="display: none;">
+          <!-- List rows will be inserted here -->
+        </div>
       </div>
       
       <!-- Pagination -->
@@ -1959,6 +2240,9 @@
     let selectedStyleIds = new Set();
     let lastSelectedIndex = null;
     let confirmCallback = null;
+    
+    // View mode state
+    let currentViewMode = 'grid'; // 'grid' or 'list'
     
     // ========================================
     // DOM ELEMENTS
@@ -2398,6 +2682,27 @@
       const end = start + STYLES_PER_PAGE;
       const pageStyles = filteredStyles.slice(start, end);
       
+      const stylesGrid = document.getElementById('stylesGrid');
+      const stylesList = document.getElementById('stylesList');
+      
+      // Show/hide appropriate view
+      if (currentViewMode === 'grid') {
+        stylesGrid.style.display = 'grid';
+        stylesList.style.display = 'none';
+        renderGridView(pageStyles, start);
+      } else {
+        stylesGrid.style.display = 'none';
+        stylesList.style.display = 'flex';
+        renderListView(pageStyles, start);
+      }
+      
+      updateSelectionUI();
+      updateSelectAllCheckbox();
+    }
+    
+    function renderGridView(pageStyles, start) {
+      const stylesGrid = document.getElementById('stylesGrid');
+      
       if (pageStyles.length === 0) {
         stylesGrid.innerHTML = `
           <div class="empty-state" style="grid-column: 1 / -1;">
@@ -2444,9 +2749,157 @@
           </div>
         `;
       }).join('');
-      
-      updateSelectionUI();
     }
+    
+    function renderListView(pageStyles, start) {
+      const stylesList = document.getElementById('stylesList');
+      
+      if (pageStyles.length === 0) {
+        stylesList.innerHTML = `
+          <div class="list-empty">
+            <p>No styles found. Try adjusting your filters.</p>
+          </div>
+        `;
+        return;
+      }
+      
+      // Build list header + rows
+      const headerHtml = `
+        <div class="list-header">
+          <div></div>
+          <div></div>
+          <div>ID</div>
+          <div>Title</div>
+          <div>Art Medium</div>
+          <div>Art Type</div>
+          <div>Status</div>
+        </div>
+      `;
+      
+      const rowsHtml = pageStyles.map((style, index) => {
+        // Find Art Medium from junction table
+        const styleArtMedium = styleArtMediums.find(sam => sam.style_id === style.id);
+        const artMedium = styleArtMedium ? lookups.art_mediums.find(am => am.id === styleArtMedium.art_medium_id) : null;
+        const artType = style.art_type_id ? lookups.art_types.find(at => at.id === style.art_type_id) : null;
+        const imageUrl = `${R2_BASE_URL}/${style.id}/${style.id}-00.webp`;
+        const isSelected = selectedStyleIds.has(style.id);
+        const globalIndex = start + index;
+        
+        // Status badges
+        let statusBadges = '';
+        if (style.is_featured) statusBadges += '<span class="status-badge featured">★ Featured</span>';
+        if (style.is_active === false) statusBadges += '<span class="status-badge unlisted">Unlisted</span>';
+        if (style.is_flagged) statusBadges += '<span class="status-badge flagged">Flagged</span>';
+        
+        const featuredClass = style.is_featured ? ' featured' : '';
+        const selectedClass = isSelected ? ' selected' : '';
+        
+        return `
+          <div class="list-row${featuredClass}${selectedClass}" data-id="${style.id}" data-index="${globalIndex}">
+            <div class="list-checkbox">
+              <input type="checkbox" ${isSelected ? 'checked' : ''} onchange="handleListCheckbox(event, '${style.id}', ${globalIndex})" onclick="event.stopPropagation()">
+            </div>
+            <div class="list-thumbnail" onclick="openEditModal('${style.id}')">
+              <img src="${imageUrl}" alt="${style.name || style.id}" loading="lazy"
+                   onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect fill=%22%23E7E2DC%22 width=%22100%22 height=%22100%22/%3E%3C/svg%3E'">
+            </div>
+            <div class="list-id" onclick="openEditModal('${style.id}')">${style.id}</div>
+            <div class="list-title" onclick="openEditModal('${style.id}')">${style.name || 'Untitled'}</div>
+            <div class="list-art-medium" onclick="openEditModal('${style.id}')">${artMedium?.name || '—'}</div>
+            <div class="list-art-type" onclick="openEditModal('${style.id}')">${artType?.name || '—'}</div>
+            <div class="list-status" onclick="openEditModal('${style.id}')">${statusBadges || '—'}</div>
+          </div>
+        `;
+      }).join('');
+      
+      stylesList.innerHTML = headerHtml + rowsHtml;
+    }
+    
+    function handleListCheckbox(event, styleId, index) {
+      event.stopPropagation();
+      
+      if (event.target.checked) {
+        selectedStyleIds.add(styleId);
+      } else {
+        selectedStyleIds.delete(styleId);
+      }
+      
+      lastSelectedIndex = index;
+      updateSelectionUI();
+      updateSelectAllCheckbox();
+      
+      // Update row visual state
+      const row = event.target.closest('.list-row');
+      if (row) {
+        if (event.target.checked) {
+          row.classList.add('selected');
+        } else {
+          row.classList.remove('selected');
+        }
+      }
+    }
+    
+    function updateSelectAllCheckbox() {
+      const listSelectAll = document.getElementById('listSelectAll');
+      const start = (currentPage - 1) * STYLES_PER_PAGE;
+      const end = start + STYLES_PER_PAGE;
+      const pageStyles = filteredStyles.slice(start, end);
+      
+      if (pageStyles.length === 0) {
+        listSelectAll.checked = false;
+        listSelectAll.indeterminate = false;
+        return;
+      }
+      
+      const selectedOnPage = pageStyles.filter(s => selectedStyleIds.has(s.id)).length;
+      
+      if (selectedOnPage === 0) {
+        listSelectAll.checked = false;
+        listSelectAll.indeterminate = false;
+      } else if (selectedOnPage === pageStyles.length) {
+        listSelectAll.checked = true;
+        listSelectAll.indeterminate = false;
+      } else {
+        listSelectAll.checked = false;
+        listSelectAll.indeterminate = true;
+      }
+    }
+    
+    // View toggle handlers
+    document.getElementById('btnGridView').addEventListener('click', () => {
+      if (currentViewMode !== 'grid') {
+        currentViewMode = 'grid';
+        document.getElementById('btnGridView').classList.add('active');
+        document.getElementById('btnListView').classList.remove('active');
+        renderStyles();
+      }
+    });
+    
+    document.getElementById('btnListView').addEventListener('click', () => {
+      if (currentViewMode !== 'list') {
+        currentViewMode = 'list';
+        document.getElementById('btnListView').classList.add('active');
+        document.getElementById('btnGridView').classList.remove('active');
+        renderStyles();
+      }
+    });
+    
+    // Select all checkbox handler
+    document.getElementById('listSelectAll').addEventListener('change', (e) => {
+      const start = (currentPage - 1) * STYLES_PER_PAGE;
+      const end = start + STYLES_PER_PAGE;
+      const pageStyles = filteredStyles.slice(start, end);
+      
+      if (e.target.checked) {
+        // Select all on current page
+        pageStyles.forEach(style => selectedStyleIds.add(style.id));
+      } else {
+        // Deselect all on current page
+        pageStyles.forEach(style => selectedStyleIds.delete(style.id));
+      }
+      
+      renderStyles();
+    });
     
     // ========================================
     // SELECTION HANDLING
