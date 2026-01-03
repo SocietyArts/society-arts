@@ -909,6 +909,180 @@
     }
     
     /* ========================================
+       AI EVALUATION STYLES
+       ======================================== */
+    .btn-ai {
+      width: 100%;
+      margin-top: var(--space-md);
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      color: white;
+      border: none;
+      padding: var(--space-sm) var(--space-md);
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-sm);
+      transition: all var(--transition-fast);
+    }
+    
+    .btn-ai:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    }
+    
+    .btn-ai:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    .ai-suggestion-panel {
+      margin-top: var(--space-lg);
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%);
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      border-radius: var(--radius-lg);
+      padding: var(--space-md);
+      animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .ai-suggestion-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #6366f1;
+      margin-bottom: var(--space-md);
+    }
+    
+    .ai-suggestion-content {
+      margin-bottom: var(--space-md);
+    }
+    
+    .ai-suggestion-category {
+      font-family: var(--font-serif);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--color-brown);
+      margin-bottom: var(--space-sm);
+    }
+    
+    .ai-suggestion-confidence {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      font-size: 12px;
+      color: var(--color-brown-60);
+      margin-bottom: var(--space-sm);
+    }
+    
+    .confidence-value {
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      background: var(--color-tan-10);
+    }
+    
+    .confidence-value.high {
+      background: rgba(74, 157, 110, 0.15);
+      color: var(--color-success);
+    }
+    
+    .confidence-value.medium {
+      background: rgba(212, 168, 75, 0.15);
+      color: var(--color-warning);
+    }
+    
+    .confidence-value.low {
+      background: rgba(199, 51, 20, 0.15);
+      color: var(--color-error);
+    }
+    
+    .ai-suggestion-reasoning {
+      font-size: 12px;
+      color: var(--color-brown-60);
+      line-height: 1.5;
+      margin-bottom: var(--space-sm);
+    }
+    
+    .ai-suggestion-evidence {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-xs);
+    }
+    
+    .evidence-tag {
+      font-size: 10px;
+      padding: 2px 8px;
+      background: var(--color-tan-10);
+      border-radius: var(--radius-sm);
+      color: var(--color-brown-60);
+    }
+    
+    .ai-suggestion-actions {
+      display: flex;
+      gap: var(--space-sm);
+    }
+    
+    .btn-accept {
+      background: var(--color-success);
+      color: white;
+      border: none;
+      flex: 1;
+    }
+    
+    .btn-accept:hover {
+      background: #3d8a5e;
+    }
+    
+    .ai-loading {
+      margin-top: var(--space-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-sm);
+      padding: var(--space-lg);
+      background: var(--color-tan-10);
+      border-radius: var(--radius-lg);
+      font-size: 13px;
+      color: var(--color-brown-60);
+    }
+    
+    .ai-loading-spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--color-tan-20);
+      border-top-color: #6366f1;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    .ai-error {
+      margin-top: var(--space-lg);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-md);
+      background: rgba(199, 51, 20, 0.1);
+      border: 1px solid rgba(199, 51, 20, 0.2);
+      border-radius: var(--radius-lg);
+      font-size: 13px;
+      color: var(--color-error);
+    }
+    
+    /* ========================================
        RESPONSIVE
        ======================================== */
     @media (max-width: 768px) {
@@ -1095,6 +1269,55 @@
           <div class="edit-preview">
             <img class="edit-preview-image" id="editPreviewImage" src="" alt="">
             <span class="edit-preview-id" id="editPreviewId"></span>
+            <button type="button" class="btn btn-ai" id="btnRevaluate">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                <path d="M12 2a4 4 0 0 1 4 4c0 1.1-.9 2-2 2h-4a2 2 0 0 1-2-2 4 4 0 0 1 4-4z"></path>
+                <path d="M12 8v8"></path>
+                <path d="M8 12h8"></path>
+                <circle cx="12" cy="12" r="10"></circle>
+              </svg>
+              Re-evaluate with AI
+            </button>
+            
+            <!-- AI Suggestion Panel (hidden by default) -->
+            <div class="ai-suggestion-panel" id="aiSuggestionPanel" style="display: none;">
+              <div class="ai-suggestion-header">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                </svg>
+                AI Suggestion
+              </div>
+              <div class="ai-suggestion-content">
+                <div class="ai-suggestion-category" id="aiSuggestedCategory">--</div>
+                <div class="ai-suggestion-confidence">
+                  <span>Confidence:</span>
+                  <span class="confidence-value" id="aiConfidence">--</span>
+                </div>
+                <div class="ai-suggestion-reasoning" id="aiReasoning">--</div>
+                <div class="ai-suggestion-evidence" id="aiEvidence"></div>
+              </div>
+              <div class="ai-suggestion-actions">
+                <button type="button" class="btn btn-sm btn-accept" id="btnAcceptSuggestion">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                  Accept
+                </button>
+                <button type="button" class="btn btn-sm btn-secondary" id="btnIgnoreSuggestion">Ignore</button>
+              </div>
+            </div>
+            
+            <!-- AI Loading State -->
+            <div class="ai-loading" id="aiLoading" style="display: none;">
+              <div class="ai-loading-spinner"></div>
+              <span>Analyzing image...</span>
+            </div>
+            
+            <!-- AI Error State -->
+            <div class="ai-error" id="aiError" style="display: none;">
+              <span id="aiErrorMessage">Error occurred</span>
+              <button type="button" class="btn btn-sm btn-secondary" id="btnRetryAi">Retry</button>
+            </div>
           </div>
           <form class="edit-form" id="editForm">
             <!-- Text Fields Section -->
@@ -1736,6 +1959,15 @@
     function closeEditModal() {
       editModal.classList.remove('visible');
       editingStyleId = null;
+      // Reset AI suggestion state
+      resetAiSuggestion();
+    }
+    
+    function resetAiSuggestion() {
+      document.getElementById('aiSuggestionPanel').style.display = 'none';
+      document.getElementById('aiLoading').style.display = 'none';
+      document.getElementById('aiError').style.display = 'none';
+      document.getElementById('btnRevaluate').disabled = false;
     }
     
     modalClose.addEventListener('click', closeEditModal);
@@ -1866,6 +2098,155 @@
         toast.style.animation = 'slideIn 0.3s ease reverse';
         setTimeout(() => toast.remove(), 300);
       }, 3000);
+    }
+    
+    // ========================================
+    // AI EVALUATION
+    // ========================================
+    const NETLIFY_FUNCTION_URL = '/.netlify/functions/evaluate-style';
+    let lastAiSuggestion = null;
+    
+    // DOM elements for AI
+    const btnRevaluate = document.getElementById('btnRevaluate');
+    const aiSuggestionPanel = document.getElementById('aiSuggestionPanel');
+    const aiLoading = document.getElementById('aiLoading');
+    const aiError = document.getElementById('aiError');
+    const aiErrorMessage = document.getElementById('aiErrorMessage');
+    const aiSuggestedCategory = document.getElementById('aiSuggestedCategory');
+    const aiConfidence = document.getElementById('aiConfidence');
+    const aiReasoning = document.getElementById('aiReasoning');
+    const aiEvidence = document.getElementById('aiEvidence');
+    const btnAcceptSuggestion = document.getElementById('btnAcceptSuggestion');
+    const btnIgnoreSuggestion = document.getElementById('btnIgnoreSuggestion');
+    const btnRetryAi = document.getElementById('btnRetryAi');
+    
+    // Re-evaluate button click
+    btnRevaluate.addEventListener('click', async () => {
+      if (!editingStyleId) return;
+      await evaluateStyle(editingStyleId);
+    });
+    
+    // Retry button click
+    btnRetryAi.addEventListener('click', async () => {
+      if (!editingStyleId) return;
+      await evaluateStyle(editingStyleId);
+    });
+    
+    // Accept suggestion
+    btnAcceptSuggestion.addEventListener('click', () => {
+      if (!lastAiSuggestion) return;
+      
+      // Update the Art Medium dropdown
+      const editArtMedium = document.getElementById('editArtMedium');
+      editArtMedium.value = lastAiSuggestion.art_medium_id;
+      
+      // Highlight the field briefly
+      editArtMedium.style.transition = 'background-color 0.3s ease';
+      editArtMedium.style.backgroundColor = 'rgba(74, 157, 110, 0.2)';
+      setTimeout(() => {
+        editArtMedium.style.backgroundColor = '';
+      }, 1000);
+      
+      // Hide the suggestion panel
+      aiSuggestionPanel.style.display = 'none';
+      
+      showToast('AI suggestion accepted. Click "Save Changes" to apply.', 'success');
+    });
+    
+    // Ignore suggestion
+    btnIgnoreSuggestion.addEventListener('click', () => {
+      aiSuggestionPanel.style.display = 'none';
+      lastAiSuggestion = null;
+    });
+    
+    // Main evaluation function
+    async function evaluateStyle(styleId) {
+      console.log('[AI] Starting evaluation for:', styleId);
+      
+      // Show loading state
+      btnRevaluate.disabled = true;
+      aiSuggestionPanel.style.display = 'none';
+      aiError.style.display = 'none';
+      aiLoading.style.display = 'flex';
+      
+      try {
+        const imageUrl = `${R2_BASE_URL}/${styleId}/${styleId}-00.webp`;
+        
+        const response = await fetch(NETLIFY_FUNCTION_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            style_id: styleId,
+            image_url: imageUrl
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok || !data.success) {
+          throw new Error(data.error || 'Evaluation failed');
+        }
+        
+        console.log('[AI] Evaluation result:', data.evaluation);
+        
+        // Store the suggestion
+        lastAiSuggestion = data.evaluation;
+        
+        // Update UI with suggestion
+        displayAiSuggestion(data.evaluation);
+        
+      } catch (error) {
+        console.error('[AI] Evaluation error:', error);
+        aiLoading.style.display = 'none';
+        aiError.style.display = 'flex';
+        aiErrorMessage.textContent = error.message || 'Failed to evaluate';
+      } finally {
+        btnRevaluate.disabled = false;
+      }
+    }
+    
+    function displayAiSuggestion(evaluation) {
+      aiLoading.style.display = 'none';
+      
+      // Category name
+      aiSuggestedCategory.textContent = `${evaluation.art_medium_id} - ${evaluation.art_medium_name}`;
+      
+      // Confidence with color coding
+      const confidencePercent = Math.round(evaluation.confidence * 100);
+      aiConfidence.textContent = `${confidencePercent}%`;
+      aiConfidence.className = 'confidence-value';
+      if (evaluation.confidence >= 0.85) {
+        aiConfidence.classList.add('high');
+      } else if (evaluation.confidence >= 0.70) {
+        aiConfidence.classList.add('medium');
+      } else {
+        aiConfidence.classList.add('low');
+      }
+      
+      // Reasoning
+      aiReasoning.textContent = evaluation.reasoning || '';
+      
+      // Visual evidence tags
+      aiEvidence.innerHTML = '';
+      if (evaluation.visual_evidence && evaluation.visual_evidence.length > 0) {
+        evaluation.visual_evidence.forEach(evidence => {
+          const tag = document.createElement('span');
+          tag.className = 'evidence-tag';
+          tag.textContent = evidence;
+          aiEvidence.appendChild(tag);
+        });
+      }
+      
+      // Show the panel
+      aiSuggestionPanel.style.display = 'block';
+      
+      // Check if suggestion differs from current
+      const currentArtMedium = document.getElementById('editArtMedium').value;
+      if (currentArtMedium === evaluation.art_medium_id) {
+        showToast('AI agrees with current classification', 'success');
+      }
     }
     
     // ========================================
