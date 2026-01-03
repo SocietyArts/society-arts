@@ -15,3 +15,10 @@
     "node": ">=18.0.0"
   }
 }
+{
+  "name": "society-arts",
+  "version": "1.0.0",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.24.0"
+  }
+}
