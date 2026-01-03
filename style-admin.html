@@ -2250,6 +2250,11 @@
     }
     
     function populateFilterDropdowns() {
+      // Save current filter selections
+      const currentArtMedium = artMediumFilter.value;
+      const currentArtType = artTypeFilter.value;
+      const currentEra = eraFilter.value;
+      
       // Art Mediums (14 categories) with counts
       const artMediumCounts = {};
       styleArtMediums.forEach(sam => {
@@ -2269,6 +2274,11 @@
       // Eras
       eraFilter.innerHTML = '<option value="">All Eras</option>' +
         lookups.eras.map(e => `<option value="${e.id}">${e.name}</option>`).join('');
+      
+      // Restore filter selections
+      artMediumFilter.value = currentArtMedium;
+      artTypeFilter.value = currentArtType;
+      eraFilter.value = currentEra;
     }
     
     function populateEditDropdowns() {
@@ -2311,7 +2321,7 @@
       searchTimeout = setTimeout(applyFilters, 300);
     });
     
-    function applyFilters() {
+    function applyFilters(resetPage = true) {
       const artMediumId = artMediumFilter.value;
       const artTypeId = artTypeFilter.value;
       const eraId = eraFilter.value;
@@ -2351,7 +2361,17 @@
         return true;
       });
       
-      currentPage = 1;
+      // Reset to page 1 only if requested, or if current page is now invalid
+      if (resetPage) {
+        currentPage = 1;
+      } else {
+        // Ensure current page is still valid
+        const maxPage = Math.ceil(filteredStyles.length / STYLES_PER_PAGE) || 1;
+        if (currentPage > maxPage) {
+          currentPage = maxPage;
+        }
+      }
+      
       renderStyles();
       updatePagination();
       updateResultsCount();
@@ -2522,10 +2542,13 @@
       renderStyles();
     }
     
-    function clearAllSelections() {
+    function clearAllSelections(skipRender = false) {
       selectedStyleIds.clear();
       lastSelectedIndex = null;
-      renderStyles();
+      if (!skipRender) {
+        renderStyles();
+      }
+      updateSelectionUI();
     }
     
     // Selection control buttons
@@ -2678,8 +2701,8 @@
         activeStylesEl.textContent = listedCount.toLocaleString();
         featuredStylesEl.textContent = featuredCount.toLocaleString();
         
-        // Re-apply filters (removes unlisted/flagged from view)
-        applyFilters();
+        // Re-apply filters (removes unlisted/flagged from view) while preserving page position
+        applyFilters(false);
         
         // Close modal if style was unlisted or flagged (it's no longer visible)
         if ((field === 'is_active' && newValue === false) || (field === 'is_flagged' && newValue === true)) {
@@ -2872,11 +2895,11 @@
           styles[styleIndex] = { ...styles[styleIndex], ...updates };
         }
         
-        // Refresh filter counts
+        // Refresh filter counts (preserves selected values)
         populateFilterDropdowns();
         
-        // Re-render
-        applyFilters();
+        // Re-render while preserving page position
+        applyFilters(false);
         
         console.log('[SAVE] Save completed successfully');
         showToast('Style updated successfully', 'success');
@@ -3212,8 +3235,9 @@
       activeStylesEl.textContent = listedCount.toLocaleString();
       featuredStylesEl.textContent = featuredCount.toLocaleString();
       
-      // Clear selection and re-render
-      clearAllSelections();
+      // Clear selection and re-apply filters (preserving current filter state and page position)
+      clearAllSelections(true); // Skip render
+      applyFilters(false); // Re-filter without resetting page
       
       // Show result
       if (errorCount === 0) {
@@ -3301,11 +3325,12 @@
       
       hideProgressModal();
       
-      // Refresh filter counts
+      // Refresh filter counts (preserves selected values)
       populateFilterDropdowns();
       
-      // Clear selection and re-render
-      clearAllSelections();
+      // Clear selection and re-apply filters (preserving current filter state and page position)
+      clearAllSelections(true); // Skip render
+      applyFilters(false); // Re-filter without resetting page
       
       // Show result
       if (errorCount === 0) {
