@@ -29,22 +29,42 @@ const EVALUATION_PROMPT = `# Art Medium Classification: Traditional Emulation
 
 You are a seasoned art professor helping students understand visual aesthetics. Your expertise is in recognizing which TRADITIONAL art medium a digital artwork is emulating.
 
-## IMPORTANT CONTEXT
+## CRITICAL RULES
 
-You are looking at a SINGLE EXAMPLE IMAGE from an art style collection. This image represents the overall aesthetic of the style. Do NOT describe this as a "collage" or "grid" - you are evaluating the artistic medium/technique shown in this ONE image.
+### 1. DO NOT DISCUSS SUBJECT MATTER
+- NEVER mention what is depicted (people, landscapes, animals, objects)
+- NEVER describe the scene or narrative
+- ONLY discuss: technique, texture, color treatment, medium characteristics, surface quality
+- These styles are TEMPLATES - users will apply their own subjects
+
+### 2. MULTI-IMAGE EVALUATION
+- You are seeing MULTIPLE EXAMPLE IMAGES from the same art style
+- Look for CONSISTENT TECHNICAL ELEMENTS across all images
+- The style is defined by HOW things are rendered, not WHAT is rendered
+- Identify the shared visual treatment/technique
 
 ## THE CORE QUESTION
 
-**"If you walked into an art supply store to recreate this exact look BY HAND, what aisle would you go to?"**
+**"If you walked into an art supply store to recreate this exact LOOK and FEEL by hand, what aisle would you go to?"**
 
-Every image in this collection was created digitally - that's a given and NOT useful information. What IS useful is understanding the VISUAL LINEAGE - which traditional art technique does this artwork honor, emulate, or reference?
+Every image was created digitally - that's NOT useful information. What IS useful is the VISUAL LINEAGE - which traditional art technique does this emulate?
 
-## IMPORTANT MINDSET
+## FOCUS ON THESE TECHNICAL ELEMENTS
 
-- Do NOT think about how it was actually made (digitally)
-- DO think about what it LOOKS LIKE it was made with
-- Ask: "What traditional materials would produce this visual effect?"
-- Ask: "What section of the art museum would this fit in?"
+✅ DISCUSS:
+- Color palette and saturation (muted, vibrant, limited)
+- Surface texture (brushstrokes, grain, smooth, chalky)
+- Edge quality (sharp, soft, bleeding, crisp)
+- Value contrast (high contrast, subtle gradation)
+- Line quality (if present - bold, delicate, sketchy)
+- Film/print characteristics (grain, color shifts, vignetting)
+- Traditional medium signatures (wet-on-wet blooms, impasto, halftone dots)
+
+❌ DO NOT DISCUSS:
+- What is depicted (subjects, scenes, people, objects)
+- Narrative or story
+- Mood or emotion (unless directly tied to technique)
+- Composition (unless discussing technical medium constraints)
 
 ---
 
@@ -121,14 +141,14 @@ Visual signatures:
 ### PHOTOGRAPHY
 
 **AMD007 - Color Photography**
-Use when you'd grab: A camera
+Use when you'd grab: A camera and film/sensor
 Visual signatures:
-- Photorealistic representation of REAL subjects
-- Natural depth of field and focus
-- Authentic textures (skin pores, fabric, surfaces)
-- Camera-consistent lighting and perspective
-- Full color, natural color range
-- CRITICAL: Subject must be something that could physically exist and be photographed
+- Photorealistic rendering with camera-like qualities
+- Natural depth of field and focus falloff
+- Film grain or digital sensor characteristics
+- Authentic lighting and exposure qualities
+- Full color with natural or stylized color grading
+- Vintage film stock looks (Kodachrome warmth, Ektachrome saturation, etc.)
 
 **AMD008 - Black & White Photography**
 Same as above but monochromatic
@@ -136,14 +156,7 @@ Visual signatures:
 - All the photographic qualities of AMD007
 - But in grayscale, sepia, or monochrome
 - Classic film photography aesthetic
-
-**⚠️ PHOTOGRAPHY EXCLUSIONS:**
-These can NEVER be photography, regardless of how realistic they look:
-- Fantasy creatures (dragons, unicorns, mythical beings)
-- Anthropomorphized objects (smiling food, objects with faces)
-- Stylized characters (anime, cartoon proportions, doll-like figures)
-- Impossible elements (pink grass, floating objects, candy worlds)
-- If the SUBJECT couldn't exist in reality, it's NOT photography
+- Tonal range and contrast characteristic of B&W film
 
 ---
 
@@ -220,18 +233,25 @@ Use ONLY when:
 
 1. **First Impression**: What art supply store aisle does this remind you of?
 
-2. **Reality Check (for Photography only)**: Could this subject physically exist?
-   - If NO → It's not photography, even if photorealistic
-   - If YES → Continue evaluating photographic qualities
+2. **Consistent Technical Elements**: What visual treatment is consistent across all sample images?
+   - Same color palette/saturation?
+   - Same texture/surface quality?
+   - Same edge treatment?
+   - Same rendering style?
 
 3. **Material Identification**: What marks, textures, or surface qualities do you see?
-   - Brushstrokes → Paint media
-   - Pencil/chalk marks → Drawing media
-   - Carved/printed marks → Printmaking
-   - Cut edges, layers → Collage
-   - Camera capture qualities → Photography
+   - Brushstrokes, paint texture → Paint media
+   - Pencil/chalk marks, hatching → Drawing media
+   - Carved marks, halftone dots → Printmaking
+   - Cut edges, layered elements → Collage
+   - Film grain, natural DOF, lens qualities → Photography
 
-4. **Refine Within Category**: Match to specific medium based on detailed characteristics
+4. **Photography Note**: If it looks photographic, consider:
+   - Does it have film/camera characteristics (grain, color shifts, DOF)?
+   - Is the rendering photorealistic with no visible artistic marks?
+   - Even stylized or fantastical subjects can be "photographic" if they're rendered with camera-like qualities
+
+5. **Refine Within Category**: Match to specific medium based on detailed characteristics
 
 ---
 
@@ -245,10 +265,22 @@ Return ONLY this JSON:
   "art_medium_name": "Category Name",
   "confidence": 0.00,
   "traditional_equivalent": "What you'd buy at the art store",
-  "reasoning": "2-3 sentences explaining why this looks like [medium]",
-  "visual_evidence": ["evidence 1", "evidence 2", "evidence 3"]
+  "reasoning": "2-3 sentences about the TECHNICAL QUALITIES that indicate this medium (no subject matter)",
+  "visual_evidence": ["technical element 1", "technical element 2", "technical element 3"]
 }
 \`\`\`
+
+**Visual Evidence Examples (GOOD):**
+- "Visible brushstroke texture with impasto effects"
+- "Warm color shift and film grain typical of Ektachrome"
+- "Soft bleeding edges where colors meet"
+- "Flat opaque color areas with clean graphic edges"
+- "Fine crosshatching for tonal values"
+
+**Visual Evidence Examples (BAD - do not use):**
+- "Mountain landscape with trees" ❌
+- "Portrait of a person" ❌
+- "Realistic representation of a lion" ❌
 
 **Confidence Scale:**
 - 0.90-1.00: Classic example of this medium's look
@@ -258,34 +290,23 @@ Return ONLY this JSON:
 
 ---
 
-## EXAMPLES OF CORRECT THINKING
+## EXAMPLES OF CORRECT REASONING
 
-**Anime character with soft shading:**
-- Looks like: Marker illustration or gouache
-- NOT: Photography (even if detailed) - subject is stylized
-- Classification: AMD003 (Flat Paint) or AMD006 (Color Drawing)
+**Style with soft color washes and white showing through:**
+- Reasoning: "Transparent color application with soft bleeding edges and luminous quality from white ground showing through. Consistent wet-on-wet technique across all samples."
+- Classification: AMD002 (Fluid Paint/Watercolor)
 
-**Hyperrealistic dragon:**
-- Looks like: Oil painting or digital (but we don't say digital)
-- NOT: Photography - dragons don't exist
-- Classification: AMD001 (Bold Paint) - it emulates realistic painting technique
-
-**Portrait of real person with brushstroke texture:**
-- Looks like: Oil painting
-- Classification: AMD001 (Bold Paint)
-
-**Portrait of real person, photorealistic, no visible brush marks:**
-- Subject could exist: YES
-- Looks like: Camera captured it
+**Style with vintage color shifts and film grain:**
+- Reasoning: "Warm color cast with subtle grain texture and natural depth of field. Color saturation and tonal range consistent with vintage slide film stock."
 - Classification: AMD007 (Color Photography)
 
-**Whimsical town with flat colors and clean edges:**
-- Looks like: Gouache illustration or screen print
-- Classification: AMD003 (Flat Paint) or AMD011 (Poster Print)
+**Style with flat opaque colors and clean edges:**
+- Reasoning: "Solid color areas with no visible brushwork and crisp graphic edges. Matte, chalky surface quality typical of gouache illustration."
+- Classification: AMD003 (Flat Paint/Gouache)
 
 ---
 
-Now analyze the provided image. Think: "What traditional art materials would create this exact look?"
+Now analyze the provided images. Focus ONLY on consistent technical/medium qualities across all samples.
 
 Return ONLY the JSON response.`;
 
@@ -330,44 +351,62 @@ exports.handler = async (event, context) => {
       apiKey: process.env.ANTHROPIC_API_KEY
     });
 
-    // Fetch the image and convert to base64
-    const imageResponse = await fetch(image_url);
-    if (!imageResponse.ok) {
-      throw new Error(`Failed to fetch image: ${imageResponse.status}`);
+    // Extract base URL to fetch multiple images
+    // image_url format: https://.../{style_id}/{style_id}-01.webp
+    const baseUrl = image_url.replace(/-\d+\.webp$/, '');
+    
+    // Fetch 4 sample images (-01 through -04)
+    const imageNumbers = ['01', '02', '03', '04'];
+    const imageContents = [];
+    
+    for (const num of imageNumbers) {
+      const url = `${baseUrl}-${num}.webp`;
+      try {
+        const imageResponse = await fetch(url);
+        if (imageResponse.ok) {
+          const imageBuffer = await imageResponse.arrayBuffer();
+          const base64Image = Buffer.from(imageBuffer).toString('base64');
+          imageContents.push({
+            type: 'image',
+            source: {
+              type: 'base64',
+              media_type: 'image/webp',
+              data: base64Image
+            }
+          });
+          console.log(`[evaluate-style] Loaded image ${num}`);
+        } else {
+          console.log(`[evaluate-style] Image ${num} not found, skipping`);
+        }
+      } catch (imgErr) {
+        console.log(`[evaluate-style] Failed to load image ${num}: ${imgErr.message}`);
+      }
     }
     
-    const imageBuffer = await imageResponse.arrayBuffer();
-    const base64Image = Buffer.from(imageBuffer).toString('base64');
-    
-    // Determine media type from URL
-    let mediaType = 'image/webp';
-    if (image_url.includes('.jpg') || image_url.includes('.jpeg')) {
-      mediaType = 'image/jpeg';
-    } else if (image_url.includes('.png')) {
-      mediaType = 'image/png';
+    // Need at least 1 image to evaluate
+    if (imageContents.length === 0) {
+      throw new Error('No images could be loaded for evaluation');
     }
+    
+    console.log(`[evaluate-style] Evaluating with ${imageContents.length} images`);
 
-    // Call Claude API with vision
+    // Build content array with all images + prompt
+    const messageContent = [
+      ...imageContents,
+      {
+        type: 'text',
+        text: EVALUATION_PROMPT
+      }
+    ];
+
+    // Call Claude API with vision (multiple images)
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 1000,
       messages: [
         {
           role: 'user',
-          content: [
-            {
-              type: 'image',
-              source: {
-                type: 'base64',
-                media_type: mediaType,
-                data: base64Image
-              }
-            },
-            {
-              type: 'text',
-              text: EVALUATION_PROMPT
-            }
-          ]
+          content: messageContent
         }
       ]
     });
