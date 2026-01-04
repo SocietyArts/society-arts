@@ -1,10 +1,10 @@
 // Netlify Function: evaluate-style.js
 // Sends style image to Claude for Art Medium classification
-// Using Society Arts Classification System v2.0
+// Philosophy: "What traditional medium does this EMULATE?"
 
 const Anthropic = require('@anthropic-ai/sdk');
 
-// Art Mediums reference
+// Art Mediums reference - Traditional media categories
 const ART_MEDIUMS = {
   AMD001: "Bold Paint (Oil/Acrylic)",
   AMD002: "Fluid Paint (Watercolor)",
@@ -22,278 +22,268 @@ const ART_MEDIUMS = {
   AMD014: "Mixed Layers"
 };
 
-// Comprehensive evaluation prompt based on Society Arts Classification System v2.0
-const EVALUATION_PROMPT = `# Art Medium Classification
+// Classification prompt - Traditional Medium Emulation Philosophy
+const EVALUATION_PROMPT = `# Art Medium Classification: Traditional Emulation
 
 ## Your Role
 
-You are a seasoned art professor and museum curator with 30 years of experience in fine art, printmaking, photography, and contemporary media. You are methodical, precise, and never guess. When uncertain, you acknowledge uncertainty rather than fabricate an answer.
+You are a seasoned art professor helping students understand visual aesthetics. Your expertise is in recognizing which TRADITIONAL art medium a digital artwork is emulating.
 
-**Your task**: Analyze this artwork image and classify it into one of 14 art medium categories based on observable visual evidence.
+## THE CORE QUESTION
 
----
+**"If you walked into an art supply store to recreate this exact look BY HAND, what aisle would you go to?"**
 
-## CLASSIFICATION DECISION TREE
+Every image in this collection was created digitally - that's a given and NOT useful information. What IS useful is understanding the VISUAL LINEAGE - which traditional art technique does this artwork honor, emulate, or reference?
 
-Follow this decision tree IN ORDER. Do not skip steps.
+## IMPORTANT MINDSET
 
-### GATE 1: Subject Reality Check (MOST IMPORTANT)
-
-**Ask: "Does this subject physically exist in the real world? Could I photograph this with a camera?"**
-
-This is the FIRST and MOST IMPORTANT question. Modern AI and 3D rendering can simulate realistic depth of field, natural lighting, and convincing textures. These technical qualities do NOT make something a photograph.
-
-#### ⛔ IMMEDIATE DISQUALIFIERS — If ANY of these appear, this is NOT Photography:
-
-**Fantasy/Impossible Subjects**
-- Mythical creatures (dragons, unicorns, phoenixes, griffins)
-- Hybrid animals that don't exist in nature
-- Aliens, monsters, or sci-fi creatures
-- Magical or supernatural elements
-- Creatures with impossible anatomy
-
-**Anthropomorphized Objects**
-- Objects with faces (mugs, mushrooms, vehicles, houses, food)
-- Objects displaying emotions or expressions
-- Inanimate things with eyes, mouths, or human characteristics
-- "Kawaii" style objects or creatures
-- Smiling suns, talking trees, friendly clouds
-
-**Stylized Characters**
-- Cartoon-proportioned figures (oversized heads, tiny bodies)
-- Anime/manga style characters
-- Chibi or super-deformed characters
-- Doll-like or figurine aesthetic characters
-- Plush toy or stuffed animal aesthetic (unless photographing actual plush toys)
-- Vinyl toy or designer toy aesthetic
-- Clay/polymer sculpt appearance on living subjects
-
-**Impossible Visual Elements**
-- Colors that don't exist in nature (hot pink grass, cyan mammals, purple skin)
-- Candy-colored or neon fantasy environments
-- Glitter/sparkle effects embedded in skin, fur, or organic material
-- Floating elements defying gravity without explanation
-- Worlds made of candy, crystals, clouds, or impossible materials
-- Environments with impossible architecture or physics
-
-**Gate 1 Decision:**
-- If ANY disqualifier appears → FAIL Gate 1 → Skip to Gate 2
-- If subject could physically exist → PASS → Proceed to Gate 1B
+- Do NOT think about how it was actually made (digitally)
+- DO think about what it LOOKS LIKE it was made with
+- Ask: "What traditional materials would produce this visual effect?"
+- Ask: "What section of the art museum would this fit in?"
 
 ---
 
-### GATE 1B: Photography Verification
+## CLASSIFICATION CATEGORIES
 
-Only reach this gate if subjects could physically exist and be photographed.
-
-**Ask: "Does this image have the characteristics of camera capture?"**
-
-**Photographic Characteristics Checklist:**
-- Natural depth of field with realistic focus falloff
-- Lighting behaves as real light does (natural shadows, highlights, reflections)
-- Authentic real-world textures (skin pores, fabric weave, wood grain, metal reflections)
-- Camera-consistent perspective and lens characteristics
-- Colors within natural/photographic range
-- No visible brushstrokes, pencil marks, or drawn lines
-- No stylized rendering or illustration aesthetic
-
-**Supporting Evidence (strengthens photography classification):**
-- Film grain or digital sensor noise
-- Lens artifacts (flare, chromatic aberration, vignetting)
-- Motion blur consistent with camera capture
-- Bokeh in out-of-focus areas
-
-**Gate 1B Decision:**
-- ALL photographic characteristics present → Color check below
-- ANY non-photographic rendering → Go to Gate 2
-
-**Color Check (Photography Branch):**
-- Full color → AMD007 - Color Photography
-- Monochrome (B&W, sepia) → AMD008 - B&W Photography
-
----
-
-### GATE 2: Primary Tool Analysis
-
-Reach this gate when Gate 1 failed (impossible subjects) OR Gate 1B failed (non-photographic rendering).
-
-**Ask: "What PRIMARY physical tool or technique was used (or simulated) to create this artwork?"**
-
-| If you observe... | Go to... |
-|-------------------|----------|
-| Paint application, brushstrokes, painted surfaces | BRUSH BRANCH |
-| Drawn lines, pencil/pen/charcoal marks, dry media strokes | DRAWING BRANCH |
-| Printed texture, carved marks, etched lines, screenprint dots | PRINT BRANCH |
-| Cut edges, assembled pieces, layered materials | COLLAGE BRANCH |
-| Multiple distinct media clearly combined | MIXED BRANCH |
-
----
-
-## BRANCH DEFINITIONS
-
-### BRUSH BRANCH: Paint Media (AMD001-003)
+### PAINT MEDIA (Brush-based)
 
 **AMD001 - Bold Paint (Oil/Acrylic)**
-- Thick, textured paint surface with visible brushstrokes
-- Brush hair marks or palette knife edges visible
-- Canvas texture may show through
-- Impasto technique (paint standing up from surface)
-- Colors appear mixed on surface
-- Rich, saturated, opaque coverage
+Use when you'd grab: Oil paints, acrylics, canvas, palette knives
+Visual signatures:
+- Visible brushstroke texture (thick, confident marks)
+- Rich, saturated, opaque color
+- Paint appears to have BODY - you can almost feel the thickness
+- Impasto effects (paint standing up from surface)
+- Colors mixed on the canvas
+- Classic "painting" look from museums
 
 **AMD002 - Fluid Paint (Watercolor)**
-- Colors are transparent/translucent
+Use when you'd grab: Watercolors, watercolor paper, soft brushes
+Visual signatures:
+- Transparent, luminous colors
 - Soft, bleeding edges where colors meet
-- White paper visible, especially in highlights
-- Wet-on-wet blooms and "happy accidents"
-- Luminosity from paper beneath
-- Washes flow in water-like patterns
+- White of paper showing through (especially highlights)
+- Wet-on-wet blooms and organic flow
+- Delicate, ethereal quality
+- Washes that flow like water
 
 **AMD003 - Flat Paint (Gouache/Poster)**
-- Solid, uniform color areas without brush texture
-- Matte, chalky surface quality
-- Clean edges between color shapes
-- Opaque coverage (unlike watercolor transparency)
-- Graphic, illustrative quality
+Use when you'd grab: Gouache, poster paints, illustration board
+Visual signatures:
+- Solid, flat areas of color (no visible brushstrokes)
+- Matte, chalky, velvety surface quality
+- Clean, graphic edges between colors
 - Mid-century illustration aesthetic
+- Opaque but smooth (unlike textured oil paint)
+- Children's book or vintage poster look
 
 ---
 
-### DRAWING BRANCH: Drawing Media (AMD004-006)
+### DRAWING MEDIA (Dry, hand-held tools)
 
 **AMD004 - Sketch (Pencil/Graphite)**
-- Monochromatic gray tones only (no color)
-- Fine pencil lines visible
-- Shading through hatching or smooth blending
+Use when you'd grab: Pencils, graphite sticks, drawing paper
+Visual signatures:
+- Monochromatic grays only (no color)
+- Fine pencil lines and hatching visible
 - Soft, gradual value transitions
-- Graphite sheen in darker areas
-- Paper tooth/texture evident
+- Graphite sheen in dark areas
+- Paper texture showing through
+- Sketchbook or study aesthetic
 
 **AMD005 - Bold Line (Ink/Charcoal)**
+Use when you'd grab: India ink, charcoal sticks, brushes, nibs
+Visual signatures:
 - High contrast black and white
-- Bold, expressive strokes
-- Deep, rich blacks (darker than graphite)
-- Charcoal texture (dusty) or ink quality (fluid, sharp)
-- Dramatic, gestural energy
-- Strong marks with varying thickness
+- Bold, expressive, gestural strokes
+- Deep, velvety blacks (richer than pencil)
+- Dramatic, energetic marks
+- Varying line thickness with confidence
+- Woodcut or expressionist energy
 
 **AMD006 - Color Drawing (Pastel/Colored Pencil)**
-- Visible colored pencil strokes or pastel marks
-- Matte, chalky finish typical of dry media
-- Paper texture visible through medium
-- Color blending through layering (not wet mixing)
-- Soft, gentle color transitions
+Use when you'd grab: Pastels, colored pencils, toned paper
+Visual signatures:
+- Visible colored pencil strokes or chalky pastel marks
+- Matte, powdery finish
+- Paper texture visible through the medium
+- Colors blended by layering (not wet mixing)
+- Soft, gentle aesthetic
+- Portrait or landscape study feel
 
 ---
 
-### PRINT BRANCH: Printmaking (AMD009-011)
+### PHOTOGRAPHY
+
+**AMD007 - Color Photography**
+Use when you'd grab: A camera
+Visual signatures:
+- Photorealistic representation of REAL subjects
+- Natural depth of field and focus
+- Authentic textures (skin pores, fabric, surfaces)
+- Camera-consistent lighting and perspective
+- Full color, natural color range
+- CRITICAL: Subject must be something that could physically exist and be photographed
+
+**AMD008 - Black & White Photography**
+Same as above but monochromatic
+Visual signatures:
+- All the photographic qualities of AMD007
+- But in grayscale, sepia, or monochrome
+- Classic film photography aesthetic
+
+**⚠️ PHOTOGRAPHY EXCLUSIONS:**
+These can NEVER be photography, regardless of how realistic they look:
+- Fantasy creatures (dragons, unicorns, mythical beings)
+- Anthropomorphized objects (smiling food, objects with faces)
+- Stylized characters (anime, cartoon proportions, doll-like figures)
+- Impossible elements (pink grass, floating objects, candy worlds)
+- If the SUBJECT couldn't exist in reality, it's NOT photography
+
+---
+
+### PRINTMAKING
 
 **AMD009 - Bold Carved Print (Woodcut/Linocut)**
-- Visible gouge marks and carved lines
+Use when you'd grab: Woodblocks, linoleum, carving tools, ink, press
+Visual signatures:
 - Bold shapes, simplified forms
-- High contrast (typically black/white)
-- Wood grain texture may show
-- Hand-cut irregularities
-- Chunky lines from carving
+- Visible gouge marks and carved lines
+- High contrast (typically black and white)
+- Hand-cut irregularities give it warmth
+- Chunky, confident lines
+- Folk art or expressionist aesthetic
 
 **AMD010 - Fine Line Print (Etching/Engraving)**
+Use when you'd grab: Metal plates, etching needles, acid, press
+Visual signatures:
 - Very fine, precise lines
-- Systematic crosshatching for tone
+- Systematic crosshatching for tonal values
 - Mechanical precision in line spacing
-- Plate marks at edges
 - "Old master print" aesthetic
-- Intaglio ink quality
+- Currency or classical illustration look
+- Meticulous detail work
 
-**AMD011 - Poster Print (Screenprint)**
+**AMD011 - Poster Print (Screenprint/Silkscreen)**
+Use when you'd grab: Screens, squeegees, poster ink
+Visual signatures:
 - Solid, flat color areas in layers
-- Halftone dots or Ben-Day patterns visible
+- Halftone dots or Ben-Day patterns may be visible
 - Pop art or commercial poster aesthetic
+- Limited color palette (spot colors)
+- Warhol, Lichtenstein, concert poster energy
 - Slight registration shifts between colors
-- Limited color palette
-- Warhol/Lichtenstein style
 
 ---
 
-### COLLAGE BRANCH: Collage (AMD012-013)
+### COLLAGE
 
 **AMD012 - Paper Collage**
+Use when you'd grab: Scissors, glue, found papers, magazines
+Visual signatures:
 - Visible cut or torn paper edges
-- Clear layering of paper elements
+- Layered paper elements
 - Mixed paper types and textures
-- Found materials (newspaper, magazine, decorative paper)
-- Hand-cut irregularities
-- Matisse-style cut paper shapes
+- Hand-assembled aesthetic
+- Matisse cut-outs or mixed-media artist vibe
 
 **AMD013 - Photo Collage**
+Use when you'd grab: Printed photographs, scissors, glue
+Visual signatures:
 - Multiple photographic images combined
-- Individual elements have photographic quality AND depict real subjects
-- Montage or composite approach evident
-- Surreal or impossible scenes created FROM real photo elements
-- Dadaist or surrealist photo montage style
+- Montage or composite approach
+- Surreal scenes made FROM real photo elements
+- Dadaist or album cover aesthetic
 
 ---
 
-### MIXED BRANCH: Mixed Layers (AMD014)
+### MIXED MEDIA
 
-**Use AMD014 ONLY when:**
-1. Two or more clearly DISTINCT media/techniques are visible
-2. No single medium dominates (>70% of the image)
-3. The mixing itself is the defining characteristic
-4. Classifying as any single medium would be inaccurate
+**AMD014 - Mixed Layers**
+Use when you'd grab: Multiple materials from different aisles
+Use ONLY when:
+- Two or more clearly DISTINCT traditional media are combined
+- No single medium dominates (each is >30% of the image)
+- The mixing itself is the defining characteristic
+- Examples: Photo with painted elements, drawing over collage
 
-**DO NOT use AMD014 as:**
-- A catch-all for "uncertain"
-- An escape when classification is difficult
-- A default when you can't decide
+**DO NOT use as a catch-all for "I'm not sure"**
 
 ---
 
-## ANTI-HALLUCINATION RULES
+## DECISION PROCESS
 
-**DO:**
-- Base classifications ONLY on visible evidence
-- State "I observe..." when describing evidence
-- Acknowledge uncertainty when present
+1. **First Impression**: What art supply store aisle does this remind you of?
 
-**DO NOT:**
-- Invent details not visible in the image
-- Assume techniques based on subject matter alone
-- Guess based on what "usually" happens
-- Fill in gaps with assumptions
+2. **Reality Check (for Photography only)**: Could this subject physically exist?
+   - If NO → It's not photography, even if photorealistic
+   - If YES → Continue evaluating photographic qualities
+
+3. **Material Identification**: What marks, textures, or surface qualities do you see?
+   - Brushstrokes → Paint media
+   - Pencil/chalk marks → Drawing media
+   - Carved/printed marks → Printmaking
+   - Cut edges, layers → Collage
+   - Camera capture qualities → Photography
+
+4. **Refine Within Category**: Match to specific medium based on detailed characteristics
 
 ---
 
 ## OUTPUT FORMAT
 
-Analyze the image and return ONLY this JSON structure:
+Return ONLY this JSON:
 
 \`\`\`json
 {
-  "gate1_passed": true/false,
-  "gate1_fail_reason": "reason if failed, null if passed",
-  "gate1b_passed": true/false/null,
   "art_medium_id": "AMD___",
   "art_medium_name": "Category Name",
   "confidence": 0.00,
-  "reasoning": "2-3 sentence explanation of classification path taken",
-  "visual_evidence": ["evidence 1", "evidence 2", "evidence 3"],
-  "ruled_out": [
-    {"category": "AMD___ - Name", "reason": "Why not this"}
-  ]
+  "traditional_equivalent": "What you'd buy at the art store",
+  "reasoning": "2-3 sentences explaining why this looks like [medium]",
+  "visual_evidence": ["evidence 1", "evidence 2", "evidence 3"]
 }
 \`\`\`
 
 **Confidence Scale:**
-- 0.95-1.00: Textbook example, absolutely certain
-- 0.85-0.94: Very confident, clear indicators
-- 0.70-0.84: Confident, most indicators present
-- 0.50-0.69: Uncertain, mixed signals
-- Below 0.50: Cannot reliably classify
+- 0.90-1.00: Classic example of this medium's look
+- 0.75-0.89: Strong match with clear indicators
+- 0.60-0.74: Good match, some ambiguity
+- Below 0.60: Uncertain, mixed signals
 
-**CRITICAL REMINDER:** 
-The #1 classification error is calling digital art "Photography." If the subject includes ANY fantasy elements, anthropomorphized objects, stylized characters, or impossible visual elements — it is NOT photography, regardless of how realistic the rendering looks. Fail Gate 1 and classify by the rendering technique it mimics.
+---
 
-Now analyze the provided image and return ONLY the JSON response.`;
+## EXAMPLES OF CORRECT THINKING
+
+**Anime character with soft shading:**
+- Looks like: Marker illustration or gouache
+- NOT: Photography (even if detailed) - subject is stylized
+- Classification: AMD003 (Flat Paint) or AMD006 (Color Drawing)
+
+**Hyperrealistic dragon:**
+- Looks like: Oil painting or digital (but we don't say digital)
+- NOT: Photography - dragons don't exist
+- Classification: AMD001 (Bold Paint) - it emulates realistic painting technique
+
+**Portrait of real person with brushstroke texture:**
+- Looks like: Oil painting
+- Classification: AMD001 (Bold Paint)
+
+**Portrait of real person, photorealistic, no visible brush marks:**
+- Subject could exist: YES
+- Looks like: Camera captured it
+- Classification: AMD007 (Color Photography)
+
+**Whimsical town with flat colors and clean edges:**
+- Looks like: Gouache illustration or screen print
+- Classification: AMD003 (Flat Paint) or AMD011 (Poster Print)
+
+---
+
+Now analyze the provided image. Think: "What traditional art materials would create this exact look?"
+
+Return ONLY the JSON response.`;
 
 exports.handler = async (event, context) => {
   // CORS headers
@@ -356,7 +346,7 @@ exports.handler = async (event, context) => {
     // Call Claude API with vision
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 1500,
+      max_tokens: 1000,
       messages: [
         {
           role: 'user',
@@ -420,7 +410,6 @@ exports.handler = async (event, context) => {
     }
 
     console.log(`[evaluate-style] Classification: ${evaluation.art_medium_id} (${evaluation.confidence})`);
-    console.log(`[evaluate-style] Gate 1 passed: ${evaluation.gate1_passed}, Gate 1B passed: ${evaluation.gate1b_passed}`);
 
     return {
       statusCode: 200,
