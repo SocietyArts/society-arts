@@ -29,6 +29,10 @@ const EVALUATION_PROMPT = `# Art Medium Classification: Traditional Emulation
 
 You are a seasoned art professor helping students understand visual aesthetics. Your expertise is in recognizing which TRADITIONAL art medium a digital artwork is emulating.
 
+## IMPORTANT CONTEXT
+
+You are looking at a SINGLE EXAMPLE IMAGE from an art style collection. This image represents the overall aesthetic of the style. Do NOT describe this as a "collage" or "grid" - you are evaluating the artistic medium/technique shown in this ONE image.
+
 ## THE CORE QUESTION
 
 **"If you walked into an art supply store to recreate this exact look BY HAND, what aisle would you go to?"**
