@@ -460,6 +460,7 @@ exports.handler = async (event, context) => {
       body: JSON.stringify({
         success: true,
         style_id,
+        images_analyzed: imageContents.length,
         evaluation
       })
     };
