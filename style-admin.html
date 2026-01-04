@@ -1577,10 +1577,10 @@
     
     .ai-suggestion-panel {
       margin-top: var(--space-lg);
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%);
-      border: 1px solid rgba(99, 102, 241, 0.2);
+      background: var(--color-white);
+      border: 1px solid rgba(99, 102, 241, 0.3);
       border-radius: var(--radius-lg);
-      padding: var(--space-md);
+      overflow: hidden;
       animation: fadeIn 0.3s ease;
     }
     
@@ -1592,63 +1592,128 @@
     .ai-suggestion-header {
       display: flex;
       align-items: center;
+      justify-content: space-between;
+      gap: var(--space-sm);
+      padding: var(--space-md) var(--space-lg);
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+      border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+    }
+    
+    .ai-suggestion-header-left {
+      display: flex;
+      align-items: center;
       gap: var(--space-sm);
       font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       color: #6366f1;
-      margin-bottom: var(--space-md);
     }
     
-    .ai-suggestion-content {
-      margin-bottom: var(--space-md);
+    .ai-suggestion-header-right {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    
+    .ai-images-badge {
+      font-size: 10px;
+      padding: 2px 8px;
+      background: rgba(99, 102, 241, 0.15);
+      border-radius: var(--radius-sm);
+      color: #6366f1;
+    }
+    
+    .ai-suggestion-body {
+      padding: var(--space-lg);
+    }
+    
+    .ai-suggestion-primary {
+      text-align: center;
+      padding-bottom: var(--space-lg);
+      border-bottom: 1px solid var(--color-tan-10);
+      margin-bottom: var(--space-lg);
     }
     
     .ai-suggestion-category {
       font-family: var(--font-serif);
-      font-size: 15px;
+      font-size: 18px;
       font-weight: 600;
       color: var(--color-brown);
-      margin-bottom: var(--space-sm);
+      margin-bottom: var(--space-xs);
     }
     
-    .ai-suggestion-confidence {
-      display: flex;
-      align-items: center;
-      gap: var(--space-sm);
+    .ai-suggestion-equivalent {
       font-size: 12px;
       color: var(--color-brown-60);
-      margin-bottom: var(--space-sm);
+      font-style: italic;
     }
     
-    .confidence-value {
-      font-weight: 700;
-      padding: 2px 8px;
-      border-radius: var(--radius-sm);
+    .ai-confidence-bar {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      margin-top: var(--space-md);
+    }
+    
+    .confidence-track {
+      flex: 1;
+      height: 6px;
       background: var(--color-tan-10);
+      border-radius: 3px;
+      overflow: hidden;
     }
     
-    .confidence-value.high {
-      background: rgba(74, 157, 110, 0.15);
-      color: var(--color-success);
+    .confidence-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.5s ease;
     }
     
-    .confidence-value.medium {
-      background: rgba(212, 168, 75, 0.15);
-      color: var(--color-warning);
+    .confidence-fill.high {
+      background: linear-gradient(90deg, #4A9D6E 0%, #6BCF8E 100%);
     }
     
-    .confidence-value.low {
-      background: rgba(199, 51, 20, 0.15);
-      color: var(--color-error);
+    .confidence-fill.medium {
+      background: linear-gradient(90deg, #D4A84B 0%, #E8C76B 100%);
+    }
+    
+    .confidence-fill.low {
+      background: linear-gradient(90deg, #C73314 0%, #E85D45 100%);
+    }
+    
+    .confidence-label {
+      font-size: 13px;
+      font-weight: 700;
+      min-width: 45px;
+      text-align: right;
+    }
+    
+    .confidence-label.high { color: var(--color-success); }
+    .confidence-label.medium { color: var(--color-warning); }
+    .confidence-label.low { color: var(--color-error); }
+    
+    .ai-suggestion-section {
+      margin-bottom: var(--space-lg);
+    }
+    
+    .ai-suggestion-section:last-child {
+      margin-bottom: 0;
+    }
+    
+    .ai-suggestion-section-title {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--color-brown-40);
+      margin-bottom: var(--space-sm);
     }
     
     .ai-suggestion-reasoning {
-      font-size: 12px;
-      color: var(--color-brown-60);
-      line-height: 1.5;
-      margin-bottom: var(--space-sm);
+      font-size: 13px;
+      color: var(--color-brown);
+      line-height: 1.6;
     }
     
     .ai-suggestion-evidence {
@@ -1658,27 +1723,148 @@
     }
     
     .evidence-tag {
-      font-size: 10px;
-      padding: 2px 8px;
+      font-size: 11px;
+      padding: 4px 10px;
       background: var(--color-tan-10);
       border-radius: var(--radius-sm);
       color: var(--color-brown-60);
+      border: 1px solid var(--color-tan-20);
     }
     
     .ai-suggestion-actions {
       display: flex;
       gap: var(--space-sm);
+      padding: var(--space-md) var(--space-lg);
+      background: var(--color-tan-10);
+      border-top: 1px solid var(--color-tan-20);
+    }
+    
+    .ai-suggestion-actions .btn {
+      flex: 1;
     }
     
     .btn-accept {
       background: var(--color-success);
       color: white;
       border: none;
-      flex: 1;
     }
     
     .btn-accept:hover {
       background: #3d8a5e;
+    }
+    
+    /* AI Suggestions Grid */
+    .ai-confidence-section {
+      margin-bottom: var(--space-lg);
+    }
+    
+    .ai-suggestions-grid {
+      margin-bottom: var(--space-lg);
+    }
+    
+    .ai-field-row {
+      display: grid;
+      grid-template-columns: 100px 1fr 30px 1fr 40px;
+      gap: var(--space-sm);
+      align-items: center;
+      padding: var(--space-sm) 0;
+      border-bottom: 1px solid var(--color-tan-10);
+    }
+    
+    .ai-field-row:last-of-type {
+      border-bottom: none;
+    }
+    
+    .ai-field-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-brown-60);
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    
+    .ai-field-current {
+      font-size: 12px;
+      color: var(--color-brown-40);
+      padding: 4px 8px;
+      background: var(--color-tan-10);
+      border-radius: var(--radius-sm);
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .ai-field-current.empty {
+      font-style: italic;
+      color: var(--color-brown-20);
+    }
+    
+    .ai-field-arrow {
+      text-align: center;
+      color: var(--color-brown-20);
+      font-size: 14px;
+    }
+    
+    .ai-field-suggested {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--color-brown);
+      padding: 4px 8px;
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: var(--radius-sm);
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .ai-field-suggested.not-evaluated {
+      background: var(--color-tan-10);
+      border-color: var(--color-tan-20);
+      color: var(--color-brown-40);
+      font-weight: 400;
+      font-style: italic;
+    }
+    
+    .ai-field-suggested.no-change {
+      background: rgba(74, 157, 110, 0.1);
+      border-color: rgba(74, 157, 110, 0.3);
+      color: var(--color-success);
+    }
+    
+    .ai-field-action {
+      text-align: center;
+    }
+    
+    .btn-field-accept {
+      width: 28px;
+      height: 28px;
+      border: 1px solid var(--color-tan-20);
+      background: var(--color-white);
+      border-radius: var(--radius-sm);
+      color: var(--color-brown-40);
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.15s ease;
+    }
+    
+    .btn-field-accept:hover {
+      background: var(--color-success);
+      border-color: var(--color-success);
+      color: white;
+    }
+    
+    .btn-field-accept:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+    
+    .btn-field-accept.accepted {
+      background: var(--color-success);
+      border-color: var(--color-success);
+      color: white;
     }
     
     .ai-loading {
@@ -2142,28 +2328,131 @@
             <!-- AI Suggestion Panel (hidden by default) -->
             <div class="ai-suggestion-panel" id="aiSuggestionPanel" style="display: none;">
               <div class="ai-suggestion-header">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-                </svg>
-                AI Suggestion
-              </div>
-              <div class="ai-suggestion-content">
-                <div class="ai-suggestion-category" id="aiSuggestedCategory">--</div>
-                <div class="ai-suggestion-confidence">
-                  <span>Confidence:</span>
-                  <span class="confidence-value" id="aiConfidence">--</span>
+                <div class="ai-suggestion-header-left">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                  </svg>
+                  AI Evaluation Results
                 </div>
-                <div class="ai-suggestion-reasoning" id="aiReasoning">--</div>
-                <div class="ai-suggestion-evidence" id="aiEvidence"></div>
+                <div class="ai-suggestion-header-right">
+                  <span class="ai-images-badge" id="aiImageCount">4 images analyzed</span>
+                </div>
               </div>
+              
+              <div class="ai-suggestion-body">
+                <!-- Confidence Bar -->
+                <div class="ai-confidence-section">
+                  <div class="ai-confidence-bar">
+                    <div class="confidence-track">
+                      <div class="confidence-fill" id="aiConfidenceFill" style="width: 0%"></div>
+                    </div>
+                    <span class="confidence-label" id="aiConfidenceLabel">--%</span>
+                  </div>
+                </div>
+                
+                <!-- Suggested Classifications Grid -->
+                <div class="ai-suggestions-grid">
+                  <div class="ai-suggestion-section-title">Suggested Classifications</div>
+                  
+                  <!-- Art Medium Row -->
+                  <div class="ai-field-row">
+                    <div class="ai-field-label">Art Medium</div>
+                    <div class="ai-field-current" id="aiCurrentMedium">--</div>
+                    <div class="ai-field-arrow">→</div>
+                    <div class="ai-field-suggested" id="aiSuggestedMedium">--</div>
+                    <div class="ai-field-action">
+                      <button type="button" class="btn-field-accept" data-field="artMedium" title="Accept">✓</button>
+                    </div>
+                  </div>
+                  
+                  <!-- Art Type Row -->
+                  <div class="ai-field-row">
+                    <div class="ai-field-label">Art Type</div>
+                    <div class="ai-field-current" id="aiCurrentArtType">--</div>
+                    <div class="ai-field-arrow">→</div>
+                    <div class="ai-field-suggested" id="aiSuggestedArtType">--</div>
+                    <div class="ai-field-action">
+                      <button type="button" class="btn-field-accept" data-field="artType" title="Accept">✓</button>
+                    </div>
+                  </div>
+                  
+                  <!-- Medium (Specific) Row -->
+                  <div class="ai-field-row">
+                    <div class="ai-field-label">Medium</div>
+                    <div class="ai-field-current" id="aiCurrentSpecificMedium">--</div>
+                    <div class="ai-field-arrow">→</div>
+                    <div class="ai-field-suggested" id="aiSuggestedSpecificMedium">--</div>
+                    <div class="ai-field-action">
+                      <button type="button" class="btn-field-accept" data-field="specificMedium" title="Accept">✓</button>
+                    </div>
+                  </div>
+                  
+                  <!-- Palette Row -->
+                  <div class="ai-field-row">
+                    <div class="ai-field-label">Palette</div>
+                    <div class="ai-field-current" id="aiCurrentPalette">--</div>
+                    <div class="ai-field-arrow">→</div>
+                    <div class="ai-field-suggested" id="aiSuggestedPalette">--</div>
+                    <div class="ai-field-action">
+                      <button type="button" class="btn-field-accept" data-field="palette" title="Accept">✓</button>
+                    </div>
+                  </div>
+                  
+                  <!-- Lighting Row -->
+                  <div class="ai-field-row">
+                    <div class="ai-field-label">Lighting</div>
+                    <div class="ai-field-current" id="aiCurrentLighting">--</div>
+                    <div class="ai-field-arrow">→</div>
+                    <div class="ai-field-suggested" id="aiSuggestedLighting">--</div>
+                    <div class="ai-field-action">
+                      <button type="button" class="btn-field-accept" data-field="lighting" title="Accept">✓</button>
+                    </div>
+                  </div>
+                  
+                  <!-- Composition Row -->
+                  <div class="ai-field-row">
+                    <div class="ai-field-label">Composition</div>
+                    <div class="ai-field-current" id="aiCurrentComposition">--</div>
+                    <div class="ai-field-arrow">→</div>
+                    <div class="ai-field-suggested" id="aiSuggestedComposition">--</div>
+                    <div class="ai-field-action">
+                      <button type="button" class="btn-field-accept" data-field="composition" title="Accept">✓</button>
+                    </div>
+                  </div>
+                  
+                  <!-- Era Row -->
+                  <div class="ai-field-row">
+                    <div class="ai-field-label">Era</div>
+                    <div class="ai-field-current" id="aiCurrentEra">--</div>
+                    <div class="ai-field-arrow">→</div>
+                    <div class="ai-field-suggested" id="aiSuggestedEra">--</div>
+                    <div class="ai-field-action">
+                      <button type="button" class="btn-field-accept" data-field="era" title="Accept">✓</button>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Technical Reasoning Section -->
+                <div class="ai-suggestion-section">
+                  <div class="ai-suggestion-section-title">Technical Analysis</div>
+                  <div class="ai-suggestion-reasoning" id="aiReasoning">--</div>
+                </div>
+                
+                <!-- Visual Evidence Tags -->
+                <div class="ai-suggestion-section">
+                  <div class="ai-suggestion-section-title">Visual Evidence</div>
+                  <div class="ai-suggestion-evidence" id="aiEvidence"></div>
+                </div>
+              </div>
+              
               <div class="ai-suggestion-actions">
-                <button type="button" class="btn btn-sm btn-accept" id="btnAcceptSuggestion">
+                <button type="button" class="btn btn-sm btn-accept" id="btnAcceptAllSuggestions">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
                     <polyline points="20 6 9 17 4 12"></polyline>
                   </svg>
-                  Accept
+                  Accept All
                 </button>
-                <button type="button" class="btn btn-sm btn-secondary" id="btnIgnoreSuggestion">Ignore</button>
+                <button type="button" class="btn btn-sm btn-secondary" id="btnIgnoreSuggestion">Dismiss</button>
               </div>
             </div>
             
@@ -3717,11 +4006,9 @@
     const aiLoading = document.getElementById('aiLoading');
     const aiError = document.getElementById('aiError');
     const aiErrorMessage = document.getElementById('aiErrorMessage');
-    const aiSuggestedCategory = document.getElementById('aiSuggestedCategory');
-    const aiConfidence = document.getElementById('aiConfidence');
     const aiReasoning = document.getElementById('aiReasoning');
     const aiEvidence = document.getElementById('aiEvidence');
-    const btnAcceptSuggestion = document.getElementById('btnAcceptSuggestion');
+    const btnAcceptAllSuggestions = document.getElementById('btnAcceptAllSuggestions');
     const btnIgnoreSuggestion = document.getElementById('btnIgnoreSuggestion');
     const btnRetryAi = document.getElementById('btnRetryAi');
     
@@ -3737,26 +4024,120 @@
       await evaluateStyle(editingStyleId);
     });
     
-    // Accept suggestion
-    btnAcceptSuggestion.addEventListener('click', () => {
+    // Accept All suggestions
+    btnAcceptAllSuggestions.addEventListener('click', () => {
       if (!lastAiSuggestion) return;
       
-      // Update the Art Medium dropdown
-      const editArtMedium = document.getElementById('editArtMedium');
-      editArtMedium.value = lastAiSuggestion.art_medium_id;
+      // Accept Art Medium
+      if (lastAiSuggestion.art_medium_id) {
+        const editArtMedium = document.getElementById('editArtMedium');
+        editArtMedium.value = lastAiSuggestion.art_medium_id;
+        highlightField(editArtMedium);
+      }
       
-      // Highlight the field briefly
-      editArtMedium.style.transition = 'background-color 0.3s ease';
-      editArtMedium.style.backgroundColor = 'rgba(74, 157, 110, 0.2)';
-      setTimeout(() => {
-        editArtMedium.style.backgroundColor = '';
-      }, 1000);
+      // Accept Art Type (if suggested)
+      if (lastAiSuggestion.art_type_id) {
+        const editArtType = document.getElementById('editArtType');
+        editArtType.value = lastAiSuggestion.art_type_id;
+        highlightField(editArtType);
+      }
+      
+      // Accept Medium/Specific (if suggested)
+      if (lastAiSuggestion.medium_id) {
+        const editMedium = document.getElementById('editMedium');
+        editMedium.value = lastAiSuggestion.medium_id;
+        highlightField(editMedium);
+      }
+      
+      // Accept Palette (if suggested)
+      if (lastAiSuggestion.palette_id) {
+        const editPalette = document.getElementById('editPalette');
+        editPalette.value = lastAiSuggestion.palette_id;
+        highlightField(editPalette);
+      }
+      
+      // Accept Lighting (if suggested)
+      if (lastAiSuggestion.lighting_id) {
+        const editLighting = document.getElementById('editLighting');
+        editLighting.value = lastAiSuggestion.lighting_id;
+        highlightField(editLighting);
+      }
+      
+      // Accept Composition (if suggested)
+      if (lastAiSuggestion.composition_id) {
+        const editComposition = document.getElementById('editComposition');
+        editComposition.value = lastAiSuggestion.composition_id;
+        highlightField(editComposition);
+      }
+      
+      // Accept Era (if suggested)
+      if (lastAiSuggestion.era_id) {
+        const editEra = document.getElementById('editEra');
+        editEra.value = lastAiSuggestion.era_id;
+        highlightField(editEra);
+      }
       
       // Hide the suggestion panel
       aiSuggestionPanel.style.display = 'none';
       
-      showToast('AI suggestion accepted. Click "Save Changes" to apply.', 'success');
+      showToast('AI suggestions accepted. Click "Save Changes" to apply.', 'success');
     });
+    
+    // Individual field accept buttons
+    document.querySelectorAll('.btn-field-accept').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (!lastAiSuggestion) return;
+        
+        const field = btn.dataset.field;
+        let editElement, suggestionKey;
+        
+        switch (field) {
+          case 'artMedium':
+            editElement = document.getElementById('editArtMedium');
+            suggestionKey = 'art_medium_id';
+            break;
+          case 'artType':
+            editElement = document.getElementById('editArtType');
+            suggestionKey = 'art_type_id';
+            break;
+          case 'specificMedium':
+            editElement = document.getElementById('editMedium');
+            suggestionKey = 'medium_id';
+            break;
+          case 'palette':
+            editElement = document.getElementById('editPalette');
+            suggestionKey = 'palette_id';
+            break;
+          case 'lighting':
+            editElement = document.getElementById('editLighting');
+            suggestionKey = 'lighting_id';
+            break;
+          case 'composition':
+            editElement = document.getElementById('editComposition');
+            suggestionKey = 'composition_id';
+            break;
+          case 'era':
+            editElement = document.getElementById('editEra');
+            suggestionKey = 'era_id';
+            break;
+        }
+        
+        if (editElement && lastAiSuggestion[suggestionKey]) {
+          editElement.value = lastAiSuggestion[suggestionKey];
+          highlightField(editElement);
+          btn.classList.add('accepted');
+          showToast(`${field} updated`, 'success');
+        }
+      });
+    });
+    
+    function highlightField(element) {
+      element.style.transition = 'background-color 0.3s ease';
+      element.style.backgroundColor = 'rgba(74, 157, 110, 0.2)';
+      setTimeout(() => {
+        element.style.backgroundColor = '';
+      }, 1000);
+    }
     
     // Ignore suggestion
     btnIgnoreSuggestion.addEventListener('click', () => {
@@ -3797,12 +4178,13 @@
         }
         
         console.log('[AI] Evaluation result:', data.evaluation);
+        console.log('[AI] Images analyzed:', data.images_analyzed || 4);
         
         // Store the suggestion
         lastAiSuggestion = data.evaluation;
         
         // Update UI with suggestion
-        displayAiSuggestion(data.evaluation);
+        displayAiSuggestion(data.evaluation, data.images_analyzed || 4);
         
       } catch (error) {
         console.error('[AI] Evaluation error:', error);
@@ -3814,23 +4196,103 @@
       }
     }
     
-    function displayAiSuggestion(evaluation) {
+    function displayAiSuggestion(evaluation, imagesAnalyzed) {
       aiLoading.style.display = 'none';
       
-      // Category name
-      aiSuggestedCategory.textContent = `${evaluation.art_medium_id} - ${evaluation.art_medium_name}`;
+      // Reset all field accept buttons
+      document.querySelectorAll('.btn-field-accept').forEach(btn => {
+        btn.classList.remove('accepted');
+        btn.disabled = false;
+      });
       
-      // Confidence with color coding
-      const confidencePercent = Math.round(evaluation.confidence * 100);
-      aiConfidence.textContent = `${confidencePercent}%`;
-      aiConfidence.className = 'confidence-value';
-      if (evaluation.confidence >= 0.85) {
-        aiConfidence.classList.add('high');
-      } else if (evaluation.confidence >= 0.70) {
-        aiConfidence.classList.add('medium');
-      } else {
-        aiConfidence.classList.add('low');
+      // Image count badge
+      const imageCountBadge = document.getElementById('aiImageCount');
+      if (imageCountBadge) {
+        imageCountBadge.textContent = `${imagesAnalyzed} images analyzed`;
       }
+      
+      // Confidence bar
+      const confidencePercent = Math.round(evaluation.confidence * 100);
+      const confidenceFill = document.getElementById('aiConfidenceFill');
+      const confidenceLabel = document.getElementById('aiConfidenceLabel');
+      
+      confidenceFill.style.width = `${confidencePercent}%`;
+      confidenceFill.className = 'confidence-fill';
+      confidenceLabel.textContent = `${confidencePercent}%`;
+      confidenceLabel.className = 'confidence-label';
+      
+      if (evaluation.confidence >= 0.85) {
+        confidenceFill.classList.add('high');
+        confidenceLabel.classList.add('high');
+      } else if (evaluation.confidence >= 0.70) {
+        confidenceFill.classList.add('medium');
+        confidenceLabel.classList.add('medium');
+      } else {
+        confidenceFill.classList.add('low');
+        confidenceLabel.classList.add('low');
+      }
+      
+      // Get current form values for comparison
+      const currentValues = {
+        artMedium: document.getElementById('editArtMedium').value,
+        artType: document.getElementById('editArtType').value,
+        specificMedium: document.getElementById('editMedium').value,
+        palette: document.getElementById('editPalette').value,
+        lighting: document.getElementById('editLighting').value,
+        composition: document.getElementById('editComposition').value,
+        era: document.getElementById('editEra').value
+      };
+      
+      // Helper to get display name from dropdown
+      function getOptionText(selectId, value) {
+        const select = document.getElementById(selectId);
+        const option = select.querySelector(`option[value="${value}"]`);
+        return option ? option.textContent : '(not set)';
+      }
+      
+      // Update Art Medium row
+      updateFieldRow('aiCurrentMedium', 'aiSuggestedMedium', 
+        currentValues.artMedium, 
+        evaluation.art_medium_id,
+        'editArtMedium',
+        document.querySelector('.btn-field-accept[data-field="artMedium"]')
+      );
+      
+      // Update Art Type row - not yet evaluated
+      updateFieldRowNotEvaluated('aiCurrentArtType', 'aiSuggestedArtType',
+        currentValues.artType, 'editArtType',
+        document.querySelector('.btn-field-accept[data-field="artType"]')
+      );
+      
+      // Update Medium (Specific) row - not yet evaluated
+      updateFieldRowNotEvaluated('aiCurrentSpecificMedium', 'aiSuggestedSpecificMedium',
+        currentValues.specificMedium, 'editMedium',
+        document.querySelector('.btn-field-accept[data-field="specificMedium"]')
+      );
+      
+      // Update Palette row - not yet evaluated
+      updateFieldRowNotEvaluated('aiCurrentPalette', 'aiSuggestedPalette',
+        currentValues.palette, 'editPalette',
+        document.querySelector('.btn-field-accept[data-field="palette"]')
+      );
+      
+      // Update Lighting row - not yet evaluated
+      updateFieldRowNotEvaluated('aiCurrentLighting', 'aiSuggestedLighting',
+        currentValues.lighting, 'editLighting',
+        document.querySelector('.btn-field-accept[data-field="lighting"]')
+      );
+      
+      // Update Composition row - not yet evaluated
+      updateFieldRowNotEvaluated('aiCurrentComposition', 'aiSuggestedComposition',
+        currentValues.composition, 'editComposition',
+        document.querySelector('.btn-field-accept[data-field="composition"]')
+      );
+      
+      // Update Era row - not yet evaluated
+      updateFieldRowNotEvaluated('aiCurrentEra', 'aiSuggestedEra',
+        currentValues.era, 'editEra',
+        document.querySelector('.btn-field-accept[data-field="era"]')
+      );
       
       // Reasoning
       aiReasoning.textContent = evaluation.reasoning || '';
@@ -3850,10 +4312,68 @@
       aiSuggestionPanel.style.display = 'block';
       
       // Check if suggestion differs from current
-      const currentArtMedium = document.getElementById('editArtMedium').value;
-      if (currentArtMedium === evaluation.art_medium_id) {
-        showToast('AI agrees with current classification', 'success');
+      if (currentValues.artMedium === evaluation.art_medium_id) {
+        showToast('AI agrees with current Art Medium classification', 'success');
       }
+    }
+    
+    function updateFieldRow(currentId, suggestedId, currentValue, suggestedValue, selectId, acceptBtn) {
+      const currentEl = document.getElementById(currentId);
+      const suggestedEl = document.getElementById(suggestedId);
+      
+      // Current value display
+      if (currentValue) {
+        const select = document.getElementById(selectId);
+        const option = select.querySelector(`option[value="${currentValue}"]`);
+        currentEl.textContent = option ? option.textContent : currentValue;
+        currentEl.classList.remove('empty');
+      } else {
+        currentEl.textContent = '(not set)';
+        currentEl.classList.add('empty');
+      }
+      
+      // Suggested value display
+      if (suggestedValue) {
+        const select = document.getElementById(selectId);
+        const option = select.querySelector(`option[value="${suggestedValue}"]`);
+        suggestedEl.textContent = option ? option.textContent : suggestedValue;
+        suggestedEl.classList.remove('not-evaluated', 'no-change');
+        
+        // Check if same as current
+        if (currentValue === suggestedValue) {
+          suggestedEl.classList.add('no-change');
+          suggestedEl.textContent = '✓ No change';
+          if (acceptBtn) acceptBtn.disabled = true;
+        } else {
+          if (acceptBtn) acceptBtn.disabled = false;
+        }
+      } else {
+        suggestedEl.textContent = 'Not evaluated';
+        suggestedEl.classList.add('not-evaluated');
+        if (acceptBtn) acceptBtn.disabled = true;
+      }
+    }
+    
+    function updateFieldRowNotEvaluated(currentId, suggestedId, currentValue, selectId, acceptBtn) {
+      const currentEl = document.getElementById(currentId);
+      const suggestedEl = document.getElementById(suggestedId);
+      
+      // Current value display
+      if (currentValue) {
+        const select = document.getElementById(selectId);
+        const option = select.querySelector(`option[value="${currentValue}"]`);
+        currentEl.textContent = option ? option.textContent : currentValue;
+        currentEl.classList.remove('empty');
+      } else {
+        currentEl.textContent = '(not set)';
+        currentEl.classList.add('empty');
+      }
+      
+      // Not yet evaluated
+      suggestedEl.textContent = 'Not evaluated';
+      suggestedEl.classList.add('not-evaluated');
+      suggestedEl.classList.remove('no-change');
+      if (acceptBtn) acceptBtn.disabled = true;
     }
     
     // ========================================
